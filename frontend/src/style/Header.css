@@ -1,0 +1,67 @@
+/* Header styles */
+.header {
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;  /* Center the user greeting */
+  padding: 0 15px;
+  z-index: 1000;
+  position: fixed;   /* Fix the header to the top of the page */
+  top: 0;            /* Fix it to the top */
+  right:0px     ;     /* Position it on the right side of the page */
+ width: 100%;
+   background-color: #212529;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Adds shadow for visibility */
+  overflow-y: visible;
+  transition: width 0.3s ease;  /* Smooth transition when sidebar toggles */
+}
+
+/* Navbar Brand */
+.navbar-brand {
+  font-weight: bold;
+  font-size: 18px;
+  position: absolute;  /* Take out of flex flow */
+  top: 50%;
+  transform: translateY(-50%);
+  right: 240px;  /* Default to expanded sidebar width */
+  transition: right 0.3s ease;
+}
+
+.wel {
+  color: white;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 auto; /* Centers the "مرحبا, {user}" div */
+}
+
+.wel span {
+  font-weight: 700;
+  color: #ffcc70;
+}
+
+/* Navbar Nav (Logout link positioning) */
+.navbar-nav {
+  position: absolute;  /* Position logout link to the right side */
+  left: 15px;  /* Align the "تسجيل خروج" to the right */
+}
+
+.nav-link {
+  color: white !important;
+  cursor: pointer;
+  font-weight: 600;
+  transition: color 0.3s;
+}
+
+.nav-link:hover {
+  color: #ffcc70 !important;
+}
+
+/* Container for responsive layout */
+.container-fluid {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}

@@ -1,0 +1,85 @@
+/* General reset */
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+/* Page Layout */
+html, body, #root {
+  margin: 0;
+    font-family: 'Poppins', sans-serif;
+  padding: 0;
+  height: 100%;
+  overflow-x: hidden;  /* Prevent page-wide horizontal scroll */
+  overflow-y: auto;    /* Allow vertical scroll if needed */
+  direction: rtl;      /* Right-to-left layout */
+  text-align: right;   /* Align text to the right */
+}
+
+body {
+  min-height: 100vh; /* Ensure at least full viewport height */
+}
+
+/* Sidebar widths */
+:root {
+  --sidebar-width: 240px;
+  --sidebar-collapsed-width: 60px;
+}
+
+/* Main Layout */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Main content container */
+.main-content {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;  /* Center content horizontally */
+  align-items: center;      /* Center content vertically */
+  padding: 20px;
+  box-sizing: border-box;
+  transition: margin-right 0.3s ease; /* Smooth transition for content margin */
+}
+
+/* Adjust content position based on sidebar state */
+.app-container.expanded .main-content {
+  margin-right: 240px; /* Adjust for expanded sidebar */
+}
+
+.app-container.collapsed .main-content {
+  margin-right: 60px;  /* Adjust for collapsed sidebar */
+}
+
+/* Max width for content */
+.content-container {
+  max-width: 1000px;
+  width: 100%;
+}
+
+/* Table styling */
+table {
+  width: 100%;          /* Full width */
+  border-collapse: collapse;
+  table-layout: fixed;  /* Fix column widths */
+  word-wrap: break-word;
+  margin: 0;
+}
+
+th, td {
+  padding: 8px;
+  text-align: center !important;
+  word-wrap: break-word;
+  white-space: normal;
+    vertical-align: middle !important;  /* vertical center */
+
+}
+
+/* Optional: Add horizontal scroll for tables */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch; /* Smooth scroll on mobile */
+}

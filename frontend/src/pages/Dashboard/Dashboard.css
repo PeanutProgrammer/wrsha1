@@ -1,0 +1,147 @@
+.wel {
+    margin-left: 100px;
+    margin-top: 20px;
+    font-size: 30px;
+}
+.wel span{
+    margin-left: 30px;
+    color: blueviolet;
+    font-weight: 700;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* .container {
+
+    max-width: 800px;
+    margin: 0 auto;
+    }
+    
+    .jumbotron {
+    background-color: #f8f9fa;
+    padding: 2rem;
+    margin-top: 4rem;
+    }
+    
+    .featured-heading {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    }
+    
+    .featured-text {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    }
+    
+    .featured-button {
+    background-color: #343a40;
+    color: #fff;
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    border-radius: 5px;
+    cursor: pointer;
+    }
+    
+    .featured-button:hover {
+    background-color: #23272b;
+    }
+    
+    .featured-img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 2rem;
+    }
+    
+    .destinations-heading {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    }
+    
+    .destinations-card {
+    margin-bottom: 2rem;
+    }
+    
+    .destinations-card-img {
+    height: 200px;
+    object-fit: cover;
+    border-radius: 5px 5px 0 0;
+    }
+    
+    .destinations-card-body {
+    padding: 1.5rem;
+    }
+    
+    .destinations-card-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    }
+    
+    .destinations-card-text {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    }
+    
+    .destinations-card-link {
+    background-color: #343a40;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-size: 1.2rem;
+    border-radius: 5px;
+    cursor: pointer;
+    }
+    
+    .destinations-card-link:hover {
+    background-color: #23272b;
+    }
+    
+    .destinations-card-link:focus {
+    outline: none;
+    box-shadow: none;
+    }
+    
+    .destinations-card-link:active {
+    transform: translateY(2px);
+    }
+    
+    @media (max-width: 768px) {
+    .featured-heading {
+    font-size: 2.5rem;
+    }
+    
+    .featured-text {
+    font-size: 1rem;
+    }
+    
+    .featured-button {
+    font-size: 1rem;
+    }
+    
+    .destinations-heading {
+    font-size: 2rem;
+    }
+    
+    .destinations-card-title {
+    font-size: 1.2rem;
+    }
+    
+    .destinations-card-text {
+    font-size: 1rem;
+    }
+    } */

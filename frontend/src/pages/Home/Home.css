@@ -1,0 +1,113 @@
+/* Background and layout */
+.home-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+background: linear-gradient(135deg, #ffffff, #e9eef5);
+  overflow: hidden;
+  text-align: center;
+  direction: rtl;
+}
+
+/* Optional gradient overlay */
+.home-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.05), transparent 70%);
+  z-index: 0;
+  animation: pulse 6s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+  from { opacity: 0.4; }
+  to { opacity: 0.8; }
+}
+
+/* Content positioning */
+.home-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: fadeInUp 1.5s ease forwards;
+  opacity: 0;
+}
+
+/* Title styling */
+.home-title {
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: #000000;
+  margin-bottom: 30px;
+  text-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+  letter-spacing: 1.5px;
+  animation: slideDown 1.5s ease forwards;
+}
+
+/* Logo styling */
+.home-logo {
+  width: 450px;
+  height: auto;
+  border-radius: 20px;
+  /* box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1); */
+  transform: scale(0.9);
+  opacity: 0;
+  animation: fadeInLogo 2s ease forwards 0.5s;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.home-logo:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+}
+
+/* Keyframes for animation */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInLogo {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .home-title {
+    font-size: 2.2rem;
+  }
+
+  .home-logo {
+    width: 280px;
+  }
+}

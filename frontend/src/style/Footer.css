@@ -1,0 +1,13 @@
+footer {
+
+	color: aliceblue;
+	padding: 20px;
+	text-align: center;
+	position: auto;
+	bottom: 0;
+	width: 100%;
+  }
+  
+  footer p {
+	margin: 0;
+  }
