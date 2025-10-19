@@ -55,6 +55,8 @@ const officerLog = require("./routes/OfficerLog");
 const department = require("./routes/Department");
 const nco = require("./routes/NCO");
 const ncoLog = require("./routes/NCOLog");
+const soldier = require("./routes/Soldier");
+const soldierLog = require("./routes/SoldierLog");
 
 
 
@@ -74,6 +76,8 @@ app.use("/officerLog",officerLog);
 app.use("/department",department);
 app.use("/ncoLog",ncoLog);
 app.use("/NCO",nco);
+app.use("/soldier",soldier);
+app.use("/soldierLog",soldierLog);
 
 
 // app.use("/busses", busses);

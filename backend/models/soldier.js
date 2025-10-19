@@ -1,9 +1,10 @@
 
 
 class Soldier {
-    constructor(name, join_date, department, mil_id, rank, in_unit) {
+    constructor(name, join_date, end_date, department, mil_id, rank, in_unit) {
         this._name = name;
         this._join_date = join_date;
+        this._end_date = end_date;
         this._department = department;
         this._mil_id = mil_id;
         this._rank = rank;
@@ -16,6 +17,10 @@ class Soldier {
 
     getJoinDate = () => {
         return this._join_date;
+    }
+
+    getEndDate = () => {
+        return this._end_date;
     }
 
     getDepartment = () => {
@@ -40,6 +45,10 @@ class Soldier {
     }
 
     setJoinDate = (join_date) => {
+        this._join_date = join_date;
+    }
+
+    setEndDate = (join_date) => {
         this._join_date = join_date;
     }
 

@@ -22,15 +22,26 @@ import OfficersTmamDetails from "./pages/Officers/OfficerTmamDeatils";
 import OfficersHome from "./pages/Officers/OfficersHome";
 
 
-import NCOsHome from "./pages/NCO/NCOsHome";
-import NCOs from "./pages/NCO/NCOs";
-import AddNCOs from "./pages/NCO/AddNCOs";
-import UpdateNCOs from "./pages/NCO/UpdateNCOs";
-import NCODetails from "./pages/NCO/NCODetails";
-import NCOsTmam from "./pages/NCO/NCOsTmam";
-import NCOsLog from "./pages/NCO/NCOsLog";
-import SearchNCOs from "./pages/NCO/SearchNCOs";
-import NCOsTmamDetails from "./pages/NCO/NCOTmamDetails";
+import NCOsHome from "./pages/NCOs/NCOsHome";
+import NCOs from "./pages/NCOs/NCOs";
+import AddNCOs from "./pages/NCOs/AddNCOs";
+import UpdateNCOs from "./pages/NCOs/UpdateNCOs";
+import NCODetails from "./pages/NCOs/NCODetails";
+import NCOsTmam from "./pages/NCOs/NCOsTmam";
+import NCOsLog from "./pages/NCOs/NCOsLog";
+import SearchNCOs from "./pages/NCOs/SearchNCOs";
+import NCOsTmamDetails from "./pages/NCOs/NCOTmamDetails";
+
+
+import SoldiersHome from "./pages/Soldiers/SoldiersHome";
+import Soldiers from "./pages/Soldiers/Soldiers";
+import AddSoldiers from "./pages/Soldiers/AddSoldiers";
+import UpdateSoldiers from "./pages/Soldiers/UpdateSoldiers";
+import SoldierDetails from "./pages/Soldiers/SoldierDetails";
+import SoldiersTmam from "./pages/Soldiers/SoldiersTmam";
+import SoldiersLog from "./pages/Soldiers/SoldiersLog";
+import SearchSoldiers from "./pages/Soldiers/SearchSoldiers";
+import SoldiersTmamDetails from "./pages/Soldiers/SoldierTmamDetails";
 
 
 
@@ -227,6 +238,64 @@ export const router = createBrowserRouter([
                     {
                             path: 'Tmam/details/:id',
                             element: <NCOsTmamDetails/>,
+                            // children:[{
+                            //     path: 'id',
+                            //     element: <OfficersTmamDetails/>
+                            // }]
+                        }
+                ]
+            }
+                ]
+            },
+            {   path: "SoldiersHome",
+                element: <Admin />,
+                children: [
+                    {
+                        path: '',
+                        element: <SoldiersHome />,
+                    },
+
+            
+            {
+                path: 'Soldiers',
+                element:<Admin/>,
+                children: [
+                    {
+                        path:'',
+                        element: <Soldiers />,
+                    },
+                    {
+                        path:'AddSoldiers',
+                        element: <AddSoldiers />,
+                    },
+                    {
+                        path:':id',
+                        element: <UpdateSoldiers />,
+                    },
+                    {
+                        path: 'details/:id',
+                        element: <SoldierDetails />
+                        // children: 
+                        // [{
+                        //     path: ':id',
+                        //     element: <OfficerDetails />
+                        // }]
+                    },
+                    {
+                        path: 'Tmam',
+                        element: <SoldiersTmam />,
+                    },
+                    {
+                        path: 'log',
+                        element: <SoldiersLog/>
+                    },
+                    {
+                        path: 'search',
+                        element: <SearchSoldiers />
+                    },
+                    {
+                            path: 'Tmam/details/:id',
+                            element: <SoldiersTmamDetails/>,
                             // children:[{
                             //     path: 'id',
                             //     element: <OfficersTmamDetails/>

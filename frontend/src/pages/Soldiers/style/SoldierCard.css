@@ -1,0 +1,221 @@
+/* ============================= */
+/* 🔹 GENERAL PAGE LAYOUT */
+/* ============================= */
+.search-officers-page {
+  padding: 40px 20px;
+  min-height: 100vh;
+  background-color: #ffffff;
+  color: #333;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ============================= */
+/* 🔹 SEARCH BOX / FILTER FORM */
+/* ============================= */
+.search-box {
+  background-color: #1e1e2f;
+  padding: 25px;
+  border-radius: 12px;
+  max-width: 700px;
+  width: 100%;
+  margin: 0 auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.search-title {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #ffcc70;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.filter-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.filter-form .form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.filter-form label {
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #ddd;
+}
+
+.filter-form input {
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #555;
+  background-color: #ffffff;
+  color: #333;
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.filter-form input:focus {
+  border-color: #ffcc70;
+  box-shadow: 0 0 5px rgba(255, 204, 112, 0.6);
+}
+
+/* Search button */
+.search-btn {
+  grid-column: span 2;
+  background-color: #ffcc70;
+  color: #1e1e2f;
+  font-weight: bold;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.search-btn:hover {
+  background-color: #e6b85f;
+  transform: translateY(-2px);
+}
+
+/* ============================= */
+/* 🔹 LOADING & ERROR STATES */
+/* ============================= */
+.loading-spinner {
+  text-align: center;
+  margin-top: 40px;
+  color: #888;
+}
+
+.spinner {
+  width: 45px;
+  height: 45px;
+  border: 3px solid #ffcc70;
+  border-top-color: transparent;
+  border-radius: 50%;
+  margin: 0 auto 10px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.alert-error {
+  background-color: #ff4d4f;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 6px;
+  text-align: center;
+  margin-top: 20px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.no-results {
+  text-align: center;
+  color: #777;
+  margin-top: 30px;
+  font-size: 1.1rem;
+}
+
+/* ============================= */
+/* 🔹 OFFICER GRID LAYOUT */
+/* ============================= */
+.officer-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 40px;
+}
+
+.officer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+  justify-items: center;
+  width: 100%;
+  max-width: 1200px;
+  margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+  .officer-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+  }
+}
+
+/* ============================= */
+/* 🔹 OFFICER CARD STYLING */
+/* ============================= */
+.officer-card {
+  width: 280px;
+  margin: 20px;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.officer-card .card {
+  background-color: #1e1e2f;
+  color: #f1f1f1;
+  border: 1px solid rgba(255, 204, 112, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.3s ease;
+}
+
+.officer-card .card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+  border-color: rgba(255, 204, 112, 0.6);
+}
+
+.officer-card .card-body {
+  padding: 20px;
+}
+
+.officer-card .card-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffcc70;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.officer-card .card-text {
+  font-size: 0.95rem;
+  color: #ddd;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.officer-card .card-text strong {
+  color: #ffcc70;
+}
+
+.officer-card .btn {
+  display: inline-block;
+  background-color: #ffcc70;
+  color: #1e1e2f;
+  border: none;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-radius: 6px;
+  padding: 10px 15px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.officer-card .btn:hover {
+  background-color: #e6b85f;
+  color: #1e1e2f;
+  transform: translateY(-2px);
+}

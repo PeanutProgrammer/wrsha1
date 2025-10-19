@@ -6,7 +6,7 @@ const moment = require("moment");
 
 
 class SoldierController {
-    static async createOfficer(req, res) {
+    static async createSoldier(req, res) {
         try {
 
             const errors = validationResult(req);
@@ -40,9 +40,10 @@ class SoldierController {
 
 
             
-            const officerObject = new Officer(
+            const soldierObject = new Soldier(
                 req.body.name,
                 req.body.join_date,
+                req.body.end_date,
                 req.body.department,
                 req.body.mil_id,
                 req.body.rank               )
@@ -51,11 +52,11 @@ class SoldierController {
             
 
 
-            await query("insert into soldiers set name =?, join_date = ?, department = ?, mil_id = ?, rank = ?",
-                [officerObject.getName(),officerObject.getJoinDate(), officerObject.getDepartment(), officerObject.getMilID(), officerObject.getRank()]);
+            await query("insert into soldiers set name =?, join_date = ?, end_date = ?, department = ?, mil_id = ?, rank = ?",
+                [soldierObject.getName(),soldierObject.getJoinDate(), soldierObject.getEndDate(), soldierObject.getDepartment(), soldierObject.getMilID(), soldierObject.getRank()]);
             
              req.app.get("io").emit("soldiersUpdated");
-            return res.status(200).json(officerObject.toJSON() );
+            return res.status(200).json(soldierObject.toJSON() );
 
 
         } catch (err) {  
@@ -65,7 +66,7 @@ class SoldierController {
 
 
 
-    static async updateOfficer(req, res) {
+    static async updateSoldier(req, res) {
         try {
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
@@ -83,7 +84,7 @@ class SoldierController {
                 return res.status(400).json({
                     errors: [
                         {
-                            msg: "Officer does not exist"
+                            msg: "Soldier does not exist"
                         }
                     ],
                 }); 
@@ -91,9 +92,10 @@ class SoldierController {
             
 
             
-             const officerObject = new Officer(
+             const soldierObject = new Soldier(
                 req.body.name,
                 req.body.join_date,
+                req.body.end_date,
                 req.body.department,
                 req.body.mil_id,
                 req.body.rank               )
@@ -108,21 +110,21 @@ class SoldierController {
             
             
 
-            await query(`update soldiers set name =?, mil_id = ?, join_date = ?, department = ?, rank = ? where id = ?`,
-                [officerObject.getName(), officerObject.getMilID(), officerObject.getJoinDate(), officerObject.getDepartment(), officerObject.getRank(), checkSoldier[0].id]);
+            await query(`update soldiers set name =?, mil_id = ?, join_date = ?, end_date = ?, department = ?, rank = ? where id = ?`,
+                [soldierObject.getName(), soldierObject.getMilID(), soldierObject.getJoinDate(), soldierObject.getEndDate(), soldierObject.getDepartment(), soldierObject.getRank(), checkSoldier[0].id]);
             
-                console.log("Name:", officerObject.getName());
-            console.log("Join Date:", officerObject.getJoinDate());
-            console.log("Department:", officerObject.getDepartment());
-            console.log("Mil ID:", officerObject.getMilID());
-            console.log("Rank:", officerObject.getRank());
+                console.log("Name:", soldierObject.getName());
+            console.log("Join Date:", soldierObject.getJoinDate());
+            console.log("Department:", soldierObject.getDepartment());
+            console.log("Mil ID:", soldierObject.getMilID());
+            console.log("Rank:", soldierObject.getRank());
 
             console.log(req.body.department);
 
              req.app.get("io").emit("soldiersUpdated");
 
 
-             return res.status(200).json( {msg: "Officer updated!"});
+             return res.status(200).json( {msg: "Soldier updated!"});
 
 
 
@@ -137,7 +139,7 @@ class SoldierController {
     }
 
 
-    static async deleteOfficer(req, res) {
+    static async deleteSoldier(req, res) {
         try {
 
             const errors = validationResult(req);
@@ -156,7 +158,7 @@ class SoldierController {
                 return res.status(400).json({
                     errors: [
                         {
-                            msg: "Officer does not exist"
+                            msg: "Soldier does not exist"
                         }
                     ],
                 }); 
@@ -168,7 +170,7 @@ class SoldierController {
              req.app.get("io").emit("soldiersUpdated");
 
             return res.status(200).json({
-                msg: "Officer deleted!"
+                msg: "Soldier deleted!"
             })
 
 
@@ -219,7 +221,7 @@ class SoldierController {
         }
     }
 
-    static async getOfficer(req, res) {
+    static async getSoldier(req, res) {
         try {
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
@@ -228,9 +230,9 @@ class SoldierController {
 
             const query = util.promisify(connection.query).bind(connection);
            
-            const officer = await query("select * from soldiers where id = ?",[req.params.id])
+            const soldier = await query("select * from soldiers where id = ?",[req.params.id])
 
-            if (officer.length == 0) {
+            if (soldier.length == 0) {
                 return res.status(404).json({
                     msg: "no soldiers found blah"
                 })
@@ -239,10 +241,10 @@ class SoldierController {
             // user.map((user) => {
             // });
 
-            console.log(officer[0]); 
+            console.log(soldier[0]); 
 
-            const officerObject = new Officer(officer[0].name, officer[0].join_date, officer[0].department, officer[0].mil_id, officer[0].rank, officer[0].in_unit);
-            return res.status(200).json(officerObject.toJSON());
+            const soldierObject = new Soldier(soldier[0].name, soldier[0].join_date, soldier[0].end_date, soldier[0].department, soldier[0].mil_id, soldier[0].rank, soldier[0].in_unit);
+            return res.status(200).json(soldierObject.toJSON());
 
 
  
@@ -269,10 +271,10 @@ class SoldierController {
             
             const soldiers = await query(`SELECT soldiers.mil_id ,soldiers.rank,soldiers.name, soldiers.department, leave_type.name AS 'tmam'
                                           FROM soldiers
-                                          LEFT JOIN officer_log
-                                          ON soldiers.id = officer_log.officerID
+                                          LEFT JOIN soldier_log
+                                          ON soldiers.id = soldier_log.soldierID
                                           LEFT JOIN leave_type
-                                          on leave_type.id = officer_log.leaveTypeID`)
+                                          on leave_type.id = soldier_log.leaveTypeID`)
 
             
 
@@ -307,7 +309,7 @@ class SoldierController {
         }
     }
 
-     static async getOfficerTmamDetails(req, res) {
+     static async getSoldierTmamDetails(req, res) {
         try {
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
@@ -319,26 +321,26 @@ class SoldierController {
             // if (req.query.search) {
             //     search =  `where name LIKE '%${req.query.search}%'`
             // }
-            const officer = await query("select * from soldiers where mil_id = ?",[req.params.id])
+            const soldier = await query("select * from soldiers where mil_id = ?",[req.params.id])
             console.log("hey");
-            if (officer.length == 0) {
+            if (soldier.length == 0) {
                 return res.status(404).json({
                     msg: "no soldiers found blah"
                 })
             }
 
-             const officerObject = new Officer(officer[0].name, officer[0].join_date, officer[0].department, officer[0].mil_id, officer[0].rank, officer[0].in_unit);
-            const officerTmam = await query(`SELECT soldiers.mil_id ,soldiers.rank,soldiers.name, soldiers.department, soldiers.join_date, leave_type.name AS 'tmam', officer_leave_details.start_date, officer_leave_details.end_date, officer_leave_details.destination, officer_log.notes
+             const soldierObject = new Soldier(soldier[0].name, soldier[0].join_date, soldier[0].department, soldier[0].mil_id, soldier[0].rank, soldier[0].in_unit);
+            const soldierTmam = await query(`SELECT soldiers.mil_id ,soldiers.rank,soldiers.name, soldiers.department, soldiers.join_date, leave_type.name AS 'tmam', soldier_leave_details.start_date, soldier_leave_details.end_date, soldier_leave_details.destination, soldier_log.notes
                                           FROM soldiers
-                                          LEFT JOIN officer_log
-                                          ON soldiers.id = officer_log.officerID
+                                          LEFT JOIN soldier_log
+                                          ON soldiers.id = soldier_log.soldierID
                                           LEFT JOIN leave_type
-                                          on leave_type.id = officer_log.leaveTypeID
-                                          LEFT JOIN officer_leave_details
-                                          ON officer_leave_details.MovementID = officer_log.id
+                                          on leave_type.id = soldier_log.leaveTypeID
+                                          LEFT JOIN soldier_leave_details
+                                          ON soldier_leave_details.MovementID = soldier_log.id
                                           WHERE soldiers.mil_id = ?
-                                          ORDER BY officer_log.id DESC
-                                          `, [officerObject.getMilID()])
+                                          ORDER BY soldier_log.id DESC
+                                          `, [soldierObject.getMilID()])
 
             
 
@@ -356,7 +358,7 @@ class SoldierController {
             
 
         
-            return res.status(200).json(officerTmam);
+            return res.status(200).json(soldierTmam);
 
 
 
@@ -434,7 +436,7 @@ class SoldierController {
 
     // Optional: filter out soldiers who joined in the future
     const validSoldiers = soldiers.filter(
-      (officer) => moment(officer.join_date).isBefore(now)
+      (soldier) => moment(soldier.join_date).isBefore(now)
     );
 
     return res.status(200).json(validSoldiers);

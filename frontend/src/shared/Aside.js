@@ -37,7 +37,7 @@ const Aside = ({ setCollapsed, collapsed }) => {
             <li className="tabs"><Link to={'Home'}>الصفحة الرئيسية</Link></li>
             <li className="tabs"><Link to={'OfficersHome'}>الضباط</Link></li>
             <li className="tabs"><Link to={'NCOsHome'}>الصف ضباط</Link></li>
-            <li className="tabs"><Link to={'NCOsHome'}>الجنود</Link></li>            
+            <li className="tabs"><Link to={'SoldiersHome'}>الجنود</Link></li>            
             <li className="tabs"><Link to={'Home'}>الخبراء</Link></li>
             <li className="tabs"><Link to={'Home'}>الزوار</Link></li>
             <li className="tabs"><Link to={'Home'}>الورش والأفرع</Link></li>
