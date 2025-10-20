@@ -1,4 +1,5 @@
 const Officer = require("../models/officer");
+const PastOfficer = require("../models/pastOfficer");
 const { validationResult } = require('express-validator');
 const connection = require("../db/dbConnection");
 const util = require("util");
@@ -161,7 +162,23 @@ class OfficerController {
                     ],
                 }); 
              }
+
+
+
+            const PastOfficerObject = new PastOfficer(
+                checkOfficer[0].name,
+                checkOfficer[0].join_date,
+                checkOfficer[0].mil_id,
+                checkOfficer[0].rank,
+                req.body.end_date,
+                req.body.transferID,
+                req.body.transferred_to
             
+            )
+
+            await query ("insert into past_officers set mil_id = ?, rank = ?, name = ?, join_date = ?, end_date = ?, transferID = ?, transferred_to = ?",
+                [PastOfficerObject.getMilID(), PastOfficerObject.getRank(), PastOfficerObject.getName(), PastOfficerObject.getJoinDate(), PastOfficerObject.getEndDate(), PastOfficerObject.getTransferID(), PastOfficerObject.getTransferredTo()]
+            )
 
             await query("delete from officers where mil_id = ?", [checkOfficer[0].mil_id])
 

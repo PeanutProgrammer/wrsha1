@@ -1,6 +1,6 @@
 {
   "$schema": "./package-schema.json",
-  "name": "bus-statio",
+  "name": "wrsha1",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

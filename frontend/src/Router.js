@@ -44,6 +44,11 @@ import SearchSoldiers from "./pages/Soldiers/SearchSoldiers";
 import SoldiersTmamDetails from "./pages/Soldiers/SoldierTmamDetails";
 
 
+import CivilliansHome from "./pages/Civillians/CivilliansHome";
+import Civillians from "./pages/Civillians/Civillians";
+
+
+
 
 import ManageBuses from "./pages/Manage-buses/ManageBuses";
 import AddBus from "./pages/Manage-buses/AddBus";
@@ -263,6 +268,64 @@ export const router = createBrowserRouter([
                     {
                         path:'',
                         element: <Soldiers />,
+                    },
+                    {
+                        path:'AddSoldiers',
+                        element: <AddSoldiers />,
+                    },
+                    {
+                        path:':id',
+                        element: <UpdateSoldiers />,
+                    },
+                    {
+                        path: 'details/:id',
+                        element: <SoldierDetails />
+                        // children: 
+                        // [{
+                        //     path: ':id',
+                        //     element: <OfficerDetails />
+                        // }]
+                    },
+                    {
+                        path: 'Tmam',
+                        element: <SoldiersTmam />,
+                    },
+                    {
+                        path: 'log',
+                        element: <SoldiersLog/>
+                    },
+                    {
+                        path: 'search',
+                        element: <SearchSoldiers />
+                    },
+                    {
+                            path: 'Tmam/details/:id',
+                            element: <SoldiersTmamDetails/>,
+                            // children:[{
+                            //     path: 'id',
+                            //     element: <OfficersTmamDetails/>
+                            // }]
+                        }
+                ]
+            }
+                ]
+            },
+            {   path: "CivilliansHome",
+                element: <Admin />,
+                children: [
+                    {
+                        path: '',
+                        element: <CivilliansHome />,
+                    },
+
+            
+            {
+                path: 'Civillians',
+                element:<Admin/>,
+                children: [
+                    {
+                        path:'',
+                        element: <Civillians />,
                     },
                     {
                         path:'AddSoldiers',

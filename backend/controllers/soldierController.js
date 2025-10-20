@@ -329,7 +329,7 @@ class SoldierController {
                 })
             }
 
-             const soldierObject = new Soldier(soldier[0].name, soldier[0].join_date, soldier[0].department, soldier[0].mil_id, soldier[0].rank, soldier[0].in_unit);
+             const soldierObject = new Soldier(soldier[0].name, soldier[0].join_date, soldier[0].end_date, soldier[0].department, soldier[0].mil_id, soldier[0].rank, soldier[0].in_unit);
             const soldierTmam = await query(`SELECT soldiers.mil_id ,soldiers.rank,soldiers.name, soldiers.department, soldiers.join_date, leave_type.name AS 'tmam', soldier_leave_details.start_date, soldier_leave_details.end_date, soldier_leave_details.destination, soldier_log.notes
                                           FROM soldiers
                                           LEFT JOIN soldier_log
@@ -340,7 +340,12 @@ class SoldierController {
                                           ON soldier_leave_details.MovementID = soldier_log.id
                                           WHERE soldiers.mil_id = ?
                                           ORDER BY soldier_log.id DESC
-                                          `, [soldierObject.getMilID()])
+                                          `, [soldierObject.getMilID()]);
+
+                                          console.log(soldierObject.getMilID());
+                                          
+
+                                          
 
             
 

@@ -3,10 +3,10 @@ const connection = require("../db/dbConnection");
 const util = require("util");
 
 
-class SoldierLogController {
+class CivillianLogController {
 
 
-    static async getSoldiersLog(req, res) {
+    static async getCivilliansLog(req, res) {
         try {
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
@@ -18,16 +18,16 @@ class SoldierLogController {
             // if (req.query.search) {
             //     search =  `where name LIKE '%${req.query.search}%'`
             // }
-            const soldiers = await query(`SELECT soldiers.mil_id, soldiers.rank, soldiers.name, soldiers.department, soldier_log.event_type, soldier_log.event_time, leave_type.name AS reason
-                                          FROM soldiers
-                                          LEFT JOIN soldier_log
-                                          ON soldier_log.soldierID = soldiers.id
+            const civillians = await query(`SELECT civillians.mil_id, civillians.rank, civillians.name, civillians.department, civillian_log.event_type, civillian_log.event_time, leave_type.name AS reason
+                                          FROM civillians
+                                          LEFT JOIN civillian_log
+                                          ON civillian_log.civillianID = civillians.id
                                           LEFT JOIN leave_type
-                                          ON soldier_log.leaveTypeID = leave_type.id`)
+                                          ON civillian_log.leaveTypeID = leave_type.id`)
 
-            if (soldiers.length == 0) {
+            if (civillians.length == 0) {
                 return res.status(404).json({
-                    msg: "no soldiers found"
+                    msg: "no civillians found"
                 })
             }
 
@@ -39,7 +39,7 @@ class SoldierLogController {
 
             
   
-            return res.status(200).json(soldiers);
+            return res.status(200).json(civillians);
 
 
 
@@ -55,4 +55,4 @@ class SoldierLogController {
 
 
 
-module.exports = SoldierLogController;
+module.exports = CivillianLogController;
