@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
-import './Officers.css';
+import './UpdateOfficers.css';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { getAuthUser } from '../../helper/Storage';
@@ -19,6 +19,11 @@ const UpdateOfficers = () => {
     mil_id: '',
     department: '',
     join_date: '',  // store as string "YYYY-MM-DD"
+    address: '',
+    height: '',
+    weight: '',
+    dob: '',
+    seniority_number: '',
     success: null,
     reload: false,
   });
@@ -43,6 +48,11 @@ const UpdateOfficers = () => {
       name: String(officer.name),
       department: String(officer.department),
       join_date: officer.join_date,  // already YYYY-MM-DD string
+      address: officer.address,
+      height: officer.height,
+      weight: officer.weight,
+      dob: officer.dob,
+      seniority_number: officer.seniority_number
     };
 
     axios
@@ -92,6 +102,11 @@ const UpdateOfficers = () => {
           department: resp.data._department,
           // Just store join_date as received (string), or format to YYYY-MM-DD
           join_date: resp.data._join_date ? formatDateToInput(resp.data._join_date) : '',
+          address: resp.data._address,
+          height: resp.data._height,
+          weight: resp.data._weight,
+          dob: resp.data._dob ? formatDateToInput(resp.data._dob) : '',
+          seniority_number: resp.data._seniority_number
         });
       })
       .catch((err) => {
@@ -141,12 +156,24 @@ const UpdateOfficers = () => {
         <Form.Group controlId="mil_id">
           <Form.Label>الرقم العسكري</Form.Label>
           <Form.Control
-            type="number"
+            type="text"
             placeholder="أدخل الرقم العسكري"
             value={officer.mil_id}
             onChange={(e) => setOfficer({ ...officer, mil_id: e.target.value })}
           />
         </Form.Group>
+
+        <Form.Group controlId="seniority_number" className="form-group">
+          <Form.Label>رقم الأقدمية</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="أدخل رقم الأقدمية "
+            value={officer.seniority_number}
+            onChange={(e) => setOfficer({ ...officer, seniority_number: e.target.value })}
+            className="form-control"
+          />
+        </Form.Group>
+
         <Form.Group controlId="rank">
           <Form.Label>رتبة الضابط</Form.Label>
           <Form.Control
@@ -209,6 +236,52 @@ const UpdateOfficers = () => {
             onChange={(e) => setOfficer({ ...officer, join_date: e.target.value })}
           />
         </Form.Group>
+
+         <Form.Group controlId="address" className="form-group">
+                  <Form.Label>العنوان</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="أدخل العنوان"
+                    value={officer.address}
+                    onChange={(e) => setOfficer({ ...officer, address: e.target.value })}
+                    className="form-control"
+                  />
+                </Form.Group>
+
+
+<Form.Group controlId="height" className="form-group">
+          <Form.Label>الطول</Form.Label>
+          <Form.Control
+            type="number"
+            placeholder="أدخل الطول"
+            value={officer.height}
+            onChange={(e) => setOfficer({ ...officer, height: e.target.value })}
+            className="form-control"
+          />
+        </Form.Group>
+
+        
+ <Form.Group controlId="weight" className="form-group">
+          <Form.Label>الوزن</Form.Label>
+          <Form.Control
+            type="number"
+            placeholder="أدخل الوزن"
+            value={officer.weight}
+            onChange={(e) => setOfficer({ ...officer, weight: e.target.value })}
+            className="form-control"
+          />
+        </Form.Group>
+
+                  <Form.Group controlId="dob" className="form-group">
+  <Form.Label>تاريخ الميلاد</Form.Label>
+  <Form.Control
+    type="date"
+    placeholder="أدخل تاريخ الميلاد"
+    value={officer.dob}
+    onChange={(e) => setOfficer({ ...officer, dob: e.target.value })}
+    className="form-control"
+  />
+</Form.Group>
 
         <Button variant="primary" type="submit" className="mt-3">
           تعديل الضابط

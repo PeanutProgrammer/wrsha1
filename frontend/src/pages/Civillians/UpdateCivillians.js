@@ -1,24 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
-import './NCO.css';
+import './Civillian.css';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { getAuthUser } from '../../helper/Storage';
 import moment from 'moment';
 
-const UpdateNCOs = () => {
+const UpdateCivillians = () => {
   const auth = getAuthUser();
   let { id } = useParams();
 
   const [dept, setDept] = useState([]);
-  const [nco, setNCO] = useState({
+  const [civillian, setCivillian] = useState({
     loading: false,
     err: '',
     name: '',
-    rank: '',
-    mil_id: '',
+    dob: '',
+    nationalID: '',
     department: '',
-    join_date: '',  // store as string "YYYY-MM-DD"
+    join_date: '',
+    address: '',
+    telephone_number: '',
     success: null,
     reload: false,
   });
@@ -33,29 +35,31 @@ const UpdateNCOs = () => {
     return `${year}-${month}-${day}`;
   };
 
-  const updateNCOs = (e) => {
+  const UpdateCivillians = (e) => {
     e.preventDefault();
-    setNCO({ ...nco, loading: true });
+    setCivillian({ ...civillian, loading: true });
 
     const data = {
-      mil_id: String(nco.mil_id),
-      rank: String(nco.rank),
-      name: String(nco.name),
-      department: String(nco.department),
-      join_date: nco.join_date,  // already YYYY-MM-DD string
+      nationalID: civillian.nationalID,
+      dob: civillian.dob,
+      name: civillian.name,
+      department: civillian.department.toString(),
+      join_date: civillian.join_date,
+      address: civillian.address,
+      telephone_number: civillian.telephone_number
     };
 
     axios
-      .put('http://localhost:4001/nco/' + id, data, {
+      .put('http://localhost:4001/civillian/' + id, data, {
         headers: {
           token: auth.token,
         },
       })
       .then((resp) => {
-        setNCO({
-          ...nco,
+        setCivillian({
+          ...civillian,
           loading: false,
-          success: 'تم تعديل بيانات ضابط الصف بنجاح!',
+          success: 'تم تعديل بيانات المدني بنجاح!',
           err: '',
         });
 
@@ -64,8 +68,8 @@ const UpdateNCOs = () => {
         }, 1000);
       })
       .catch((err) => {
-        setNCO({
-          ...nco,
+        setCivillian({
+          ...civillian,
           loading: false,
           err: err.response
             ? JSON.stringify(err.response.data.errors)
@@ -78,25 +82,29 @@ const UpdateNCOs = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:4001/nco/' + id, {
+      .get('http://localhost:4001/civillian/' + id, {
         headers: {
           token: auth.token,
         },
       })
       .then((resp) => {
-        setNCO({
-          ...nco,
-          mil_id: resp.data._mil_id,
-          rank: resp.data._rank,
+        setCivillian({
+          ...civillian,
+          nationalID: resp.data._nationalID,
           name: resp.data._name,
           department: resp.data._department,
           // Just store join_date as received (string), or format to YYYY-MM-DD
           join_date: resp.data._join_date ? formatDateToInput(resp.data._join_date) : '',
+          dob: resp.data._dob ? formatDateToInput(resp.data._dob) : '',
+          address: resp.data._address,
+          telephone_number: resp.data._telephone_number,
+
+          
         });
       })
       .catch((err) => {
-        setNCO({
-          ...nco,
+        setCivillian({
+          ...civillian,
           loading: false,
           err: err.response
             ? JSON.stringify(err.response.data.errors)
@@ -105,7 +113,7 @@ const UpdateNCOs = () => {
         });
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nco.reload]);
+  }, [civillian.reload]);
 
   useEffect(() => {
     axios
@@ -125,55 +133,36 @@ const UpdateNCOs = () => {
         href="https://cdn.jsdelivr.net/npm/react-datepicker/dist/react-datepicker.css"
       />
 
-      <h1 className="text-center p-2">تعديل بيانات ضابط الصف</h1>
+      <h1 className="text-center p-2">تعديل بيانات المدني</h1>
 
-      {nco.err && (
+      {civillian.err && (
         <Alert variant="danger" className="p-2">
-          {nco.err}
+          {civillian.err}
         </Alert>
       )}
-      {nco.success && (
+      {civillian.success && (
         <Alert variant="success" className="p-2">
-          {nco.success}
+          {civillian.success}
         </Alert>
       )}
-      <Form onSubmit={updateNCOs}>
-        <Form.Group controlId="mil_id">
-          <Form.Label>الرقم العسكري</Form.Label>
+      <Form onSubmit={UpdateCivillians}>
+        <Form.Group controlId="nationalID">
+          <Form.Label>الرقم القومي</Form.Label>
           <Form.Control
             type="number"
-            placeholder="أدخل الرقم العسكري"
-            value={nco.mil_id}
-            onChange={(e) => setNCO({ ...nco, mil_id: e.target.value })}
+            placeholder="أدخل الرقم القومي"
+            value={civillian.nationalID}
+            onChange={(e) => setCivillian({ ...civillian, nationalID: e.target.value })}
           />
         </Form.Group>
-        <Form.Group controlId="rank">
-          <Form.Label>درجة ضابط الصف</Form.Label>
-          <Form.Control
-            as="select"
-            placeholder="إختر درجة ضابط الصف"
-            value={nco.rank}
-            onChange={(e) => setNCO({ ...nco, rank: e.target.value })}
-          >
-            <option value="">إختر درجة ضابط الصف</option>
-            <option value="عريف">عريف</option>
-            <option value="رقيب">رقيب</option>
-            <option value="رقيب أول">رقيب أول</option> 
-            <option value="مساعد">مساعد</option> 
-            <option value="مساعد أول">مساعد أول</option> 
-            <option value="صانع ماهر">صانع ماهر</option> 
-            <option value="صانع دقيق">صانع دقيق</option> 
-            <option value="ملاحظ">ملاحظ</option> 
-            <option value="ملاحظ فني">ملاحظ فني</option> 
-          </Form.Control>
-        </Form.Group>
+
         <Form.Group controlId="name">
-          <Form.Label>إسم ضابط الصف</Form.Label>
+          <Form.Label>إسم المدني</Form.Label>
           <Form.Control
             type="text"
-            placeholder="أدخل إسم ضابط الصف"
-            value={nco.name}
-            onChange={(e) => setNCO({ ...nco, name: e.target.value })}
+            placeholder="أدخل إسم المدني"
+            value={civillian.name}
+            onChange={(e) => setCivillian({ ...civillian, name: e.target.value })}
           />
         </Form.Group>
         <Form.Group controlId="department">
@@ -181,8 +170,8 @@ const UpdateNCOs = () => {
           <Form.Control
             as="select"
             placeholder="أدخل الورشة / الفرع"
-            value={nco.department}
-            onChange={(e) => setNCO({ ...nco, department: e.target.value })}
+            value={civillian.department}
+            onChange={(e) => setCivillian({ ...civillian, department: e.target.value })}
           >
             <option value="">إختر الورشة / الفرع</option>
             {dept.map((dep) => (
@@ -197,17 +186,54 @@ const UpdateNCOs = () => {
           <Form.Label>تاريخ الضم</Form.Label>
           <Form.Control
             type="date"
-            value={nco.join_date}
-            onChange={(e) => setNCO({ ...nco, join_date: e.target.value })}
+            value={civillian.join_date}
+            onChange={(e) => setCivillian({ ...civillian, join_date: e.target.value })}
           />
         </Form.Group>
 
+
+                <Form.Group controlId="address" className="form-group">
+                  <Form.Label>العنوان</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="أدخل العنوان"
+                    value={civillian.address}
+                    onChange={(e) => setCivillian({ ...civillian, address: e.target.value })}
+                    className="form-control"
+                  />
+        
+        
+                </Form.Group>
+
+
+        <Form.Group controlId="join_date">
+          <Form.Label>تاريخ الميلاد</Form.Label>
+          <Form.Control
+            type="date"
+            value={civillian.dob}
+            onChange={(e) => setCivillian({ ...civillian, dob: e.target.value })}
+          />
+        </Form.Group>
+
+                <Form.Group controlId="telephone_number" className="form-group">
+                  <Form.Label>رقم الهاتف</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="أدخل رقم الهاتف"
+                    value={civillian.telephone_number}
+                    onChange={(e) => setCivillian({ ...civillian, telephone_number: e.target.value })}
+                    className="form-control"
+                  />
+        
+        
+                </Form.Group>
+
         <Button variant="primary" type="submit" className="mt-3">
-          تعديل الضابط
+          تعديل المدني
         </Button>
       </Form>
     </div>
   );
 };
 
-export default UpdateNCOs;
+export default UpdateCivillians;

@@ -46,14 +46,19 @@ class OfficerController {
                 req.body.join_date,
                 req.body.department,
                 req.body.mil_id,
-                req.body.rank               )
+                req.body.rank,
+                req.body.address,
+                req.body.height,
+                req.body.weight,
+                req.body.dob,
+                req.body.seniority_number               )
             
 
             
 
 
-            await query("insert into officers set name =?, join_date = ?, department = ?, mil_id = ?, rank = ?",
-                [officerObject.getName(),officerObject.getJoinDate(), officerObject.getDepartment(), officerObject.getMilID(), officerObject.getRank()]);
+            await query("insert into officers set name =?, join_date = ?, department = ?, mil_id = ?, rank = ?, address = ?, height = ?, weight = ?, dob = ?, seniority_number = ?",
+                [officerObject.getName(),officerObject.getJoinDate(), officerObject.getDepartment(), officerObject.getMilID(), officerObject.getRank(), officerObject.getAddress(), officerObject.getHeight(), officerObject.getWeight(), officerObject.getDOB(), officerObject.getSeniorityNumber()]);
             
              req.app.get("io").emit("officersUpdated");
             return res.status(200).json(officerObject.toJSON() );
@@ -92,12 +97,17 @@ class OfficerController {
             
 
             
-             const officerObject = new Officer(
+            const officerObject = new Officer(
                 req.body.name,
                 req.body.join_date,
                 req.body.department,
                 req.body.mil_id,
-                req.body.rank               )
+                req.body.rank,
+                req.body.address,
+                req.body.height,
+                req.body.weight,
+                req.body.dob,
+                req.body.seniority_number               )
             
                  console.log("hello");
 
@@ -109,8 +119,8 @@ class OfficerController {
             
             
 
-            await query(`update officers set name =?, mil_id = ?, join_date = ?, department = ?, rank = ? where id = ?`,
-                [officerObject.getName(), officerObject.getMilID(), officerObject.getJoinDate(), officerObject.getDepartment(), officerObject.getRank(), checkOfficer[0].id]);
+            await query(`update officers set name =?, mil_id = ?, join_date = ?, department = ?, rank = ?, address = ?,  height = ?, weight = ?, dob = ?, seniority_number = ? where id = ?`,
+                [officerObject.getName(), officerObject.getMilID(), officerObject.getJoinDate(), officerObject.getDepartment(), officerObject.getRank(), officerObject.getAddress(), officerObject.getHeight(), officerObject.getWeight(), officerObject.getDOB(), officerObject.getSeniorityNumber(), checkOfficer[0].id]);
             
                 console.log("Name:", officerObject.getName());
             console.log("Join Date:", officerObject.getJoinDate());
@@ -170,14 +180,19 @@ class OfficerController {
                 checkOfficer[0].join_date,
                 checkOfficer[0].mil_id,
                 checkOfficer[0].rank,
+                checkOfficer[0].address,
+                checkOfficer[0].height,
+                checkOfficer[0].weight,
+                checkOfficer[0].dob,
+                checkOfficer[0].seniority_number,
                 req.body.end_date,
                 req.body.transferID,
                 req.body.transferred_to
             
             )
 
-            await query ("insert into past_officers set mil_id = ?, rank = ?, name = ?, join_date = ?, end_date = ?, transferID = ?, transferred_to = ?",
-                [PastOfficerObject.getMilID(), PastOfficerObject.getRank(), PastOfficerObject.getName(), PastOfficerObject.getJoinDate(), PastOfficerObject.getEndDate(), PastOfficerObject.getTransferID(), PastOfficerObject.getTransferredTo()]
+            await query ("insert into past_officers set mil_id = ?, rank = ?, name = ?, join_date = ?, address = ?,  height = ?, weight = ?, dob = ?, seniority_number = ?,  end_date = ?, transferID = ?, transferred_to = ?",
+                [PastOfficerObject.getMilID(), PastOfficerObject.getRank(), PastOfficerObject.getName(), PastOfficerObject.getJoinDate(), officerObject.getAddress(), officerObject.getHeight(), officerObject.getWeight(), officerObject.getDOB(), officerObject.getSeniorityNumber(), PastOfficerObject.getEndDate(), PastOfficerObject.getTransferID(), PastOfficerObject.getTransferredTo()]
             )
 
             await query("delete from officers where mil_id = ?", [checkOfficer[0].mil_id])
@@ -258,7 +273,7 @@ class OfficerController {
 
             console.log(officer[0]); 
 
-            const officerObject = new Officer(officer[0].name, officer[0].join_date, officer[0].department, officer[0].mil_id, officer[0].rank, officer[0].in_unit);
+            const officerObject = new Officer(officer[0].name, officer[0].join_date, officer[0].department, officer[0].mil_id, officer[0].rank, officer[0].address, officer[0].height, officer[0].weight, officer[0].dob, officer[0].seniority_number, officer[0].in_unit);
             return res.status(200).json(officerObject.toJSON());
 
 

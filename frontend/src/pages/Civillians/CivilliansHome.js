@@ -44,7 +44,7 @@ const CivilliansHome = () => {
           <h2>تمام المدنيين</h2>
         </div>
         {auth && auth.type === "admin" && (
-          <Link to={"Soldiers/Tmam"} className="button">Go</Link>
+          <Link to={"Civillians/Tmam"} className="button">Go</Link>
         )}
       </div>
 
@@ -54,7 +54,7 @@ const CivilliansHome = () => {
           <h2>سجل دخول / خروج المدنيين</h2>
         </div>
         {auth && auth.type === "admin" && (
-          <Link to={"Soldiers/log"} className="button">Go</Link>
+          <Link to={"Civillians/log"} className="button">Go</Link>
         )}
       </div>
 
@@ -64,7 +64,7 @@ const CivilliansHome = () => {
             <FaSearch className="card-icon" />
             <h2>بحث</h2>
           </div>
-          <Link to="Soldiers/search" className="button">Go</Link>
+          <Link to="Civillians/search" className="button">Go</Link>
         </div>
       )}
     </div>

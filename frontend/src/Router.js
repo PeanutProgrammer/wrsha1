@@ -46,6 +46,13 @@ import SoldiersTmamDetails from "./pages/Soldiers/SoldierTmamDetails";
 
 import CivilliansHome from "./pages/Civillians/CivilliansHome";
 import Civillians from "./pages/Civillians/Civillians";
+import AddCivillians from "./pages/Civillians/AddCivillians";
+import UpdateCivillians from "./pages/Civillians/UpdateCivillians";
+import CivillianDetails from "./pages/Civillians/CivillianDetails";
+import CivilliansTmam from "./pages/Civillians/CivilliansTmam";
+import CivilliansLog from "./pages/Civillians/CivilliansLog";
+import SearchCivillians from "./pages/Civillians/SearchCivillians";
+import CivilliansTmamDetails from "./pages/Civillians/CivilliansTmamDetails";
 
 
 
@@ -67,6 +74,7 @@ import UserBusses from "./pages/Manage-buses/UserBusses";
 import UserRequests from "./pages/Requests/UserRequests";
 import NotFound from "./shared/NotFound";
 import { Navigate } from "react-router-dom";
+
 
 //import Dashboard from "./pages/Dashboard/Dashboard";
 //import Card from "./pages/Dashboard/Card";
@@ -328,16 +336,16 @@ export const router = createBrowserRouter([
                         element: <Civillians />,
                     },
                     {
-                        path:'AddSoldiers',
-                        element: <AddSoldiers />,
+                        path:'AddCivillians',
+                        element: <AddCivillians />,
                     },
                     {
                         path:':id',
-                        element: <UpdateSoldiers />,
+                        element: <UpdateCivillians />,
                     },
                     {
                         path: 'details/:id',
-                        element: <SoldierDetails />
+                        element: <CivillianDetails />
                         // children: 
                         // [{
                         //     path: ':id',
@@ -346,19 +354,19 @@ export const router = createBrowserRouter([
                     },
                     {
                         path: 'Tmam',
-                        element: <SoldiersTmam />,
+                        element: <CivilliansTmam />,
                     },
                     {
                         path: 'log',
-                        element: <SoldiersLog/>
+                        element: <CivilliansLog/>
                     },
                     {
                         path: 'search',
-                        element: <SearchSoldiers />
+                        element: <SearchCivillians />
                     },
                     {
                             path: 'Tmam/details/:id',
-                            element: <SoldiersTmamDetails/>,
+                            element: <CivilliansTmamDetails/>,
                             // children:[{
                             //     path: 'id',
                             //     element: <OfficersTmamDetails/>

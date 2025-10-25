@@ -20,6 +20,14 @@ router.post("/",shuoonOfficers,
         .isString().withMessage("Please enter a valid rank"),
         body("department")
         .isString().withMessage("Please enter a valid department number") ,
+    body("height")
+        .isNumeric().withMessage("Please enter valid Height"),
+    body("weight")
+        .isNumeric().withMessage("Please enter valid Weight"),
+    body("dob")
+        .isDate().withMessage("Please enter a valid DOB"),
+    body("seniority_number")
+        .isString().withMessage("Please enter a valid Seniority Number"),
     (req, res) => {
             OfficerController.createOfficer(req, res);
         }
@@ -36,7 +44,15 @@ router.put("/:id", admin,
     body("department")
     .isString(),
     body("join_date")
-    .isDate(),  (req, res) => {
+    .isDate(),
+    body("height")
+    .isNumeric(),
+     body("weight")
+    .isNumeric(),
+    body("dob")
+    .isDate(),
+     body("seniority_number")
+    .isString(),  (req, res) => {
     OfficerController.updateOfficer(req, res);
     console.log("BODY RECEIVED:", req.body);
 

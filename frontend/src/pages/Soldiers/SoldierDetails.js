@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Alert } from 'react-bootstrap';
-import './Soldier.css';
+import './SoldierDetails.css';
 import { Link , useParams} from 'react-router-dom';
 import axios from 'axios';
 import { getAuthUser } from '../../helper/Storage';
@@ -38,8 +38,7 @@ const SoldierDetails = () => {
 
 
   return (
-    <div className="officer p-5">
-      
+    <div className="officer-details-container">
       {soldier.err && (
         <Alert variant="danger" className="p-2">
           {soldier.err}
@@ -51,34 +50,65 @@ const SoldierDetails = () => {
         </Alert>
       )}
 
-<div className="table-responsive">
-      <Table striped bordered hover>
-              <thead>
-                <tr>
-                  <th>الرقم العسكري</th>
-                  <th>الدرجة</th>
-                  <th>الإسم</th>
-                  <th>الورشة / الفرع</th>
-                  <th>تاريخ الضم</th>
-                  <th>تاريخ التسريح</th>
-                  <th>التمام</th>
-                  
-                </tr>
-              </thead>
-              <tbody>
-               <tr>
-                  <td>{soldier.results._mil_id}</td>
-                  <td>{soldier.results._rank}</td>
-                  <td>{soldier.results._name}</td>
-                  <td>{soldier.results._department}</td>
-                  <td>{moment(soldier.results._join_date).format("yyyy-MM-DD")}</td>
-                  <td>{moment(soldier.results._end_date).format("yyyy-MM-DD")}</td>
+      {/* Full-width officer details */}
+      <div className="officer-details-section">
+        <h1>{soldier.results._name}</h1>
+        <p className="officer-rank">{soldier.results._rank}</p>
 
-                  <td>{soldier.results._in_unit ? "متواجد" : "غير موجود"}</td>
-                </tr>
-              </tbody>
-            </Table>
-            </div>
+        {/* Table for officer details */}
+        <div className="table-responsive">
+          <table className="officer-details-table">
+            <tbody>
+              <tr>
+                <td><strong>الرقم العسكري:</strong></td>
+                <td>{soldier.results._mil_id}</td>
+              </tr>
+
+              <tr>
+                <td><strong>الدرجة:</strong></td>
+                <td>{soldier.results._rank}</td>
+              </tr>
+              <tr>
+                <td><strong>الاسم:</strong></td>
+                <td>{soldier.results._name}</td>
+              </tr>
+              <tr>
+                <td><strong>الورشة / الفرع:</strong></td>
+                <td>{soldier.results._department}</td>
+              </tr>
+              <tr>
+                <td><strong>تاريخ الضم:</strong></td>
+                <td>{moment(soldier.results._join_date).format('YYYY-MM-DD')}</td>
+              </tr>
+
+                            <tr>
+                <td><strong>تاريخ التسريح:</strong></td>
+                <td>{moment(soldier.results._end_date).format('YYYY-MM-DD')}</td>
+              </tr>
+              {/* <tr>
+                <td><strong>العنوان:</strong></td>
+                <td>{soldier.results._address ? soldier.results._address : "لا يوجد"}</td>
+              </tr> */}
+              {/* <tr>
+                <td><strong>الوزن:</strong></td>
+                <td>{soldier.results._weight} كجم</td>
+              </tr>
+              <tr>
+                <td><strong>الطول:</strong></td>
+                <td>{soldier.results._height} سم</td>
+              </tr>
+              <tr>
+                <td><strong>تاريخ الميلاد:</strong></td>
+                <td>{moment(soldier.results._dob).format('YYYY-MM-DD')}</td>
+              </tr> */}
+              <tr>
+                <td><strong>التمام:</strong></td>
+                <td>{soldier.results._in_unit ? 'متواجد' : 'غير موجود'}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 };

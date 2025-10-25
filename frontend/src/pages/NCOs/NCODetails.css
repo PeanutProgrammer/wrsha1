@@ -1,0 +1,68 @@
+/* OfficerDetails.css */
+
+/* General layout for RTL */
+.officer-details-container {
+  max-width: 100%;  /* Full width */
+  padding: 30px;
+  background-color: #f5f6fa; /* Light background */
+  direction: rtl;  /* Make everything RTL */
+  text-align: right; /* Right-align the text */
+  box-sizing: border-box;
+}
+
+/* Officer Details Header */
+.officer-details-section {
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+}
+
+.officer-details-section h1 {
+  font-size: 2.5rem;
+  color: #343a40;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+.officer-details-section .officer-rank {
+  font-size: 1.5rem;
+  color: #007bff;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+/* Table Styling */
+.officer-details-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+}
+
+.officer-details-table td {
+  padding: 15px;
+  border: 1px solid #e0e0e0;
+  font-size: 1.1rem;
+  color: #495057;
+}
+
+.officer-details-table td strong {
+  color: #007bff;
+}
+
+/* Table Rows Hover */
+.officer-details-table tr:hover {
+  background-color: #f8f9fa;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .officer-details-section h1 {
+    font-size: 1.8rem; /* Smaller heading for mobile */
+  }
+
+  .officer-details-table td {
+    font-size: 1rem;  /* Smaller text for mobile */
+  }
+}

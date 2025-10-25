@@ -195,6 +195,7 @@ class CivillianController {
                 search =  `where name LIKE '%${req.query.search}%'`
             }
             const civillians = await query(`select * from civillians ${search}`)
+            
 
             if (civillians.length == 0) {
                 return res.status(404).json({
@@ -231,6 +232,9 @@ class CivillianController {
            
             const civillian = await query("select * from civillians where id = ?",[req.params.id])
 
+            console.log(civillian);
+            
+
             if (civillian.length == 0) {
                 return res.status(404).json({
                     msg: "no civillians found blah"
@@ -243,14 +247,18 @@ class CivillianController {
             console.log(civillian[0]); 
 
             const civillianObject = new Civillian(
-                req.body.name,
-                req.body.join_date,
-                req.body.department,
-                req.body.nationalID,
-                req.body.telephone_number,
-                req.body.address,
-                req.body.dob
+               civillian[0].name,
+               civillian[0].join_date,
+               civillian[0].department,
+               civillian[0].nationalID,
+               civillian[0].telephone_number,
+               civillian[0].address,
+               civillian[0].dob
              )
+
+
+             console.log(civillianObject);
+             
             return res.status(200).json(civillianObject.toJSON());
 
 

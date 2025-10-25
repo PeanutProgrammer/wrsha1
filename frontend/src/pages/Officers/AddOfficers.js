@@ -3,9 +3,7 @@ import { Form, Button, Alert } from 'react-bootstrap';
 import './Officers.css';
 import axios from 'axios';
 import { getAuthUser } from '../../helper/Storage';
-import DatePicker from 'react-datepicker';
 import "react-datetime/css/react-datetime.css";
-import { ar } from 'date-fns/locale';  // Import Arabic locale from date-fns
 
 const AddOfficers = () => {
   const auth = getAuthUser();
@@ -18,6 +16,11 @@ const AddOfficers = () => {
     mil_id: '',
     department: '',
     join_date: '',
+    address: '',
+    height: '',
+    weight: '',
+    dob: '',
+    seniority_number: '',
     success: null,
   });
 
@@ -31,6 +34,11 @@ const AddOfficers = () => {
       name: officer.name,
       department: officer.department.toString(),
       join_date: officer.join_date,
+      address: officer.address,
+      height: officer.height,
+      weight: officer.weight,
+      dob: officer.dob,
+      seniority_number: officer.seniority_number
     };
 
     axios
@@ -48,6 +56,11 @@ const AddOfficers = () => {
           mil_id: '',
           department: '',
           join_date: new Date(),
+          address: '',
+          height: '',
+          weight: '',
+          dob: new Date(),
+          seniority_number: '',
           success: 'تمت الإضافة بنجاح!',
         });
 
@@ -97,6 +110,17 @@ const AddOfficers = () => {
             placeholder="أدخل الرقم العسكري"
             value={officer.mil_id}
             onChange={(e) => setOfficer({ ...officer, mil_id: e.target.value })}
+            className="form-control"
+          />
+        </Form.Group>
+
+        <Form.Group controlId="seniority_number" className="form-group">
+          <Form.Label>رقم الأقدمية</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="أدخل رقم الأقدمية "
+            value={officer.seniority_number}
+            onChange={(e) => setOfficer({ ...officer, seniority_number: e.target.value })}
             className="form-control"
           />
         </Form.Group>
@@ -168,6 +192,54 @@ const AddOfficers = () => {
     className="form-control"
   />
 </Form.Group>
+
+ <Form.Group controlId="address" className="form-group">
+          <Form.Label>العنوان</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="أدخل العنوان"
+            value={officer.address}
+            onChange={(e) => setOfficer({ ...officer, address: e.target.value })}
+            className="form-control"
+          />
+        </Form.Group>
+
+ <Form.Group controlId="height" className="form-group">
+          <Form.Label>الطول</Form.Label>
+          <Form.Control
+            type="number"
+            placeholder="أدخل الطول"
+            value={officer.height}
+            onChange={(e) => setOfficer({ ...officer, height: e.target.value })}
+            className="form-control"
+          />
+        </Form.Group>
+
+        
+ <Form.Group controlId="weight" className="form-group">
+          <Form.Label>الوزن</Form.Label>
+          <Form.Control
+            type="number"
+            placeholder="أدخل الوزن"
+            value={officer.weight}
+            onChange={(e) => setOfficer({ ...officer, weight: e.target.value })}
+            className="form-control"
+          />
+        </Form.Group>
+
+                  <Form.Group controlId="dob" className="form-group">
+  <Form.Label>تاريخ الميلاد</Form.Label>
+  <Form.Control
+    type="date"
+    placeholder="أدخل تاريخ الميلاد"
+    value={officer.dob}
+    onChange={(e) => setOfficer({ ...officer, dob: e.target.value })}
+    className="form-control"
+  />
+</Form.Group>
+
+
+ 
 
         <Button variant="primary" type="submit" className="submit-btn" disabled={officer.loading}>
           {officer.loading ? 'جاري الإضافة...' : 'إضافة'}
