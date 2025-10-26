@@ -3,7 +3,24 @@ import { Form, Button, Alert } from 'react-bootstrap';
 import './Officers.css';
 import axios from 'axios';
 import { getAuthUser } from '../../helper/Storage';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 import "react-datetime/css/react-datetime.css";
+
+// Validation schema using yup
+const schema = yup.object().shape({
+  name: yup.string().min(3, 'اسم الضابط يجب أن يكون أكثر من 3 حروف').max(30, 'اسم الضابط يجب ألا يتجاوز 30 حرف').required('اسم الضابط مطلوب'),
+  rank: yup.string().required('الرتبة مطلوبة'),
+  mil_id: yup.string().matches(/^\d+$/, 'الرقم العسكري يجب أن يحتوي على أرقام فقط').required('الرقم العسكري مطلوب'),
+  department: yup.string().required('الفرع / الورشة مطلوب'),
+  join_date: yup.date().required('تاريخ الضم مطلوب').typeError('يرجى إدخال تاريخ صحيح'),
+  address: yup.string().required('العنوان مطلوب'),
+  height: yup.number().typeError('الطول يجب أن يكون رقماً').required('الطول مطلوب'),
+  weight: yup.number().typeError('الوزن يجب أن يكون رقماً').required('الوزن مطلوب'),
+  dob: yup.date().required('تاريخ الميلاد مطلوب').typeError('يرجى إدخال تاريخ صحيح'),
+  seniority_number: yup.string().required('رقم الأقدمية مطلوب'),
+});
 
 const AddOfficers = () => {
   const auth = getAuthUser();
@@ -24,58 +41,48 @@ const AddOfficers = () => {
     success: null,
   });
 
-  const createOfficer = (e) => {
-    e.preventDefault();
+   const { register, handleSubmit, formState: { errors }, reset } = useForm({
+    resolver: yupResolver(schema),
+  });
+
+   // Handle form submission
+  const createOfficer = async (data) => {
     setOfficer({ ...officer, loading: true });
 
-    const data = {
-      mil_id: officer.mil_id,
-      rank: officer.rank,
-      name: officer.name,
-      department: officer.department.toString(),
-      join_date: officer.join_date,
-      address: officer.address,
-      height: officer.height,
-      weight: officer.weight,
-      dob: officer.dob,
-      seniority_number: officer.seniority_number
-    };
-
-    axios
-      .post('http://localhost:4001/Officer/', data, {
-        headers: {
-          token: auth.token,
-        },
-      })
-      .then((resp) => {
-        setOfficer({
-          loading: false,
-          err: null,
-          name: '',
-          rank: '',
-          mil_id: '',
-          department: '',
-          join_date: new Date(),
-          address: '',
-          height: '',
-          weight: '',
-          dob: new Date(),
-          seniority_number: '',
-          success: 'تمت الإضافة بنجاح!',
-        });
-
-        setTimeout(() => {
-          window.history.back();
-        }, 1000); // Wait for 1 second before going back
-      })
-      .catch((err) => {
-        setOfficer({
-          ...officer,
-          loading: false,
-          err: err.response ? JSON.stringify(err.response.data.errors) : 'Something went wrong. Please try again later.',
-          success: null,
-        });
+    try {
+      await axios.post('http://localhost:4001/Officer/', data, {
+        headers: { token: auth.token },
       });
+
+      setOfficer({
+        loading: false,
+        err: null,
+        success: 'تمت الإضافة بنجاح!',
+        name: '',
+        rank: '',
+        mil_id: '',
+        department: '',
+        join_date: '',
+        address: '',
+        height: '',
+        weight: '',
+        dob: '',
+        seniority_number: '',
+      });
+
+      reset(); // Reset form after successful submission
+
+      setTimeout(() => {
+        window.history.back();
+      }, 1000); // Wait for 1 second before going back
+    } catch (err) {
+      setOfficer({
+        ...officer,
+        loading: false,
+        err: err.response ? JSON.stringify(err.response.data.errors) : 'Something went wrong. Please try again later.',
+        success: null,
+      });
+    }
   };
 
   useEffect(() => {
@@ -89,69 +96,74 @@ const AddOfficers = () => {
       .catch((err) => console.log(err));
   }, []);
 
-  return (
+   return (
     <div className="add-officer-form">
       <h1 className="text-center mb-4">إضافة ضابط جديد</h1>
+
+      {/* Display Errors */}
       {officer.err && (
         <Alert variant="danger" className="p-2">
           {officer.err}
         </Alert>
       )}
+
+      {/* Display Success Message */}
       {officer.success && (
         <Alert variant="success" className="p-2">
           {officer.success}
         </Alert>
       )}
-      <Form onSubmit={createOfficer} className="form">
+
+      <Form onSubmit={handleSubmit(createOfficer)} className="form">
         <Form.Group controlId="mil_id" className="form-group">
           <Form.Label>الرقم العسكري</Form.Label>
           <Form.Control
             type="text"
             placeholder="أدخل الرقم العسكري"
-            value={officer.mil_id}
-            onChange={(e) => setOfficer({ ...officer, mil_id: e.target.value })}
-            className="form-control"
+            {...register("mil_id")}
+            className={`form-control ${errors.mil_id ? 'is-invalid' : ''}`}
           />
+          {errors.mil_id && <div className="invalid-feedback">{errors.mil_id.message}</div>}
         </Form.Group>
 
         <Form.Group controlId="seniority_number" className="form-group">
           <Form.Label>رقم الأقدمية</Form.Label>
           <Form.Control
             type="text"
-            placeholder="أدخل رقم الأقدمية "
-            value={officer.seniority_number}
-            onChange={(e) => setOfficer({ ...officer, seniority_number: e.target.value })}
-            className="form-control"
+            placeholder="أدخل رقم الأقدمية"
+            {...register("seniority_number")}
+            className={`form-control ${errors.seniority_number ? 'is-invalid' : ''}`}
           />
+          {errors.seniority_number && <div className="invalid-feedback">{errors.seniority_number.message}</div>}
         </Form.Group>
 
         <Form.Group controlId="rank" className="form-group">
           <Form.Label>الرتبة</Form.Label>
           <Form.Control
             as="select"
-            value={officer.rank}
-            onChange={(e) => setOfficer({ ...officer, rank: e.target.value })}
-            className="form-control"
+            {...register("rank")}
+            className={`form-control ${errors.rank ? 'is-invalid' : ''}`}
           >
             <option value="">إختر رتبة الضابط</option>
             <option value="ملازم">ملازم</option>
             <option value="ملازم أول">ملازم أول</option>
-            <option value="نقيب">نقيب</option> 
-            <option value="نقيب أ ح">نقيب أ ح</option> 
-            <option value="رائد">رائد</option> 
-            <option value="رائد أ ح">رائد أ ح</option> 
-            <option value="مقدم">مقدم</option> 
-            <option value="مقدم أ ح">مقدم أ ح</option> 
-            <option value="عقيد">عقيد</option> 
-            <option value="عقيد أ ح">عقيد أ ح</option> 
-            <option value="عميد">عميد</option> 
-            <option value="عميد أ ح">عميد أ ح</option> 
-            <option value="لواء">لواء</option> 
-            <option value="لواء أ ح">لواء أ ح</option> 
-            <option value="فريق">فريق</option> 
-            <option value="فريق أول">فريق أول</option> 
+            <option value="نقيب">نقيب</option>
+            <option value="نقيب أ ح">نقيب أ ح</option>
+            <option value="رائد">رائد</option>
+            <option value="رائد أ ح">رائد أ ح</option>
+            <option value="مقدم">مقدم</option>
+            <option value="مقدم أ ح">مقدم أ ح</option>
+            <option value="عقيد">عقيد</option>
+            <option value="عقيد أ ح">عقيد أ ح</option>
+            <option value="عميد">عميد</option>
+            <option value="عميد أ ح">عميد أ ح</option>
+            <option value="لواء">لواء</option>
+            <option value="لواء أ ح">لواء أ ح</option>
+            <option value="فريق">فريق</option>
+            <option value="فريق أول">فريق أول</option>
             <option value="مشير">مشير</option>
           </Form.Control>
+          {errors.rank && <div className="invalid-feedback">{errors.rank.message}</div>}
         </Form.Group>
 
         <Form.Group controlId="name" className="form-group">
@@ -159,90 +171,84 @@ const AddOfficers = () => {
           <Form.Control
             type="text"
             placeholder="أدخل اسم الضابط"
-            value={officer.name}
-            onChange={(e) => setOfficer({ ...officer, name: e.target.value })}
-            className="form-control"
+            {...register("name")}
+            className={`form-control ${errors.name ? 'is-invalid' : ''}`}
           />
+          {errors.name && <div className="invalid-feedback">{errors.name.message}</div>}
         </Form.Group>
 
         <Form.Group controlId="department" className="form-group">
           <Form.Label>الورشة / الفرع</Form.Label>
           <Form.Control
             as="select"
-            value={officer.department}
-            onChange={(e) => setOfficer({ ...officer, department: e.target.value })}
-            className="form-control"
+            {...register("department")}
+            className={`form-control ${errors.department ? 'is-invalid' : ''}`}
           >
             <option value="">إختر الورشة / الفرع</option>
             {dept.map((dep) => (
-              <option key={dep.name} value={dep.name}>
-                {dep.name}
-              </option>
+              <option key={dep.name} value={dep.name}>{dep.name}</option>
             ))}
           </Form.Control>
+          {errors.department && <div className="invalid-feedback">{errors.department.message}</div>}
         </Form.Group>
 
-          <Form.Group controlId="join_date" className="form-group">
-  <Form.Label>تاريخ الضم</Form.Label>
-  <Form.Control
-    type="date"
-    placeholder="أدخل تاريخ الضم"
-    value={officer.join_date}
-    onChange={(e) => setOfficer({ ...officer, join_date: e.target.value })}
-    className="form-control"
-  />
-</Form.Group>
-
- <Form.Group controlId="address" className="form-group">
-          <Form.Label>العنوان</Form.Label>
+        <Form.Group controlId="join_date" className="form-group">
+          <Form.Label>تاريخ الضم</Form.Label>
           <Form.Control
-            type="text"
-            placeholder="أدخل العنوان"
-            value={officer.address}
-            onChange={(e) => setOfficer({ ...officer, address: e.target.value })}
-            className="form-control"
+            type="date"
+            {...register("join_date")}
+            className={`form-control ${errors.join_date ? 'is-invalid' : ''}`}
           />
+          {errors.join_date && <div className="invalid-feedback">{errors.join_date.message}</div>}
         </Form.Group>
 
- <Form.Group controlId="height" className="form-group">
+
+        <Form.Group controlId="address" className="form-group">
+           <Form.Label>العنوان</Form.Label>
+            <Form.Control
+                        type="text"
+            placeholder="أدخل العنوان"
+            {...register("address")}
+            className={`form-control ${errors.address ? 'is-invalid' : ''}`}
+          />
+          {errors.address && <div className="invalid-feedback">{errors.address.message}</div>}
+        </Form.Group>
+
+        <Form.Group controlId="height" className="form-group">
           <Form.Label>الطول</Form.Label>
           <Form.Control
             type="number"
             placeholder="أدخل الطول"
-            value={officer.height}
-            onChange={(e) => setOfficer({ ...officer, height: e.target.value })}
-            className="form-control"
+            {...register("height")}
+            className={`form-control ${errors.height ? 'is-invalid' : ''}`}
           />
+          {errors.height && <div className="invalid-feedback">{errors.height.message}</div>}
         </Form.Group>
 
-        
- <Form.Group controlId="weight" className="form-group">
+        <Form.Group controlId="weight" className="form-group">
           <Form.Label>الوزن</Form.Label>
           <Form.Control
             type="number"
             placeholder="أدخل الوزن"
-            value={officer.weight}
-            onChange={(e) => setOfficer({ ...officer, weight: e.target.value })}
-            className="form-control"
+            {...register("weight")}
+            className={`form-control ${errors.weight ? 'is-invalid' : ''}`}
           />
+          {errors.weight && <div className="invalid-feedback">{errors.weight.message}</div>}
         </Form.Group>
 
-                  <Form.Group controlId="dob" className="form-group">
-  <Form.Label>تاريخ الميلاد</Form.Label>
-  <Form.Control
-    type="date"
-    placeholder="أدخل تاريخ الميلاد"
-    value={officer.dob}
-    onChange={(e) => setOfficer({ ...officer, dob: e.target.value })}
-    className="form-control"
-  />
-</Form.Group>
+        <Form.Group controlId="dob" className="form-group">
+          <Form.Label>تاريخ الميلاد</Form.Label>
+          <Form.Control
+            type="date"
+            {...register("dob")}
+            className={`form-control ${errors.dob ? 'is-invalid' : ''}`}
+          />
+          {errors.dob && <div className="invalid-feedback">{errors.dob.message}</div>}
+        </Form.Group>
 
-
- 
-
-        <Button variant="primary" type="submit" className="submit-btn" disabled={officer.loading}>
-          {officer.loading ? 'جاري الإضافة...' : 'إضافة'}
+        {/* Submit Button */}
+        <Button type="submit" variant="primary" className='submit-btn' disabled={officer.loading}>
+          {officer.loading ? 'جاري الإضافة...' : 'إضافة الضابط'}
         </Button>
       </Form>
     </div>

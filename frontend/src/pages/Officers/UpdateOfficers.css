@@ -73,6 +73,7 @@ button[type='submit'] {
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  width: 100%;
 }
 
 button[type='submit']:hover {
@@ -80,7 +81,7 @@ button[type='submit']:hover {
 }
 
 /* RTL Specific Adjustments */
-.form-control, .form-label, button[type='submit'] {
+.form-control, .form-label {
   text-align: right;
 }
 

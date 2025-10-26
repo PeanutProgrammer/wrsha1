@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Alert } from 'react-bootstrap';
+import { Table, Alert, Modal, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { getAuthUser } from '../../helper/Storage';
@@ -17,6 +17,8 @@ const Officers = () => {
   });
   const [currentPage, setCurrentPage] = useState(1); // Current page number
   const [recordsPerPage] = useState(10); // Number of records per page
+  const [showConfirm, setShowConfirm] = useState(false);  // Modal state
+  const [selectedOfficer, setSelectedOfficer] = useState(null);  // Selected officer for deletion
 
 useEffect(() => {
   const socket = io("http://localhost:4001"); // your backend port
@@ -69,23 +71,34 @@ useEffect(() => {
 
   
 
-  const deleteOfficer = (mil_id) => {
+    // Show confirmation modal before deleting
+  const handleDeleteClick = (officer) => {
+    setSelectedOfficer(officer);
+    setShowConfirm(true);
+  };
+
+  // Confirm deletion
+  const confirmDelete = () => {
+    if (!selectedOfficer) return;
+
     axios
-      .delete('http://localhost:4001/Officer/' + mil_id, {
-        headers: {
-          token: auth.token,
-        },
+      .delete('http://localhost:4001/Officer/' + selectedOfficer.mil_id, {
+        headers: { token: auth.token },
       })
-      .then((resp) => {
+      .then(() => {
+        setShowConfirm(false);
+        setSelectedOfficer(null);
         setOfficers({ ...officers, reload: officers.reload + 1 });
       })
       .catch((err) => {
         setOfficers({
+          ...officers,
           err:
             err.response
               ? JSON.stringify(err.response.data.errors)
-              : 'Something went wrong. Please try again later.',
+              : "Something went wrong. Please try again later.",
         });
+        setShowConfirm(false);
       });
   };
 
@@ -152,7 +165,7 @@ useEffect(() => {
                   <div className="action-buttons">
                     <button
                       className="btn btn-sm btn-danger"
-                      onClick={() => deleteOfficer(officer.mil_id)}
+                      onClick={() => handleDeleteClick(officer)}
                     >
                       حذف
                     </button>
@@ -201,6 +214,23 @@ useEffect(() => {
           Next
         </button>
       </div>
+          {/* Confirmation Modal */}
+      <Modal show={showConfirm} onHide={() => setShowConfirm(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>تأكيد الحذف</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          هل أنت متأكد أنك تريد حذف الضابط <strong>{selectedOfficer?.name}</strong>؟
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowConfirm(false)}>
+            إلغاء
+          </Button>
+          <Button variant="danger" onClick={confirmDelete}>
+            حذف
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

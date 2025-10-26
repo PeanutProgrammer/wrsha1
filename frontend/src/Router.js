@@ -55,6 +55,13 @@ import SearchCivillians from "./pages/Civillians/SearchCivillians";
 import CivilliansTmamDetails from "./pages/Civillians/CivilliansTmamDetails";
 
 
+import ExpertsHome from "./pages/Experts/ExpertsHome";
+import Experts from "./pages/Experts/Experts";
+import AddExperts from "./pages/Experts/AddExperts";
+
+
+
+
 
 
 import ManageBuses from "./pages/Manage-buses/ManageBuses";
@@ -376,6 +383,66 @@ export const router = createBrowserRouter([
             }
                 ]
             },
+            {   path: "ExpertsHome",
+                element: <Admin />,
+                children: [
+                    {
+                        path: '',
+                        element: <ExpertsHome />,
+                    },
+
+            
+            {
+                path: 'Experts',
+                element:<Admin/>,
+                children: [
+                    {
+                        path:'',
+                        element: <Experts />,
+                    },
+                    {
+                        path:'AddExperts',
+                        element: <AddExperts />,
+                    },
+                    {
+                        path:':id',
+                        element: <UpdateCivillians />,
+                    },
+                    {
+                        path: 'details/:id',
+                        element: <CivillianDetails />
+                        // children: 
+                        // [{
+                        //     path: ':id',
+                        //     element: <OfficerDetails />
+                        // }]
+                    },
+                    {
+                        path: 'Tmam',
+                        element: <CivilliansTmam />,
+                    },
+                    {
+                        path: 'log',
+                        element: <CivilliansLog/>
+                    },
+                    {
+                        path: 'search',
+                        element: <SearchCivillians />
+                    },
+                    {
+                            path: 'Tmam/details/:id',
+                            element: <CivilliansTmamDetails/>,
+                            // children:[{
+                            //     path: 'id',
+                            //     element: <OfficersTmamDetails/>
+                            // }]
+                        }
+                ]
+            }
+                ]
+            },
+
+
             {
                 path: "ManageBuses",
                 element:<Admin/>,
