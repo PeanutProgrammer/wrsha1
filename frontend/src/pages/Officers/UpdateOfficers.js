@@ -62,8 +62,18 @@ const UpdateOfficers = () => {
   const updateOfficers = (data) => {
     setOfficer({ ...officer, loading: true });
 
+          console.log("Request Data:", data);
+
+           const formattedData = {
+    ...data,
+    join_date: data.join_date ? formatDateToInput(data.join_date) : '',
+    dob: data.dob ? formatDateToInput(data.dob) : '',
+  };
+
+
+
     axios
-      .put('http://localhost:4001/Officer/' + id, data, {
+      .put('http://localhost:4001/Officer/' + id, formattedData, {
         headers: {
           token: auth.token,
         },
@@ -172,6 +182,7 @@ const UpdateOfficers = () => {
             placeholder="أدخل الرقم العسكري"
             {...register('mil_id')}
             className={`form-control ${errors.mil_id ? 'is-invalid' : ''}`}
+            disabled
           />
           {errors.mil_id && <div className="invalid-feedback">{errors.mil_id.message}</div>}
         </Form.Group>

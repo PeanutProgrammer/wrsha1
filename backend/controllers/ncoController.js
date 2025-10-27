@@ -1,4 +1,4 @@
-const Officer = require("../models/nco");
+const NCO = require("../models/nco");
 const { validationResult } = require('express-validator');
 const connection = require("../db/dbConnection");
 const util = require("util");
@@ -40,21 +40,22 @@ class NCOController {
 
 
             
-            const officerObject = new Officer(
+            const officerObject = new NCO(
                 req.body.name,
                 req.body.join_date,
                 req.body.department,
                 req.body.mil_id,
-                req.body.rank               )
+                req.body.rank,
+                req.body.address,
+                req.body.height,
+                req.body.weight,
+                req.body.dob,      
+         )
             
 
-            
+            await query("insert into ncos set name =?, join_date = ?, department = ?, mil_id = ?, rank = ?, address = ?, height = ?, weight = ?, dob = ?",
+                [officerObject.getName(),officerObject.getJoinDate(), officerObject.getDepartment(), officerObject.getMilID(), officerObject.getRank(), officerObject.getAddress(), officerObject.getHeight(), officerObject.getWeight(), officerObject.getDOB()]);
 
-
-            await query("insert into ncos set name =?, join_date = ?, department = ?, mil_id = ?, rank = ?",
-                [officerObject.getName(),officerObject.getJoinDate(), officerObject.getDepartment(), officerObject.getMilID(), officerObject.getRank()]);
-            
-        
             return res.status(200).json(officerObject.toJSON() );
 
 
@@ -83,7 +84,7 @@ class NCOController {
                 return res.status(400).json({
                     errors: [
                         {
-                            msg: "Officer does not exist"
+                            msg: "NCO does not exist"
                         }
                     ],
                 }); 
@@ -91,12 +92,16 @@ class NCOController {
             
 
             
-             const officerObject = new Officer(
+             const officerObject = new NCO(
                 req.body.name,
                 req.body.join_date,
                 req.body.department,
                 req.body.mil_id,
-                req.body.rank               )
+                req.body.rank,
+                req.body.address,
+                req.body.height,
+                req.body.weight,
+                req.body.dob,              )
             
                  console.log("hello");
 
@@ -104,13 +109,11 @@ class NCOController {
             
 
              
-           
-            
-            
 
-            await query(`update ncos set name =?, mil_id = ?, join_date = ?, department = ?, rank = ? where id = ?`,
-                [officerObject.getName(), officerObject.getMilID(), officerObject.getJoinDate(), officerObject.getDepartment(), officerObject.getRank(), checkOfficer[0].id]);
-            
+
+            await query(`update ncos set name =?, join_date = ?, department = ?, rank = ?, address = ?, height = ?, weight = ?, dob = ? where id = ?`,
+                [officerObject.getName(), officerObject.getJoinDate(), officerObject.getDepartment(), officerObject.getRank(), officerObject.getAddress(), officerObject.getHeight(), officerObject.getWeight(), officerObject.getDOB(), checkOfficer[0].id]);
+
                 console.log("Name:", officerObject.getName());
             console.log("Join Date:", officerObject.getJoinDate());
             console.log("Department:", officerObject.getDepartment());
@@ -120,7 +123,7 @@ class NCOController {
             console.log(req.body.department);
 
 
-             return res.status(200).json( {msg: "Officer updated!"});
+             return res.status(200).json( {msg: "NCO updated!"});
 
 
 
@@ -154,7 +157,7 @@ class NCOController {
                 return res.status(400).json({
                     errors: [
                         {
-                            msg: "Officer does not exist"
+                            msg: "NCO does not exist"
                         }
                     ],
                 }); 
@@ -164,7 +167,7 @@ class NCOController {
             await query("delete from ncos where mil_id = ?", [checkOfficer[0].mil_id])
 
             return res.status(200).json({
-                msg: "Officer deleted!"
+                msg: "NCO deleted!"
             })
 
 
@@ -189,11 +192,11 @@ class NCOController {
             if (req.query.search) {
                 search =  `where name LIKE '%${req.query.search}%'`
             }
-            const officers = await query(`select * from ncos ${search}`)
+            const ncos = await query(`select * from ncos ${search}`)
 
-            if (officers.length == 0) {
+            if (ncos.length == 0) {
                 return res.status(404).json({
-                    msg: "no officers found hey"
+                    msg: "no ncos found hey"
                 })
             }
 
@@ -205,7 +208,7 @@ class NCOController {
 
             
   
-            return res.status(200).json(officers);
+            return res.status(200).json(ncos);
 
 
 
@@ -224,9 +227,9 @@ class NCOController {
 
             const query = util.promisify(connection.query).bind(connection);
            
-            const officer = await query("select * from ncos where id = ?",[req.params.id])
+            const nco = await query("select * from ncos where id = ?",[req.params.id])
 
-            if (officer.length == 0) {
+            if (nco.length == 0) {
                 return res.status(404).json({
                     msg: "no ncos found blah"
                 })
@@ -235,9 +238,9 @@ class NCOController {
             // user.map((user) => {
             // });
 
-            console.log(officer[0]); 
+            console.log(nco[0]); 
 
-            const officerObject = new Officer(officer[0].name, officer[0].join_date, officer[0].department, officer[0].mil_id, officer[0].rank, officer[0].in_unit);
+            const officerObject = new NCO(nco[0].name, nco[0].join_date, nco[0].department, nco[0].mil_id, nco[0].rank, nco[0].address, nco[0].height, nco[0].weight, nco[0].dob, nco[0].in_unit);
             return res.status(200).json(officerObject.toJSON());
 
 
@@ -263,7 +266,7 @@ class NCOController {
 
             console.log("hey");
             
-            const officers = await query(`SELECT ncos.mil_id ,ncos.rank,ncos.name, ncos.department, leave_type.name AS 'tmam'
+            const ncos = await query(`SELECT ncos.mil_id ,ncos.rank,ncos.name, ncos.department, leave_type.name AS 'tmam'
                                           FROM ncos
                                           LEFT JOIN officer_log
                                           ON ncos.id = officer_log.officerID
@@ -274,14 +277,14 @@ class NCOController {
 
 
                                           
-            console.log(officers[0]);
+            console.log(ncos[0]);
             console.log("hello");
             
             
 
-            if (officers.length == 0) {
+            if (ncos.length == 0) {
                 return res.status(404).json({
-                    msg: "no officers found now"
+                    msg: "no ncos found now"
                 })
             }
 
@@ -293,7 +296,7 @@ class NCOController {
 
             
   
-            return res.status(200).json(officers);
+            return res.status(200).json(ncos);
 
 
 
@@ -315,15 +318,15 @@ class NCOController {
             // if (req.query.search) {
             //     search =  `where name LIKE '%${req.query.search}%'`
             // }
-            const officer = await query("select * from ncos where mil_id = ?",[req.params.id])
+            const nco = await query("select * from ncos where mil_id = ?",[req.params.id])
             console.log("hey");
-            if (officer.length == 0) {
+            if (nco.length == 0) {
                 return res.status(404).json({
-                    msg: "no officers found blah"
+                    msg: "no ncos found blah"
                 })
             }
 
-             const officerObject = new Officer(officer[0].name, officer[0].join_date, officer[0].department, officer[0].mil_id, officer[0].rank, officer[0].in_unit);
+            const officerObject = new NCO(nco[0].name, nco[0].join_date, nco[0].department, nco[0].mil_id, nco[0].rank, nco[0].address, nco[0].height, nco[0].weight, nco[0].dob, nco[0].in_unit);
             const officerTmam = await query(`SELECT ncos.mil_id ,ncos.rank,ncos.name, ncos.department, ncos.join_date, leave_type.name AS 'tmam', officer_leave_details.start_date, officer_leave_details.end_date, officer_leave_details.destination, officer_log.notes
                                           FROM ncos
                                           LEFT JOIN nco_log
@@ -420,17 +423,17 @@ class NCOController {
     const whereClause = filters.length > 0 ? "WHERE " + filters.join(" AND ") : "";
     const sql = `SELECT * FROM ncos ${whereClause}`;
 
-    const officers = await query(sql, params);
+    const ncos = await query(sql, params);
 
-    if (officers.length === 0) {
+    if (ncos.length === 0) {
       return res.status(404).json({
-        errors: [{ msg: "No officers found" }],
+        errors: [{ msg: "No ncos found" }],
       });
     }
 
     // Optional: filter out officers who joined in the future
-    const validOfficers = officers.filter(
-      (officer) => moment(officer.join_date).isBefore(now)
+    const validOfficers = ncos.filter(
+      (nco) => moment(nco.join_date).isBefore(now)
     );
 
     return res.status(200).json(validOfficers);
@@ -445,68 +448,7 @@ class NCOController {
 
 
 
-    static async getSearchHistory(req, res) {
-        try {
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-            }
-
-            const query = util.promisify(connection.query).bind(connection);
-
-            const { token } = req.headers;
-
-            const user = await query("select * from users where token = ?",[token] )
-
-            const history = await query("select * from search_history where user_id = ?", [user[0].id]);
-
-
- 
-            if (history.length == 0) {
-                return res.status(404).json({
-                    msg: "No history found"
-                })
-            }
-
-            return res.status(200).json(history)
-
-
-
-
-        } catch (err) {
-            return res.status(500).json({ err: err });
-        }
-    }
-
-
-    static async deleteHistory(req, res) {
-        try {
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-            }
-
-            const query = util.promisify(connection.query).bind(connection);
-
-
-
-             await query("delete from search_history where id = ?", [req.params.id]);
-
-
- 
-            
-
-            return res.status(200).json({
-                msg: "History Cleared!"
-            })
-
-
-
-
-        } catch (err) {
-            return res.status(500).json({ err: err });
-        }
-    }
+   
 
     
     }

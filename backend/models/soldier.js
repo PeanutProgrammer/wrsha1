@@ -1,13 +1,16 @@
 
 
 class Soldier {
-    constructor(name, join_date, end_date, department, mil_id, rank, in_unit) {
+    constructor(name, join_date, end_date, department, mil_id, rank, telephone_number, guardian_name, guardian_telephone_number, in_unit) {
         this._name = name;
         this._join_date = join_date;
         this._end_date = end_date;
         this._department = department;
         this._mil_id = mil_id;
         this._rank = rank;
+        this._telephone_number = telephone_number;
+        this._guardian_name = guardian_name;
+        this._guardian_telephone_number = guardian_telephone_number;
         this._in_unit = in_unit || true;
     }
 
@@ -33,6 +36,20 @@ class Soldier {
 
     getRank = () => {
         return this._rank;
+    }
+
+
+    getTelephoneNumber = () => {
+        return this._telephone_number;
+    }
+
+    getGuardianName = () => {
+        return this._guardian_name;
+    }
+
+
+    getGuardianTelephoneNumber = () => {
+        return this._guardian_telephone_number;
     }
 
     getInUnit = () => {
@@ -62,6 +79,21 @@ class Soldier {
 
     setRank = (rank) => {
         this._rank = rank;
+    }
+
+
+    setTelephoneNumber = (telephone_number) => {
+        this._telephone_number = telephone_number;
+    }
+
+
+    setGuardianName = (guardian_name) => {
+        this._guardian_name = guardian_name;
+    }
+
+
+    setGuardianTelephoneNumber = (guardian_telephone_number) => {
+        this._guardian_telephone_number = guardian_telephone_number;
     }
 
     setInUnit = (in_unit) => {

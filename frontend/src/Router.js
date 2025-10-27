@@ -58,6 +58,10 @@ import CivilliansTmamDetails from "./pages/Civillians/CivilliansTmamDetails";
 import ExpertsHome from "./pages/Experts/ExpertsHome";
 import Experts from "./pages/Experts/Experts";
 import AddExperts from "./pages/Experts/AddExperts";
+import UpdateExperts from "./pages/Experts/UpdateExperts";
+import ExpertDetails from "./pages/Experts/ExpertDetails";
+import ExpertsLog from "./pages/Experts/ExpertsLog";
+import SearchExperts from "./pages/Experts/SearchExperts";
 
 
 
@@ -406,11 +410,11 @@ export const router = createBrowserRouter([
                     },
                     {
                         path:':id',
-                        element: <UpdateCivillians />,
+                        element: <UpdateExperts />,
                     },
                     {
                         path: 'details/:id',
-                        element: <CivillianDetails />
+                        element: <ExpertDetails />
                         // children: 
                         // [{
                         //     path: ':id',
@@ -423,11 +427,11 @@ export const router = createBrowserRouter([
                     },
                     {
                         path: 'log',
-                        element: <CivilliansLog/>
+                        element: <ExpertsLog />
                     },
                     {
                         path: 'search',
-                        element: <SearchCivillians />
+                        element: <SearchExperts />
                     },
                     {
                             path: 'Tmam/details/:id',

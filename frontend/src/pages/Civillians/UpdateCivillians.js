@@ -1,10 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
-import './Civillian.css';
+import './UpdateCivillians.css';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { getAuthUser } from '../../helper/Storage';
-import moment from 'moment';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+  import moment from 'moment';
+
+// Validation schema using yup
+const schema = yup.object().shape({
+  nationalID: yup.string().matches(/^\d+$/, 'الرقم القومي يجب أن يحتوي على أرقام فقط').required('الرقم القومي مطلوب'),
+  name: yup.string().min(3, 'اسم المدني يجب أن يكون أكثر من 3 حروف').max(30, 'اسم المدني يجب ألا يتجاوز 30 حرف').required('اسم المدني مطلوب'),
+  security_clearance_number: yup.string().required('رقم التصديق الأمني مطلوب'),
+  valid_from: yup.date().required('تاريخ بداية التصديق الأمني مطلوب').typeError('يرجى إدخال تاريخ صحيح'),
+  valid_through: yup.date().required('تاريخ انتهاء التصديق الأمني مطلوب').min(yup.ref('valid_from'), 'تاريخ الانتهاء يجب أن يكون بعد تاريخ البداية').typeError('يرجى إدخال تاريخ صحيح'),
+  dob: yup.date().required('تاريخ الميلاد مطلوب').typeError('يرجى إدخال تاريخ صحيح'),
+  department: yup.string().required('الفرع / الورشة مطلوب'),
+  join_date: yup.date().required('تاريخ الضم مطلوب').typeError('يرجى إدخال تاريخ صحيح'),
+  address: yup.string().required('العنوان مطلوب'),
+  telephone_number: yup.string().required('رقم الهاتف مطلوب'),
+});
 
 const UpdateCivillians = () => {
   const auth = getAuthUser();
@@ -14,18 +31,25 @@ const UpdateCivillians = () => {
   const [civillian, setCivillian] = useState({
     loading: false,
     err: '',
-    name: '',
-    dob: '',
     nationalID: '',
+    name: '',
+    security_clearance_number: '',
+    valid_from: '',
+    valid_through: '',
+    dob: '',
     department: '',
     join_date: '',
-    address: '',
     telephone_number: '',
+    address: '',
     success: null,
     reload: false,
   });
 
-  // Helper to format date as YYYY-MM-DD (local, no timezone offset)
+  // Use Form Hook from react-hook-form
+  const { register, handleSubmit, formState: { errors }, reset } = useForm({
+    resolver: yupResolver(schema),
+  });
+
   const formatDateToInput = (date) => {
     if (!date) return '';
     const d = new Date(date);
@@ -35,22 +59,21 @@ const UpdateCivillians = () => {
     return `${year}-${month}-${day}`;
   };
 
-  const UpdateCivillians = (e) => {
-    e.preventDefault();
+  const updateCivillians = (data) => {
     setCivillian({ ...civillian, loading: true });
 
-    const data = {
-      nationalID: civillian.nationalID,
-      dob: civillian.dob,
-      name: civillian.name,
-      department: civillian.department.toString(),
-      join_date: civillian.join_date,
-      address: civillian.address,
-      telephone_number: civillian.telephone_number
-    };
+          console.log("Request Data:", data);
+
+           const formattedData = {
+    ...data,
+    join_date: data.join_date ? formatDateToInput(data.join_date) : '',
+    dob: data.dob ? formatDateToInput(data.dob) : ''
+  };
+
+
 
     axios
-      .put('http://localhost:4001/civillian/' + id, data, {
+      .put('http://localhost:4001/Civillian/' + id, formattedData, {
         headers: {
           token: auth.token,
         },
@@ -76,13 +99,12 @@ const UpdateCivillians = () => {
             : 'Something went wrong. Please try again later.',
           success: null,
         });
-        console.log(err);
       });
   };
 
   useEffect(() => {
     axios
-      .get('http://localhost:4001/civillian/' + id, {
+      .get('http://localhost:4001/Civillian/' + id, {
         headers: {
           token: auth.token,
         },
@@ -92,14 +114,28 @@ const UpdateCivillians = () => {
           ...civillian,
           nationalID: resp.data._nationalID,
           name: resp.data._name,
-          department: resp.data._department,
-          // Just store join_date as received (string), or format to YYYY-MM-DD
-          join_date: resp.data._join_date ? formatDateToInput(resp.data._join_date) : '',
+          security_clearance_number: resp.data._security_clearance_number,
+          valid_from: resp.data._valid_from ? formatDateToInput(resp.data._valid_from) : '',
+          valid_through: resp.data._valid_through ? formatDateToInput(resp.data._valid_through) : '',
           dob: resp.data._dob ? formatDateToInput(resp.data._dob) : '',
-          address: resp.data._address,
+          department: resp.data._department,
+          join_date: resp.data._join_date ? formatDateToInput(resp.data._join_date) : '',
           telephone_number: resp.data._telephone_number,
-
-          
+          address: resp.data._address,
+          loading: false,
+          err: '',
+        });
+        reset({
+          nationalID: resp.data._nationalID,
+          name: resp.data._name,
+          security_clearance_number: resp.data._security_clearance_number,
+          valid_from: resp.data._valid_from ? formatDateToInput(resp.data._valid_from) : '',
+          valid_through: resp.data._valid_through ? formatDateToInput(resp.data._valid_through) : '',
+          dob: resp.data._dob ? formatDateToInput(resp.data._dob) : '',
+          department: resp.data._department,
+          join_date: resp.data._join_date ? formatDateToInput(resp.data._join_date) : '',
+          telephone_number: resp.data._telephone_number,
+          address: resp.data._address
         });
       })
       .catch((err) => {
@@ -112,8 +148,7 @@ const UpdateCivillians = () => {
           success: null,
         });
       });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [civillian.reload]);
+  }, [id, civillian.reload, reset]);
 
   useEffect(() => {
     axios
@@ -128,11 +163,6 @@ const UpdateCivillians = () => {
 
   return (
     <div className="Update">
-      <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/react-datepicker/dist/react-datepicker.css"
-      />
-
       <h1 className="text-center p-2">تعديل بيانات المدني</h1>
 
       {civillian.err && (
@@ -145,33 +175,40 @@ const UpdateCivillians = () => {
           {civillian.success}
         </Alert>
       )}
-      <Form onSubmit={UpdateCivillians}>
-        <Form.Group controlId="nationalID">
-          <Form.Label>الرقم القومي</Form.Label>
-          <Form.Control
-            type="number"
-            placeholder="أدخل الرقم القومي"
-            value={civillian.nationalID}
-            onChange={(e) => setCivillian({ ...civillian, nationalID: e.target.value })}
-          />
-        </Form.Group>
+      
+      <Form onSubmit={handleSubmit(updateCivillians)}>
+       <Form.Group controlId="nationalID">
+  <Form.Label>الرقم القومي</Form.Label>
+  <Form.Control
+    type="text"
+    placeholder="أدخل الرقم القومي"
+    {...register('nationalID')}
+    className={`form-control ${errors.nationalID ? 'is-invalid' : ''}`}
+    disabled // Make it uneditable
+  />
+  {errors.nationalID && <div className="invalid-feedback">{errors.nationalID.message}</div>}
+</Form.Group>
+
+
+
 
         <Form.Group controlId="name">
           <Form.Label>إسم المدني</Form.Label>
           <Form.Control
             type="text"
             placeholder="أدخل إسم المدني"
-            value={civillian.name}
-            onChange={(e) => setCivillian({ ...civillian, name: e.target.value })}
+            {...register('name')}
+            className={`form-control ${errors.name ? 'is-invalid' : ''}`}
           />
+          {errors.name && <div className="invalid-feedback">{errors.name.message}</div>}
         </Form.Group>
+
         <Form.Group controlId="department">
           <Form.Label>الورشة / الفرع</Form.Label>
           <Form.Control
             as="select"
-            placeholder="أدخل الورشة / الفرع"
-            value={civillian.department}
-            onChange={(e) => setCivillian({ ...civillian, department: e.target.value })}
+            {...register('department')}
+            className={`form-control ${errors.department ? 'is-invalid' : ''}`}
           >
             <option value="">إختر الورشة / الفرع</option>
             {dept.map((dep) => (
@@ -180,56 +217,94 @@ const UpdateCivillians = () => {
               </option>
             ))}
           </Form.Control>
+          {errors.department && <div className="invalid-feedback">{errors.department.message}</div>}
         </Form.Group>
 
         <Form.Group controlId="join_date">
           <Form.Label>تاريخ الضم</Form.Label>
           <Form.Control
             type="date"
-            value={civillian.join_date}
-            onChange={(e) => setCivillian({ ...civillian, join_date: e.target.value })}
+            {...register('join_date')}
+            className={`form-control ${errors.join_date ? 'is-invalid' : ''}`}
           />
+          {errors.join_date && <div className="invalid-feedback">{errors.join_date.message}</div>}
         </Form.Group>
 
 
-                <Form.Group controlId="address" className="form-group">
-                  <Form.Label>العنوان</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="أدخل العنوان"
-                    value={civillian.address}
-                    onChange={(e) => setCivillian({ ...civillian, address: e.target.value })}
-                    className="form-control"
-                  />
-        
-        
-                </Form.Group>
 
+        <Form.Group controlId="security_clearance_number" className="form-group">
+          <Form.Label>رقم التصديق الأمني</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="أدخل رقم التصديق الأمني"
+            {...register('security_clearance_number')}
+            className={`form-control ${errors.security_clearance_number ? 'is-invalid' : ''}`}
+          />
+          {errors.security_clearance_number && <div className="invalid-feedback">{errors.security_clearance_number.message}</div>}
+        </Form.Group>
 
-        <Form.Group controlId="join_date">
+        <Form.Group controlId="valid_from" className="form-group">
+          <Form.Label>الفترة من</Form.Label>
+          <Form.Control
+            type="date"
+            placeholder="أدخل تاريخ بداية التصديق الأمني"
+            {...register('valid_from')}
+            className={`form-control ${errors.valid_from ? 'is-invalid' : ''}`}
+          />
+          {errors.valid_from && <div className="invalid-feedback">{errors.valid_from.message}</div>}
+        </Form.Group>
+
+        <Form.Group controlId="valid_through" className="form-group">
+          <Form.Label>الفترة إلى</Form.Label>
+          <Form.Control
+            type="date"
+            placeholder="أدخل تاريخ انتهاء التصديق الأمني"
+            {...register('valid_through')}
+            className={`form-control ${errors.valid_through ? 'is-invalid' : ''}`}
+          />
+          {errors.valid_through && <div className="invalid-feedback">{errors.valid_through.message}</div>}
+        </Form.Group>
+
+                <Form.Group controlId="dob">
           <Form.Label>تاريخ الميلاد</Form.Label>
           <Form.Control
             type="date"
-            value={civillian.dob}
-            onChange={(e) => setCivillian({ ...civillian, dob: e.target.value })}
+            {...register('dob')}
+            className={`form-control ${errors.dob ? 'is-invalid' : ''}`}
           />
+          {errors.dob && <div className="invalid-feedback">{errors.dob.message}</div>}
         </Form.Group>
 
-                <Form.Group controlId="telephone_number" className="form-group">
-                  <Form.Label>رقم الهاتف</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="أدخل رقم الهاتف"
-                    value={civillian.telephone_number}
-                    onChange={(e) => setCivillian({ ...civillian, telephone_number: e.target.value })}
-                    className="form-control"
-                  />
-        
-        
-                </Form.Group>
+        <Form.Group controlId="address" className="form-group">
+          <Form.Label>العنوان</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="أدخل العنوان"
+            {...register('address')}
+            className={`form-control ${errors.address ? 'is-invalid' : ''}`}
+          />
+          {errors.address && <div className="invalid-feedback">{errors.address.message}</div>}
+        </Form.Group>
 
-        <Button variant="primary" type="submit" className="mt-3">
-          تعديل المدني
+
+
+        <Form.Group controlId="telephone_number" className="form-group">
+          <Form.Label>رقم الهاتف</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="أدخل رقم الهاتف"
+            {...register('telephone_number')}
+            className={`form-control ${errors.telephone_number ? 'is-invalid' : ''}`}
+          />
+          {errors.telephone_number && <div className="invalid-feedback">{errors.telephone_number.message}</div>}
+        </Form.Group>
+
+
+
+      
+
+        <Button variant="primary" type="submit" className="mt-3" disabled={civillian.loading}>
+          {civillian.loading ? 'جاري التعديل...' : 'تعديل المدني'}
         </Button>
       </Form>
     </div>

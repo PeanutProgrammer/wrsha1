@@ -78,22 +78,22 @@ const NCODetails = () => {
                 <td><strong>تاريخ الضم:</strong></td>
                 <td>{moment(nco.results._join_date).format('YYYY-MM-DD')}</td>
               </tr>
-              {/* <tr>
+              <tr>
                 <td><strong>العنوان:</strong></td>
                 <td>{nco.results._address ? nco.results._address : "لا يوجد"}</td>
-              </tr> */}
-              {/* <tr>
+              </tr>
+              <tr>
                 <td><strong>الوزن:</strong></td>
-                <td>{nco.results._weight} كجم</td>
-              </tr> */}
-              {/* <tr>
+                <td>{nco.results._weight ? nco.results._weight + " كجم" : "لا يوجد"} </td>
+              </tr>
+              <tr>
                 <td><strong>الطول:</strong></td>
-                <td>{nco.results._height} سم</td>
+                <td>{nco.results._height ? nco.results._height + " سم" : "لا يوجد"}</td>
               </tr>
               <tr>
                 <td><strong>تاريخ الميلاد:</strong></td>
-                <td>{moment(nco.results._dob).format('YYYY-MM-DD')}</td>
-              </tr> */}
+                <td>{moment(nco.results._dob).format('YYYY-MM-DD') ? moment(nco.results._dob).format('YYYY-MM-DD') : "لا يوجد"}</td>
+              </tr>
               <tr>
                 <td><strong>التمام:</strong></td>
                 <td>{nco.results._in_unit ? 'متواجد' : 'غير موجود'}</td>

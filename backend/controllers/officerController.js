@@ -119,9 +119,9 @@ class OfficerController {
             
             
 
-            await query(`update officers set name =?, mil_id = ?, join_date = ?, department = ?, rank = ?, address = ?,  height = ?, weight = ?, dob = ?, seniority_number = ? where id = ?`,
-                [officerObject.getName(), officerObject.getMilID(), officerObject.getJoinDate(), officerObject.getDepartment(), officerObject.getRank(), officerObject.getAddress(), officerObject.getHeight(), officerObject.getWeight(), officerObject.getDOB(), officerObject.getSeniorityNumber(), checkOfficer[0].id]);
-            
+            await query(`update officers set name =?, join_date = ?, department = ?, rank = ?, address = ?,  height = ?, weight = ?, dob = ?, seniority_number = ? where id = ?`,
+                [officerObject.getName(), officerObject.getJoinDate(), officerObject.getDepartment(), officerObject.getRank(), officerObject.getAddress(), officerObject.getHeight(), officerObject.getWeight(), officerObject.getDOB(), officerObject.getSeniorityNumber(), checkOfficer[0].id]);
+
                 console.log("Name:", officerObject.getName());
             console.log("Join Date:", officerObject.getJoinDate());
             console.log("Department:", officerObject.getDepartment());

@@ -18,7 +18,7 @@ class ExpertLogController {
             // if (req.query.search) {
             //     search =  `where name LIKE '%${req.query.search}%'`
             // }
-            const experts = await query(`SELECT experts.nationalID, experts.name, experts.security_clearance_number, experts.company_name, expert_record.department_visited, expert_record.start_date, expert_record.end_date
+            const experts = await query(`SELECT experts.nationalID, experts.name, experts.security_clearance_number, experts.company_name, experts.valid_from, experts.valid_through, expert_record.department_visited, expert_record.start_date, expert_record.end_date
                                           FROM experts
                                           LEFT JOIN expert_record
                                           ON expert_record.expertID = experts.nationalID

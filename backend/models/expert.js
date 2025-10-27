@@ -1,11 +1,11 @@
 
 
 class Expert {
-    constructor(nationalID, name, passport_num, security_clearance_num, valid_from, valid_through, company_name ) {
+    constructor(nationalID, name, passport_number, security_clearance_num, valid_from, valid_through, company_name ) {
         this._nationalID = nationalID;
         this._name = name;
-        this._passport_num = passport_num;
-        this._security_clearance_num = security_clearance_num;
+        this._passport_number = passport_number;
+        this._security_clearance_number = security_clearance_num;
         this._valid_from = valid_from;
         this._valid_through = valid_through;
         this._company_name = company_name;
@@ -19,12 +19,12 @@ class Expert {
         return this._name;
     }
 
-    getPassportNum = () => {
-        return this._passport_num;
+    getPassportNumber = () => {
+        return this._passport_number;
     }
 
     getSecurityClearanceNumber = () => {
-        return this._security_clearance_num;
+        return this._security_clearance_number;
     }
 
     getValidFrom = () => {
@@ -49,16 +49,16 @@ class Expert {
         this._name = name;
     }
 
-     setPassportNum = (passport_num) => {
-        this._passport_num = passport_num;
+     setPassportNumber = (passport_number) => {
+        this._passport_number = passport_number;
     }
 
-     setSecurityClearanceNum = (security_clearance_num) => {
-        this._security_clearance_num = security_clearance_num;
+     setSecurityClearanceNumber = (security_clearance_number) => {
+        this._security_clearance_number = security_clearance_number;
     }
 
      setValidFrom = (valid_from) => {
-        this.valid_from = valid_from;
+        this._valid_from = valid_from;
     }
 
      setValidThrough = (valid_through) => {

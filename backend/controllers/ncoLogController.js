@@ -181,7 +181,7 @@ class ncoLogController {
             // if (req.query.search) {
             //     search =  `where name LIKE '%${req.query.search}%'`
             // }
-            const officers = await query(`SELECT ncos.mil_id, ncos.rank, ncos.name, ncos.department, nco_log.event_type, nco_log.event_time, leave_type.name AS reason
+            const officers = await query(`SELECT ncos.mil_id, ncos.rank, ncos.name, ncos.department, nco_log.event_type, nco_log.event_time, leave_type.name AS reason, nco_log.notes
                                           FROM ncos
                                           LEFT JOIN nco_log
                                           ON nco_log.ncoID = ncos.id

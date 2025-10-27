@@ -45,12 +45,34 @@ const AddOfficers = () => {
     resolver: yupResolver(schema),
   });
 
+
+  const formatDateToLocalString = (date) => {
+  const d = new Date(date);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');  // months are 0-indexed
+  const day = String(d.getDate()).padStart(2, '0');  // pad day with zero if needed
+  return `${year}-${month}-${day}`;
+};
+
    // Handle form submission
   const createOfficer = async (data) => {
     setOfficer({ ...officer, loading: true });
 
+      console.log("Request Data:", data);
+
+  // Format the dates (join_date and dob) to yyyy-MM-DD format
+  const formattedData = {
+    ...data,
+    join_date: data.join_date ? formatDateToLocalString(data.join_date) : '',
+    dob: data.dob ? formatDateToLocalString(data.dob) : '',
+  };
+
+  // Log the formatted data
+  console.log("Formatted Request Data:", formattedData);
+
+
     try {
-      await axios.post('http://localhost:4001/Officer/', data, {
+      await axios.post('http://localhost:4001/Officer/', formattedData, {
         headers: { token: auth.token },
       });
 

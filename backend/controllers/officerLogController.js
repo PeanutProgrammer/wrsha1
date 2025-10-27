@@ -19,7 +19,7 @@ class OfficerLogController {
             // if (req.query.search) {
             //     search =  `where name LIKE '%${req.query.search}%'`
             // }
-            const officers = await query(`SELECT officers.mil_id, officers.rank, officers.name, officers.department, officer_log.event_type, officer_log.event_time, leave_type.name AS reason
+            const officers = await query(`SELECT officers.mil_id, officers.rank, officers.name, officers.department, officer_log.event_type, officer_log.event_time, leave_type.name AS reason, officer_log.notes
                                           FROM officers
                                           LEFT JOIN officer_log
                                           ON officer_log.officerID = officers.id

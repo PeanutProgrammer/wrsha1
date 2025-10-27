@@ -8,20 +8,26 @@ const shuoonSarya = require("../middleware/shuoonSarya");
 
 router.post("/", shuoonSarya,
     body("name")
-        .isString().withMessage("Please enter a valid name")
-        .isLength({ min: 3, max: 30 }).withMessage("Name should be more than 3 characters and no longer than 30 characters"),
+        .isString().withMessage("يرجى إدخال اسم صحيح")
+        .isLength({ min: 3, max: 30 }).withMessage("اسم الضابط يجب أن يكون أكثر من 3 حروف ولا يتجاوز 30 حرفًا"),
     body("join_date")
-        .isDate(format = "yyyy-MM-DD").withMessage("Please enter a valid date"),
+        .isDate().withMessage("يرجى إدخال تاريخ ضم صحيح بصيغة yyyy-MM-DD"),
     body("end_date")
-        .isDate(format = "yyyy-MM-DD").withMessage("Please enter a valid date"),
+        .isDate().withMessage("يرجى إدخال تاريخ تسريح صحيح بصيغة yyyy-MM-DD"),
     body("department")
-        .isString().withMessage("Please enter a valid department"),
+        .isString().withMessage("يرجى إدخال اسم الفرع أو الورشة"),
     body("mil_id")
-        .isNumeric().withMessage("Please enter a valid Military ID"),
+        .isNumeric().withMessage("يرجى إدخال رقم عسكري صحيح"),
     body("rank")
-        .isString().withMessage("Please enter a valid rank"),
-        body("department")
-        .isString().withMessage("Please enter a valid department number") ,
+        .isString().withMessage("يرجى إدخال رتبة صحيحة"),
+    body("department")
+        .isString().withMessage("يرجى إدخال رقم الفرع أو الورشة بشكل صحيح"),
+    body("telephone_number")
+        .isString().withMessage("يرجى إدخال رقم الهاتف بشكل صحيح"),
+    body("guardian_name")
+        .isString().withMessage("يرجى إدخال اسم صحيح"),
+    body("guardian_telephone_number")
+        .isString().withMessage("يرجى إدخال رقم الهاتف بشكل صحيح"),
     (req, res) => {
             SoldierController.createSoldier(req, res);
         }
@@ -29,26 +35,33 @@ router.post("/", shuoonSarya,
 
 
 router.put("/:id", admin,
-    body("mil_id")
-    .isString   (),
-    body("rank")
-    .isString(),
-    body("name")
-    .isString(),
-    body("department")
-    .isString(),
+   body("name")
+        .isString().withMessage("يرجى إدخال اسم صحيح")
+        .isLength({ min: 3, max: 30 }).withMessage("اسم الضابط يجب أن يكون أكثر من 3 حروف ولا يتجاوز 30 حرفًا"),
     body("join_date")
-    .isDate(),
+        .isDate().withMessage("يرجى إدخال تاريخ ضم صحيح بصيغة yyyy-MM-DD"),
     body("end_date")
-    .isDate(),  (req, res) => {
+        .isDate().withMessage("يرجى إدخال تاريخ تسريح صحيح بصيغة yyyy-MM-DD"),
+    body("department")
+        .isString().withMessage("يرجى إدخال اسم الفرع أو الورشة"),
+
+    body("rank")
+        .isString().withMessage("يرجى إدخال رتبة صحيحة"),
+    body("department")
+        .isString().withMessage("يرجى إدخال رقم الفرع أو الورشة بشكل صحيح"),
+    body("telephone_number")
+        .isString().withMessage("يرجى إدخال رقم الهاتف بشكل صحيح"),
+    body("guardian_name")
+        .isString().withMessage("يرجى إدخال اسم صحيح"),
+    body("guardian_telephone_number")
+        .isString().withMessage("يرجى إدخال رقم الهاتف بشكل صحيح"),
+          (req, res) => {
     SoldierController.updateSoldier(req, res);
     console.log("BODY RECEIVED:", req.body);
 
 });
 
-router.delete("/history/:id", authorized,(req, res) => {
-    SoldierController.deleteHistory(req, res);
-})
+
 
 
 router.delete("/:mil_id", admin,  (req, res) => {

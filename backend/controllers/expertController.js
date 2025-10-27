@@ -43,8 +43,8 @@ class ExpertController {
             const expertObject = new Expert(
                 req.body.nationalID,
                 req.body.name,
-                req.body.passport_num,
-                req.body.security_clearance_num,
+                req.body.passport_number,
+                req.body.security_clearance_number,
                 req.body.valid_from,
                 req.body.valid_through,
                 req.body.company_name
@@ -56,7 +56,7 @@ class ExpertController {
 
 
             await query("insert into experts set  nationalID = ?, name =?, passport_number = ?, security_clearance_number = ?, valid_from = ?, valid_through = ?, company_name = ?",
-                [expertObject.getNationalID(),expertObject.getName(),expertObject.getPassportNum(), expertObject.getSecurityClearanceNumber(), expertObject.getValidFrom(), expertObject.getValidThrough(), expertObject.getCompanyName()]);
+                [expertObject.getNationalID(),expertObject.getName(),expertObject.getPassportNumber(), expertObject.getSecurityClearanceNumber(), expertObject.getValidFrom(), expertObject.getValidThrough(), expertObject.getCompanyName()]);
             
              req.app.get("io").emit("expertsUpdated");
             return res.status(200).json(expertObject.toJSON() );
@@ -98,15 +98,23 @@ class ExpertController {
             const expertObject = new Expert(
                 req.body.nationalID,
                 req.body.name,
-                req.body.passport_num,
-                req.body.security_clearance_num,
+                req.body.passport_number,
+                req.body.security_clearance_number,
                 req.body.valid_from,
                 req.body.valid_through,
                 req.body.company_name
 
               )
             
-                 console.log("hello");
+                 console.log('Executing query with data:', [
+    expertObject.getNationalID(),
+    expertObject.getName(),
+    expertObject.getPassportNumber(),
+    req.body.security_clearance_number,
+    expertObject.getValidFrom(),
+    expertObject.getValidThrough(),
+    expertObject.getCompanyName()
+]);
 
             
             
@@ -116,8 +124,8 @@ class ExpertController {
             
             
 
-            await query(`update experts set  nationalID = ?, name =?, passport_number = ?, security_clearance_number = ?, valid_from = ?, valid_through = ?, company_name = ?`,
-                [expertObject.getNationalID(),expertObject.getName(),expertObject.getPassportNum(), expertObject.getSecurityClearanceNumber(), expertObject.getValidFrom(), expertObject.getValidThrough(), expertObject.getCompanyName()]);
+            await query(`update experts set  name =?, passport_number = ?, security_clearance_number = ?, valid_from = ?, valid_through = ?, company_name = ? where nationalID = ?`,
+                [expertObject.getName(), expertObject.getPassportNumber(), expertObject.getSecurityClearanceNumber(), expertObject.getValidFrom(), expertObject.getValidThrough(), expertObject.getCompanyName() , req.params.id]);
             
 
 
@@ -234,6 +242,7 @@ class ExpertController {
             }
 
             const query = util.promisify(connection.query).bind(connection);
+           console.log(req.params.id);
            
             const expert = await query("select * from experts where nationalID = ?",[req.params.id])
 
@@ -248,7 +257,7 @@ class ExpertController {
 
             console.log(expert[0]); 
 
-            const expertObject = new Expert(expert[0].nationalID, expert[0].name, expert[0].passport_num, expert[0].security_clearance_num,  expert[0].valid_from, expert[0].valid_through, expert[0].company_name);
+            const expertObject = new Expert(expert[0].nationalID, expert[0].name, expert[0].passport_number, expert[0].security_clearance_number,  expert[0].valid_from, expert[0].valid_through, expert[0].company_name);
             return res.status(200).json(expertObject.toJSON());
 
 
@@ -411,9 +420,9 @@ class ExpertController {
     }
 
     // Filter by rank
-    if (req.query.security_clearance_num) {
+    if (req.query.security_clearance_number) {
       filters.push(`security_clearance_number = ?`);
-      params.push(req.query.security_clearance_num);
+      params.push(req.query.security_clearance_number);
     }
 
     // // Filter by join date range

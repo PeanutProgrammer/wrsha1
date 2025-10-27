@@ -3,9 +3,23 @@ import { Form, Button, Alert } from 'react-bootstrap';
 import './NCO.css';
 import axios from 'axios';
 import { getAuthUser } from '../../helper/Storage';
-import DatePicker from 'react-datepicker';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 import "react-datetime/css/react-datetime.css";
-import { ar } from 'date-fns/locale';  // Import Arabic locale from date-fns
+
+// Validation schema using yup
+const schema = yup.object().shape({
+  name: yup.string().min(3, 'اسم ضابط صف الصف يجب أن يكون أكثر من 3 حروف').max(30, 'اسم ضابط صف الصف يجب ألا يتجاوز 30 حرف').required('اسم ضابط صف الصف مطلوب'),
+  rank: yup.string().required('الدرجة مطلوبة'),
+  mil_id: yup.string().matches(/^\d+$/, 'الرقم العسكري يجب أن يحتوي على أرقام فقط').required('الرقم العسكري مطلوب'),
+  department: yup.string().required('الفرع / الورشة مطلوب'),
+  join_date: yup.date().required('تاريخ الضم مطلوب').typeError('يرجى إدخال تاريخ صحيح'),
+  address: yup.string().required('العنوان مطلوب'),
+  height: yup.number().typeError('الطول يجب أن يكون رقماً').required('الطول مطلوب'),
+  weight: yup.number().typeError('الوزن يجب أن يكون رقماً').required('الوزن مطلوب'),
+  dob: yup.date().required('تاريخ الميلاد مطلوب').typeError('يرجى إدخال تاريخ صحيح'),
+});
 
 const AddNCOs = () => {
   const auth = getAuthUser();
@@ -18,51 +32,76 @@ const AddNCOs = () => {
     mil_id: '',
     department: '',
     join_date: '',
+    address: '',
+    height: '',
+    weight: '',
+    dob: '',
     success: null,
   });
 
-  const createNCO = (e) => {
-    e.preventDefault();
+   const { register, handleSubmit, formState: { errors }, reset } = useForm({
+    resolver: yupResolver(schema),
+  });
+
+
+  const formatDateToLocalString = (date) => {
+  const d = new Date(date);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');  // months are 0-indexed
+  const day = String(d.getDate()).padStart(2, '0');  // pad day with zero if needed
+  return `${year}-${month}-${day}`;
+};
+
+   // Handle form submission
+  const createNCO = async (data) => {
     setNCO({ ...nco, loading: true });
 
-    const data = {
-      mil_id: nco.mil_id,
-      rank: nco.rank,
-      name: nco.name,
-      department: nco.department.toString(),
-      join_date: nco.join_date,
-    };
+      console.log("Request Data:", data);
 
-    axios
-      .post('http://localhost:4001/nco/', data, {
-        headers: {
-          token: auth.token,
-        },
-      })
-      .then((resp) => {
-        setNCO({
-          loading: false,
-          err: null,
-          name: '',
-          rank: '',
-          mil_id: '',
-          department: '',
-          join_date: new Date(),
-          success: 'تمت الإضافة بنجاح!',
-        });
+  // Format the dates (join_date and dob) to yyyy-MM-DD format
+  const formattedData = {
+    ...data,
+    join_date: data.join_date ? formatDateToLocalString(data.join_date) : '',
+    dob: data.dob ? formatDateToLocalString(data.dob) : '',
+  };
 
-        setTimeout(() => {
-          window.history.back();
-        }, 1000); // Wait for 1 second before going back
-      })
-      .catch((err) => {
-        setNCO({
-          ...nco,
-          loading: false,
-          err: err.response ? JSON.stringify(err.response.data.errors) : 'Something went wrong. Please try again later.',
-          success: null,
-        });
+  // Log the formatted data
+  console.log("Formatted Request Data:", formattedData);
+
+
+    try {
+      await axios.post('http://localhost:4001/NCO/', formattedData, {
+        headers: { token: auth.token },
       });
+
+      setNCO({
+        loading: false,
+        err: null,
+        success: 'تمت الإضافة بنجاح!',
+        name: '',
+        rank: '',
+        mil_id: '',
+        department: '',
+        join_date: '',
+        address: '',
+        height: '',
+        weight: '',
+        dob: '',
+      });
+
+      reset(); // Reset form after successful submission
+
+      setTimeout(() => {
+        window.history.back();
+      }, 1000); // Wait for 1 second before going back
+    } catch (err) {
+      setNCO({
+        ...nco,
+        loading: false,
+        err: err.response ? JSON.stringify(err.response.data.errors) : 'Something went wrong. Please try again later.',
+        success: null,
+      });
+    }
   };
 
   useEffect(() => {
@@ -76,38 +115,42 @@ const AddNCOs = () => {
       .catch((err) => console.log(err));
   }, []);
 
-  return (
+   return (
     <div className="add-officer-form">
       <h1 className="text-center mb-4">إضافة ضابط صف جديد</h1>
+
+      {/* Display Errors */}
       {nco.err && (
         <Alert variant="danger" className="p-2">
           {nco.err}
         </Alert>
       )}
+
+      {/* Display Success Message */}
       {nco.success && (
         <Alert variant="success" className="p-2">
           {nco.success}
         </Alert>
       )}
-      <Form onSubmit={createNCO} className="form">
+
+      <Form onSubmit={handleSubmit(createNCO)} className="form">
         <Form.Group controlId="mil_id" className="form-group">
           <Form.Label>الرقم العسكري</Form.Label>
           <Form.Control
             type="text"
             placeholder="أدخل الرقم العسكري"
-            value={nco.mil_id}
-            onChange={(e) => setNCO({ ...nco, mil_id: e.target.value })}
-            className="form-control"
+            {...register("mil_id")}
+            className={`form-control ${errors.mil_id ? 'is-invalid' : ''}`}
           />
+          {errors.mil_id && <div className="invalid-feedback">{errors.mil_id.message}</div>}
         </Form.Group>
 
         <Form.Group controlId="rank" className="form-group">
           <Form.Label>الدرجة</Form.Label>
           <Form.Control
             as="select"
-            value={nco.rank}
-            onChange={(e) => setNCO({ ...nco, rank: e.target.value })}
-            className="form-control"
+            {...register("rank")}
+            className={`form-control ${errors.rank ? 'is-invalid' : ''}`}
           >
             <option value="">إختر درجة ضابط الصف</option>
             <option value="عريف">عريف</option>
@@ -120,6 +163,7 @@ const AddNCOs = () => {
             <option value="ملاحظ">ملاحظ</option> 
             <option value="ملاحظ فني">ملاحظ فني</option> 
           </Form.Control>
+          {errors.rank && <div className="invalid-feedback">{errors.rank.message}</div>}
         </Form.Group>
 
         <Form.Group controlId="name" className="form-group">
@@ -127,42 +171,84 @@ const AddNCOs = () => {
           <Form.Control
             type="text"
             placeholder="أدخل اسم ضابط الصف"
-            value={nco.name}
-            onChange={(e) => setNCO({ ...nco, name: e.target.value })}
-            className="form-control"
+            {...register("name")}
+            className={`form-control ${errors.name ? 'is-invalid' : ''}`}
           />
+          {errors.name && <div className="invalid-feedback">{errors.name.message}</div>}
         </Form.Group>
 
         <Form.Group controlId="department" className="form-group">
           <Form.Label>الورشة / الفرع</Form.Label>
           <Form.Control
             as="select"
-            value={nco.department}
-            onChange={(e) => setNCO({ ...nco, department: e.target.value })}
-            className="form-control"
+            {...register("department")}
+            className={`form-control ${errors.department ? 'is-invalid' : ''}`}
           >
             <option value="">إختر الورشة / الفرع</option>
             {dept.map((dep) => (
-              <option key={dep.name} value={dep.name}>
-                {dep.name}
-              </option>
+              <option key={dep.name} value={dep.name}>{dep.name}</option>
             ))}
           </Form.Control>
+          {errors.department && <div className="invalid-feedback">{errors.department.message}</div>}
         </Form.Group>
 
-          <Form.Group controlId="join_date" className="form-group">
-  <Form.Label>تاريخ الضم</Form.Label>
-  <Form.Control
-    type="date"
-    placeholder="أدخل تاريخ الضم"
-    value={nco.join_date}
-    onChange={(e) => setNCO({ ...nco, join_date: e.target.value })}
-    className="form-control"
-  />
-</Form.Group>
+        <Form.Group controlId="join_date" className="form-group">
+          <Form.Label>تاريخ الضم</Form.Label>
+          <Form.Control
+            type="date"
+            {...register("join_date")}
+            className={`form-control ${errors.join_date ? 'is-invalid' : ''}`}
+          />
+          {errors.join_date && <div className="invalid-feedback">{errors.join_date.message}</div>}
+        </Form.Group>
 
-        <Button variant="primary" type="submit" className="submit-btn" disabled={nco.loading}>
-          {nco.loading ? 'جاري الإضافة...' : 'إضافة'}
+
+        <Form.Group controlId="address" className="form-group">
+           <Form.Label>العنوان</Form.Label>
+            <Form.Control
+                        type="text"
+            placeholder="أدخل العنوان"
+            {...register("address")}
+            className={`form-control ${errors.address ? 'is-invalid' : ''}`}
+          />
+          {errors.address && <div className="invalid-feedback">{errors.address.message}</div>}
+        </Form.Group>
+
+        <Form.Group controlId="height" className="form-group">
+          <Form.Label>الطول</Form.Label>
+          <Form.Control
+            type="number"
+            placeholder="أدخل الطول"
+            {...register("height")}
+            className={`form-control ${errors.height ? 'is-invalid' : ''}`}
+          />
+          {errors.height && <div className="invalid-feedback">{errors.height.message}</div>}
+        </Form.Group>
+
+        <Form.Group controlId="weight" className="form-group">
+          <Form.Label>الوزن</Form.Label>
+          <Form.Control
+            type="number"
+            placeholder="أدخل الوزن"
+            {...register("weight")}
+            className={`form-control ${errors.weight ? 'is-invalid' : ''}`}
+          />
+          {errors.weight && <div className="invalid-feedback">{errors.weight.message}</div>}
+        </Form.Group>
+
+        <Form.Group controlId="dob" className="form-group">
+          <Form.Label>تاريخ الميلاد</Form.Label>
+          <Form.Control
+            type="date"
+            {...register("dob")}
+            className={`form-control ${errors.dob ? 'is-invalid' : ''}`}
+          />
+          {errors.dob && <div className="invalid-feedback">{errors.dob.message}</div>}
+        </Form.Group>
+
+        {/* Submit Button */}
+        <Button type="submit" variant="primary" className='submit-btn' disabled={nco.loading}>
+          {nco.loading ? 'جاري الإضافة...' : 'إضافة ضابط الصف'}
         </Button>
       </Form>
     </div>

@@ -68,7 +68,7 @@ const CivilliansTmamDetails = () => {
   <div className="mb-4 border p-3 rounded bg-light text-end" dir="rtl">
     <h5 className="mb-3">معلومات المدني:</h5>
     <p><strong>الاسم:</strong> {basicInfo.name}</p>
-    <p><strong>العنوان:</strong> {basicInfo.address}</p>
+    <p><strong>رقم التصريح الأمني:</strong> {basicInfo.security_clearance_number}</p>
     <p><strong>الرقم القومي:</strong> {basicInfo.nationalID}</p>
     <p><strong>الفرع / الورشة:</strong> {basicInfo.department}</p>
   </div>

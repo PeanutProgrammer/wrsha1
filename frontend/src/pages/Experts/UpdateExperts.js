@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
-import './Expert.css';
+import './UpdateExperts.css';
+import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { getAuthUser } from '../../helper/Storage';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import "react-datetime/css/react-datetime.css";
+  import moment from 'moment';
 
 // Validation schema using yup
 const schema = yup.object().shape({
@@ -19,120 +20,177 @@ const schema = yup.object().shape({
   company_name: yup.string().required('اسم الشركة مطلوب'),
 });
 
-const AddExperts = () => {
+const UpdateExperts = () => {
   const auth = getAuthUser();
+  let { id } = useParams();
+
   const [expert, setExpert] = useState({
     loading: false,
-    err: [],
+    err: '',
+    nationalID: '',
+    name: '',
+    passport_number: '',
+    security_clearance_number: '',
+    valid_from: '',
+    valid_through: '',
+    company_name: '',
     success: null,
+    reload: false,
   });
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-    reset
-  } = useForm({
-    resolver: yupResolver(schema)
+  // Use Form Hook from react-hook-form
+  const { register, handleSubmit, formState: { errors }, reset } = useForm({
+    resolver: yupResolver(schema),
   });
 
-      const formatDateToLocalString = (date) => {
-  const d = new Date(date);
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, '0');  // months are 0-indexed
-  const day = String(d.getDate()).padStart(2, '0');  // pad day with zero if needed
-  return `${year}-${month}-${day}`;
-};
-
-  // Handle form submission
-  const createExpert = async (data) => {
-    setExpert({ ...expert, loading: true });
-
-    const formattedData = {
-    ...data,
-  valid_from: data.valid_from ? formatDateToLocalString(data.valid_from) : '',
-  valid_through: data.valid_through ? formatDateToLocalString(data.valid_through) : '',
+  const formatDateToInput = (date) => {
+    if (!date) return '';
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   };
 
-    try {
-      await axios.post('http://localhost:4001/expert/', formattedData, {
+  const updateExperts = (data) => {
+    setExpert({ ...expert, loading: true });
+
+          console.log("Request Data:", data);
+
+    const formattedData = {
+      ...data,
+      valid_from: data.valid_from ? formatDateToInput(data.valid_from) : '',
+      valid_through: data.valid_through ? formatDateToInput(data.valid_through) : '',
+    };
+
+
+
+    axios
+      .put('http://localhost:4001/Expert/' + id, formattedData, {
         headers: {
           token: auth.token,
         },
-      });
+      })
+      .then((resp) => {
 
-      setExpert({
-        loading: false,
-        err: [],
-        success: 'تمت الإضافة بنجاح!',
-      });
+        console.log("API Response:", resp.data);  // Log the full response to verify field names
 
-      reset(); // Reset form after successful submission
+        setExpert({
+          ...expert,
+          loading: false,
+          success: 'تم تعديل بيانات الخبير بنجاح!',
+          err: '',
+        });
 
-      setTimeout(() => {
-        window.history.back();
-      }, 1000);
-    } catch (err) {
-      setExpert({
-        loading: false,
-        err: err.response ? err.response.data.errors : ['حدث خطأ ما. يرجى المحاولة لاحقًا.'],
-        success: null,
+        setTimeout(() => {
+          window.history.back();
+        }, 1000);
+      })
+      .catch((err) => {
+        setExpert({
+          ...expert,
+          loading: false,
+          err: err.response
+            ? JSON.stringify(err.response.data.errors)
+            : 'Something went wrong. Please try again later.',
+          success: null,
+        });
       });
-    }
   };
 
+  useEffect(() => {
+    axios
+      .get('http://localhost:4001/Expert/' + id, {
+        headers: {
+          token: auth.token,
+        },
+      })
+      .then((resp) => {
+
+
+        setExpert({
+          ...expert,
+          nationalID: resp.data._nationalID,
+          name: resp.data._name,
+          passport_number: resp.data.passport_number,
+          security_clearance_number: resp.data._security_clearance_number,
+          valid_from: resp.data._valid_from ? formatDateToInput(resp.data._valid_from) : '',
+          valid_through: resp.data._valid_through ? formatDateToInput(resp.data._valid_through) : '',
+          company_name: resp.data._company_name,
+          loading: false,
+          err: '',
+        });
+        reset({
+          nationalID: resp.data._nationalID,
+          name: resp.data._name,
+          passport_number: resp.data._passport_number,
+          security_clearance_number: resp.data._security_clearance_number,
+          valid_from: resp.data._valid_from ? formatDateToInput(resp.data._valid_from) : '',
+          valid_through: resp.data._valid_through ? formatDateToInput(resp.data._valid_through) : '',
+          company_name: resp.data._company_name,
+        });
+      })
+      .catch((err) => {
+        setExpert({
+          ...expert,
+          loading: false,
+          err: err.response
+            ? JSON.stringify(err.response.data.errors)
+            : 'Something went wrong. Please try again later.',
+          success: null,
+        });
+      });
+  }, [id, expert.reload, reset]);
+
+
   return (
-    <div className="add-officer-form">
-      <h1 className="text-center mb-4">إضافة خبير جديد</h1>
-      
-      {/* Display Errors */}
-      {expert.err.length > 0 && (
+    <div className="Update">
+      <h1 className="text-center p-2">تعديل بيانات الخبير</h1>
+
+      {expert.err && (
         <Alert variant="danger" className="p-2">
-          <ul>
-            {expert.err.map((error, index) => (
-              <li key={index}>{error.msg || error}</li>
-            ))}
-          </ul>
+          {expert.err}
         </Alert>
       )}
-
-      {/* Display Success Message */}
       {expert.success && (
         <Alert variant="success" className="p-2">
           {expert.success}
         </Alert>
       )}
-      
-      <Form onSubmit={handleSubmit(createExpert)} className="form">
-        <Form.Group controlId="nationalID" className="form-group">
-          <Form.Label>الرقم القومي</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="أدخل الرقم القومي"
-            {...register("nationalID")}
-            className={`form-control ${errors.nationalID ? 'is-invalid' : ''}`}
-          />
-          {errors.nationalID && <div className="invalid-feedback">{errors.nationalID.message}</div>}
-        </Form.Group>
 
-        <Form.Group controlId="name" className="form-group">
-          <Form.Label>اسم الخبير</Form.Label>
+      <Form onSubmit={handleSubmit(updateExperts)}>
+       <Form.Group controlId="nationalID">
+  <Form.Label>الرقم القومي</Form.Label>
+  <Form.Control
+    type="text"
+    placeholder="أدخل الرقم القومي"
+    {...register('nationalID')}
+    className={`form-control ${errors.nationalID ? 'is-invalid' : ''}`}
+    disabled // Make it uneditable
+  />
+  {errors.nationalID && <div className="invalid-feedback">{errors.nationalID.message}</div>}
+</Form.Group>
+
+
+
+
+        <Form.Group controlId="name">
+          <Form.Label>إسم الخبير</Form.Label>
           <Form.Control
             type="text"
-            placeholder="أدخل اسم الخبير"
-            {...register("name")}
+            placeholder="أدخل إسم الخبير"
+            {...register('name')}
             className={`form-control ${errors.name ? 'is-invalid' : ''}`}
           />
           {errors.name && <div className="invalid-feedback">{errors.name.message}</div>}
         </Form.Group>
 
         <Form.Group controlId="passport_number" className="form-group">
-          <Form.Label>جواز السفر</Form.Label>
+          <Form.Label>رقم جواز السفر</Form.Label>
           <Form.Control
             type="text"
             placeholder="أدخل رقم جواز السفر"
-            {...register("passport_number")}
+            {...register('passport_number')}
             className={`form-control ${errors.passport_number ? 'is-invalid' : ''}`}
           />
           {errors.passport_number && <div className="invalid-feedback">{errors.passport_number.message}</div>}
@@ -143,7 +201,7 @@ const AddExperts = () => {
           <Form.Control
             type="text"
             placeholder="أدخل رقم التصديق الأمني"
-            {...register("security_clearance_number")}
+            {...register('security_clearance_number')}
             className={`form-control ${errors.security_clearance_number ? 'is-invalid' : ''}`}
           />
           {errors.security_clearance_number && <div className="invalid-feedback">{errors.security_clearance_number.message}</div>}
@@ -154,7 +212,7 @@ const AddExperts = () => {
           <Form.Control
             type="date"
             placeholder="أدخل تاريخ بداية التصديق الأمني"
-            {...register("valid_from")}
+            {...register('valid_from')}
             className={`form-control ${errors.valid_from ? 'is-invalid' : ''}`}
           />
           {errors.valid_from && <div className="invalid-feedback">{errors.valid_from.message}</div>}
@@ -165,7 +223,7 @@ const AddExperts = () => {
           <Form.Control
             type="date"
             placeholder="أدخل تاريخ انتهاء التصديق الأمني"
-            {...register("valid_through")}
+            {...register('valid_through')}
             className={`form-control ${errors.valid_through ? 'is-invalid' : ''}`}
           />
           {errors.valid_through && <div className="invalid-feedback">{errors.valid_through.message}</div>}
@@ -176,18 +234,22 @@ const AddExperts = () => {
           <Form.Control
             type="text"
             placeholder="أدخل اسم الشركة"
-            {...register("company_name")}
+            {...register('company_name')}
             className={`form-control ${errors.company_name ? 'is-invalid' : ''}`}
           />
           {errors.company_name && <div className="invalid-feedback">{errors.company_name.message}</div>}
         </Form.Group>
 
-        <Button variant="primary" type="submit" className="submit-btn" disabled={expert.loading}>
-          {expert.loading ? 'جاري الإضافة...' : 'إضافة'}
+
+
+      
+
+        <Button variant="primary" type="submit" className="mt-3" disabled={expert.loading}>
+          {expert.loading ? 'جاري التعديل...' : 'تعديل الخبير'}
         </Button>
       </Form>
     </div>
   );
 };
 
-export default AddExperts;
+export default UpdateExperts;

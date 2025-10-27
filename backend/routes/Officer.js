@@ -34,8 +34,7 @@ router.post("/", shuoonOfficers,
 );
 
 router.put("/:id", admin,
-    body("mil_id")
-        .isString().withMessage("يرجى إدخال رقم عسكري صحيح"),
+
     body("rank")
         .isString().withMessage("يرجى إدخال رتبة صحيحة"),
     body("name")

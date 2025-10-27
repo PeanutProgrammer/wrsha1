@@ -84,6 +84,7 @@ const OfficersLog = () => {
             <th>دخول / خروج</th>
             <th>الوقت</th>
             <th>السبب</th>
+            <th>ملاحظات</th>
             {/* <th>Action</th> */}
           </tr>
         </thead>
@@ -109,6 +110,7 @@ const OfficersLog = () => {
 </td>
 
             <td>{(officer.event_type? (officer.event_type == "دخول"? "دخول" : officer.reason): "لا يوجد")}</td>
+            <td>{officer.notes? officer.notes : "لا يوجد"}</td>
             {/* <td >{officer.tmam? officer.tmam: "متواجد"}</td> */}
               {/* <td> */}
                 {/* <button className="btn btn-sm btn-danger mx-1 p-2" onClick ={(e) =>  {deleteOfficer(officer.mil_id)}}>حذف</button> */}

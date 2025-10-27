@@ -7,6 +7,7 @@ import moment from 'moment';
 
 const Civillians = () => {
   const auth = getAuthUser();
+    const now = moment().format("YYYY-MM-DD HH:mm:ss");
   const [civillians, setCivillians] = useState({
     loading: true,
     err: null,
@@ -141,6 +142,10 @@ const Civillians = () => {
               <th>الإسم</th>
               <th>الورشة / الفرع</th>
               <th>تاريخ الضم</th>
+              <th>رقم التصديق الأمني</th>
+              <th>الفترة من</th>
+              <th>الفترة إلى</th>
+              <th>حالة التصديق</th>
               <th>التمام</th>
               <th>الإجراءات</th>
             </tr>
@@ -152,6 +157,26 @@ const Civillians = () => {
                 <td>{civillian.name}</td>
                 <td>{civillian.department}</td>
                 <td>{moment(civillian.join_date).format('YYYY-MM-DD')}</td>
+                <td>{civillian.security_clearance_number}</td>
+                <td>{moment(civillian.valid_from).format('YYYY-MM-DD')}</td>
+                <td>{moment(civillian.valid_through).format('YYYY-MM-DD')}</td>
+                <td
+                                className={
+                    moment(civillian.valid_from).isBefore(now) && moment(civillian.valid_through).isAfter(now)
+                      ? 'bg-success text-white' // Valid: green
+                      : moment(civillian.valid_through).isBefore(now)
+                      ? 'bg-danger text-white' // Expired: red
+                      : moment(civillian.valid_from).isAfter(now)
+                      ? 'bg-warning text-dark'  // Not started yet: yellow
+                      : 'bg-danger text-white'  // fallback
+                  }> {moment(civillian.valid_from).isBefore(now) && moment(civillian.valid_through).isAfter(now)
+                    ? 'ساري'
+                    : moment(civillian.valid_through).isBefore(now)
+                    ? 'منتهي'
+                    : moment(civillian.valid_from).isAfter(now)
+                    ? 'لم يبدأ بعد'  // Optional, if you want to display something for experts who haven't started yet
+                    : 'منتهي' // fallback for invalid state
+                  }</td>
                 <td>{civillian.in_unit ? 'متواجد' : 'غير موجود'}</td>
                 <td>
                   <div className="action-buttons">

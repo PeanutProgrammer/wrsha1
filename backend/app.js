@@ -60,6 +60,7 @@ const soldierLog = require("./routes/SoldierLog");
 const civillian = require("./routes/Civillian");
 const civillianLog = require("./routes/CivillianLog");
 const expert = require("./routes/Expert");
+const expertLog = require("./routes/ExpertLog");
 
 
 
@@ -84,6 +85,7 @@ app.use("/soldierLog",soldierLog);
 app.use("/civillian",civillian);
 app.use("/civillianLog",civillianLog);
 app.use("/expert",expert);
+app.use("/expertLog",expertLog);
 
 
 // app.use("/busses", busses);

@@ -46,14 +46,17 @@ class SoldierController {
                 req.body.end_date,
                 req.body.department,
                 req.body.mil_id,
-                req.body.rank               )
+                req.body.rank,
+                req.body.telephone_number,
+                req.body.guardian_name,
+                req.body.guardian_telephone_number               )
             
 
             
 
 
-            await query("insert into soldiers set name =?, join_date = ?, end_date = ?, department = ?, mil_id = ?, rank = ?",
-                [soldierObject.getName(),soldierObject.getJoinDate(), soldierObject.getEndDate(), soldierObject.getDepartment(), soldierObject.getMilID(), soldierObject.getRank()]);
+            await query("insert into soldiers set name =?, join_date = ?, end_date = ?, department = ?, mil_id = ?, rank = ?, telephone_number =?, guardian_name = ?, guardian_telephone_number =?",
+                [soldierObject.getName(),soldierObject.getJoinDate(), soldierObject.getEndDate(), soldierObject.getDepartment(), soldierObject.getMilID(), soldierObject.getRank(), soldierObject.getTelephoneNumber(), soldierObject.getGuardianName(), soldierObject.getGuardianTelephoneNumber()]);
             
              req.app.get("io").emit("soldiersUpdated");
             return res.status(200).json(soldierObject.toJSON() );
@@ -92,13 +95,16 @@ class SoldierController {
             
 
             
-             const soldierObject = new Soldier(
+            const soldierObject = new Soldier(
                 req.body.name,
                 req.body.join_date,
                 req.body.end_date,
                 req.body.department,
                 req.body.mil_id,
-                req.body.rank               )
+                req.body.rank,
+                req.body.telephone_number,
+                req.body.guardian_name,
+                req.body.guardian_telephone_number               )
             
                  console.log("hello");
 
@@ -110,9 +116,9 @@ class SoldierController {
             
             
 
-            await query(`update soldiers set name =?, mil_id = ?, join_date = ?, end_date = ?, department = ?, rank = ? where id = ?`,
-                [soldierObject.getName(), soldierObject.getMilID(), soldierObject.getJoinDate(), soldierObject.getEndDate(), soldierObject.getDepartment(), soldierObject.getRank(), checkSoldier[0].id]);
-            
+            await query(`update soldiers set name =?, join_date = ?, end_date = ?, department = ?, rank = ?, telephone_number =?, guardian_name = ?, guardian_telephone_number =? where id = ?`,
+                [soldierObject.getName(),soldierObject.getJoinDate(), soldierObject.getEndDate(), soldierObject.getDepartment(), soldierObject.getRank(), soldierObject.getTelephoneNumber(), soldierObject.getGuardianName(), soldierObject.getGuardianTelephoneNumber(), req.params.id]);
+
                 console.log("Name:", soldierObject.getName());
             console.log("Join Date:", soldierObject.getJoinDate());
             console.log("Department:", soldierObject.getDepartment());
@@ -243,7 +249,7 @@ class SoldierController {
 
             console.log(soldier[0]); 
 
-            const soldierObject = new Soldier(soldier[0].name, soldier[0].join_date, soldier[0].end_date, soldier[0].department, soldier[0].mil_id, soldier[0].rank, soldier[0].in_unit);
+            const soldierObject = new Soldier(soldier[0].name, soldier[0].join_date, soldier[0].end_date, soldier[0].department, soldier[0].mil_id, soldier[0].rank, soldier[0].telephone_number, soldier[0].guardian_name, soldier[0].guardian_telephone_number, soldier[0].in_unit);
             return res.status(200).json(soldierObject.toJSON());
 
 
@@ -329,7 +335,7 @@ class SoldierController {
                 })
             }
 
-             const soldierObject = new Soldier(soldier[0].name, soldier[0].join_date, soldier[0].end_date, soldier[0].department, soldier[0].mil_id, soldier[0].rank, soldier[0].in_unit);
+            const soldierObject = new Soldier(soldier[0].name, soldier[0].join_date, soldier[0].end_date, soldier[0].department, soldier[0].mil_id, soldier[0].rank, soldier[0].telephone_number, soldier[0].guardian_name, soldier[0].guardian_telephone_number, soldier[0].in_unit);
             const soldierTmam = await query(`SELECT soldiers.mil_id ,soldiers.rank,soldiers.name, soldiers.department, soldiers.join_date, leave_type.name AS 'tmam', soldier_leave_details.start_date, soldier_leave_details.end_date, soldier_leave_details.destination, soldier_log.notes
                                           FROM soldiers
                                           LEFT JOIN soldier_log
@@ -456,68 +462,6 @@ class SoldierController {
 
 
 
-    static async getSearchHistory(req, res) {
-        try {
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-            }
-
-            const query = util.promisify(connection.query).bind(connection);
-
-            const { token } = req.headers;
-
-            const user = await query("select * from users where token = ?",[token] )
-
-            const history = await query("select * from search_history where user_id = ?", [user[0].id]);
-
-
- 
-            if (history.length == 0) {
-                return res.status(404).json({
-                    msg: "No history found"
-                })
-            }
-
-            return res.status(200).json(history)
-
-
-
-
-        } catch (err) {
-            return res.status(500).json({ err: err });
-        }
-    }
-
-
-    static async deleteHistory(req, res) {
-        try {
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-            }
-
-            const query = util.promisify(connection.query).bind(connection);
-
-
-
-             await query("delete from search_history where id = ?", [req.params.id]);
-
-
- 
-            
-
-            return res.status(200).json({
-                msg: "History Cleared!"
-            })
-
-
-
-
-        } catch (err) {
-            return res.status(500).json({ err: err });
-        }
-    }
 
     
     }

@@ -84,7 +84,7 @@ const SoldiersLog = () => {
             <th>دخول / خروج</th>
             <th>الوقت</th>
             <th>السبب</th>
-            <th>Action</th>
+            <th>ملاحظات</th>
           </tr>
         </thead>
         <tbody>
@@ -109,12 +109,14 @@ const SoldiersLog = () => {
 </td>
 
             <td>{(soldier.event_type? (soldier.event_type == "دخول"? "دخول" : soldier.reason): "لا يوجد")}</td>
+            <td>{soldier.notes? soldier.notes: "لا يوجد"}</td>
+
             {/* <td >{officer.tmam? officer.tmam: "متواجد"}</td> */}
-              <td>
+              {/* <td> */}
                 {/* <button className="btn btn-sm btn-danger mx-1 p-2" onClick ={(e) =>  {deleteOfficer(officer.mil_id)}}>حذف</button> */}
                 {/* <Link to={`${officer.mil_id}`} className="btn btn-sm btn-primary mx-1 p-2">تعديل</Link> */}
-                <Link to={`details/${soldier.mil_id}`} className="btn btn-sm btn-primary mx-1 p-2">تفاصيل </Link>
-              </td>
+                {/* <Link to={`details/${soldier.mil_id}`} className="btn btn-sm btn-primary mx-1 p-2">تفاصيل </Link> */}
+              {/* </td> */}
             </tr>
           ))}
         </tbody>

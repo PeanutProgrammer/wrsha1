@@ -81,10 +81,26 @@ const SoldierDetails = () => {
                 <td>{moment(soldier.results._join_date).format('YYYY-MM-DD')}</td>
               </tr>
 
-                            <tr>
+              <tr>
                 <td><strong>تاريخ التسريح:</strong></td>
                 <td>{moment(soldier.results._end_date).format('YYYY-MM-DD')}</td>
               </tr>
+
+              <tr>
+                <td><strong>رقم الهاتف:</strong></td>
+                <td>{soldier.results._telephone_number}</td>
+              </tr>
+
+              <tr>
+                <td><strong>اسم ولي الأمر:</strong></td>
+                <td>{soldier.results._guardian_name}</td>
+              </tr>
+
+              <tr>
+                <td><strong>رقم هاتف ولي الأمر:</strong></td>
+                <td>{soldier.results._guardian_telephone_number}</td>
+              </tr>
+
               {/* <tr>
                 <td><strong>العنوان:</strong></td>
                 <td>{soldier.results._address ? soldier.results._address : "لا يوجد"}</td>

@@ -6,7 +6,7 @@ const util = require("util");
 
 
 
-class authController {
+class authController { 
     static  async login(req, res) {
         try {
 

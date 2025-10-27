@@ -4,24 +4,54 @@ const CivillianController = require("../controllers/civillianController");
 const authorized = require("../middleware/authorized");
 const admin = require("../middleware/admin");
 const shuoonOfficers = require("../middleware/shuoonOfficers");
+const moment = require('moment');
 
 
 router.post("/", shuoonOfficers,
     body("name")
-        .isString().withMessage("Please enter a valid name")
-        .isLength({ min: 3, max: 30 }).withMessage("Name should be more than 3 characters and no longer than 30 characters"),
+          .isString().withMessage("من فضلك أدخل اسم صحيح")
+          .isLength({ min: 3, max: 30 }).withMessage("الاسم يجب أن يكون بين 3 و 30 حرفًا"),
+  
+      // Validate 'valid_from' and 'valid_through' dates
+    body("valid_from")
+          .isDate().withMessage("من فضلك أدخل تاريخ بدء صحيح (YYYY-MM-DD)")
+          .custom((value, { req }) => {
+              if (!moment(value, "YYYY-MM-DD", true).isValid()) {
+                  throw new Error("تاريخ بدء الخبرة يجب أن يكون بالتنسيق الصحيح (YYYY-MM-DD).");
+              }
+              if (moment(value).isAfter(req.body.valid_through)) {
+                  throw new Error("تاريخ بدء الخبرة يجب أن يكون قبل تاريخ الانتهاء.");
+              }
+              return true;
+          }),
+    body("valid_through")
+          .isDate().withMessage("من فضلك أدخل تاريخ انتهاء صحيح (YYYY-MM-DD)")
+          .custom((value, { req }) => {
+              if (!moment(value, "YYYY-MM-DD", true).isValid()) {
+                  throw new Error("تاريخ انتهاء الخبرة يجب أن يكون بالتنسيق الصحيح (YYYY-MM-DD).");
+              }
+              if (moment(value).isBefore(req.body.valid_from)) {
+                  throw new Error("تاريخ انتهاء الخبرة يجب أن يكون بعد تاريخ البدء.");
+              }
+              return true;
+          }),
+    // Validate 'security_clearance_number'
+    body("security_clearance_number")
+        .isString().withMessage("من فضلك أدخل رقم التصديق الأمني صحيح"),
     body("join_date")
-        .isDate(format = "yyyy-MM-DD").withMessage("Please enter a valid date"),
+        .isDate(format = "yyyy-MM-DD").withMessage("من فضلك أدخل تاريخ ضم صحيح (YYYY-MM-DD)"),
     body("department")
-        .isString().withMessage("Please enter a valid department"),
+        .isString().withMessage("من فضلك أدخل قسم صحيح"),
+    // Validate 'nationalID'
     body("nationalID")
-        .isNumeric().withMessage("Please enter a valid National ID"),
+        .isNumeric().withMessage("من فضلك أدخل رقم الهوية الوطنية صحيح"),
+
     body("telephone_number")
-        .isMobilePhone('ar-EG').withMessage("Please enter a valid Telephone Number"),
+        .isMobilePhone('ar-EG').withMessage("من فضلك أدخل رقم هاتف صحيح"),
     body("address")
-        .isString().withMessage("Please enter a valid address") ,
+        .isString().withMessage("من فضلك أدخل عنوان صحيح"),
     body("dob")
-         .isDate(format = "yyyy-MM-DD").withMessage("Please enter a valid date"),
+         .isDate(format = "yyyy-MM-DD").withMessage("من فضلك أدخل تاريخ صحيح للميلاد"),
     (req, res) => {
             CivillianController.createCivillian(req, res);
         }
@@ -29,20 +59,51 @@ router.post("/", shuoonOfficers,
 
 
 router.put("/:id", admin,
-    body("nationalID")
-    .isString   (),
     body("name")
-    .isString(),
-    body("department")
-    .isString(),
+          .isString().withMessage("من فضلك أدخل اسم صحيح")
+          .isLength({ min: 3, max: 30 }).withMessage("الاسم يجب أن يكون بين 3 و 30 حرفًا"),
+  
+      // Validate 'valid_from' and 'valid_through' dates
+    body("valid_from")
+          .isDate().withMessage("من فضلك أدخل تاريخ بدء صحيح (YYYY-MM-DD)")
+          .custom((value, { req }) => {
+              if (!moment(value, "YYYY-MM-DD", true).isValid()) {
+                  throw new Error("تاريخ بدء الخبرة يجب أن يكون بالتنسيق الصحيح (YYYY-MM-DD).");
+              }
+              if (moment(value).isAfter(req.body.valid_through)) {
+                  throw new Error("تاريخ بدء الخبرة يجب أن يكون قبل تاريخ الانتهاء.");
+              }
+              return true;
+          }),
+    body("valid_through")
+          .isDate().withMessage("من فضلك أدخل تاريخ انتهاء صحيح (YYYY-MM-DD)")
+          .custom((value, { req }) => {
+              if (!moment(value, "YYYY-MM-DD", true).isValid()) {
+                  throw new Error("تاريخ انتهاء الخبرة يجب أن يكون بالتنسيق الصحيح (YYYY-MM-DD).");
+              }
+              if (moment(value).isBefore(req.body.valid_from)) {
+                  throw new Error("تاريخ انتهاء الخبرة يجب أن يكون بعد تاريخ البدء.");
+              }
+              return true;
+          }),
+    // Validate 'security_clearance_number'
+    body("security_clearance_number")
+        .isString().withMessage("من فضلك أدخل رقم التصديق الأمني صحيح"),
     body("join_date")
-    .isDate(),
-    body("dob")
-    .isDate(),
+        .isDate(format = "yyyy-MM-DD").withMessage("من فضلك أدخل تاريخ ضم صحيح (YYYY-MM-DD)"),
+    body("department")
+        .isString().withMessage("من فضلك أدخل قسم صحيح"),
+    // Validate 'nationalID'
+    body("nationalID")
+        .isNumeric().withMessage("من فضلك أدخل رقم الهوية الوطنية صحيح"),
+
     body("telephone_number")
-    .isMobilePhone(),
+        .isMobilePhone('ar-EG').withMessage("من فضلك أدخل رقم هاتف صحيح"),
     body("address")
-    .isString(),  (req, res) => {
+        .isString().withMessage("من فضلك أدخل عنوان صحيح"),
+    body("dob")
+         .isDate(format = "yyyy-MM-DD").withMessage("من فضلك أدخل تاريخ صحيح للميلاد"),
+           (req, res) => {
     CivillianController.updateCivillian(req, res);
     console.log("BODY RECEIVED:", req.body);
 

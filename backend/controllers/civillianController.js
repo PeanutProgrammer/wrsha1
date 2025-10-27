@@ -47,15 +47,15 @@ class CivillianController {
                 req.body.nationalID,
                 req.body.telephone_number,
                 req.body.address,
-                req.body.dob
+                req.body.dob,
+                req.body.security_clearance_number,
+                req.body.valid_from,
+                req.body.valid_through
              )
-            
-
-            
 
 
-            await query("insert into civillians set name =?, join_date = ?, department = ?, nationalID = ?, telephone_number = ?, address = ?, dob = ?",
-                [civillianObject.getName(),civillianObject.getJoinDate(), civillianObject.getDepartment(), civillianObject.getNationalID(), civillianObject.getTelephoneNumber(), civillianObject.getAddress(), civillianObject.getDOB()]);
+            await query("insert into civillians set name =?, join_date = ?, department = ?, nationalID = ?, telephone_number = ?, address = ?, dob = ?, security_clearance_number = ?, valid_from = ?, valid_through = ?",
+                [civillianObject.getName(),civillianObject.getJoinDate(), civillianObject.getDepartment(), civillianObject.getNationalID(), civillianObject.getTelephoneNumber(), civillianObject.getAddress(), civillianObject.getDOB(), civillianObject.getSecurityClearanceNumber(), civillianObject.getValidFrom(), civillianObject.getValidThrough()]);
             
              req.app.get("io").emit("civilliansUpdated");
             return res.status(200).json(civillianObject.toJSON() );
@@ -101,7 +101,10 @@ class CivillianController {
                 req.body.nationalID,
                 req.body.telephone_number,
                 req.body.address,
-                req.body.dob
+                req.body.dob,
+                req.body.security_clearance_number,
+                req.body.valid_from,
+                req.body.valid_through
              )
             
                  console.log("hello");
@@ -109,13 +112,8 @@ class CivillianController {
             
             
 
-             
-           
-            
-            
-
-            await query(`update civillians set name =?, join_date = ?, department = ?, nationalID = ?, telephone_number = ?, address = ?, dob = ?`,
-                [civillianObject.getName(),civillianObject.getJoinDate(), civillianObject.getDepartment(), civillianObject.getNationalID(), civillianObject.getTelephoneNumber(), civillianObject.getAddress(), civillianObject.getDOB()]);
+            await query(`update civillians set name =?, join_date = ?, department = ?, nationalID = ?, telephone_number = ?, address = ?, dob = ?, security_clearance_number = ?, valid_from = ?, valid_through = ? where id = ?`,
+                [civillianObject.getName(),civillianObject.getJoinDate(), civillianObject.getDepartment(), civillianObject.getNationalID(), civillianObject.getTelephoneNumber(), civillianObject.getAddress(), civillianObject.getDOB(), civillianObject.getSecurityClearanceNumber(), civillianObject.getValidFrom(), civillianObject.getValidThrough(), req.params.id]);
 
 
             console.log(req.body.department);
@@ -253,7 +251,10 @@ class CivillianController {
                civillian[0].nationalID,
                civillian[0].telephone_number,
                civillian[0].address,
-               civillian[0].dob
+               civillian[0].dob,
+               civillian[0].security_clearance_number,
+               civillian[0].valid_from,
+               civillian[0].valid_through
              )
 
 
@@ -344,8 +345,8 @@ class CivillianController {
                 })
             }
 
-             const civillianObject = new Civillian(civillian[0].name, civillian[0].join_date, civillian[0].end_date, civillian[0].department, civillian[0].nationalID, civillian[0].rank, civillian[0].in_unit);
-            const civillianTmam = await query(`SELECT civillians.nationalID,civillians.name, civillians.department, civillians.join_date, leave_type.name AS 'tmam', civillian_leave_details.start_date, civillian_leave_details.end_date, civillian_leave_details.destination, civillian_log.notes
+             const civillianObject = new Civillian(civillian[0].name, civillian[0].join_date, civillian[0].department, civillian[0].nationalID, civillian[0].telephone_number, civillian[0].address, civillian[0].dob, civillian[0].security_clearance_number, civillian[0].valid_from, civillian[0].valid_through);
+            const civillianTmam = await query(`SELECT civillians.nationalID,civillians.name, civillians.department, civillians.security_clearance_number, civillians.join_date, leave_type.name AS 'tmam', civillian_leave_details.start_date, civillian_leave_details.end_date, civillian_leave_details.destination, civillian_log.notes
                                           FROM civillians
                                           LEFT JOIN civillian_log
                                           ON civillians.id = civillian_log.civillianID
