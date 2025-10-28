@@ -83,7 +83,6 @@ const CivilliansLog = () => {
             <th>دخول / خروج</th>
             <th>الوقت</th>
             <th>السبب</th>
-            <th>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -109,11 +108,11 @@ const CivilliansLog = () => {
 
             <td>{(civillian.event_type? (civillian.event_type == "دخول"? "دخول" : civillian.reason): "لا يوجد")}</td>
             {/* <td >{officer.tmam? officer.tmam: "متواجد"}</td> */}
-              <td>
-                {/* <button className="btn btn-sm btn-danger mx-1 p-2" onClick ={(e) =>  {deleteOfficer(officer.mil_id)}}>حذف</button> */}
-                {/* <Link to={`${officer.mil_id}`} className="btn btn-sm btn-primary mx-1 p-2">تعديل</Link> */}
+              {/* <td>
+                <button className="btn btn-sm btn-danger mx-1 p-2" onClick ={(e) =>  {deleteOfficer(officer.mil_id)}}>حذف</button>
+                <Link to={`${officer.mil_id}`} className="btn btn-sm btn-primary mx-1 p-2">تعديل</Link>
                 <Link to={`details/${civillian.mil_id}`} className="btn btn-sm btn-primary mx-1 p-2">تفاصيل </Link>
-              </td>
+              </td> */}
             </tr>
           ))}
         </tbody>

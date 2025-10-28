@@ -65,6 +65,12 @@ import SearchExperts from "./pages/Experts/SearchExperts";
 
 
 
+import GuestsHome from "./pages/Guests/GuestsHome";
+import Guests from "./pages/Guests/Guests";
+import AddGuests from "./pages/Guests/AddGuests";
+
+
+
 
 
 
@@ -421,10 +427,10 @@ export const router = createBrowserRouter([
                         //     element: <OfficerDetails />
                         // }]
                     },
-                    {
-                        path: 'Tmam',
-                        element: <CivilliansTmam />,
-                    },
+                    // {
+                    //     path: 'Tmam',
+                    //     element: <CivilliansTmam />,
+                    // },
                     {
                         path: 'log',
                         element: <ExpertsLog />
@@ -433,14 +439,73 @@ export const router = createBrowserRouter([
                         path: 'search',
                         element: <SearchExperts />
                     },
+                    // {
+                    //         path: 'Tmam/details/:id',
+                    //         element: <CivilliansTmamDetails/>,
+                    //         // children:[{
+                    //         //     path: 'id',
+                    //         //     element: <OfficersTmamDetails/>
+                    //         // }]
+                    //     }
+                ]
+            }
+                ]
+            },
+
+            {   path: "GuestsHome",
+                element: <Admin />,
+                children: [
                     {
-                            path: 'Tmam/details/:id',
-                            element: <CivilliansTmamDetails/>,
-                            // children:[{
-                            //     path: 'id',
-                            //     element: <OfficersTmamDetails/>
-                            // }]
-                        }
+                        path: '',
+                        element: <GuestsHome />,
+                    },
+
+            
+            {
+                path: 'Guests',
+                element:<Admin/>,
+                children: [
+                    {
+                        path:'',
+                        element: <Guests />,
+                    },
+                    {
+                        path:'AddGuests',
+                        element: <AddGuests />,
+                    },
+                    {
+                        path:':id',
+                        element: <UpdateExperts />,
+                    },
+                    {
+                        path: 'details/:id',
+                        element: <ExpertDetails />
+                        // children: 
+                        // [{
+                        //     path: ':id',
+                        //     element: <OfficerDetails />
+                        // }]
+                    },
+                    // {
+                    //     path: 'Tmam',
+                    //     element: <CivilliansTmam />,
+                    // },
+                    {
+                        path: 'log',
+                        element: <ExpertsLog />
+                    },
+                    {
+                        path: 'search',
+                        element: <SearchExperts />
+                    },
+                    // {
+                    //         path: 'Tmam/details/:id',
+                    //         element: <CivilliansTmamDetails/>,
+                    //         // children:[{
+                    //         //     path: 'id',
+                    //         //     element: <OfficersTmamDetails/>
+                    //         // }]
+                    //     }
                 ]
             }
                 ]

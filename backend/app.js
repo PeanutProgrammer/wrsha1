@@ -61,6 +61,7 @@ const civillian = require("./routes/Civillian");
 const civillianLog = require("./routes/CivillianLog");
 const expert = require("./routes/Expert");
 const expertLog = require("./routes/ExpertLog");
+const guest = require("./routes/Guest");
 
 
 
@@ -86,6 +87,7 @@ app.use("/civillian",civillian);
 app.use("/civillianLog",civillianLog);
 app.use("/expert",expert);
 app.use("/expertLog",expertLog);
+app.use("/guest",guest);
 
 
 // app.use("/busses", busses);

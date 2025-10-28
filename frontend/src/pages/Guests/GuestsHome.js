@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import "./ExpertsHome.css";
+import "./GuestsHome.css";
 import { Link } from "react-router-dom";
 import { getAuthUser } from "../../helper/Storage";
 import axios from "axios";
 import { FaUsers, FaClipboardCheck, FaHistory, FaSearch } from "react-icons/fa";
 
-const ExpertsHome = () => {
+const GuestsHome = () => {
   const auth = getAuthUser();
   
   
@@ -30,10 +30,10 @@ const ExpertsHome = () => {
       <div className="card">
         <div className="card-header">
           <FaUsers className="card-icon" />
-          <h2>بيانات الخبراء</h2>
+          <h2>بيانات الزوار</h2>
         </div>
         {auth && auth.type === "admin" && (
-          <Link to={"Experts"} className="button">Go</Link>
+          <Link to={"Guests"} className="button">Go</Link>
         )}
       </div>
 
@@ -46,11 +46,11 @@ const ExpertsHome = () => {
           <Link to={"Civillians/Tmam"} className="button">Go</Link>
         )}
       </div> */}
-
+{/* 
       <div className="card">
         <div className="card-header">
           <FaHistory className="card-icon" />
-          <h2>سجل دخول / خروج الخبراء</h2>
+          <h2>سجل دخول / خروج الزوار</h2>
         </div>
         {auth && auth.type === "admin" && (
           <Link to={"Experts/log"} className="button">Go</Link>
@@ -65,9 +65,9 @@ const ExpertsHome = () => {
           </div>
           <Link to="Experts/search" className="button">Go</Link>
         </div>
-      )}
+      )} */}
     </div>
   );
 };
 
-export default ExpertsHome;
+export default GuestsHome;

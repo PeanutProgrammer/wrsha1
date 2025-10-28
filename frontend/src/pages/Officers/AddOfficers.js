@@ -45,6 +45,9 @@ const AddOfficers = () => {
     resolver: yupResolver(schema),
   });
 
+  console.log("Form errors:", errors); // Log to see any validation issues
+
+
 
   const formatDateToLocalString = (date) => {
   const d = new Date(date);
@@ -56,6 +59,8 @@ const AddOfficers = () => {
 
    // Handle form submission
   const createOfficer = async (data) => {
+          console.log("Request Data:", data);
+
     setOfficer({ ...officer, loading: true });
 
       console.log("Request Data:", data);
