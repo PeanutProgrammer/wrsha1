@@ -18,7 +18,7 @@ class CivillianLogController {
             // if (req.query.search) {
             //     search =  `where name LIKE '%${req.query.search}%'`
             // }
-            const civillians = await query(`SELECT civillians.mil_id, civillians.rank, civillians.name, civillians.department, civillian_log.event_type, civillian_log.event_time, leave_type.name AS reason
+            const civillians = await query(`SELECT civillians.nationalID, civillians.name, civillians.department, civillian_log.event_type, civillian_log.event_time, leave_type.name AS reason
                                           FROM civillians
                                           LEFT JOIN civillian_log
                                           ON civillian_log.civillianID = civillians.id

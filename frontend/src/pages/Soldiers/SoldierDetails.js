@@ -88,17 +88,17 @@ const SoldierDetails = () => {
 
               <tr>
                 <td><strong>رقم الهاتف:</strong></td>
-                <td>{soldier.results._telephone_number}</td>
+                <td>{soldier.results._telephone_number ? soldier.results._telephone_number : "لا يوجد" }</td>
               </tr>
 
               <tr>
                 <td><strong>اسم ولي الأمر:</strong></td>
-                <td>{soldier.results._guardian_name}</td>
+                <td>{soldier.results._guardian_name ? soldier.results._guardian_name : "لا يوجد" }</td>
               </tr>
 
               <tr>
                 <td><strong>رقم هاتف ولي الأمر:</strong></td>
-                <td>{soldier.results._guardian_telephone_number}</td>
+                <td>{soldier.results._guardian_telephone_number ? soldier.results._guardian_telephone_number : "لا يوجد"}</td>
               </tr>
 
               {/* <tr>

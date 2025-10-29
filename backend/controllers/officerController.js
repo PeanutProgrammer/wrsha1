@@ -185,15 +185,15 @@ class OfficerController {
                 checkOfficer[0].weight,
                 checkOfficer[0].dob,
                 checkOfficer[0].seniority_number,
-                req.body.end_date,
-                req.body.transferID,
-                req.body.transferred_to
+                // req.body.end_date,
+                // req.body.transferID,
+                // req.body.transferred_to
             
             )
 
-            await query ("insert into past_officers set mil_id = ?, rank = ?, name = ?, join_date = ?, address = ?,  height = ?, weight = ?, dob = ?, seniority_number = ?,  end_date = ?, transferID = ?, transferred_to = ?",
-                [PastOfficerObject.getMilID(), PastOfficerObject.getRank(), PastOfficerObject.getName(), PastOfficerObject.getJoinDate(), officerObject.getAddress(), officerObject.getHeight(), officerObject.getWeight(), officerObject.getDOB(), officerObject.getSeniorityNumber(), PastOfficerObject.getEndDate(), PastOfficerObject.getTransferID(), PastOfficerObject.getTransferredTo()]
-            )
+            // await query ("insert into past_officers set mil_id = ?, rank = ?, name = ?, join_date = ?, address = ?,  height = ?, weight = ?, dob = ?, seniority_number = ?,  end_date = ?, transferID = ?, transferred_to = ?",
+            //     [PastOfficerObject.getMilID(), PastOfficerObject.getRank(), PastOfficerObject.getName(), PastOfficerObject.getJoinDate(), officerObject.getAddress(), officerObject.getHeight(), officerObject.getWeight(), officerObject.getDOB(), officerObject.getSeniorityNumber(), PastOfficerObject.getEndDate(), PastOfficerObject.getTransferID(), PastOfficerObject.getTransferredTo()]
+            // )
 
             await query("delete from officers where mil_id = ?", [checkOfficer[0].mil_id])
 

@@ -65,7 +65,7 @@ router.put("/:id", admin,
   
       // Validate 'valid_from' and 'valid_through' dates
     body("valid_from")
-          .isDate().withMessage("من فضلك أدخل تاريخ بدء صحيح (YYYY-MM-DD)")
+          .isDate(format = "yyyy-MM-DD").withMessage("من فضلك أدخل تاريخ بدء صحيح (YYYY-MM-DD)")
           .custom((value, { req }) => {
               if (!moment(value, "YYYY-MM-DD", true).isValid()) {
                   throw new Error("تاريخ بدء الخبرة يجب أن يكون بالتنسيق الصحيح (YYYY-MM-DD).");
@@ -76,7 +76,7 @@ router.put("/:id", admin,
               return true;
           }),
     body("valid_through")
-          .isDate().withMessage("من فضلك أدخل تاريخ انتهاء صحيح (YYYY-MM-DD)")
+          .isDate(format = "yyyy-MM-DD").withMessage("من فضلك أدخل تاريخ انتهاء صحيح (YYYY-MM-DD)")
           .custom((value, { req }) => {
               if (!moment(value, "YYYY-MM-DD", true).isValid()) {
                   throw new Error("تاريخ انتهاء الخبرة يجب أن يكون بالتنسيق الصحيح (YYYY-MM-DD).");

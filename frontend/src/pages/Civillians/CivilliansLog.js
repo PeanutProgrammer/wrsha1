@@ -87,9 +87,8 @@ const CivilliansLog = () => {
         </thead>
         <tbody>
         {civillians.results.map((civillian) => (
-            <tr key={civillian.mil_id}>
-            <td>{civillian.mil_id}</td>    
-            <td>{civillian.rank}</td>
+            <tr key={civillian.nationalID}>
+            <td>{civillian.nationalID}</td>    
             <td>{civillian.name}</td>
             <td>{civillian.department}</td>
             <td>{civillian.event_type? civillian.event_type: "لا يوجد"}</td>

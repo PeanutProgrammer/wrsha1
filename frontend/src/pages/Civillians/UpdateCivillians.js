@@ -20,7 +20,7 @@ const schema = yup.object().shape({
   department: yup.string().required('الفرع / الورشة مطلوب'),
   join_date: yup.date().required('تاريخ الضم مطلوب').typeError('يرجى إدخال تاريخ صحيح'),
   address: yup.string().required('العنوان مطلوب'),
-  telephone_number: yup.string().required('رقم الهاتف مطلوب'),
+  telephone_number: yup.string().required('رقم الهاتف مطلوب').typeError('يرجى إدخال رقم هاتف صحيح'),
 });
 
 const UpdateCivillians = () => {
@@ -67,7 +67,9 @@ const UpdateCivillians = () => {
            const formattedData = {
     ...data,
     join_date: data.join_date ? formatDateToInput(data.join_date) : '',
-    dob: data.dob ? formatDateToInput(data.dob) : ''
+    dob: data.dob ? formatDateToInput(data.dob) : '',
+    valid_from: data.valid_from ? formatDateToInput(data.valid_from) : '',
+    valid_through: data.valid_through ? formatDateToInput(data.valid_through) : ''
   };
 
 
