@@ -20,7 +20,7 @@ const AddGuests = () => {
   const [officer, setOfficer] = useState([]);
   const [guest, setGuest] = useState({
     loading: false,
-    err: [],
+    err: null,  // Initially null, update with actual error message
     success: null,
   });
 
@@ -47,48 +47,56 @@ const AddGuests = () => {
   };
 
   // Handle form submission
-  const createGuest = async (data) => {
-setGuest((prevState) => ({ ...prevState, loading: true }));
+// Handle API error response more gracefully
+const createGuest = async (data) => {
+    setGuest((prevState) => ({ ...prevState, loading: true }));
 
-    // Ensure visit_start is set to the current time before submission
     const formattedData = {
-      ...data,
-      visit_start: formatDateToLocalString(new Date()),  // Automatically set to current date and time
+        ...data,
+        visit_start: formatDateToLocalString(new Date()),  // Automatically set to current date and time
+        visit_end: null,  // If visit_end is not provided, send null
     };
 
-    console.log("after submit", formattedData);
+    console.log("Request Data with visit_end:", formattedData);
 
     try {
-      await axios.post('http://localhost:4001/guest/', formattedData, {
-        headers: {
-          token: auth.token,
-        },
-      });
+        await axios.post('http://localhost:4001/guest/', formattedData, {
+            headers: {
+                token: auth.token,
+            },
+        });
 
-      setGuest({
-        loading: false,
-        err: [],
-        success: 'تمت الإضافة بنجاح!',
-      });
+        setGuest({
+            loading: false,
+            err: null,
+            success: 'تمت الإضافة بنجاح!',
+        });
 
-      reset(); // Reset form after successful submission
+        reset(); // Reset form after successful submission
 
-      setTimeout(() => {
-        window.history.back();
-      }, 1000);
+        setTimeout(() => {
+            window.history.back();
+        }, 1000);
     } catch (err) {
-      setGuest({
-        ...guest,
-        loading: false,
-        err: err.response ? JSON.stringify(err.response.data.errors) : 'Something went wrong. Please try again later.',
-        success: null,
-      });
+        // Handle errors gracefully and ensure it's a string before setting it
+        const errorMessage = err.response 
+            ? (Array.isArray(err.response.data.errors) 
+                ? err.response.data.errors.map(e => e.msg).join(', ') 
+                : err.response.data.errors) 
+            : 'Something went wrong. Please try again later.';
+
+        setGuest({
+            ...guest,
+            loading: false,
+            err: errorMessage,
+            success: null,
+        });
     }
+};
 
-    console.log("after submit", formattedData);
-  };
 
-    useEffect(() => {
+
+  useEffect(() => {
     axios
       .get('http://localhost:4001/officer/', {
         headers: {
@@ -102,17 +110,18 @@ setGuest((prevState) => ({ ...prevState, loading: true }));
   return (
     <div className="add-officer-form">
       <h1 className="text-center mb-4">إضافة زائر جديد</h1>
-      
+
       {/* Display Errors */}
-      {guest.err.length > 0 && (
-        <Alert variant="danger" className="p-2">
-          <ul>
-            {guest.err.map((error, index) => (
-              <li key={index}>{error.msg || error}</li>
-            ))}
-          </ul>
-        </Alert>
-      )}
+{guest.err && (
+    <Alert variant="danger" className="p-2">
+        {Array.isArray(guest.err) ? (
+            guest.err.map((error, index) => <div key={index}>{error}</div>)
+        ) : (
+            guest.err
+        )}
+    </Alert>
+)}
+
 
       {/* Display Success Message */}
       {guest.success && (
@@ -120,63 +129,57 @@ setGuest((prevState) => ({ ...prevState, loading: true }));
           {guest.success}
         </Alert>
       )}
-      
-     <Form
-  onSubmit={handleSubmit((data) => {
-    console.log("Form Submitted with data:", data); // Check if the form data is getting passed to handleSubmit
-    createGuest(data); // Proceed with form submission logic
-  })}
-  className="form"
->
-  <Form.Group controlId="name" className="form-group">
-    <Form.Label>اسم الزائر</Form.Label>
-    <Form.Control
-      type="text"
-      placeholder="أدخل اسم الزائر"
-      {...register("name")}
-      className={`form-control ${errors.name ? "is-invalid" : ""}`}
-    />
-    {errors.name && <div className="invalid-feedback">{errors.name.message}</div>}
-  </Form.Group>
 
-  <Form.Group controlId="visit_to" className="form-group">
-    <Form.Label>المسؤول الذي تتم زيارته</Form.Label>
-    <Form.Control
-      as="select"
-      {...register("visit_to")}
-      className={`form-control ${errors.visit_to ? "is-invalid" : ""}`}
-    >
-      <option value="">اختر المسؤول</option>
-      {officer.map((officer) => (
-        <option key={officer.id} value={officer.id}>
-          {officer.rank + " / " + officer.name}
-        </option>
-      ))}
-    </Form.Control>
-    {errors.visit_to && <div className="invalid-feedback">{errors.visit_to.message}</div>}
-  </Form.Group>
+      <Form onSubmit={handleSubmit(createGuest)} className="form">
+        <Form.Group controlId="name" className="form-group">
+          <Form.Label>اسم الزائر</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="أدخل اسم الزائر"
+            {...register("name")}
+            className={`form-control ${errors.name ? "is-invalid" : ""}`}
+          />
+          {errors.name && <div className="invalid-feedback">{errors.name.message}</div>}
+        </Form.Group>
 
-  <Form.Group controlId="reason" className="form-group">
-    <Form.Label>سبب الزيارة</Form.Label>
-    <Form.Control
-      type="text"
-      placeholder="أدخل سبب الزيارة"
-      {...register("visit_reason")}
-      className={`form-control ${errors.visit_reason ? "is-invalid" : ""}`}
-    />
-    {errors.visit_reason && <div className="invalid-feedback">{errors.visit_reason.message}</div>}
-  </Form.Group>
+        <Form.Group controlId="visit_to" className="form-group">
+          <Form.Label>المسؤول الذي تتم زيارته</Form.Label>
+          <Form.Control
+            as="select"
+            {...register("visit_to")}
+            className={`form-control ${errors.visit_to ? "is-invalid" : ""}`}
+            defaultValue=""
+          >
+            <option value="">اختر المسؤول</option>
+            {officer.map((officer) => (
+              <option key={officer.id} value={officer.id}>
+                {officer.rank + " / " + officer.name}
+              </option>
+            ))}
+          </Form.Control>
+          {errors.visit_to && <div className="invalid-feedback">{errors.visit_to.message}</div>}
+        </Form.Group>
 
-  <Button
-    variant="primary"
-    type="submit"
-    className="submit-btn"
-    disabled={guest.loading}
-  >
-    {guest.loading ? "جاري الإضافة..." : " إضافة"}
-  </Button>
-</Form>
+        <Form.Group controlId="reason" className="form-group">
+          <Form.Label>سبب الزيارة</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="أدخل سبب الزيارة"
+            {...register("reason")}
+            className={`form-control ${errors.reason ? "is-invalid" : ""}`}
+          />
+          {errors.reason && <div className="invalid-feedback">{errors.reason.message}</div>}
+        </Form.Group>
 
+        <Button
+          variant="primary"
+          type="submit"
+          className="submit-btn"
+          disabled={guest.loading}
+        >
+          {guest.loading ? "جاري الإضافة..." : " إضافة"}
+        </Button>
+      </Form>
     </div>
   );
 };

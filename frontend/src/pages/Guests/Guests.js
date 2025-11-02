@@ -7,7 +7,6 @@ import moment from 'moment';
 
 const Guests = () => {
   const auth = getAuthUser();
-  const now = moment().format("YYYY-MM-DD HH:mm:ss");
   const [Guests, setGuests] = useState({
     loading: true,
     err: null,
@@ -96,6 +95,40 @@ const Guests = () => {
       });
   };
 
+  // ✅ Function to end the visit (update visit_end)
+  const endVisit = (guestId) => {
+    const visitEnd = moment().format("YYYY-MM-DD HH:mm:ss");  // Current time
+
+    axios
+      .put(`http://localhost:4001/guest/end-visit/${guestId}`, { visit_end: visitEnd }, {
+        headers: {
+          token: auth.token,
+        },
+      })
+      .then((response) => {
+        // Refresh the guest data after updating
+        setGuests({
+          ...Guests,
+          reload: Guests.reload + 1,
+          success: 'تم إنهاء الزيارة بنجاح ✅',
+          err: null,
+        });
+
+        // ✅ Hide message after 3 seconds
+        setTimeout(() => {
+          setGuests((prev) => ({ ...prev, success: null }));
+        }, 3000);
+      })
+      .catch((err) => {
+        setGuests({
+          ...Guests,
+          err:
+            err.response?.data?.errors ||
+            'حدث خطأ أثناء محاولة إنهاء الزيارة.',
+        });
+      });
+  };
+
   // ✅ Pagination logic
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
@@ -138,7 +171,7 @@ const Guests = () => {
         <Table striped bordered hover>
           <thead>
             <tr>
-              <th>#</th>              
+              <th>#</th>
               <th>الإسم</th>
               <th>زيارة إلى</th>
               <th>وقت الدخول</th>
@@ -152,12 +185,12 @@ const Guests = () => {
               <tr key={guest.id}>
                 <td>{guest.id}</td>
                 <td>{guest.name}</td>
-                <td>{guest.rank + " " +guest.officer_name}</td>
+                <td>{guest.rank + " " + guest.officer_name}</td>
                 <td>{moment(guest.visit_start).format('YYYY-MM-DD HH:mm')}</td>
-                <td>{moment(guest.visit_end).format('YYYY-MM-DD HH:mm')}</td>
+                {/* Conditionally show visit_end */}
+                <td>{guest.visit_end ? moment(guest.visit_end).format('YYYY-MM-DD HH:mm') : 'لا يوجد'}</td>
                 <td>{guest.reason ? guest.reason : "لا يوجد"}</td>
 
-                
                 <td>
                   <div className="action-buttons">
                     <button
@@ -172,12 +205,16 @@ const Guests = () => {
                     >
                       تعديل
                     </Link>
-                    <Link
-                      to={`details/${guest.nationalID}`}
-                      className="btn btn-sm btn-primary"
-                    >
-                      تفاصيل
-                    </Link>
+
+                    {/* Add End Visit button */}
+                    {!guest.visit_end && (
+                      <button
+                        className="btn btn-sm btn-success"
+                        onClick={() => endVisit(guest.id)}
+                      >
+                        إنهاء الزيارة
+                      </button>
+                    )}
                   </div>
                 </td>
               </tr>

@@ -71,6 +71,11 @@ import AddGuests from "./pages/Guests/AddGuests";
 
 
 
+import PastWorkersHome from "./pages/Past_Workers/PastWorkersHome";
+import PastOfficers from "./pages/Past_Workers/PastOfficers";
+
+
+
 
 
 
@@ -510,6 +515,66 @@ export const router = createBrowserRouter([
             }
                 ]
             },
+
+             {   path: "PastWorkersHome",
+                element: <Admin />,
+                children: [
+                    {
+                        path: '',
+                        element: <PastWorkersHome />,
+                    },
+
+            
+            {
+                path: 'PastOfficers',
+                element:<Admin/>,
+                children: [
+                    {
+                        path:'',
+                        element: <PastOfficers />,
+                    },
+                    {
+                        path:'AddGuests',
+                        element: <AddGuests />,
+                    },
+                    {
+                        path:':id',
+                        element: <UpdateExperts />,
+                    },
+                    {
+                        path: 'details/:id',
+                        element: <ExpertDetails />
+                        // children: 
+                        // [{
+                        //     path: ':id',
+                        //     element: <OfficerDetails />
+                        // }]
+                    },
+                    // {
+                    //     path: 'Tmam',
+                    //     element: <CivilliansTmam />,
+                    // },
+                    {
+                        path: 'log',
+                        element: <ExpertsLog />
+                    },
+                    {
+                        path: 'search',
+                        element: <SearchExperts />
+                    },
+                    // {
+                    //         path: 'Tmam/details/:id',
+                    //         element: <CivilliansTmamDetails/>,
+                    //         // children:[{
+                    //         //     path: 'id',
+                    //         //     element: <OfficersTmamDetails/>
+                    //         // }]
+                    //     }
+                ]
+            }
+                ]
+            },
+
 
 
             {

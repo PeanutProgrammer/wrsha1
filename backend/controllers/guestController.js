@@ -6,59 +6,85 @@ const moment = require("moment");
 
 
 class GuestController {
-    static async createGuest(req, res) {
-        try {
-
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
+   static async createGuest(req, res) {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
-            }
-            
- 
-            const query = util.promisify(connection.query).bind(connection);
-             const checkGuest = await query(
-            "SELECT * from guests where id = ?",
-            [req.body.id]
-             );
-
-
-             if (checkGuest.length > 0) {
-                return res.status(400).json({
-                    errors: [
-                        {
-                            msg: "Guest with this ID already exists"
-                        }
-                    ],
-                }); 
-             }
-
-            
-
-
-           
-
-
-            const guestObject = new Guest(
-                req.body.name,
-                req.body.visit_start,
-                req.body.visit_end,
-                req.body.visit_to,
-                req.body.reason
-              )
-            
-
-
-            await query("insert into guests set  name =?, visit_start = ?, visit_end = ?, visit_to = ?, reason = ?",
-                [guestObject.getName(), guestObject.getVisitStart(), guestObject.getVisitEnd(), guestObject.getVisitTo(), guestObject.getReason()]);
-
-            req.app.get("io").emit("guestsUpdated");
-            return res.status(200).json(guestObject.toJSON() );
-
-
-        } catch (err) {  
-            return res.status(500).json({ err: "error" });
         }
+
+        const query = util.promisify(connection.query).bind(connection);
+
+        // Check if the guest already exists by name (assuming 'name' is unique)
+        const checkGuest = await query(
+            "SELECT * from guests where name = ?",  // Adjust to use 'name' or another unique identifier
+            [req.body.name]
+        );
+
+        if (checkGuest.length > 0) {
+            return res.status(400).json({
+                errors: [
+                    { msg: "Guest with this name already exists" }
+                ],
+            });
+        }
+
+        // Ensure visit_start is set to current date and time if not provided
+        const visitStart = req.body.visit_start || new Date().toISOString();  // Use current time if missing
+        const visitEnd = req.body.visit_end || null;  // Use null if visit_end is missing
+
+        // Correctly instantiate the Guest object with the proper order of parameters
+        const guestObject = new Guest(
+            null,  // id is null, assuming auto-increment
+            req.body.name,
+            visitStart,
+            visitEnd,
+            req.body.visit_to,
+            req.body.reason
+        );
+
+        // Log the guest data you're trying to insert into the database
+        console.log('Executing query with data:', [
+            guestObject.getName(),
+            guestObject.getVisitStart(),
+            guestObject.getVisitEnd(),
+            guestObject.getVisitTo(),
+            guestObject.getReason(),
+        ]);
+
+        // Now insert the guest into the database
+        await query(
+            "INSERT INTO guests SET name = ?, visit_start = ?, visit_end = ?, visit_to = ?, reason = ?",
+            [
+                guestObject.getName(),
+                guestObject.getVisitStart(),
+                guestObject.getVisitEnd(),
+                guestObject.getVisitTo(),
+                guestObject.getReason()
+            ]
+        );
+
+        // Emit the update to other clients via socket (if required)
+        req.app.get("io").emit("guestsUpdated");
+
+        // Log the guest object
+        console.log(guestObject.toJSON());
+
+        // Return the successfully created guest object
+        return res.status(200).json(guestObject.toJSON());
+
+    } catch (err) {
+        // Log the actual error to see what went wrong
+        console.error('Error occurred in createGuest:', err);
+
+        // Respond with a 500 error and the error details for easier debugging
+        return res.status(500).json({
+            error: "Internal Server Error",
+            message: err.message || err,  // Provide the error message for easier debugging
+        });
     }
+}
+
 
 
 
@@ -245,6 +271,56 @@ class GuestController {
         } catch (err) {
             return res.status(500).json({ err: err });
             
+        }
+    }
+
+        static async endVisit(req, res) {
+        try {
+            // Validate guest ID
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(400).json({ errors: errors.array() });
+            }
+
+            const query = util.promisify(connection.query).bind(connection);
+
+            // Check if the guest exists
+            const checkGuest = await query(
+                "SELECT * from guests where id = ?",
+                [req.params.id]
+            );
+
+            if (checkGuest.length == 0) {
+                return res.status(400).json({
+                    errors: [
+                        {
+                            msg: "Guest does not exist"
+                        }
+                    ],
+                });
+            }
+
+            // Get the current time to set as visit_end
+            const visitEnd = moment().format("YYYY-MM-DD HH:mm:ss");
+
+            // Update the visit_end field in the database
+            await query(
+                "UPDATE guests SET visit_end = ? WHERE id = ?",
+                [visitEnd, req.params.id]
+            );
+
+            // Emit the update via socket if needed
+            req.app.get("io").emit("guestsUpdated");
+
+            // Respond with a success message
+            return res.status(200).json({
+                msg: "Visit ended successfully!",
+                visit_end: visitEnd // Return the new visit_end time
+            });
+
+        } catch (err) {
+            // Handle error and return a response
+            return res.status(500).json({ err: err });
         }
     }
 

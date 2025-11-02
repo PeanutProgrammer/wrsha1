@@ -1,14 +1,16 @@
 
 
 class Guest {
-    constructor(id ,name, visit_start, visit_end, visit_to, reason) {
-        this._id = id;
+    constructor(id, name, visit_start, visit_end, visit_to, reason) {
+        this._id = id;  // This should be the ID, but you're passing 'name' as the first parameter.
         this._name = name;
         this._visit_start = visit_start;
         this._visit_end = visit_end;
         this._visit_to = visit_to;
         this._reason = reason;
     }
+
+
 
     getId = () => {
         return this._id;
@@ -63,6 +65,7 @@ class Guest {
         return json;
       } 
 }
+
 
 
 module.exports = Guest;

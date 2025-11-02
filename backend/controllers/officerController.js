@@ -148,69 +148,79 @@ class OfficerController {
     }
 
 
-    static async deleteOfficer(req, res) {
-        try {
-
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
+  static async deleteOfficer(req, res) {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
-            }
-
-            const query = util.promisify(connection.query).bind(connection);
-              const checkOfficer = await query(
-            "SELECT * from officers where mil_id = ?",
-            [req.params.mil_id]
-             );
-            
-            
-             if (checkOfficer.length == 0) {
-                return res.status(400).json({
-                    errors: [
-                        {
-                            msg: "Officer does not exist"
-                        }
-                    ],
-                }); 
-             }
-
-
-
-            const PastOfficerObject = new PastOfficer(
-                checkOfficer[0].name,
-                checkOfficer[0].join_date,
-                checkOfficer[0].mil_id,
-                checkOfficer[0].rank,
-                checkOfficer[0].address,
-                checkOfficer[0].height,
-                checkOfficer[0].weight,
-                checkOfficer[0].dob,
-                checkOfficer[0].seniority_number,
-                // req.body.end_date,
-                // req.body.transferID,
-                // req.body.transferred_to
-            
-            )
-
-            // await query ("insert into past_officers set mil_id = ?, rank = ?, name = ?, join_date = ?, address = ?,  height = ?, weight = ?, dob = ?, seniority_number = ?,  end_date = ?, transferID = ?, transferred_to = ?",
-            //     [PastOfficerObject.getMilID(), PastOfficerObject.getRank(), PastOfficerObject.getName(), PastOfficerObject.getJoinDate(), officerObject.getAddress(), officerObject.getHeight(), officerObject.getWeight(), officerObject.getDOB(), officerObject.getSeniorityNumber(), PastOfficerObject.getEndDate(), PastOfficerObject.getTransferID(), PastOfficerObject.getTransferredTo()]
-            // )
-
-            await query("delete from officers where mil_id = ?", [checkOfficer[0].mil_id])
-
-             req.app.get("io").emit("officersUpdated");
-
-            return res.status(200).json({
-                msg: "Officer deleted!"
-            })
-
-
-
-        } catch (err) {
-
-            return res.status(500).json({ err: err });
-
         }
+
+        const query = util.promisify(connection.query).bind(connection);
+
+        // Check if the officer exists
+        const checkOfficer = await query(
+            "SELECT * FROM officers WHERE mil_id = ?", 
+            [req.params.mil_id]
+        );
+
+        if (checkOfficer.length === 0) {
+            return res.status(400).json({
+                errors: [
+                    { msg: "Officer does not exist" }
+                ],
+            });
+        }
+
+        // Create a PastOfficer object with the officer's data
+        const PastOfficerObject = {
+            mil_id: checkOfficer[0].mil_id,
+            rank: checkOfficer[0].rank,
+            name: checkOfficer[0].name,
+            join_date: checkOfficer[0].join_date,
+            address: checkOfficer[0].address,
+            height: checkOfficer[0].height,
+            weight: checkOfficer[0].weight,
+            dob: checkOfficer[0].dob,
+            seniority_number: checkOfficer[0].seniority_number,
+            // If you have additional fields such as 'end_date', 'transferID', etc.
+            end_date: req.body.end_date || new Date().toISOString(),
+            transferID: req.body.transferID || null,
+            transferred_to: req.body.transferred_to || null
+        };
+
+        // Insert the officer data into the past_officers table
+        await query(
+            "INSERT INTO past_officers (mil_id, rank, name, join_date, address, height, weight, dob, seniority_number, end_date, transferID, transferred_to) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            [
+                PastOfficerObject.mil_id,
+                PastOfficerObject.rank,
+                PastOfficerObject.name,
+                PastOfficerObject.join_date,
+                PastOfficerObject.address,
+                PastOfficerObject.height,
+                PastOfficerObject.weight,
+                PastOfficerObject.dob,
+                PastOfficerObject.seniority_number,
+                PastOfficerObject.end_date,
+                PastOfficerObject.transferID,
+                PastOfficerObject.transferred_to
+            ]
+        );
+
+        // Now delete the officer from the officers table
+        await query("DELETE FROM officers WHERE mil_id = ?", [checkOfficer[0].mil_id]);
+
+        // Emit the update (if you're using socket.io or any real-time system)
+        req.app.get("io").emit("officersUpdated");
+
+        return res.status(200).json({
+            msg: "Officer deleted and moved to past_officers!"
+        });
+    } catch (err) {
+        console.error('Error in deleting officer:', err);
+        return res.status(500).json({ err: err.message || err });
     }
+}
 
 
     static async getOfficers(req, res) {
