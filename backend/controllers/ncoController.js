@@ -162,6 +162,40 @@ class NCOController {
                     ],
                 }); 
              }
+
+               // Create a PastOfficer object with the officer's data
+        const PastNCOObject = {
+            mil_id: checkOfficer[0].mil_id,
+            rank: checkOfficer[0].rank,
+            name: checkOfficer[0].name,
+            join_date: checkOfficer[0].join_date,
+            address: checkOfficer[0].address,
+            height: checkOfficer[0].height,
+            weight: checkOfficer[0].weight,
+            dob: checkOfficer[0].dob,
+            // If you have additional fields such as 'end_date', 'transferID', etc.
+            end_date: req.body.end_date || new Date().toISOString(),
+            transferID: req.body.transferID || null,
+            transferred_to: req.body.transferred_to || null
+        };
+
+        // Insert the officer data into the past_officers table
+        await query(
+            "INSERT INTO past_ncos (mil_id, rank, name, join_date, address, height, weight, dob, end_date, transferID, transferred_to) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            [
+                PastNCOObject.mil_id,
+                PastNCOObject.rank,
+                PastNCOObject.name,
+                PastNCOObject.join_date,
+                PastNCOObject.address,
+                PastNCOObject.height,
+                PastNCOObject.weight,
+                PastNCOObject.dob,
+                PastNCOObject.end_date,
+                PastNCOObject.transferID,
+                PastNCOObject.transferred_to
+            ]
+        );
             
 
             await query("delete from ncos where mil_id = ?", [checkOfficer[0].mil_id])

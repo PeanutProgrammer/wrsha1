@@ -56,7 +56,7 @@ const PastWorkersHome = () => {
           <h2>بيانات ضباط الصف السابقين</h2>
         </div>
         {auth && auth.type === "admin" && (
-          <Link to={"Officers/Tmam"} className="button">Go</Link>
+          <Link to={"PastNCOs"} className="button">Go</Link>
         )}
       </div>
 
@@ -76,7 +76,7 @@ const PastWorkersHome = () => {
             <FaSearch className="card-icon" />
             <h2>بحث</h2>
           </div>
-          <Link to="Officers/search" className="button">Go</Link>
+          <Link to="SearchPastWorkers" className="button">Go</Link>
         </div>
       )}
     </div>

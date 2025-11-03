@@ -73,6 +73,10 @@ import AddGuests from "./pages/Guests/AddGuests";
 
 import PastWorkersHome from "./pages/Past_Workers/PastWorkersHome";
 import PastOfficers from "./pages/Past_Workers/PastOfficers";
+import PastOfficerDetails from "./pages/Past_Workers/PastOfficerDetails";
+import PastNCOs from "./pages/Past_Workers/PastNCOs";
+import PastNCODetails from "./pages/Past_Workers/PastNCODetails";
+import SearchPastWorkers from "./pages/Past_Workers/SearchPastWorkers";
 
 
 
@@ -543,7 +547,7 @@ export const router = createBrowserRouter([
                     },
                     {
                         path: 'details/:id',
-                        element: <ExpertDetails />
+                        element: <PastOfficerDetails />
                         // children: 
                         // [{
                         //     path: ':id',
@@ -571,6 +575,57 @@ export const router = createBrowserRouter([
                     //         // }]
                     //     }
                 ]
+            }, 
+            {
+                path: 'PastNCOs',
+                element:<Admin/>,
+                children: [
+                    {
+                        path:'',
+                        element: <PastNCOs />,
+                    },
+                    {
+                        path:'AddGuests',
+                        element: <AddGuests />,
+                    },
+                    {
+                        path:':id',
+                        element: <UpdateExperts />,
+                    },
+                    {
+                        path: 'details/:id',
+                        element: <PastNCODetails />
+                        // children: 
+                        // [{
+                        //     path: ':id',
+                        //     element: <OfficerDetails />
+                        // }]
+                    },
+                    // {
+                    //     path: 'Tmam',
+                    //     element: <CivilliansTmam />,
+                    // },
+                    {
+                        path: 'log',
+                        element: <ExpertsLog />
+                    },
+                    {
+                        path: 'search',
+                        element: <SearchExperts />
+                    },
+                    // {
+                    //         path: 'Tmam/details/:id',
+                    //         element: <CivilliansTmamDetails/>,
+                    //         // children:[{
+                    //         //     path: 'id',
+                    //         //     element: <OfficersTmamDetails/>
+                    //         // }]
+                    //     }
+                ]
+            } ,
+            {
+                path: 'SearchPastWorkers',
+                element:<SearchPastWorkers/>,
             }
                 ]
             },

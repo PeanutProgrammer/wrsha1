@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Alert, Modal, Button } from 'react-bootstrap';
+import { Table, Alert, Modal, Button, Form } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { getAuthUser } from '../../helper/Storage';
@@ -10,7 +10,7 @@ const NCOs = () => {
   const [ncos, setNCOs] = useState({
     loading: true,
     err: null,
-    success: null, // ✅ Added success message
+    success: null,
     results: [],
     reload: 0,
   });
@@ -18,9 +18,13 @@ const NCOs = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [recordsPerPage] = useState(8);
 
-  // ✅ Modal state
   const [showConfirm, setShowConfirm] = useState(false);
   const [selectedNCO, setSelectedNCO] = useState(null);
+
+  // Additional fields for the delete operation
+  const [endDate, setEndDate] = useState('');
+  const [transferID, setTransferID] = useState('');
+  const [transferredTo, setTransferredTo] = useState('');
 
   useEffect(() => {
     setNCOs({ ...ncos, loading: true });
@@ -48,30 +52,46 @@ const NCOs = () => {
               : 'حدث خطأ أثناء تحميل البيانات.',
         });
       });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ncos.reload]);
 
-  // ✅ Show confirmation modal before deleting
+  // Show confirmation modal before deleting
   const handleDeleteClick = (nco) => {
     setSelectedNCO(nco);
     setShowConfirm(true);
   };
 
-  // ✅ Delete confirmation
+  // Handle form data changes for delete modal
+  const handleEndDateChange = (e) => setEndDate(e.target.value);
+  const handleTransferIDChange = (e) => setTransferID(e.target.value);
+  const handleTransferredToChange = (e) => setTransferredTo(e.target.value);
+
+  // Delete confirmation with additional fields
   const confirmDelete = () => {
     if (!selectedNCO) return;
 
+    // Prepare data to be sent for archiving the NCO
+    const data = {
+      end_date: endDate,
+      transferID: transferID,
+      transferred_to: transferredTo,
+    };
+
+    // Send DELETE request with additional fields
     axios
       .delete('http://localhost:4001/nco/' + selectedNCO.mil_id, {
         headers: {
           token: auth.token,
         },
+        data: data, // Send additional fields in the body of the DELETE request
       })
       .then(() => {
         setShowConfirm(false);
         setSelectedNCO(null);
+        setEndDate('');
+        setTransferID('');
+        setTransferredTo('');
 
-        // ✅ Show success message
+        // Show success message
         setNCOs({
           ...ncos,
           reload: ncos.reload + 1,
@@ -79,7 +99,7 @@ const NCOs = () => {
           err: null,
         });
 
-        // ✅ Hide message after 3 seconds
+        // Hide success message after 3 seconds
         setTimeout(() => {
           setNCOs((prev) => ({ ...prev, success: null }));
         }, 3000);
@@ -95,7 +115,7 @@ const NCOs = () => {
       });
   };
 
-  // ✅ Pagination logic
+  // Pagination logic
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
   const currentRecords = ncos.results.slice(
@@ -119,14 +139,12 @@ const NCOs = () => {
         </Link>
       </div>
 
-      {/* ✅ Success Message */}
       {ncos.success && (
         <Alert variant="success" className="p-2 text-center">
           {ncos.success}
         </Alert>
       )}
 
-      {/* ❌ Error Message */}
       {ncos.err && (
         <Alert variant="danger" className="p-2 text-center">
           {ncos.err}
@@ -214,7 +232,7 @@ const NCOs = () => {
         </button>
       </div>
 
-      {/* ✅ Confirmation Modal */}
+      {/* Confirmation Modal */}
       <Modal show={showConfirm} onHide={() => setShowConfirm(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>تأكيد الحذف</Modal.Title>
@@ -222,6 +240,36 @@ const NCOs = () => {
         <Modal.Body>
           هل أنت متأكد أنك تريد حذف ضابط الصف{' '}
           <strong>{selectedNCO?.name}</strong>؟
+
+          {/* Additional Fields */}
+          <Form>
+            <Form.Group controlId="endDate">
+              <Form.Label>تاريخ النقل</Form.Label>
+              <Form.Control
+                type="date"
+                value={endDate}
+                onChange={handleEndDateChange}
+              />
+            </Form.Group>
+
+            <Form.Group controlId="transferID">
+              <Form.Label>رقم بند أوامر النقل</Form.Label>
+              <Form.Control
+                type="text"
+                value={transferID}
+                onChange={handleTransferIDChange}
+              />
+            </Form.Group>
+
+            <Form.Group controlId="transferredTo">
+              <Form.Label>تم النقل إلى</Form.Label>
+              <Form.Control
+                type="text"
+                value={transferredTo}
+                onChange={handleTransferredToChange}
+              />
+            </Form.Group>
+          </Form>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowConfirm(false)}>

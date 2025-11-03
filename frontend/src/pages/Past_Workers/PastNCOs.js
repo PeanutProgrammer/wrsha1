@@ -6,7 +6,7 @@ import { getAuthUser } from '../../helper/Storage';
 import moment from 'moment';
 import { io } from "socket.io-client";
 
-const Officers = () => {
+const PastNCOs = () => {
   const auth = getAuthUser();
   const [officers, setOfficers] = useState({
     loading: true,
@@ -16,20 +16,16 @@ const Officers = () => {
   });
   const [currentPage, setCurrentPage] = useState(1); // Current page number
   const [recordsPerPage] = useState(10); // Number of records per page
-  const [showConfirm, setShowConfirm] = useState(false);  // Modal state
-  const [selectedOfficer, setSelectedOfficer] = useState(null);  // Selected officer for deletion
 
-  const [endDate, setEndDate] = useState('');
-  const [transferID, setTransferID] = useState('');
-  const [transferredTo, setTransferredTo] = useState('');
+
 
   useEffect(() => {
-    const socket = io("http://localhost:4001"); //  backend port
+    const socket = io("http://localhost:4001"); // your backend port
 
     // 🔁 Initial fetch
     const fetchData = () => {
       axios
-        .get("http://localhost:4001/officer/", {
+        .get("http://localhost:4001/pastNCO/", {
           headers: { token: auth.token },
         })
         .then((resp) => {
@@ -59,7 +55,7 @@ const Officers = () => {
     });
 
     socket.on("officersUpdated", () => {
-      console.log("📢 Officers updated — refetching data...");
+      console.log("📢 PastOfficers updated — refetching data...");
       fetchData(); // ✅ Re-fetch on update
     });
 
@@ -68,54 +64,12 @@ const Officers = () => {
 
 
   // Show confirmation modal before deleting
-  const handleDeleteClick = (officer) => {
-    setSelectedOfficer(officer);
-    setShowConfirm(true);
-  };
-
+ 
   // Handle form data changes
-  const handleEndDateChange = (e) => setEndDate(e.target.value);
-  const handleTransferIDChange = (e) => setTransferID(e.target.value);
-  const handleTransferredToChange = (e) => setTransferredTo(e.target.value);
+
 
   // Confirm deletion
-  const confirmDelete = () => {
-    if (!selectedOfficer) return;
-
-    // Prepare data to be sent for archiving the officer
-    const data = {
-      end_date: endDate,
-      transferID: transferID,
-      transferred_to: transferredTo,
-    };
-
-    // Change the API method to DELETE as per the new backend implementation
-    axios
-      .delete('http://localhost:4001/officer/' + selectedOfficer.mil_id, {
-        headers: { token: auth.token },
-        data: data,  // Send additional fields in the body of the DELETE request
-      })
-      .then(() => {
-        setShowConfirm(false);
-        setSelectedOfficer(null);
-        setEndDate('');
-        setTransferID('');
-        setTransferredTo('');
-        setOfficers({ ...officers, reload: officers.reload + 1, success: 'تم حذف الضابط  بنجاح ✅',
-          err: null, });
-      })
-      .catch((err) => {
-        setOfficers({
-          ...officers,
-          err:
-            err.response
-              ? JSON.stringify(err.response.data.errors)
-              : "Something went wrong. Please try again later.",
-        });
-        setShowConfirm(false);
-      });
-  };
-
+ 
   // Get current records for the current page
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
@@ -136,10 +90,8 @@ const Officers = () => {
   return (
     <div className="Officers p-5">
       <div className="header d-flex justify-content-between mb-3">
-        <h3 className="text-center mb-3">إدارة الضباط</h3>
-        <Link to={"AddOfficers"} className="btn btn-success mb-4">
-          إنشاء ضابط جديد +
-        </Link>
+        <h3 className="text-center mb-3">إدارة ضباط الصف السابقين</h3>
+
       </div>
 
       {officers.err && (
@@ -160,9 +112,9 @@ const Officers = () => {
               <th>الرقم العسكري</th>
               <th>الرتبة</th>
               <th>الإسم</th>
-              <th>الورشة / الفرع</th>
               <th>تاريخ الضم</th>
-              <th>التمام</th>
+              <th>تاريخ النقل</th>
+              <th>النقل إلى</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -172,17 +124,11 @@ const Officers = () => {
                 <td>{officer.mil_id}</td>
                 <td>{officer.rank}</td>
                 <td>{officer.name}</td>
-                <td>{officer.department}</td>
                 <td>{moment(officer.join_date).format('YYYY-MM-DD')}</td>
-                <td>{officer.in_unit ? 'متواجد' : 'غير موجود'}</td>
+                <td>{moment(officer.end_date).format('YYYY-MM-DD')}</td>
+                <td>{officer.transferred_to}</td>
                 <td>
                   <div className="action-buttons">
-                    <button
-                      className="btn btn-sm btn-danger"
-                      onClick={() => handleDeleteClick(officer)}
-                    >
-                      حذف
-                    </button>
                     <Link to={`${officer.id}`} className="btn btn-sm btn-primary">
                       تعديل
                     </Link>
@@ -228,56 +174,9 @@ const Officers = () => {
       </div>
 
       {/* Confirmation Modal for Deleting Officer */}
-      <Modal show={showConfirm} onHide={() => setShowConfirm(false)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>تأكيد الحذف</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <div>
-            <p>هل أنت متأكد أنك تريد حذف الضابط <strong>{selectedOfficer?.name}</strong>؟</p>
-
-            {/* Additional Fields */}
-            <Form>
-              <Form.Group controlId="endDate">
-                <Form.Label>تاريخ النقل</Form.Label>
-                <Form.Control
-                  type="date"
-                  value={endDate}
-                  onChange={handleEndDateChange}
-                />
-              </Form.Group>
-
-              <Form.Group controlId="transferID">
-                <Form.Label>رقم بند أوامر النقل</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={transferID}
-                  onChange={handleTransferIDChange}
-                />
-              </Form.Group>
-
-              <Form.Group controlId="transferredTo">
-                <Form.Label>تم النقل إلى</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={transferredTo}
-                  onChange={handleTransferredToChange}
-                />
-              </Form.Group>
-            </Form>
-          </div>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowConfirm(false)}>
-            إلغاء
-          </Button>
-          <Button variant="danger" onClick={confirmDelete}>
-            حذف
-          </Button>
-        </Modal.Footer>
-      </Modal>
+   
     </div>
   );
 };
 
-export default Officers;
+export default PastNCOs;
