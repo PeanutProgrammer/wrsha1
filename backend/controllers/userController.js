@@ -67,67 +67,54 @@ class UserController {
 
 
 
-    static async updateUser(req, res) {
-        try {
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
+ static async updateUser(req, res) {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
-            }
-
-            const query = util.promisify(connection.query).bind(connection);
-             const checkUser = await query(
-            "SELECT * from users where id = ?",
-            [req.params.id]
-             );
-            
-            
-             if (checkUser.length == 0) {
-                return res.status(400).json({
-                    errors: [
-                        {
-                            msg: "User does not exist"
-                        }
-                    ],
-                }); 
-             }
-            
-
-            
-             const userObject = new User(
-                req.body.name,
-                 req.body.username, 
-                "",
-                "",)
-            
-                 console.log("hello");
-
-            
-             await userObject.setPassword(req.body.password)
-            
-
-             
-           
-            
-            
-
-            await query("update  users set name = ?, username = ?, password = ?, where id = ?",
-            [userObject.getName(),userObject.getUsername(),userObject.getPassword(),req.params.id]);
-            
-
-
-             return res.status(200).json( {msg: "User updated!"});
-
-
-
-
-
-
-
-        } catch (err) {
-            return res.status(500).json({ err: err });
-
         }
+
+        const query = util.promisify(connection.query).bind(connection);
+        
+        // Check if the user exists
+        const checkUser = await query("SELECT * FROM users WHERE id = ?", [req.params.id]);
+        
+        if (checkUser.length === 0) {
+            return res.status(400).json({
+                errors: [{ msg: "User does not exist" }],
+            });
+        }
+
+        const updatedFields = {
+            name: req.body.name || checkUser[0].name,
+            username: req.body.username || checkUser[0].username,
+            type: req.body.type || checkUser[0].type,  // Only update type if it's provided
+        };
+
+        // If a new password is provided, hash it and update
+        if (req.body.password) {
+            const userObject = new User(updatedFields.name, updatedFields.username, "", updatedFields.type);
+            await userObject.setPassword(req.body.password);  // Hash the new password
+            updatedFields.password = userObject.getPassword();  // Store the hashed password
+        }
+
+        // Update user in the database
+        const updateQuery = "UPDATE users SET name = ?, username = ?, password = ?, type = ? WHERE id = ?";
+        await query(updateQuery, [
+            updatedFields.name,
+            updatedFields.username,
+            updatedFields.password || checkUser[0].password,  // Keep existing password if not updated
+            updatedFields.type,
+            req.params.id,
+        ]);
+
+        return res.status(200).json({ msg: "User updated successfully!" });
+
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ err: "Internal Server Error" });
     }
+}
 
 
     static async deleteUser(req, res) {

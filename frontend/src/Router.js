@@ -79,6 +79,11 @@ import PastNCODetails from "./pages/Past_Workers/PastNCODetails";
 import SearchPastWorkers from "./pages/Past_Workers/SearchPastWorkers";
 
 
+import Users from "./pages/Users/Users";
+import AddUsers from "./pages/Users/AddUsers";
+import UpdateUsers from "./pages/Users/UpdateUsers";
+
+
 
 
 
@@ -629,6 +634,60 @@ export const router = createBrowserRouter([
             }
                 ]
             },
+
+
+
+
+            
+            {
+                path: 'Users',
+                element:<Admin/>,
+                children: [
+                    {
+                        path:'',
+                        element: <Users />,
+                    },
+                    {
+                        path:'AddUsers',
+                        element: <AddUsers />,
+                    },
+                    {
+                        path:':id',
+                        element: <UpdateUsers />,
+                    },
+                    {
+                        path: 'details/:id',
+                        element: <ExpertDetails />
+                        // children: 
+                        // [{
+                        //     path: ':id',
+                        //     element: <OfficerDetails />
+                        // }]
+                    },
+                    // {
+                    //     path: 'Tmam',
+                    //     element: <CivilliansTmam />,
+                    // },
+                    {
+                        path: 'log',
+                        element: <ExpertsLog />
+                    },
+                    {
+                        path: 'search',
+                        element: <SearchExperts />
+                    },
+                    // {
+                    //         path: 'Tmam/details/:id',
+                    //         element: <CivilliansTmamDetails/>,
+                    //         // children:[{
+                    //         //     path: 'id',
+                    //         //     element: <OfficersTmamDetails/>
+                    //         // }]
+                    //     }
+                ]
+            }
+            ,
+
 
 
 
