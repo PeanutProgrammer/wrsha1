@@ -17,7 +17,7 @@ const schema = yup.object().shape({
 
   username: yup.string()
     .required('اسم المستخدم مطلوب')  
-    .min(5, 'اسم المستخدم يجب أن يكون أكثر من 5 حروف')  
+    .min(3, 'اسم المستخدم يجب أن يكون أكثر من 3 حروف')  
     .max(15, 'اسم المستخدم يجب ألا يتجاوز 15 حرف'),  
 
   password: yup.string()

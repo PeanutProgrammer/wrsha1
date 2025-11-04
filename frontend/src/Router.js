@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import App from './App';
 import { Guest } from "./middleware/Guest";
 import { Admin } from "./middleware/Admin";
+import {Gate} from "./middleware/Gate";
 import History from './pages/history/History';
 import Travel from './pages/Home/Home';
 import ProductList from "./pages/product/ProductList";
@@ -20,6 +21,8 @@ import OfficersLog from "./pages/Officers/OfficersLog";
 import SearchOfficers from "./pages/Officers/SearchOfficers";
 import OfficersTmamDetails from "./pages/Officers/OfficerTmamDeatils";
 import OfficersHome from "./pages/Officers/OfficersHome";
+import OfficerArrival from "./pages/Officers/arrival";
+import OfficerDeparture from "./pages/Officers/departure";
 
 
 import NCOsHome from "./pages/NCOs/NCOsHome";
@@ -31,6 +34,8 @@ import NCOsTmam from "./pages/NCOs/NCOsTmam";
 import NCOsLog from "./pages/NCOs/NCOsLog";
 import SearchNCOs from "./pages/NCOs/SearchNCOs";
 import NCOsTmamDetails from "./pages/NCOs/NCOTmamDetails";
+import NCOArrival from "./pages/NCOs/arrival";
+import NCODeparture from "./pages/NCOs/departure";    
 
 
 import SoldiersHome from "./pages/Soldiers/SoldiersHome";
@@ -176,7 +181,7 @@ export const router = createBrowserRouter([
                 ]
             },
             {   path: "OfficersHome",
-                element: <Admin />,
+                element: <Gate />,
                 children: [
                     {
                         path: '',
@@ -186,7 +191,7 @@ export const router = createBrowserRouter([
             
             {
                 path: 'Officers',
-                element:<Admin/>,
+                element:<Gate />,
                 children: [
                     {
                         path:'',
@@ -228,13 +233,24 @@ export const router = createBrowserRouter([
                             //     path: 'id',
                             //     element: <OfficersTmamDetails/>
                             // }]
-                        }
+                        },
+
+                    {
+                        path: 'Arrival',
+                        element: <OfficerArrival />
+                    },
+
+                    {
+                        path: 'Departure',
+                        element: <OfficerDeparture />
+                    }
                 ]
-            }
+            },
+            
                 ]
             },
             {   path: "NCOsHome",
-                element: <Admin />,
+                element: <Gate />,
                 children: [
                     {
                         path: '',
@@ -244,7 +260,7 @@ export const router = createBrowserRouter([
             
             {
                 path: 'NCOs',
-                element:<Admin/>,
+                element:<Gate />,
                 children: [
                     {
                         path:'',
@@ -286,7 +302,16 @@ export const router = createBrowserRouter([
                             //     path: 'id',
                             //     element: <OfficersTmamDetails/>
                             // }]
-                        }
+                        }, 
+
+                    {
+                        path: 'Arrival',
+                        element: <NCOArrival />
+                    },
+                    {
+                        path: 'Departure',
+                        element: <NCODeparture />
+                    },
                 ]
             }
                 ]

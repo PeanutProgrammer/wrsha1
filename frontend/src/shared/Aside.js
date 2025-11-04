@@ -27,8 +27,13 @@ const Aside = ({ setCollapsed, collapsed }) => {
       <ul>
         {auth?.type === "بوابة" && (
           <>
-            <li className="tabs"><Link to={'Home'}>Home</Link></li>
-            <li className="tabs"><Link to={'Home'}>Test3</Link></li>
+            <li className="tabs"><Link to={'Home'}>الصفحة الرئيسية</Link></li>
+            <li className="tabs"><Link to={'OfficersHome'}>الضباط</Link></li>
+            <li className="tabs"><Link to={'NCOsHome'}>الصف ضباط</Link></li>
+            <li className="tabs"><Link to={'SoldiersHome'}>الجنود</Link></li>    
+            <li className="tabs"><Link to={'CivilliansHome'}>المدنيين</Link></li>            
+            <li className="tabs"><Link to={'ExpertsHome'}>الخبراء</Link></li>
+            <li className="tabs"><Link to={'GuestsHome'}>الزوار</Link></li>
           </>
         )}
 

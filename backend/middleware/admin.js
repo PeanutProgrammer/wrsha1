@@ -1,7 +1,6 @@
 const connection = require("../db/dbConnection");
 const util = require("util");
 
-const adminType = 5;
 
 const admin = async (req, res,next) => {
     const query = util.promisify(connection.query).bind(connection);

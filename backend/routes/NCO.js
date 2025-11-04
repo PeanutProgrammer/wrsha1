@@ -4,6 +4,7 @@ const NCOController = require("../controllers/ncoController");
 const authorized = require("../middleware/authorized");
 const admin = require("../middleware/admin");
 const shuoonSarya = require("../middleware/shuoonSarya");
+const gate = require("../middleware/gate");
 
 
 router.post("/", shuoonSarya,
@@ -70,7 +71,7 @@ router.get("/filter",  authorized,(req, res) => {
 
 
 
-router.get("/", admin,(req, res) => {
+router.get("/", gate,(req, res) => {
     NCOController.getOfficers(req, res);
 });
 

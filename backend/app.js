@@ -64,6 +64,7 @@ const expertLog = require("./routes/ExpertLog");
 const guest = require("./routes/Guest");
 const pastOfficer = require("./routes/PastOfficer");
 const pastNCO = require("./routes/PastNCO");
+const leaveType = require("./routes/LeaveType");
 
 
 
@@ -92,6 +93,7 @@ app.use("/expertLog",expertLog);
 app.use("/guest",guest);
 app.use("/pastOfficer", pastOfficer);
 app.use("/pastNCO", pastNCO);
+app.use("/leaveType", leaveType);
 
 
 // app.use("/busses", busses);

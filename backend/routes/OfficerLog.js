@@ -4,80 +4,92 @@ const authorized = require("../middleware/authorized");
 const admin = require("../middleware/admin");
 const shuoonOfficers = require("../middleware/shuoonOfficers");
 const OfficerLogController = require("../controllers/officerLogController");
+const gate = require("../middleware/gate");
+const moment = require("moment");
 
+// Arrival route (already exists)
+router.post("/", gate,
+    body("officerID")
+        .isNumeric().withMessage("من فضلك أدخل اسم ضابط صحيح"),
+    body("leaveTypeID")
+        .isNumeric().withMessage("من فضلك أدخل نوع عودة صحيح"),
+    body("loggerID")
+        .isNumeric(),
+    body("event_type")
+        .isAlphanumeric('ar-EG'),
+    body("event_time")
+        .custom((value) => {
+            if (!(value instanceof Date)) {
+                if (!moment(value, "YYYY-MM-DD HH:mm:ss", true).isValid()) {
+                    throw new Error("تاريخ ووقت العودة يجب أن يكون بالتنسيق الصحيح (YYYY-MM-DD HH:mm:ss).");
+                }
+            } else {
+                if (!moment(value).isValid()) {
+                    throw new Error("تاريخ ووقت العودة يجب أن يكون بتاريخ صحيح.");
+                }
+            }
+            return true;
+        }),
+    (req, res) => {
+        OfficerLogController.createArrival(req, res);
+    }
+);
 
-// router.post("/",shuoonOfficers,
-//     body("name")
-//         .isString().withMessage("Please enter a valid name")
-//         .isLength({ min: 3, max: 30 }).withMessage("Name should be more than 3 characters and no longer than 30 characters"),
-//     body("join_date")
-//         .isDate().withMessage("Please enter a valid date"),
-//     body("department")
-//         .isAlphanumeric('ar-EG').withMessage("Please enter a valid department"),
-//     body("mil_id")
-//         .isNumeric().withMessage("Please enter a valid Military ID"),
-//     body("rank")
-//         .isString().withMessage("Please enter a valid rank"),
-//         body("department")
-//         .isString().withMessage("Please enter a valid department number") ,
-//     (req, res) => {
-//             OfficerController.createOfficer(req, res);
-//         }
-// );
+// Departure route (new route for departure)
+router.post("/departure", gate,
+    body("officerID")
+        .isNumeric().withMessage("من فضلك أدخل اسم ضابط صحيح"),
+    body("leaveTypeID")
+        .isNumeric().withMessage("من فضلك أدخل نوع عودة صحيح"),
+    body("loggerID")
+        .isNumeric(),
+    body("event_type")
+        .isAlphanumeric('ar-EG'),
+    body("event_time")
+        .custom((value) => {
+            if (!(value instanceof Date)) {
+                if (!moment(value, "YYYY-MM-DD HH:mm:ss", true).isValid()) {
+                    throw new Error("تاريخ ووقت الخروج يجب أن يكون بالتنسيق الصحيح (YYYY-MM-DD HH:mm:ss).");
+                }
+            } else {
+                if (!moment(value).isValid()) {
+                    throw new Error("تاريخ ووقت الخروج يجب أن يكون بتاريخ صحيح.");
+                }
+            }
+            return true;
+        }),
+    // New validation for start_date, end_date, and destination
+    body("start_date")
+        .custom((value, { req }) => {
+            if (!moment(value, "YYYY-MM-DD", true).isValid()) {
+                throw new Error("تاريخ ووقت الخروج يجب أن يكون بالتنسيق الصحيح (YYYY-MM-DD).");
+            }
+            if (moment(value).isAfter(req.body.end_date)) {
+                throw new Error("تاريخ ووقت الخروج يجب أن يكون قبل تاريخ الانتهاء.");
+            }
+            return true;
+        }),
+    body("end_date")
+        .custom((value, { req }) => {
+            if (!moment(value, "YYYY-MM-DD", true).isValid()) {
+                throw new Error("تاريخ ووقت العودة يجب أن يكون بالتنسيق الصحيح (YYYY-MM-DD).");
+            }
+            if (moment(value).isBefore(req.body.start_date)) {
+                throw new Error("تاريخ ووقت العودة يجب أن يكون بعد تاريخ البدء.");
+            }
+            return true;
+        }),
+    body("destination")
+        .isString().withMessage("من فضلك أدخل الوجهة.").optional(),
 
+    (req, res) => {
+        OfficerLogController.createDeparture(req, res);
+    }
+);
 
-// router.put("/:id", admin,
-//     body("mil_id")
-//     .isAlphanumeric(),
-//     body("rank")
-//     .isString(),
-//     body("name")
-//     .isString(),
-//     body("department")
-//     .isString(),
-//     body("join_date")
-//     .isDate(),  (req, res) => {
-//     OfficerController.updateUser(req, res);
-// });
-
-// router.delete("/history/:id", authorized,(req, res) => {
-//     OfficerController.deleteHistory(req, res);
-// })
-
-
-// router.delete("/:mil_id", admin,  (req, res) => {
-//     OfficerController.deleteOfficer(req, res);
-// });
-
-
-
-// router.get("/history",  authorized,(req, res) => {
-//     OfficerController.getSearchHistory(req, res);
-// });  
-
-
-
-
-router.get("/", admin,(req, res) => {
+// Get officer logs (as before)
+router.get("/", admin, (req, res) => {
     OfficerLogController.getOfficersLog(req, res);
 });
-
-// router.get("/tmam", admin, (req,res) => {
-//     OfficerController.getOfficersTmam(req,res);
-// });
-
-// router.get("/log", admin, (req,res) => {
-//     OfficerController.getOfficersTmam(req,res);
-// });
-
-// router.get("/:id", admin, (req, res) => {
-//     OfficerController.getOfficer(req, res);
-// });
-
-
-
- 
- 
-
 
 module.exports = router;

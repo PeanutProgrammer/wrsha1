@@ -4,6 +4,7 @@ const OfficerController = require("../controllers/officerController");
 const authorized = require("../middleware/authorized");
 const admin = require("../middleware/admin");
 const shuoonOfficers = require("../middleware/shuoonOfficers");
+const gate = require("../middleware/gate");
 
 
 router.post("/", shuoonOfficers,
@@ -75,7 +76,7 @@ router.get("/filter",  authorized,(req, res) => {
 
 
 
-router.get("/", admin,(req, res) => {
+router.get("/", gate,(req, res) => {
     console.log("Getting Officers");
     
     OfficerController.getOfficers(req, res);

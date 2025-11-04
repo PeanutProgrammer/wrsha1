@@ -10,7 +10,7 @@ router.post("/", admin,
         .isLength({ min: 3, max: 30 }).withMessage("يجب أن يكون الاسم أكثر من 3 حروف وألا يتجاوز 30 حرفًا"),
     body("username")
         .isString().withMessage("الرجاء إدخال اسم مستخدم صالح")
-        .isLength({ min: 5, max: 15 }).withMessage("يجب أن يكون اسم المستخدم أكثر من 5 حروف وألا يتجاوز 15 حرفًا"),
+        .isLength({ min: 3, max: 15 }).withMessage("يجب أن يكون اسم المستخدم أكثر من 3 حروف وألا يتجاوز 15 حرفًا"),
     body("password").isStrongPassword({ minLength: 8, minLowercase: 1, minUppercase: 1, minNumbers: 1 })
         .withMessage("الرجاء إدخال كلمة مرور صالحة"),
     body("type")
@@ -27,14 +27,14 @@ router.put("/:id", admin,
     .isLength({ min: 3, max: 30 }).withMessage("يجب أن يكون الاسم أكثر من 3 حروف وألا يتجاوز 30 حرفًا"),
     body("username")
         .isString().withMessage("الرجاء إدخال اسم مستخدم صالح")
-        .isLength({ min: 5, max: 15 }).withMessage("يجب أن يكون اسم المستخدم أكثر من 5 حروف وألا يتجاوز 15 حرفًا"),
+        .isLength({ min: 3, max: 15 }).withMessage("يجب أن يكون اسم المستخدم أكثر من 3 حروف وألا يتجاوز 15 حرفًا"),
     body("password").isStrongPassword({ minLength: 8, minLowercase: 1, minUppercase: 1, minNumbers: 1 })
     .withMessage("الرجاء إدخال كلمة مرور صالحة"),
       body("type")
         .isIn(['admin', 'بوابة', 'مبنى القيادة', 'شؤون ضباط', 'شؤون ادارية', 'قائد الأمن'])
         .withMessage("النوع يجب أن يكون 'admin', 'بوابة', 'مبنى القيادة', 'شؤون ضباط', 'شؤون ادارية' أو 'قائد الأمن'"),
     (req, res) => {
-    UserController.updateUser(req, res);
+    UserController.updateUser(req, res); 
 });
 
 router.delete("/:id", admin, (req, res) => {
