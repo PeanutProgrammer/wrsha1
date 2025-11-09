@@ -7,28 +7,16 @@ import { FaUsers, FaClipboardCheck, FaHistory, FaSearch } from "react-icons/fa";
 
 const CivilliansHome = () => {
   const auth = getAuthUser();
-    const [Soldiers, setSoldiers] = useState([]);
   
-  
-
-    // useEffect(() => {
-    //     // fetch the destinations from your API
-    //   axios.get('http://localhost:4001/Officer/',  {
-    //     headers: {
-    //         token: auth.token
-    //       }
-    //     })
-    //         .then(response => setSoldiers(response.data))
-    //         .catch(error => console.error(error));
-
-    // });
-
 
  
 
   return (
     <div className="cards-container">
-      <div className="card">
+      
+     {auth && auth.type === "admin" && (
+           <>
+<div className="card">
         <div className="card-header">
           <FaUsers className="card-icon" />
           <h2>بيانات المدنيين</h2>
@@ -67,8 +55,31 @@ const CivilliansHome = () => {
           <Link to="Civillians/search" className="button">Go</Link>
         </div>
       )}
-    </div>
-  );
-};
+             </>
+           )}
+         {/* بوابة Cards */}
+               {auth && auth.type === "بوابة" && (
+                 <>
+                   <div className="card">
+                     <div className="card-header">
+                       <FaClipboardCheck className="card-icon" />
+                       <h2>تسجيل دخول</h2>
+                     </div>
+                     <Link to={"Civillians/Arrival"} className="button">تسجيل دخول</Link>
+                   </div>
+         
+                   <div className="card">
+                     <div className="card-header">
+                       <FaClipboardCheck className="card-icon" />
+                       <h2>تسجيل خروج</h2>
+                     </div>
+                     <Link to={"Civillians/Departure"} className="button">تسجيل خروج</Link>
+                   </div>
+                 </>
+               )}
+         
+             </div>
+           );
+         };
 
 export default CivilliansHome;

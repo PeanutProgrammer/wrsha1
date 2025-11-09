@@ -5,6 +5,7 @@ const ExpertController = require("../controllers/expertController");
 const authorized = require("../middleware/authorized");
 const admin = require("../middleware/admin");
 const shuoonSarya = require("../middleware/shuoonSarya");
+const gate = require("../middleware/gate");
 
 router.post("/", 
     // Add custom validation middleware for logical checks
@@ -150,7 +151,7 @@ router.get("/filter",  authorized,(req, res) => {
 
 
 
-router.get("/", admin,(req, res) => {
+router.get("/", gate,(req, res) => {
     ExpertController.getExperts(req, res);
 });
 

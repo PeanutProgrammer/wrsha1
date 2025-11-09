@@ -5,6 +5,7 @@ const authorized = require("../middleware/authorized");
 const admin = require("../middleware/admin");
 const shuoonOfficers = require("../middleware/shuoonOfficers");
 const moment = require('moment');
+const gate = require("../middleware/gate");
 
 
 router.post("/", shuoonOfficers,
@@ -125,7 +126,7 @@ router.get("/filter",  authorized,(req, res) => {
 
 
 
-router.get("/", admin,(req, res) => {
+router.get("/", gate,(req, res) => {
     CivillianController.getCivillians(req, res);
 });
 

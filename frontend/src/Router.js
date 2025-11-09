@@ -47,6 +47,8 @@ import SoldiersTmam from "./pages/Soldiers/SoldiersTmam";
 import SoldiersLog from "./pages/Soldiers/SoldiersLog";
 import SearchSoldiers from "./pages/Soldiers/SearchSoldiers";
 import SoldiersTmamDetails from "./pages/Soldiers/SoldierTmamDetails";
+import SoldierArrival from "./pages/Soldiers/arrival";
+import SoldierDeparture from "./pages/Soldiers/departure";
 
 
 import CivilliansHome from "./pages/Civillians/CivilliansHome";
@@ -58,6 +60,8 @@ import CivilliansTmam from "./pages/Civillians/CivilliansTmam";
 import CivilliansLog from "./pages/Civillians/CivilliansLog";
 import SearchCivillians from "./pages/Civillians/SearchCivillians";
 import CivilliansTmamDetails from "./pages/Civillians/CivilliansTmamDetails";
+import CivillianArrival from "./pages/Civillians/arrival";
+import CivillianDeparture from "./pages/Civillians/departure";
 
 
 import ExpertsHome from "./pages/Experts/ExpertsHome";
@@ -67,6 +71,8 @@ import UpdateExperts from "./pages/Experts/UpdateExperts";
 import ExpertDetails from "./pages/Experts/ExpertDetails";
 import ExpertsLog from "./pages/Experts/ExpertsLog";
 import SearchExperts from "./pages/Experts/SearchExperts";
+import ExpertArrival from "./pages/Experts/arrival";
+import ExpertDeparture from "./pages/Experts/departure";
 
 
 
@@ -306,7 +312,7 @@ export const router = createBrowserRouter([
 
                     {
                         path: 'Arrival',
-                        element: <NCOArrival />
+                        element: <NCOArrival  />
                     },
                     {
                         path: 'Departure',
@@ -317,7 +323,7 @@ export const router = createBrowserRouter([
                 ]
             },
             {   path: "SoldiersHome",
-                element: <Admin />,
+                element: <Gate />,
                 children: [
                     {
                         path: '',
@@ -327,7 +333,7 @@ export const router = createBrowserRouter([
             
             {
                 path: 'Soldiers',
-                element:<Admin/>,
+                element:<Gate />,
                 children: [
                     {
                         path:'',
@@ -369,13 +375,21 @@ export const router = createBrowserRouter([
                             //     path: 'id',
                             //     element: <OfficersTmamDetails/>
                             // }]
-                        }
+                        },
+                        {
+                        path: 'Arrival',
+                        element: <SoldierArrival  />
+                    },
+                    {
+                        path: 'Departure',
+                        element: <SoldierDeparture />
+                    },
                 ]
             }
                 ]
             },
             {   path: "CivilliansHome",
-                element: <Admin />,
+                element: <Gate />,
                 children: [
                     {
                         path: '',
@@ -385,7 +399,7 @@ export const router = createBrowserRouter([
             
             {
                 path: 'Civillians',
-                element:<Admin/>,
+                element:<Gate/>,
                 children: [
                     {
                         path:'',
@@ -427,13 +441,22 @@ export const router = createBrowserRouter([
                             //     path: 'id',
                             //     element: <OfficersTmamDetails/>
                             // }]
-                        }
+                        },
+
+                                                {
+                        path: 'Arrival',
+                        element: <CivillianArrival  />
+                    },
+                    {
+                        path: 'Departure',
+                        element: <CivillianDeparture />
+                    },
                 ]
             }
                 ]
             },
             {   path: "ExpertsHome",
-                element: <Admin />,
+                element: <Gate />,
                 children: [
                     {
                         path: '',
@@ -443,7 +466,7 @@ export const router = createBrowserRouter([
             
             {
                 path: 'Experts',
-                element:<Admin/>,
+                element:<Gate/>,
                 children: [
                     {
                         path:'',
@@ -478,14 +501,14 @@ export const router = createBrowserRouter([
                         path: 'search',
                         element: <SearchExperts />
                     },
-                    // {
-                    //         path: 'Tmam/details/:id',
-                    //         element: <CivilliansTmamDetails/>,
-                    //         // children:[{
-                    //         //     path: 'id',
-                    //         //     element: <OfficersTmamDetails/>
-                    //         // }]
-                    //     }
+                                            {
+                        path: 'Arrival',
+                        element: <ExpertArrival  />
+                    },
+                    {
+                        path: 'Departure',
+                        element: <ExpertDeparture />
+                    },
                 ]
             }
                 ]
