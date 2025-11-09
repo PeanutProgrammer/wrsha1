@@ -11,7 +11,7 @@ class Soldier {
         this._telephone_number = telephone_number;
         this._guardian_name = guardian_name;
         this._guardian_telephone_number = guardian_telephone_number;
-        this._in_unit = in_unit || true;
+        this._in_unit = in_unit;
     }
 
     getName = () => {

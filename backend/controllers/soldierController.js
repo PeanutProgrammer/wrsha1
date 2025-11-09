@@ -250,6 +250,8 @@ class SoldierController {
             console.log(soldier[0]); 
 
             const soldierObject = new Soldier(soldier[0].name, soldier[0].join_date, soldier[0].end_date, soldier[0].department, soldier[0].mil_id, soldier[0].rank, soldier[0].telephone_number, soldier[0].guardian_name, soldier[0].guardian_telephone_number, soldier[0].in_unit);
+            console.log(soldierObject.toJSON());
+            
             return res.status(200).json(soldierObject.toJSON());
 
 

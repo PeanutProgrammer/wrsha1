@@ -254,7 +254,8 @@ class CivillianController {
                civillian[0].dob,
                civillian[0].security_clearance_number,
                civillian[0].valid_from,
-               civillian[0].valid_through
+               civillian[0].valid_through,
+                civillian[0].in_unit
              )
 
 

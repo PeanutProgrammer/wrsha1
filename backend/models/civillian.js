@@ -12,7 +12,7 @@ class Civillian {
         this._security_clearance_number = security_clearance_number;
         this._valid_from = valid_from;
         this._valid_through = valid_through;
-        this._in_unit = in_unit || true;
+        this._in_unit = in_unit;
 
     }
 

@@ -36,6 +36,10 @@ const SoldierDetails = () => {
   }, [soldier.reload]);
 
 
+  console.log(soldier.results);
+  
+
+
 
   return (
     <div className="officer-details-container">

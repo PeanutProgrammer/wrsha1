@@ -11,7 +11,7 @@ class NCO {
         this._height = height;
         this._weight = weight;
         this._dob = dob;
-        this._in_unit = in_unit || true;
+        this._in_unit = in_unit;
     }
 
     getName = () => {

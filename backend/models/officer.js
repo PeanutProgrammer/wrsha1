@@ -12,7 +12,7 @@ class Officer {
         this._weight = weight;
         this._dob = dob;
         this._seniority_number = seniority_number;
-        this._in_unit = in_unit || true;
+        this._in_unit = in_unit;
     }
 
     getName = () => {
