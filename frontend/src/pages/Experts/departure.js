@@ -109,9 +109,6 @@ const ExpertDeparture = () => {
     <div className="Officers p-5">
       <div className="header d-flex justify-content-between mb-3">
         <h3 className="text-center mb-3">الخبراء المتواجدين</h3>
-        <Link to={'AddExperts'} className="btn btn-success mb-4">
-          إضافة خبير جديد +
-        </Link>
       </div>
 
       {/* Success Message */}

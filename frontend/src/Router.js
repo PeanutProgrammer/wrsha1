@@ -79,6 +79,8 @@ import ExpertDeparture from "./pages/Experts/departure";
 import GuestsHome from "./pages/Guests/GuestsHome";
 import Guests from "./pages/Guests/Guests";
 import AddGuests from "./pages/Guests/AddGuests";
+import GuestArrival from "./pages/Guests/arrival";
+import GuestDeparture from "./pages/Guests/departure";
 
 
 
@@ -515,7 +517,7 @@ export const router = createBrowserRouter([
             },
 
             {   path: "GuestsHome",
-                element: <Admin />,
+                element: <Gate />,
                 children: [
                     {
                         path: '',
@@ -525,7 +527,7 @@ export const router = createBrowserRouter([
             
             {
                 path: 'Guests',
-                element:<Admin/>,
+                element:<Gate/>,
                 children: [
                     {
                         path:'',
@@ -560,14 +562,14 @@ export const router = createBrowserRouter([
                         path: 'search',
                         element: <SearchExperts />
                     },
-                    // {
-                    //         path: 'Tmam/details/:id',
-                    //         element: <CivilliansTmamDetails/>,
-                    //         // children:[{
-                    //         //     path: 'id',
-                    //         //     element: <OfficersTmamDetails/>
-                    //         // }]
-                    //     }
+                    {
+                        path: 'Arrival',
+                        element: <GuestArrival  />
+                    },
+                    {
+                        path: 'Departure',
+                        element: <GuestDeparture />
+                    },
                 ]
             }
                 ]

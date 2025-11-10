@@ -5,10 +5,13 @@ const GuestController = require("../controllers/guestController");
 const authorized = require("../middleware/authorized");
 const admin = require("../middleware/admin");
 const shuoonSarya = require("../middleware/shuoonSarya");
+const gate = require("../middleware/gate");
+
+
 
 router.post("/", 
     // Add custom validation middleware for logical checks
-    shuoonSarya,
+    gate,
     body("name")
         .isString().withMessage("من فضلك أدخل اسم صحيح")
         .isLength({ min: 3, max: 30 }).withMessage("الاسم يجب أن يكون بين 3 و 30 حرفًا"),
@@ -128,7 +131,7 @@ router.put("/:id", admin,
     }
 );
 
-router.put("/end-visit/:id", admin, (req, res) => {
+router.put("/end-visit/:id", gate, (req, res) => {
     // Call the endVisit function from the controller
     GuestController.endVisit(req, res);
 });
@@ -143,11 +146,14 @@ router.delete("/:id", admin,  (req, res) => {
 
 
 
-
+    // Get all guests
+router.get("/current", gate,(req, res) => {
+    GuestController.getCurrentGuests(req, res);
+});
 
 
     // Get all guests
-router.get("/", admin,(req, res) => {
+router.get("/", gate,(req, res) => {
     GuestController.getGuests(req, res);
 });
 

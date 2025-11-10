@@ -324,6 +324,38 @@ class GuestController {
         }
     }
 
+
+     static async getCurrentGuests(req, res) {
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(400).json({ errors: errors.array() });
+            }
+
+            const query = util.promisify(connection.query).bind(connection);
+
+            // SQL query to fetch guests with null end_date in expert_record
+            const guests = await query(`
+                SELECT guests.id ,guests.name, guests.visit_start, guests.visit_end, guests.visit_to, guests.reason, officers.rank, officers.name as officer_name
+                FROM officers
+                RIGHT JOIN guests ON guests.visit_to = officers.id
+                 WHERE guests.visit_end IS NULL AND guests.visit_start IS NOT NULL
+            `);
+
+            if (guests.length === 0) {
+                return res.status(404).json({
+                    msg: "No guests with null visit_end found"
+                });
+            }
+
+            return res.status(200).json(guests);
+        } catch (err) {
+            console.error(err);  // Log error for debugging
+            return res.status(500).json({ err: err.message });
+        }
+    }
+
+
    
 
     
