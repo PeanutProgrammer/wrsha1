@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Alert, Modal, Button, Form } from 'react-bootstrap';
+import { Table, Alert, Modal, Button, Form,  Dropdown, DropdownButton } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { getAuthUser } from '../../helper/Storage';
 import moment from 'moment';
 import { io } from "socket.io-client";
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';  // This imports the autoTable plugin
+import htmlDocx from 'html-docx-js/dist/html-docx';
+import { FaPrint } from 'react-icons/fa';  // Import the printer icon from react-icons
 
 const Officers = () => {
   const auth = getAuthUser();
@@ -133,14 +137,136 @@ const Officers = () => {
     pageNumbers.push(i);
   }
 
+   // Export to PDF
+const exportToPDF = () => {
+  const doc = new jsPDF();
+
+  // Use the autoTable plugin to add the table to the PDF
+  doc.autoTable({ html: '#officer-table' });  // Assuming you have an id for your table
+
+  // Save the PDF
+  doc.save('officers_table.pdf');
+};
+// Function to get current date and time in Arabic format
+const getFormattedDate = () => {
+  const date = new Date();
+  const options = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  };
+  return date.toLocaleString('ar-EG', options); // Arabic (Egypt) locale for Arabic format
+};
+
+// Export to Word
+const exportToWord = () => {
+  const table = document.getElementById('officer-table');
+  if (table) {
+    // Clone the table to modify it before export
+    const tableClone = table.cloneNode(true);
+
+    // Remove the "Actions" column (last column)
+    const rows = tableClone.querySelectorAll('tr');
+    rows.forEach(row => {
+      const cells = row.querySelectorAll('td, th'); // Include both headers and data cells
+      if (cells.length > 0) {
+        row.deleteCell(cells.length - 1); // Remove the last cell (Actions column)
+      }
+    });
+
+    // Get current date in Arabic format
+    const currentDate = getFormattedDate();
+
+    // Create header and footer content
+    const header = `
+      <div style="text-align: center; font-size: 16pt; font-weight: bold; font-family: 'Arial', sans-serif;">
+        <p>إدارة الضباط</p>
+      </div>
+    `;
+    const footer = `
+      <div style="text-align: center; font-size: 10pt; font-family: 'Arial', sans-serif; color: #888;">
+        <p>تم طباعة هذا المستند في: ${currentDate}</p>
+      </div>
+    `;
+
+    // Set the direction to RTL for the Word document and include header, footer, and the table
+    const tableHTML = `
+      <div style="direction: rtl; font-family: 'Arial', sans-serif; font-size: 12pt;">
+        <!-- Header -->
+        ${header}
+        <!-- Table -->
+        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+          <thead>
+            <tr style="background-color: #f2f2f2;">
+              <th style="border: 1px solid black; padding: 5px;">الرقم العسكري</th>
+              <th style="border: 1px solid black; padding: 5px;">الرتبة</th>
+              <th style="border: 1px solid black; padding: 5px;">الإسم</th>
+              <th style="border: 1px solid black; padding: 5px;">الورشة / الفرع</th>
+              <th style="border: 1px solid black; padding: 5px;">تاريخ الضم</th>
+              <th style="border: 1px solid black; padding: 5px;">التمام</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${Array.from(rows)
+              .map((row, index) => {
+                const cells = row.querySelectorAll('td');
+                const rowStyle = index % 2 === 0 ? 'background-color: #ffffff;' : 'background-color: #f9f9f9;';
+                return `
+                  <tr style="${rowStyle}">
+                    ${Array.from(cells)
+                      .map(cell => `<td style="border: 1px solid black; padding: 5px;">${cell.innerHTML}</td>`)
+                      .join('')}
+                  </tr>
+                `;
+              })
+              .join('')}
+          </tbody>
+        </table>
+        <!-- Footer -->
+        ${footer}
+      </div>
+    `;
+
+    // Convert HTML to Word format
+    const converted = htmlDocx.asBlob(tableHTML);
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(converted);
+    link.download = 'officers_table.docx';
+    link.click();
+  } else {
+    alert('Table not found!');
+  }
+};
   return (
     <div className="Officers p-5">
       <div className="header d-flex justify-content-between mb-3">
-        <h3 className="text-center mb-3">إدارة الضباط</h3>
-        <Link to={"AddOfficers"} className="btn btn-success mb-4">
-          إنشاء ضابط جديد +
-        </Link>
-      </div>
+  <h3 className="text-center mb-3">إدارة الضباط</h3>
+
+  {/* Button container with d-flex */}
+  <div className="d-flex">
+    {/* Add New Officer Button */}
+    <Link to={"AddOfficers"} className="btn btn-success mb-4 mx-2">
+      إنشاء ضابط جديد +
+    </Link>
+
+    {/* Export Button with Dropdown */}
+    <Dropdown className="mb-4">
+      <DropdownButton
+        variant="secondary"
+        id="export-dropdown"
+        title={<><FaPrint className="mr-2 " />  طباعة   </>}
+      >
+        <Dropdown.Item onClick={exportToPDF}>PDF</Dropdown.Item>
+        <Dropdown.Item onClick={exportToWord}>Word</Dropdown.Item>
+      </DropdownButton>
+    </Dropdown>
+  </div>
+</div>
+
 
       {officers.err && (
         <Alert variant="danger" className="p-2">
@@ -154,12 +280,12 @@ const Officers = () => {
       )}
 
       <div className="table-responsive">
-        <Table striped bordered hover>
+        <Table id="officer-table" striped bordered hover>
           <thead>
             <tr>
               <th>الرقم العسكري</th>
               <th>الرتبة</th>
-              <th>الإسم</th>
+              <th>الاسم</th>
               <th>الورشة / الفرع</th>
               <th>تاريخ الضم</th>
               <th>التمام</th>

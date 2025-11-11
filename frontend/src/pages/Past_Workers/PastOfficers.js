@@ -129,9 +129,9 @@ const PastOfficers = () => {
                 <td>{officer.transferred_to}</td>
                 <td>
                   <div className="action-buttons">
-                    <Link to={`${officer.id}`} className="btn btn-sm btn-primary">
+                    {/* <Link to={`${officer.id}`} className="btn btn-sm btn-primary">
                       تعديل
-                    </Link>
+                    </Link> */}
                     <Link to={`details/${officer.id}`} className="btn btn-sm btn-primary">
                       تفاصيل
                     </Link>

@@ -140,7 +140,7 @@ const GuestDeparture = () => {
         <Table striped bordered hover>
           <thead>
             <tr>
-              <th>#</th>
+              {/* <th>#</th> */}
               <th>الإسم</th>
               <th>زيارة إلى</th>
               <th>وقت الدخول</th>
@@ -152,7 +152,7 @@ const GuestDeparture = () => {
           <tbody>
             {currentRecords.map((guest) => (
               <tr key={guest.id}>
-                <td>{guest.id}</td>
+                {/* <td>{guest.id}</td> */}
                 <td>{guest.name}</td>
                 <td>{guest.rank + " " + guest.officer_name}</td>
                 <td>{moment(guest.visit_start).format('YYYY-MM-DD HH:mm')}</td>
