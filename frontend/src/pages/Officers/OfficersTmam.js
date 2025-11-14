@@ -92,7 +92,7 @@ const OfficersTmam = () => {
             <td>{officer.rank}</td>
             <td>{officer.name}</td>
             <td>{officer.department}</td>
-            <td >{officer.tmam? officer.tmam: "متواجد"}</td>
+            <td >{officer.in_unit? "متواجد" : officer.tmam}</td>
               <td>
                 {/* <button className="btn btn-sm btn-danger mx-1 p-2" onClick ={(e) =>  {deleteOfficer(officer.mil_id)}}>حذف</button> */}
                 {/* <Link to={`${officer.mil_id}`} className="btn btn-sm btn-primary mx-1 p-2">تعديل</Link> */}

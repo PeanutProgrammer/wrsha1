@@ -257,7 +257,7 @@ class ExpertController {
 
             console.log(expert[0]); 
 
-            const expertObject = new Expert(expert[0].nationalID, expert[0].name, expert[0].passport_number, expert[0].security_clearance_number,  expert[0].valid_from, expert[0].valid_through, expert[0].company_name);
+            const expertObject = new Expert(expert[0].nationalID, expert[0].name, expert[0].passport_number, expert[0].security_clearance_number,  expert[0].valid_from, expert[0].valid_through, expert[0].company_name, expert[0].in_unit);
             return res.status(200).json(expertObject.toJSON());
 
 

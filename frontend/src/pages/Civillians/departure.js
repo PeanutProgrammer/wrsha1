@@ -92,7 +92,7 @@ const CivillianDeparture = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:4001/civillian/', {
+      .get('http://localhost:4001/civillian/current', {
         headers: {
           token: auth.token,
         },

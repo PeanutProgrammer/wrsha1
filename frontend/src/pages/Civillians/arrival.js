@@ -80,7 +80,7 @@ const CivillianArrival = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:4001/civillian/', {
+      .get('http://localhost:4001/civillian/absent', {
         headers: {
           token: auth.token,
         },

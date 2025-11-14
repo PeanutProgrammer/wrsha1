@@ -65,15 +65,22 @@ const OfficersTmamDetails = () => {
       )}
 
       {basicInfo && (
-  <div className="mb-4 border p-3 rounded bg-light text-end" dir="rtl">
-    <h5 className="mb-3">معلومات الضابط:</h5>
-    <p><strong>الاسم:</strong> {basicInfo.name}</p>
-    <p><strong>الرتبة:</strong> {basicInfo.rank}</p>
-    <p><strong>الرقم العسكري:</strong> {basicInfo.mil_id}</p>
-    <p><strong>الفرع / الورشة:</strong> {basicInfo.department}</p>
-  </div>
-)}
-
+        <div className="mb-4 border p-3 rounded bg-light text-end" dir="rtl">
+          <h5 className="mb-3">معلومات الضابط:</h5>
+          <p>
+            <strong>الاسم:</strong> {basicInfo.name}
+          </p>
+          <p>
+            <strong>الرتبة:</strong> {basicInfo.rank}
+          </p>
+          <p>
+            <strong>الرقم العسكري:</strong> {basicInfo.mil_id}
+          </p>
+          <p>
+            <strong>الفرع / الورشة:</strong> {basicInfo.department}
+          </p>
+        </div>
+      )}
 
       <h5 className="mb-3">سجل التمام:</h5>
       <Table striped bordered hover>
@@ -92,16 +99,30 @@ const OfficersTmamDetails = () => {
             records.map((rec, index) => (
               <tr key={index}>
                 <td>{index + 1}</td>
-                <td>{rec.tmam || 'متواجد'}</td>
-                <td>{rec.destination || '—'}</td>
-                <td>{rec.start_date ? moment(rec.start_date).format("YYYY-MM-DD") : '—'}</td>
-                <td>{rec.end_date ? moment(rec.end_date).format("YYYY-MM-DD") : '—'}</td>
-                <td>{rec.notes || '—'}</td>
+                <td>
+                  {rec.event_type === "دخول"
+                    ? `عودة ${rec.tmam || ""}` // show "عودة" + leave type if exists
+                    : rec.tmam || "متواجد"}{" "}
+                </td>{" "}
+                <td>{rec.destination || "—"}</td>
+                <td>
+                  {rec.start_date
+                    ? moment(rec.start_date).format("YYYY-MM-DD")
+                    : "—"}
+                </td>
+                <td>
+                  {rec.end_date
+                    ? moment(rec.end_date).format("YYYY-MM-DD")
+                    : "—"}
+                </td>
+                <td>{rec.notes || "—"}</td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="6" className="text-center">لا يوجد سجلات تمام.</td>
+              <td colSpan="6" className="text-center">
+                لا يوجد سجلات تمام.
+              </td>
             </tr>
           )}
         </tbody>

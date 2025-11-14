@@ -152,7 +152,7 @@ const SearchOfficers = () => {
           </div>
 
           <div className="form-group">
-            <label>الورشة / الفرع</label>
+            <label  >الورشة / الفرع</label>
             <select
               value={filters.department}
               onChange={(e) => setFilters({ ...filters, department: e.target.value })}

@@ -80,7 +80,7 @@ const SoldierArrival = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:4001/soldier/', {
+      .get('http://localhost:4001/soldier/absent', {
         headers: {
           token: auth.token,
         },

@@ -58,9 +58,6 @@ router.put("/:id", admin,
     }
 );
 
-router.delete("/history/:id", authorized,(req, res) => {
-    OfficerController.deleteHistory(req, res);
-})
 
 
 router.delete("/:mil_id", admin,  (req, res) => {
@@ -95,6 +92,14 @@ router.get("/tmam", admin, (req,res) => {
 
 router.get("/log", admin, (req,res) => {
     OfficerController.getOfficersTmam(req,res);
+});
+
+router.get("/current", gate, (req, res) => {
+    OfficerController.getCurrentOfficers(req, res);
+});
+
+router.get("/absent", gate, (req, res) => {
+    OfficerController.getAbsentOfficers(req, res);
 });
 
 router.get("/:id", admin, (req, res) => {

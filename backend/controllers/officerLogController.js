@@ -24,7 +24,8 @@ class OfficerLogController {
                                           LEFT JOIN officer_log
                                           ON officer_log.officerID = officers.id
                                           LEFT JOIN leave_type
-                                          ON officer_log.leaveTypeID = leave_type.id`)
+                                          ON officer_log.leaveTypeID = leave_type.id
+                                          order by officer_log.event_time DESC`)
 
             if (officers.length == 0) {
                 return res.status(404).json({

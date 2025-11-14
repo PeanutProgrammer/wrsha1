@@ -117,6 +117,12 @@ class ExpertLogController {
             [visitEnd, req.params.id]
         );
 
+                    await query(
+                      "update experts set in_unit = 0 where nationalID = ?",
+                      [checkExpert[0].expertID]
+                    );
+
+
         // Emit the update via socket if needed
         req.app.get("io").emit("expertsUpdated");
 
@@ -196,7 +202,8 @@ class ExpertLogController {
                 [expertObject.getStartDate(), expertObject.getEndDate(), expertObject.getExpertID(), expertObject.getDepartmentVisited(), expertObject.getLoggerID(), expertObject.getNotes()]);
 
 
-                    // await query("update experts set in_unit = 1 where id = ?", [expertObject.getExpertID()]);
+                    
+            await query("update experts set in_unit = 1 where nationalID = ?", [expertObject.getExpertID()]);
 
 
 
@@ -264,7 +271,7 @@ class ExpertLogController {
 
              const expertRecordId = expertRecordResult.insertId;
 
-            // await query("update experts set in_unit = 0 where id = ?", [expertObject.getExpertID()]);
+            await query("update experts set in_unit = 0 where nationalID = ?", [expertObject.getExpertID()]);
 
 
 

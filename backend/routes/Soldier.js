@@ -97,6 +97,14 @@ router.get("/log", admin, (req,res) => {
     SoldierController.getSoldiersTmam(req,res);
 });
 
+router.get("/absent", gate, (req, res) => {
+    SoldierController.getAbsentSoldiers(req, res);
+});
+
+router.get("/current", gate, (req, res) => {
+    SoldierController.getCurrentSoldiers(req, res);
+});
+
 router.get("/:id", admin, (req, res) => {
     SoldierController.getSoldier(req, res);
 });

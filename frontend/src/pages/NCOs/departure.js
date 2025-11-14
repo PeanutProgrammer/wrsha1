@@ -92,7 +92,7 @@ const NCODeparture = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:4001/nco/', {
+      .get('http://localhost:4001/nco/current', {
         headers: {
           token: auth.token,
         },

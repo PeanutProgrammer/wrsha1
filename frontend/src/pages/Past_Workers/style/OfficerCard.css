@@ -13,7 +13,7 @@
 /* 🔹 SEARCH BOX / FILTER FORM */
 /* ============================= */
 .search-box {
-  background-color: #1e1e2f;
+  background-color: #7e7e71;
   padding: 25px;
   border-radius: 12px;
   max-width: 700px;
@@ -25,7 +25,7 @@
 .search-title {
   text-align: center;
   margin-bottom: 20px;
-  color: #ffcc70;
+  color: #efc428;
   font-size: 1.5rem;
   font-weight: 700;
 }
@@ -44,7 +44,7 @@
 .filter-form label {
   margin-bottom: 6px;
   font-weight: 600;
-  color: #ddd;
+  color: #ffffff;
 }
 
 .filter-form input {

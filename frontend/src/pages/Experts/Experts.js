@@ -115,7 +115,7 @@ const Experts = () => {
     <div className="Officers p-5">
       <div className="header d-flex justify-content-between mb-3">
         <h3 className="text-center mb-3">إدارة الخبراء</h3>
-        <Link to={'AddExperts'} className="btn btn-success mb-4">
+        <Link to={"AddExperts"} className="btn btn-success mb-4">
           إنشاء خبير جديد +
         </Link>
       </div>
@@ -139,13 +139,14 @@ const Experts = () => {
           <thead>
             <tr>
               <th>الرقم القومي</th>
-              <th>جواز السفر</th>              
+              <th>جواز السفر</th>
               <th>الإسم</th>
               <th>رقم التصديق الأمني</th>
               <th>الفترة من</th>
               <th>الفترة إلى</th>
               <th>اسم الشركة</th>
               <th>حالة التصديق</th>
+              <th>التمام</th>
               <th>الإجراءات</th>
             </tr>
           </thead>
@@ -156,27 +157,43 @@ const Experts = () => {
                 <td>{expert.passport_number}</td>
                 <td>{expert.name}</td>
                 <td>{expert.security_clearance_number}</td>
-                <td>{moment(expert.valid_from).format('YYYY-MM-DD')}</td>
-                <td>{moment(expert.valid_through).format('YYYY-MM-DD')}</td>
+                <td>{moment(expert.valid_from).format("YYYY-MM-DD")}</td>
+                <td>{moment(expert.valid_through).format("YYYY-MM-DD")}</td>
                 <td>{expert.company_name}</td>
 
                 <td
-                className={
-    moment(expert.valid_from).isBefore(now) && moment(expert.valid_through).isAfter(now)
-      ? 'bg-success text-white' // Valid: green
-      : moment(expert.valid_through).isBefore(now)
-      ? 'bg-danger text-white' // Expired: red
-      : moment(expert.valid_from).isAfter(now)
-      ? 'bg-warning text-dark'  // Not started yet: yellow
-      : 'bg-danger text-white'  // fallback
-  }> {moment(expert.valid_from).isBefore(now) && moment(expert.valid_through).isAfter(now)
-    ? 'ساري'
-    : moment(expert.valid_through).isBefore(now)
-    ? 'منتهي'
-    : moment(expert.valid_from).isAfter(now)
-    ? 'لم يبدأ بعد'  // Optional, if you want to display something for experts who haven't started yet
-    : 'منتهي' // fallback for invalid state
-  }</td>
+                  className={
+                    moment(expert.valid_from).isBefore(now) &&
+                    moment(expert.valid_through).isAfter(now)
+                      ? "bg-success text-white" // Valid: green
+                      : moment(expert.valid_through).isBefore(now)
+                      ? "bg-danger text-white" // Expired: red
+                      : moment(expert.valid_from).isAfter(now)
+                      ? "bg-warning text-dark" // Not started yet: yellow
+                      : "bg-danger text-white" // fallback
+                  }
+                >
+                  {" "}
+                  {
+                    moment(expert.valid_from).isBefore(now) &&
+                    moment(expert.valid_through).isAfter(now)
+                      ? "ساري"
+                      : moment(expert.valid_through).isBefore(now)
+                      ? "منتهي"
+                      : moment(expert.valid_from).isAfter(now)
+                      ? "لم يبدأ بعد" // Optional, if you want to display something for experts who haven't started yet
+                      : "منتهي" // fallback for invalid state
+                  }
+                </td>
+                <td
+                  className={
+                    expert.in_unit
+                      ? "bg-success text-white"
+                      : "bg-danger text-white"
+                  }
+                >
+                  {expert.in_unit ? "متواجد" : "غير موجود"}
+                </td>
                 <td>
                   <div className="action-buttons">
                     <button
@@ -219,7 +236,7 @@ const Experts = () => {
           <button
             key={number}
             className={`btn btn-light page-btn ${
-              currentPage === number ? 'active' : ''
+              currentPage === number ? "active" : ""
             }`}
             onClick={() => paginate(number)}
           >
@@ -242,7 +259,7 @@ const Experts = () => {
           <Modal.Title>تأكيد الحذف</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          هل أنت متأكد أنك تريد حذف الخبير{' '}
+          هل أنت متأكد أنك تريد حذف الخبير{" "}
           <strong>{selectedExpert?.name}</strong>؟
         </Modal.Body>
         <Modal.Footer>

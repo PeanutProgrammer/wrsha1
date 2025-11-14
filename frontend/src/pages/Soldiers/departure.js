@@ -92,7 +92,7 @@ const SoldierDeparture = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:4001/soldier/', {
+      .get('http://localhost:4001/soldier/current', {
         headers: {
           token: auth.token,
         },

@@ -64,7 +64,7 @@ const NCOsHome = () => {
               <div className="card">
                 <div className="card-header">
                   <FaClipboardCheck className="card-icon" />
-                  <h2>تسجيل دخول</h2>
+                  <h2>تسجيل دخول ضباط الصف</h2>
                 </div>
                 <Link to={"NCOs/Arrival"} className="button">تسجيل دخول</Link>
               </div>
@@ -72,7 +72,7 @@ const NCOsHome = () => {
               <div className="card">
                 <div className="card-header">
                   <FaClipboardCheck className="card-icon" />
-                  <h2>تسجيل خروج</h2>
+                  <h2>تسجيل خروج ضباط الصف</h2>
                 </div>
                 <Link to={"/dashboard/NCOsHome/NCOs/Departure"} className="button">تسجيل خروج</Link>
               </div>

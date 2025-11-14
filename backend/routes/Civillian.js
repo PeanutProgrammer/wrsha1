@@ -145,6 +145,14 @@ router.get("/log", admin, (req,res) => {
     CivillianController.getCivilliansTmam(req,res);
 });
 
+router.get("/absent", gate, (req, res) => {
+    CivillianController.getAbsentCivillians(req, res);
+});
+
+router.get("/current", gate, (req, res) => {
+    CivillianController.getCurrentCivillians(req, res);
+});
+
 router.get("/:id", admin, (req, res) => {
     CivillianController.getCivillian(req, res);
 });

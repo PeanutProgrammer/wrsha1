@@ -80,7 +80,7 @@ const NCOArrival = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:4001/nco/', {
+      .get('http://localhost:4001/nco/absent', {
         headers: {
           token: auth.token,
         },

@@ -80,7 +80,7 @@ const OfficerArrival = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:4001/officer/', {
+      .get('http://localhost:4001/officer/absent', {
         headers: {
           token: auth.token,
         },
@@ -104,12 +104,14 @@ const OfficerArrival = () => {
   const officerOptions = officer.map((officer) => ({
     value: officer.id,
     label: `${officer.rank} / ${officer.name}`,
+    leaveTypeID: officer.leaveTypeID, // attach latest leave type
   }));
 
   // Handle when an officer is selected
   const handleOfficerChange = (selectedOption) => {
     if (selectedOption) {
       setValue("officerID", selectedOption.value); // Set the officerID field in react-hook-form
+      setValue("leaveTypeID", selectedOption.leaveTypeID || ""); // Set leaveTypeID from officer
     }
   };
 

@@ -90,6 +90,14 @@ router.get("/log", admin, (req,res) => {
     NCOController.getOfficersTmam(req,res);
 });
 
+router.get("/current", gate, (req, res) => {
+    NCOController.getCurrentOfficers(req, res);
+});
+
+router.get("/absent", gate, (req, res) => {
+    NCOController.getAbsentOfficers(req, res);
+});
+
 router.get("/:id", admin, (req, res) => {
     NCOController.getOfficer(req, res);
 });

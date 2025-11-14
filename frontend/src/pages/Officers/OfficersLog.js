@@ -109,7 +109,9 @@ const OfficersLog = () => {
     : "لا يوجد"}
 </td>
 
-            <td>{(officer.event_type? (officer.event_type == "دخول"? "دخول" : officer.reason): "لا يوجد")}</td>
+            <td>{(officer.event_type ? (officer.event_type == "دخول" ?
+              `عودة ${officer.reason || ""}`
+              : officer.reason) : "لا يوجد")}</td>
             <td>{officer.notes? officer.notes : "لا يوجد"}</td>
             {/* <td >{officer.tmam? officer.tmam: "متواجد"}</td> */}
               {/* <td> */}
