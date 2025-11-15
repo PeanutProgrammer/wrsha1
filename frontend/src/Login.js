@@ -18,7 +18,7 @@ const Login = () => {
         e.preventDefault();
         setlogin({ ...login, loading: true, err: [] });
         axios
-            .post("http://192.168.1.201:4001/auth/login", {
+            .post("http://localhost:4001/auth/login", {
                 username: login.username,
                 password: login.password,
             })

@@ -23,6 +23,7 @@ import OfficersTmamDetails from "./pages/Officers/OfficerTmamDeatils";
 import OfficersHome from "./pages/Officers/OfficersHome";
 import OfficerArrival from "./pages/Officers/arrival";
 import OfficerDeparture from "./pages/Officers/departure";
+import SecurityOfficers from "./pages/Officers/SecurityOfficers";
 
 
 import NCOsHome from "./pages/NCOs/NCOsHome";
@@ -139,62 +140,22 @@ export const router = createBrowserRouter([
         //Nesting Children
         children: [
             {
-                path: "travel",
-                element: <ProductList />,
-            },
-            {
-                path: "product-info/:id",
-                element: <ProductInfo />,
-            },
-            {
-                path: "history",
-                element: <History />,
-            },
-            {
-                path: "Destinations",
-                element: <Destinations/>
-            },
-            {
                 path: "Home",
                 element: <Home />,
             },
             {
-                path: "All-Requests",
-                element: <UserRequests/>
-            },
-            {
-                path: "All-Busses",
-                element: <UserBusses/>
-            },
-            {
-                path: "All-Destinations",
-                element: <UserDestinations/>
-            },
-            {
-                path: "Destinations",
-                element:<Admin/>,
-                children: [
-                    {
-                        path:'',
-                        element: <Destinations />,
+                        path:'SecurityOfficers',
+                        element: <SecurityOfficers />,
                     },
-                    {
-                        path:'AddDestinations',
-                        element: <AddDestinations />,
-                    },
-                    {
-                        path:':id',
-                        element: <UpdateDestinations />,
-                    },
-                ]
-            },
-            {   path: "OfficersHome",
+            {
+                path: "OfficersHome",
                 element: <Gate />,
                 children: [
                     {
                         path: '',
                         element: <OfficersHome />,
                     },
+
 
             
             {
@@ -205,6 +166,7 @@ export const router = createBrowserRouter([
                         path:'',
                         element: <Officers />,
                     },
+
                     {
                         path:'AddOfficers',
                         element: <AddOfficers />,

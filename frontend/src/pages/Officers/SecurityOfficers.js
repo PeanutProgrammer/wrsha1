@@ -25,7 +25,7 @@ import { FaPrint } from 'react-icons/fa';  // Import the printer icon from react
 //   // You can add more fonts here
 // };
 
-const Officers = () => {
+const SecurityOfficers = () => {
   const auth = getAuthUser();
   const [officers, setOfficers] = useState({
     loading: true,
@@ -48,7 +48,7 @@ const Officers = () => {
     // 🔁 Initial fetch
     const fetchData = () => {
       axios
-        .get("http://localhost:4001/officer/", {
+        .get("http://localhost:4001/officer/tmam", {
           headers: { token: auth.token },
         })
         .then((resp) => {
@@ -249,9 +249,9 @@ const exportToWord = () => {
     const rows = tableClone.querySelectorAll('tr');
     rows.forEach(row => {
       const cells = row.querySelectorAll('td, th'); // Include both headers and data cells
-      if (cells.length > 0) {
-        row.deleteCell(cells.length - 1); // Remove the last cell (Actions column)
-      }
+      // if (cells.length > 0) {
+      //   row.deleteCell(cells.length - 1); // Remove the last cell (Actions column)
+      // }
     });
 
     // Get current date in Arabic format
@@ -284,6 +284,8 @@ const exportToWord = () => {
               <th style="border: 1px solid black; padding: 5px;">الورشة / الفرع</th>
               <th style="border: 1px solid black; padding: 5px;">تاريخ الضم</th>
               <th style="border: 1px solid black; padding: 5px;">التمام</th>
+              <th style="border: 1px solid black; padding: 5px;">ملاحظات</th>
+
             </tr>
           </thead>
           <tbody>
@@ -324,11 +326,7 @@ const exportToWord = () => {
 
   {/* Button container with d-flex */}
   <div className="d-flex">
-    {/* Add New Officer Button */}
-    <Link to={"AddOfficers"} className="btn btn-success mb-4 mx-2">
-      إنشاء ضابط جديد +
-    </Link>
-
+   
     {/* Export Button with Dropdown */}
           <Dropdown className="mb-4">
             <DropdownButton
@@ -368,7 +366,7 @@ const exportToWord = () => {
               <th>الورشة / الفرع</th>
               <th>تاريخ الضم</th>
               <th>التمام</th>
-              <th>Action</th>
+              <th>ملاحظات</th>
             </tr>
           </thead>
           <tbody>
@@ -379,8 +377,14 @@ const exportToWord = () => {
                 <td>{officer.name}</td>
                 <td>{officer.department}</td>
                 <td>{moment(officer.join_date).format('YYYY-MM-DD')}</td>
-                <td>{officer.in_unit ? 'متواجد' : 'غير موجود'}</td>
-                <td>
+                <td  className={
+                    officer.in_unit
+                      ? "bg-success text-white"
+                      : "bg-danger text-white"
+                  }
+                >{officer.in_unit ? 'متواجد' : 'غير موجود'}</td>
+                <td >{officer.in_unit? "لا يوجد" : officer.tmam}</td>
+                {/* <td>
                   <div className="action-buttons">
                     <button
                       className="btn btn-sm btn-danger"
@@ -395,7 +399,7 @@ const exportToWord = () => {
                       تفاصيل
                     </Link>
                   </div>
-                </td>
+                </td> */}
               </tr>
             ))}
           </tbody>
@@ -485,4 +489,4 @@ const exportToWord = () => {
   );
 };
 
-export default Officers;
+export default SecurityOfficers;

@@ -21,7 +21,7 @@ const OfficerCard = ({ id, mil_id, name, join_date, rank, end_date }) => {
           <h3 className="card-title">{name}</h3>
           <p className="card-text">
             <strong>الرقم العسكري:</strong> {mil_id} <br />
-            <strong>الرتبة:</strong> {rank} <br />
+            <strong>الرتبة / الدرجة :</strong> {rank} <br />
             <strong>تاريخ الضم:</strong> {new Date(join_date).toLocaleDateString()} <br />
             <strong>تاريخ الانتهاء:</strong> {new Date(end_date).toLocaleDateString()}
           </p>

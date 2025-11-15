@@ -1,13 +1,16 @@
 const connection = require("../db/dbConnection");
 const util = require("util");
 
-const securityHeadType = 6;
 
 const securityHead = async (req, res,next) => {
     const query = util.promisify(connection.query).bind(connection);
     const { token } = req.headers; 
-    const securityHeadData = await query("select * from users where token = ?", [token]);
-    if (securityHeadData[0] && securityHeadData[0].type == securityHeadType) { 
+        console.log(token);
+
+    const userData = await query("select * from users where token = ?", [token]);
+ 
+    
+    if (userData[0] && (userData[0].type == "قائد الامن" || userData[0].type == "admin" )) { 
         next();
     } else {
         res.status(403).json({

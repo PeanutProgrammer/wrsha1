@@ -117,12 +117,12 @@ const SearchPastWorkers = () => {
           </div>
 
           <div className="form-group">
-            <label>الرتبة</label>
+            <label>الرتبة / الدرجة </label>
             <select
               value={filters.rank}
               onChange={(e) => setFilters({ ...filters, rank: e.target.value })}
             >
-              <option value="">إختر رتبة</option>
+              <option value="">إختر رتبة / درجة </option>
             <option value="ملازم">ملازم</option>
             <option value="ملازم أول">ملازم أول</option>
             <option value="نقيب">نقيب</option>
