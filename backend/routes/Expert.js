@@ -9,7 +9,7 @@ const gate = require("../middleware/gate");
 
 router.post("/", 
     // Add custom validation middleware for logical checks
-    shuoonSarya,
+    admin,
     body("name")
         .isString().withMessage("من فضلك أدخل اسم صحيح")
         .isLength({ min: 3, max: 30 }).withMessage("الاسم يجب أن يكون بين 3 و 30 حرفًا"),
@@ -55,6 +55,9 @@ router.post("/",
     // Validate 'security_clearance_number'
     body("security_clearance_number")
         .isString().withMessage("من فضلك أدخل رقم التصديق الأمني صحيح"),
+
+    body("department")
+        .isString().withMessage("من فضلك أدخل الورشة / الفرع بشكل صحيح"),
 
     // Handle validation results
     (req, res) => {
@@ -118,6 +121,9 @@ router.put("/:id", admin,
     // Validate security clearance number (should be a string)
     body("security_clearance_number")
         .isString().withMessage("من فضلك أدخل رقم التصديق الأمني صحيح"),
+
+    body("department")
+        .isString().withMessage("من فضلك أدخل الورشة / الفرع بشكل صحيح"),
 
     // Handle validation results
     (req, res) => {

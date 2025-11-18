@@ -47,16 +47,14 @@ class ExpertController {
                 req.body.security_clearance_number,
                 req.body.valid_from,
                 req.body.valid_through,
-                req.body.company_name
+                req.body.company_name,
+                req.body.department
 
               )
             
 
-            
-
-
-            await query("insert into experts set  nationalID = ?, name =?, passport_number = ?, security_clearance_number = ?, valid_from = ?, valid_through = ?, company_name = ?",
-                [expertObject.getNationalID(),expertObject.getName(),expertObject.getPassportNumber(), expertObject.getSecurityClearanceNumber(), expertObject.getValidFrom(), expertObject.getValidThrough(), expertObject.getCompanyName()]);
+            await query("insert into experts set  nationalID = ?, name =?, passport_number = ?, security_clearance_number = ?, valid_from = ?, valid_through = ?, company_name = ?, department = ?",
+                [expertObject.getNationalID(),expertObject.getName(),expertObject.getPassportNumber(), expertObject.getSecurityClearanceNumber(), expertObject.getValidFrom(), expertObject.getValidThrough(), expertObject.getCompanyName(), expertObject.getDepartment()]);
             
              req.app.get("io").emit("expertsUpdated");
             return res.status(200).json(expertObject.toJSON() );
@@ -102,8 +100,8 @@ class ExpertController {
                 req.body.security_clearance_number,
                 req.body.valid_from,
                 req.body.valid_through,
-                req.body.company_name
-
+                req.body.company_name,
+                req.body.department
               )
             
                  console.log('Executing query with data:', [
@@ -113,21 +111,18 @@ class ExpertController {
     req.body.security_clearance_number,
     expertObject.getValidFrom(),
     expertObject.getValidThrough(),
-    expertObject.getCompanyName()
+    expertObject.getCompanyName(),
+    expertObject.getDepartment()
 ]);
 
             
             
 
              
-           
-            
-            
 
-            await query(`update experts set  name =?, passport_number = ?, security_clearance_number = ?, valid_from = ?, valid_through = ?, company_name = ? where nationalID = ?`,
-                [expertObject.getName(), expertObject.getPassportNumber(), expertObject.getSecurityClearanceNumber(), expertObject.getValidFrom(), expertObject.getValidThrough(), expertObject.getCompanyName() , req.params.id]);
-            
 
+            await query(`update experts set  name =?, passport_number = ?, security_clearance_number = ?, valid_from = ?, valid_through = ?, company_name = ?, department = ? where nationalID = ?`,
+                [expertObject.getName(), expertObject.getPassportNumber(), expertObject.getSecurityClearanceNumber(), expertObject.getValidFrom(), expertObject.getValidThrough(), expertObject.getCompanyName(), expertObject.getDepartment(), req.params.id]);
 
 
 
@@ -257,7 +252,7 @@ class ExpertController {
 
             console.log(expert[0]); 
 
-            const expertObject = new Expert(expert[0].nationalID, expert[0].name, expert[0].passport_number, expert[0].security_clearance_number,  expert[0].valid_from, expert[0].valid_through, expert[0].company_name, expert[0].in_unit);
+            const expertObject = new Expert(expert[0].nationalID, expert[0].name, expert[0].passport_number, expert[0].security_clearance_number,  expert[0].valid_from, expert[0].valid_through, expert[0].company_name, expert[0].department, expert[0].in_unit);
             return res.status(200).json(expertObject.toJSON());
 
 

@@ -14,7 +14,7 @@ import Select from 'react-select'; // Importing react-select
 const schema = yup.object().shape({
   notes: yup.string().max(500, 'الملاحظات يجب ألا تتجاوز 500 حرف').optional(),
   ncoID: yup.number().required(' اسم ضابط الصف مطلوب '),
-  leaveTypeID: yup.number().optional('نوع العودة مطلوب'),
+  leaveTypeID: yup.number().required('نوع العودة مطلوب'),
 });
 
 const NCOArrival = () => {

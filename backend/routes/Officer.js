@@ -21,7 +21,7 @@ router.post("/", shuoonOfficers,
     body("rank")
         .isString().withMessage("يرجى إدخال رتبة صحيحة"),
     body("department")
-        .isString().withMessage("يرجى إدخال رقم الفرع أو الورشة بشكل صحيح"),
+        .isString().withMessage("يرجى إدخال الفرع أو الورشة بشكل صحيح"),
     body("height")
         .isNumeric().withMessage("يرجى إدخال طول صحيح"),
     body("weight")

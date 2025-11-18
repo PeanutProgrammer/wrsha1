@@ -5,6 +5,7 @@ const authorized = require("../middleware/authorized");
 const admin = require("../middleware/admin");
 const shuoonSarya = require("../middleware/shuoonSarya");
 const gate = require("../middleware/gate");
+const securityHead = require("../middleware/securityHead");
 
 
 router.post("/", shuoonSarya,
@@ -86,7 +87,7 @@ router.get("/tmam/:id", admin, (req,res) => {
     SoldierController.getSoldierTmamDetails(req,res);
 });
 
-router.get("/tmam", admin, (req,res) => {
+router.get("/tmam", (securityHead), (req,res) => {
     SoldierController.getSoldiersTmam(req,res);
 });
 

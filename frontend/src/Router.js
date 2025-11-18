@@ -37,7 +37,7 @@ import SearchNCOs from "./pages/NCOs/SearchNCOs";
 import NCOsTmamDetails from "./pages/NCOs/NCOTmamDetails";
 import NCOArrival from "./pages/NCOs/arrival";
 import NCODeparture from "./pages/NCOs/departure";    
-
+import SecurityNCOs from "./pages/NCOs/SecurityNCOs";
 
 import SoldiersHome from "./pages/Soldiers/SoldiersHome";
 import Soldiers from "./pages/Soldiers/Soldiers";
@@ -50,6 +50,7 @@ import SearchSoldiers from "./pages/Soldiers/SearchSoldiers";
 import SoldiersTmamDetails from "./pages/Soldiers/SoldierTmamDetails";
 import SoldierArrival from "./pages/Soldiers/arrival";
 import SoldierDeparture from "./pages/Soldiers/departure";
+import SecuritySoldiers from "./pages/Soldiers/SecuritySoldiers";
 
 
 import CivilliansHome from "./pages/Civillians/CivilliansHome";
@@ -63,6 +64,7 @@ import SearchCivillians from "./pages/Civillians/SearchCivillians";
 import CivilliansTmamDetails from "./pages/Civillians/CivilliansTmamDetails";
 import CivillianArrival from "./pages/Civillians/arrival";
 import CivillianDeparture from "./pages/Civillians/departure";
+import SecurityCivillians from "./pages/Civillians/SecurityCivillians";
 
 
 import ExpertsHome from "./pages/Experts/ExpertsHome";
@@ -146,6 +148,20 @@ export const router = createBrowserRouter([
             {
                         path:'SecurityOfficers',
                         element: <SecurityOfficers />,
+                    },
+            {
+                        path:'SecurityNCOs',
+                        element: <SecurityNCOs />,
+                    },
+
+            {
+                        path:'SecuritySoldiers',
+                        element: <SecuritySoldiers />,
+                    },
+
+            {
+                        path:'SecurityCivillians',
+                        element: <SecurityCivillians />,
                     },
             {
                 path: "OfficersHome",

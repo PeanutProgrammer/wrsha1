@@ -1,7 +1,7 @@
 
 
 class Expert {
-    constructor(nationalID, name, passport_number, security_clearance_num, valid_from, valid_through, company_name, in_unit) {
+    constructor(nationalID, name, passport_number, security_clearance_num, valid_from, valid_through, company_name, department, in_unit) {
         this._nationalID = nationalID;
         this._name = name;
         this._passport_number = passport_number;
@@ -9,6 +9,7 @@ class Expert {
         this._valid_from = valid_from;
         this._valid_through = valid_through;
         this._company_name = company_name;
+        this._department = department;
         this._in_unit = in_unit;
     }
 
@@ -38,6 +39,10 @@ class Expert {
 
     getCompanyName = () => {
         return this._company_name;
+    }
+
+    getDepartment = () => {
+        return this._department;
     }
 
     getInUnit = () => {
@@ -73,7 +78,11 @@ class Expert {
      setCompanyName = (company_name) => {
         this._company_name = company_name;
      }
-    
+
+        setDepartment = (department) => {
+        this._department = department;
+    }
+
     setInUnit = (in_unit) => {
         this._in_unit = in_unit;
     }

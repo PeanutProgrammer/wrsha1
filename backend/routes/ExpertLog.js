@@ -11,8 +11,8 @@ const moment = require("moment");
 router.post("/", gate,
     body("expertID")
         .isNumeric().withMessage("من فضلك أدخل اسم خبير صحيح"),
-    body("department_visited")
-        .isString().withMessage("من فضلك أدخل الورشة / الفرع الصحيحة"),
+    body("officerID")
+        .isNumeric().withMessage("من فضلك أدخل الضابط المرافق للخبير").optional(),
     body("loggerID")
         .isNumeric(),
     body("start_date")
@@ -45,6 +45,9 @@ router.post("/", gate,
         
                 return true;
             }),
+
+    body("notes")
+        .isString().withMessage("من فضلك أدخل ملاحظات صحيحة").optional(),
     (req, res) => {
         ExpertLogController.createArrival(req, res);
     }
@@ -54,8 +57,8 @@ router.post("/", gate,
 router.post("/departure", gate,
     body("expertID")
         .isNumeric().withMessage("من فضلك أدخل اسم خبير صحيح"),
-    body("department_visited")
-        .isString().withMessage("من فضلك أدخل الورشة / الفرع الصحيحة"),
+    body("officerID")
+        .isNumeric().withMessage("من فضلك أدخل الضابط المرافق للخبير").optional(),
     body("loggerID")
         .isNumeric(),
     body("start_date")
@@ -88,6 +91,9 @@ router.post("/departure", gate,
         
                 return true;
             }),
+
+    body("notes")
+        .isString().withMessage("من فضلك أدخل ملاحظات صحيحة").optional(),
 
     (req, res) => {
         ExpertLogController.createDeparture(req, res);

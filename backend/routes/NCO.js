@@ -5,6 +5,7 @@ const authorized = require("../middleware/authorized");
 const admin = require("../middleware/admin");
 const shuoonSarya = require("../middleware/shuoonSarya");
 const gate = require("../middleware/gate");
+const security = require("../middleware/securityHead");
 
 
 router.post("/", shuoonSarya,
@@ -20,7 +21,7 @@ router.post("/", shuoonSarya,
     body("rank")
         .isString().withMessage("يرجى إدخال رتبة صحيحة"),
     body("department")
-        .isString().withMessage("يرجى إدخال رقم الفرع أو الورشة بشكل صحيح"),
+        .isString().withMessage("يرجى إدخال الفرع أو الورشة بشكل صحيح"),
     body("height")
         .isNumeric().withMessage("يرجى إدخال طول صحيح"),
     body("weight")
@@ -79,7 +80,7 @@ router.get("/tmam/:id", admin, (req,res) => {
     NCOController.getOfficerTmamDetails(req,res);
 });
 
-router.get("/tmam", admin, (req,res) => {
+router.get("/tmam", (security || admin), (req,res) => {
     NCOController.getOfficersTmam(req,res);
 });
 

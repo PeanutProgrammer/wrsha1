@@ -70,7 +70,9 @@ const ExpertsLog = () => {
             <th>حالة التصديق</th>
             <th>وقت الدخول</th>
             <th>وقت الخروج</th>
-            <th>زيارة إلى</th>
+            <th>الفرع / الورشة</th>
+            <th>الضابط المرافق</th>
+            <th>ملاحظات</th>
           </tr>
         </thead>
         <tbody>
@@ -124,7 +126,10 @@ const ExpertsLog = () => {
     : "لا يوجد"}
 </td>
 
-<td>{expert.department_visited}</td>
+<td>{expert.department}</td>
+
+            <td>{expert.rank} / {expert.officerName}</td>
+            <td>{expert.notes ? expert.notes : "لا يوجد"}</td>
 
             {/* <td >{officer.tmam? officer.tmam: "متواجد"}</td> */}
               

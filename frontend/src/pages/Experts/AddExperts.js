@@ -17,10 +17,13 @@ const schema = yup.object().shape({
   valid_from: yup.date().required('تاريخ بداية التصديق الأمني مطلوب').typeError('يرجى إدخال تاريخ صحيح'),
   valid_through: yup.date().required('تاريخ انتهاء التصديق الأمني مطلوب').min(yup.ref('valid_from'), 'تاريخ الانتهاء يجب أن يكون بعد تاريخ البداية').typeError('يرجى إدخال تاريخ صحيح'),
   company_name: yup.string().required('اسم الشركة مطلوب'),
+  department: yup.string().required('الفرع / الورشة مطلوب'),
+
 });
 
 const AddExperts = () => {
   const auth = getAuthUser();
+  const [dept, setDept] = useState([]);
   const [expert, setExpert] = useState({
     loading: false,
     err: [],
@@ -81,6 +84,18 @@ const AddExperts = () => {
       });
     }
   };
+
+
+   useEffect(() => {
+        axios
+          .get('http://localhost:4001/department/', {
+            headers: {
+              token: auth.token,
+            },
+          })
+          .then((resp) => setDept(resp.data))
+          .catch((err) => console.log(err));
+      }, []);
 
   return (
     <div className="add-officer-form">
@@ -170,6 +185,23 @@ const AddExperts = () => {
           />
           {errors.valid_through && <div className="invalid-feedback">{errors.valid_through.message}</div>}
         </Form.Group>
+
+         <Form.Group controlId="department">
+                                  <Form.Label>الورشة / الفرع</Form.Label>
+                                  <Form.Control
+                                    as="select"
+                                    {...register('department')}
+                                    className={`form-control ${errors.department ? 'is-invalid' : ''}`}
+                                  >
+                                    <option value="">إختر الورشة / الفرع</option>
+                                    {dept.map((dep) => (
+                                      <option key={dep.name} value={dep.name}>
+                                        {dep.name}
+                                      </option>
+                                    ))}
+                                  </Form.Control>
+                                  {errors.department && <div className="invalid-feedback">{errors.department.message}</div>}
+                                </Form.Group>
 
         <Form.Group controlId="company_name" className="form-group">
           <Form.Label>اسم الشركة</Form.Label>

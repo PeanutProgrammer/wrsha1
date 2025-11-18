@@ -18,10 +18,14 @@ const schema = yup.object().shape({
   valid_from: yup.date().required('تاريخ بداية التصديق الأمني مطلوب').typeError('يرجى إدخال تاريخ صحيح'),
   valid_through: yup.date().required('تاريخ انتهاء التصديق الأمني مطلوب').min(yup.ref('valid_from'), 'تاريخ الانتهاء يجب أن يكون بعد تاريخ البداية').typeError('يرجى إدخال تاريخ صحيح'),
   company_name: yup.string().required('اسم الشركة مطلوب'),
+  department: yup.string().required('الفرع / الورشة مطلوب'),
+  
 });
 
 const UpdateExperts = () => {
   const auth = getAuthUser();
+  const [dept, setDept] = useState([]);
+
   let { id } = useParams();
 
   const [expert, setExpert] = useState({
@@ -34,6 +38,7 @@ const UpdateExperts = () => {
     valid_from: '',
     valid_through: '',
     company_name: '',
+    department: '',
     success: null,
     reload: false,
   });
@@ -117,6 +122,7 @@ const UpdateExperts = () => {
           valid_from: resp.data._valid_from ? formatDateToInput(resp.data._valid_from) : '',
           valid_through: resp.data._valid_through ? formatDateToInput(resp.data._valid_through) : '',
           company_name: resp.data._company_name,
+          department: resp.data._department,
           loading: false,
           err: '',
         });
@@ -128,6 +134,7 @@ const UpdateExperts = () => {
           valid_from: resp.data._valid_from ? formatDateToInput(resp.data._valid_from) : '',
           valid_through: resp.data._valid_through ? formatDateToInput(resp.data._valid_through) : '',
           company_name: resp.data._company_name,
+          department: resp.data._department,
         });
       })
       .catch((err) => {
@@ -141,6 +148,17 @@ const UpdateExperts = () => {
         });
       });
   }, [id, expert.reload, reset]);
+
+   useEffect(() => {
+          axios
+            .get('http://localhost:4001/department/', {
+              headers: {
+                token: auth.token,
+              },
+            })
+            .then((resp) => setDept(resp.data))
+            .catch((err) => console.log(err));
+        }, []);
 
 
   return (
@@ -228,6 +246,24 @@ const UpdateExperts = () => {
           />
           {errors.valid_through && <div className="invalid-feedback">{errors.valid_through.message}</div>}
         </Form.Group>
+
+
+         <Form.Group controlId="department">
+                                          <Form.Label>الورشة / الفرع</Form.Label>
+                                          <Form.Control
+                                            as="select"
+                                            {...register('department')}
+                                            className={`form-control ${errors.department ? 'is-invalid' : ''}`}
+                                          >
+                                            <option value="">إختر الورشة / الفرع</option>
+                                            {dept.map((dep) => (
+                                              <option key={dep.name} value={dep.name}>
+                                                {dep.name}
+                                              </option>
+                                            ))}
+                                          </Form.Control>
+                                          {errors.department && <div className="invalid-feedback">{errors.department.message}</div>}
+                                        </Form.Group>
 
         <Form.Group controlId="company_name" className="form-group">
           <Form.Label>اسم الشركة</Form.Label>

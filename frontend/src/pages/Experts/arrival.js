@@ -14,19 +14,20 @@ import Select from 'react-select'; // Importing react-select
 const schema = yup.object().shape({
   notes: yup.string().max(500, 'الملاحظات يجب ألا تتجاوز 500 حرف').optional(),
   expertID: yup.number().required(' اسم الخبير مطلوب '),
-  department_visited: yup.string().required('الورشة / الفرع مطلوب'),
+  officerID: yup.string().required('الضابط المرافق مطلوب'),
 });
 
 const ExpertArrival = () => {
   const [expert, setExpert] = useState([]);
-  const [dept, setDept] = useState([]);
+  const [officer, setOfficer] = useState([]);
+  const [hasInternalOfficer, setHasInternalOfficer] = useState(false); // State for radio button selection
   const auth = getAuthUser();
   const [expertLog, setExpertLog] = useState({
     loading: false,
     err: '',
     notes: '',
     expertID: '',
-    department_visited: '',
+    officerID: '',
     success: null,
   });
 
@@ -46,8 +47,7 @@ const ExpertArrival = () => {
       loggerID: auth.id
     };
 
-        console.log("Formatted Request Data:", formattedData);
-
+    console.log("Formatted Request Data:", formattedData);
 
     try {
       await axios.post('http://localhost:4001/expertLog/', formattedData, {
@@ -60,7 +60,7 @@ const ExpertArrival = () => {
         success: 'تمت الإضافة بنجاح!',
         notes: '',
         expertID: '',
-        department_visited: '',
+        officerID: '',
       });
 
       reset(); // Reset form after successful submission
@@ -89,16 +89,16 @@ const ExpertArrival = () => {
       .catch((err) => console.log(err));
   }, []);
 
-   useEffect(() => {
-      axios
-        .get('http://localhost:4001/department/', {
-          headers: {
-            token: auth.token,
-          },
-        })
-        .then((resp) => setDept(resp.data))
-        .catch((err) => console.log(err));
-    }, []);
+  useEffect(() => {
+    axios
+      .get('http://localhost:4001/officer/', {
+        headers: {
+          token: auth.token,
+        },
+      })
+      .then((resp) => setOfficer(resp.data))
+      .catch((err) => console.log(err));
+  }, []);
 
   // Transform experts into format required by react-select
   const expertOptions = expert.map((expert) => ({
@@ -110,6 +110,19 @@ const ExpertArrival = () => {
   const handleExpertChange = (selectedOption) => {
     if (selectedOption) {
       setValue("expertID", selectedOption.value); // Set the expertID field in react-hook-form
+    }
+  };
+
+  const officerOptions = officer.map((officer) => ({
+    value: officer.id,
+    label: `${officer.rank} / ${officer.name}`,
+    leaveTypeID: officer.leaveTypeID, // attach latest leave type
+  }));
+
+  // Handle when an officer is selected
+  const handleOfficerChange = (selectedOption) => {
+    if (selectedOption) {
+      setValue("officerID", selectedOption.value); // Set the officerID field in react-hook-form
     }
   };
 
@@ -132,8 +145,6 @@ const ExpertArrival = () => {
       color: state.isSelected ? '#fff' : '#495057',
     }),
   };
-
-
 
   return (
     <div className="add-officer-form">
@@ -158,33 +169,73 @@ const ExpertArrival = () => {
         <Form.Group controlId="expertID" className="form-group">
           <Form.Label>الاسم</Form.Label>
           <Select
-            {...register("expertID")} // Bind the expertID value from react-hook-form
+            {...register("expertID")}
             options={expertOptions}
             getOptionLabel={(e) => e.label}
             getOptionValue={(e) => e.value}
-            onChange={handleExpertChange} // Update expertID on selection
-            className="react-select" // Avoid using Bootstrap's `form-control` here
-            styles={customStyles} // Apply custom styles to fix overlap issues
+            onChange={handleExpertChange}
+            className="react-select"
+            styles={customStyles}
             placeholder="اختر الخبير"
           />
           {errors.expertID && <div className="invalid-feedback">{errors.expertID.message}</div>}
         </Form.Group>
 
-        {/* Leave Type Dropdown */}
-        <Form.Group controlId="department_visited" className="form-group">
-          <Form.Label>الورشة / الفرع المطلوب</Form.Label>
-          <Form.Control
-            as="select"
-            {...register("department_visited")}
-            className={`form-control ${errors.department_visited ? 'is-invalid' : ''}`}
-          >
-            <option value="">إختر الورشة / الفرع المطلوب</option>
-            {dept.map((type) => (
-              <option key={type.name} value={type.name}>{type.name}</option>
-            ))}
-          </Form.Control>
-          {errors.department_visited && <div className="invalid-feedback">{errors.department_visited.message}</div>}
-        </Form.Group>
+        {/* Radio Button for internal companion officer */}
+       {/* <Form.Group className="form-group">
+  <Form.Label>هل يوجد ضابط مرافِق داخلي؟</Form.Label>
+  <div>
+    <Form.Check
+      type="radio"
+      label="نعم"
+      name="hasInternalOfficer"
+      checked={hasInternalOfficer}
+      onChange={() => setHasInternalOfficer(true)}
+      className="custom-radio" // Apply custom styles if needed
+    />
+    <Form.Check
+      type="radio"
+      label="لا"
+      name="hasInternalOfficer"
+      checked={!hasInternalOfficer}
+      onChange={() => setHasInternalOfficer(false)}
+      className="custom-radio" // Apply custom styles if needed
+    />
+  </div>
+</Form.Group> */}
+
+
+
+
+
+        {/* Conditionally render officer input field */}
+        {!hasInternalOfficer ? (
+          <Form.Group controlId="officerID" className="form-group">
+            <Form.Label>الضابط المرافق</Form.Label>
+            <Select
+              {...register("officerID")}
+              options={officerOptions}
+              getOptionLabel={(e) => e.label}
+              getOptionValue={(e) => e.value}
+              onChange={handleOfficerChange}
+              className="react-select"
+              styles={customStyles}
+              placeholder="اختر الضابط المرافق"
+            />
+            {errors.officerID && <div className="invalid-feedback">{errors.officerID.message}</div>}
+          </Form.Group>
+        ) : (
+          <Form.Group controlId="officerID" className="form-group">
+            <Form.Label>الضابط المرافق</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="أدخل اسم الضابط"
+              {...register("officerID")}
+              className={`form-control ${errors.officerID ? 'is-invalid' : ''}`}
+            />
+            {errors.officerID && <div className="invalid-feedback">{errors.officerID.message}</div>}
+          </Form.Group>
+        )}
 
         {/* Notes */}
         <Form.Group controlId="notes" className="form-group">

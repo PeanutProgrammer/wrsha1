@@ -278,13 +278,26 @@ class NCOController {
       console.log("hey");
 
       const ncos =
-        await query(`SELECT ncos.mil_id ,ncos.rank,ncos.name, ncos.department, leave_type.name AS 'tmam'
-                                          FROM ncos
-                                          LEFT JOIN officer_log
-                                          ON ncos.id = officer_log.officerID
-                                          LEFT JOIN leave_type
-                                          on leave_type.id = officer_log.leaveTypeID`);
-
+        await query(`
+SELECT 
+    o.mil_id,
+    o.rank,
+    o.name,
+    o.department,
+    o.in_unit,
+    lt.name AS tmam
+FROM ncos o
+LEFT JOIN (
+    SELECT ncoID, MAX(event_time) AS latest_event
+    FROM nco_log
+    GROUP BY ncoID
+) lastLog
+    ON lastLog.ncoID = o.id
+LEFT JOIN nco_log ol
+    ON ol.ncoID = o.id AND ol.event_time = lastLog.latest_event
+LEFT JOIN leave_type lt
+    ON lt.id = ol.leaveTypeID
+`);
       console.log(ncos[0]);
       console.log("hello");
 
@@ -335,7 +348,7 @@ class NCOController {
         nco[0].in_unit
       );
       const officerTmam = await query(
-        `SELECT ncos.mil_id ,ncos.rank,ncos.name, ncos.department, ncos.join_date, leave_type.name AS 'tmam', officer_leave_details.start_date, officer_leave_details.end_date, officer_leave_details.destination, officer_log.notes
+        `SELECT ncos.mil_id ,ncos.rank,ncos.name, ncos.department, ncos.join_date, leave_type.name AS 'tmam', nco_leave_details.start_date, nco_leave_details.end_date, nco_leave_details.destination, nco_log.notes
                                           FROM ncos
                                           LEFT JOIN nco_log
                                           ON ncos.id = nco_log.ncoID

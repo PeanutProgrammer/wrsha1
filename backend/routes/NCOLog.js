@@ -89,7 +89,7 @@ router.post("/departure", gate,
 
 // Get officer logs (as before)
 router.get("/", admin, (req, res) => {
-    NcoLogController.getOfficersLog(req, res);
+    NcoLogController.getNcosLog(req, res);
 });
 
 module.exports = router;

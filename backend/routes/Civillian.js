@@ -6,6 +6,7 @@ const admin = require("../middleware/admin");
 const shuoonOfficers = require("../middleware/shuoonOfficers");
 const moment = require('moment');
 const gate = require("../middleware/gate");
+const securityHead = require("../middleware/securityHead");
 
 
 router.post("/", shuoonOfficers,
@@ -42,7 +43,7 @@ router.post("/", shuoonOfficers,
     body("join_date")
         .isDate(format = "yyyy-MM-DD").withMessage("من فضلك أدخل تاريخ ضم صحيح (YYYY-MM-DD)"),
     body("department")
-        .isString().withMessage("من فضلك أدخل قسم صحيح"),
+        .isString().withMessage("من فضلك أدخل ورشة / فرع صحيح "),
     // Validate 'nationalID'
     body("nationalID")
         .isNumeric().withMessage("من فضلك أدخل رقم الهوية الوطنية صحيح"),
@@ -134,7 +135,7 @@ router.get("/tmam/:id", admin, (req,res) => {
     CivillianController.getCivillianTmamDetails(req,res);
 });
 
-router.get("/tmam", admin, (req,res) => {
+router.get("/tmam", securityHead, (req,res) => {
     CivillianController.getCivilliansTmam(req,res);
 });
 

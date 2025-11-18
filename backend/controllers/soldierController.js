@@ -253,12 +253,26 @@ class SoldierController {
       console.log("hey");
 
       const soldiers =
-        await query(`SELECT soldiers.mil_id ,soldiers.rank,soldiers.name, soldiers.department, leave_type.name AS 'tmam'
-                                          FROM soldiers
-                                          LEFT JOIN soldier_log
-                                          ON soldiers.id = soldier_log.soldierID
-                                          LEFT JOIN leave_type
-                                          on leave_type.id = soldier_log.leaveTypeID`);
+        await query(`
+SELECT 
+    o.mil_id,
+    o.rank,
+    o.name,
+    o.department,
+    o.in_unit,
+    lt.name AS tmam
+FROM soldiers o
+LEFT JOIN (
+    SELECT soldierID, MAX(event_time) AS latest_event
+    FROM soldier_log
+    GROUP BY soldierID
+) lastLog
+    ON lastLog.soldierID = o.id
+LEFT JOIN soldier_log ol
+    ON ol.soldierID = o.id AND ol.event_time = lastLog.latest_event
+LEFT JOIN leave_type lt
+    ON lt.id = ol.leaveTypeID
+`);
 
       console.log(soldiers[0]);
       console.log("hello");

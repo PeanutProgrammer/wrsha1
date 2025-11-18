@@ -7,6 +7,19 @@
 
 }
 
+/* Custom CSS for radio buttons stacked vertically */
+.custom-radio .form-check-input {
+  transform: scale(0.8);          /* Shrink the radio button */
+  width: 1.25rem;                 /* Set width */
+  height: 1.25rem;                /* Set height */
+  border-radius: 50%;             /* Keep it circular */
+  margin-top: 0.2rem;             /* Adjust vertical alignment */
+  margin-right: 1.5rem;           /* Space between button and label */
+}
+
+
+
+
 .Officers .header {
   position: relative; /* or just remove fixed/sticky */
   top: auto;

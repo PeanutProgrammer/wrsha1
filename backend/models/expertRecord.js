@@ -1,11 +1,11 @@
 
 
 class ExpertRecord {
-    constructor(start_date, end_date, expertID, department_visited, loggerID, notes) {
+    constructor(start_date, end_date, expertID, officerID, loggerID, notes) {
         this._start_date = start_date;
         this._end_date = end_date;
         this._expertID = expertID;
-        this._department_visited = department_visited;
+        this._officerID = officerID;
         this._loggerID = loggerID;
         this._notes = notes;
     }
@@ -25,8 +25,8 @@ class ExpertRecord {
     }
 
 
-    getDepartmentVisited = () => {
-        return this._department_visited;
+    getOfficerID = () => {
+        return this._officerID;
     }
 
 
@@ -54,8 +54,8 @@ class ExpertRecord {
     }
 
 
-    setDepartmentVisited = (department_visited) => {
-        this._department_visited = department_visited;
+    setOfficerID = (officerID) => {
+        this._officerID = officerID;
     }
 
     setLoggerID = (loggerID) => {

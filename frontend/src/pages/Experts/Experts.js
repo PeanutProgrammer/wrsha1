@@ -144,6 +144,7 @@ const Experts = () => {
               <th>رقم التصديق الأمني</th>
               <th>الفترة من</th>
               <th>الفترة إلى</th>
+              <th>الفرع / الورشة</th>
               <th>اسم الشركة</th>
               <th>حالة التصديق</th>
               <th>التمام</th>
@@ -159,6 +160,7 @@ const Experts = () => {
                 <td>{expert.security_clearance_number}</td>
                 <td>{moment(expert.valid_from).format("YYYY-MM-DD")}</td>
                 <td>{moment(expert.valid_through).format("YYYY-MM-DD")}</td>
+                <td>{expert.department}</td>
                 <td>{expert.company_name}</td>
 
                 <td

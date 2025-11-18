@@ -257,12 +257,26 @@ class CivillianController {
       console.log("hey");
 
       const civillians =
-        await query(`SELECT civillians.nationalID,civillians.name, civillians.department, leave_type.name AS 'tmam'
-                                          FROM civillians
-                                          LEFT JOIN civillian_log
-                                          ON civillians.id = civillian_log.civillianID
-                                          LEFT JOIN leave_type
-                                          on leave_type.id = civillian_log.leaveTypeID`);
+        await query(`
+SELECT 
+    o.nationalID,
+    o.name,
+    o.department,
+    o.security_clearance_number,
+    o.in_unit,
+    lt.name AS tmam
+FROM civillians o
+LEFT JOIN (
+    SELECT civillianID, MAX(event_time) AS latest_event
+    FROM civillian_log
+    GROUP BY civillianID
+) lastLog
+    ON lastLog.civillianID = o.id
+LEFT JOIN civillian_log ol
+    ON ol.civillianID = o.id AND ol.event_time = lastLog.latest_event
+LEFT JOIN leave_type lt
+    ON lt.id = ol.leaveTypeID
+`);
 
       console.log(civillians[0]);
       console.log("hello");
