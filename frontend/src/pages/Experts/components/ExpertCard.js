@@ -13,7 +13,7 @@ const ExpertCard = ({ id, nationalID, name, company_name, security_clearance_num
             <strong>اسم الشركة:</strong> {company_name} <br />
             <strong>رقم التصديق الأمني:</strong> {security_clearance_number} <br />
           </p>
-          <Link className="btn btn-primary w-100" to={`/dashboard/ExpertsHome/Expert/details/${id}`}>
+          <Link className="btn btn-primary w-100" to={`/dashboard/experts/details/${nationalID}`}>
             تفاصيل
           </Link>
         </div>

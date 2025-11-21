@@ -40,7 +40,7 @@ router.post("/departure", gate,
     body("officerID")
         .isNumeric().withMessage("من فضلك أدخل اسم ضابط صحيح"),
     body("leaveTypeID")
-        .isNumeric().withMessage("من فضلك أدخل نوع عودة صحيح"),
+        .isNumeric().withMessage("من فضلك أدخل نوع عودة صحيح").optional(),
     body("loggerID")
         .isNumeric(),
     body("event_type")
@@ -60,6 +60,7 @@ router.post("/departure", gate,
         }),
     // New validation for start_date, end_date, and destination
     body("start_date")
+        .optional()
         .custom((value, { req }) => {
             if (!moment(value, "YYYY-MM-DD", true).isValid()) {
                 throw new Error("تاريخ ووقت الخروج يجب أن يكون بالتنسيق الصحيح (YYYY-MM-DD).");
@@ -68,8 +69,10 @@ router.post("/departure", gate,
                 throw new Error("تاريخ ووقت الخروج يجب أن يكون قبل تاريخ الانتهاء.");
             }
             return true;
-        }),
+        })
+    ,
     body("end_date")
+        .optional()
         .custom((value, { req }) => {
             if (!moment(value, "YYYY-MM-DD", true).isValid()) {
                 throw new Error("تاريخ ووقت العودة يجب أن يكون بالتنسيق الصحيح (YYYY-MM-DD).");

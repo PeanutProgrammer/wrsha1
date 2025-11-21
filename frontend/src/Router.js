@@ -1,17 +1,24 @@
 import { createBrowserRouter } from "react-router-dom";
-import App from './App';
+import App from "./App";
 import { Guest } from "./middleware/Guest";
+import { ProtectedRoute } from "./middleware/ProtectedRoute";
 import { Admin } from "./middleware/Admin";
-import {Gate} from "./middleware/Gate";
-import History from './pages/history/History';
-import Travel from './pages/Home/Home';
-import ProductList from "./pages/product/ProductList";
-import ProductInfo from "./pages/product/ProductInfo";
-import Login from "./Login";
-import Destinations from "./pages/Destinations/Destinations";
-import AddDestinations from "./pages/Destinations/AddDestinations";
-import UpdateDestinations from "./pages/Destinations/UpdateDestinations";
 
+import Login from "./Login";
+import NotFound from "./shared/NotFound";
+import NotAuthorized from "./shared/NotAuthorized";
+
+// Home Pages
+import Home from "./pages/Home/Home";
+import OfficersHome from "./pages/Officers/OfficersHome";
+import NCOsHome from "./pages/NCOs/NCOsHome";
+import SoldiersHome from "./pages/Soldiers/SoldiersHome";
+import CivilliansHome from "./pages/Civillians/CivilliansHome";
+import ExpertsHome from "./pages/Experts/ExpertsHome";
+import GuestsHome from "./pages/Guests/GuestsHome";
+import PastWorkersHome from "./pages/Past_Workers/PastWorkersHome";
+
+// Officers
 import Officers from "./pages/Officers/Officers";
 import AddOfficers from "./pages/Officers/AddOfficers";
 import UpdateOfficers from "./pages/Officers/UpdateOfficers";
@@ -20,13 +27,11 @@ import OfficersTmam from "./pages/Officers/OfficersTmam";
 import OfficersLog from "./pages/Officers/OfficersLog";
 import SearchOfficers from "./pages/Officers/SearchOfficers";
 import OfficersTmamDetails from "./pages/Officers/OfficerTmamDeatils";
-import OfficersHome from "./pages/Officers/OfficersHome";
 import OfficerArrival from "./pages/Officers/arrival";
 import OfficerDeparture from "./pages/Officers/departure";
-import SecurityOfficers from "./pages/Officers/SecurityOfficers";
-
-
-import NCOsHome from "./pages/NCOs/NCOsHome";
+import ManageOfficers from "./pages/Officers/ManageOfficers";
+import ManageTmam from "./pages/Officers/ManageTmam";
+// NCOs
 import NCOs from "./pages/NCOs/NCOs";
 import AddNCOs from "./pages/NCOs/AddNCOs";
 import UpdateNCOs from "./pages/NCOs/UpdateNCOs";
@@ -36,10 +41,9 @@ import NCOsLog from "./pages/NCOs/NCOsLog";
 import SearchNCOs from "./pages/NCOs/SearchNCOs";
 import NCOsTmamDetails from "./pages/NCOs/NCOTmamDetails";
 import NCOArrival from "./pages/NCOs/arrival";
-import NCODeparture from "./pages/NCOs/departure";    
-import SecurityNCOs from "./pages/NCOs/SecurityNCOs";
+import NCODeparture from "./pages/NCOs/departure";
 
-import SoldiersHome from "./pages/Soldiers/SoldiersHome";
+// Soldiers
 import Soldiers from "./pages/Soldiers/Soldiers";
 import AddSoldiers from "./pages/Soldiers/AddSoldiers";
 import UpdateSoldiers from "./pages/Soldiers/UpdateSoldiers";
@@ -50,10 +54,8 @@ import SearchSoldiers from "./pages/Soldiers/SearchSoldiers";
 import SoldiersTmamDetails from "./pages/Soldiers/SoldierTmamDetails";
 import SoldierArrival from "./pages/Soldiers/arrival";
 import SoldierDeparture from "./pages/Soldiers/departure";
-import SecuritySoldiers from "./pages/Soldiers/SecuritySoldiers";
 
-
-import CivilliansHome from "./pages/Civillians/CivilliansHome";
+// Civillians
 import Civillians from "./pages/Civillians/Civillians";
 import AddCivillians from "./pages/Civillians/AddCivillians";
 import UpdateCivillians from "./pages/Civillians/UpdateCivillians";
@@ -64,10 +66,8 @@ import SearchCivillians from "./pages/Civillians/SearchCivillians";
 import CivilliansTmamDetails from "./pages/Civillians/CivilliansTmamDetails";
 import CivillianArrival from "./pages/Civillians/arrival";
 import CivillianDeparture from "./pages/Civillians/departure";
-import SecurityCivillians from "./pages/Civillians/SecurityCivillians";
 
-
-import ExpertsHome from "./pages/Experts/ExpertsHome";
+// Experts
 import Experts from "./pages/Experts/Experts";
 import AddExperts from "./pages/Experts/AddExperts";
 import UpdateExperts from "./pages/Experts/UpdateExperts";
@@ -77,721 +77,457 @@ import SearchExperts from "./pages/Experts/SearchExperts";
 import ExpertArrival from "./pages/Experts/arrival";
 import ExpertDeparture from "./pages/Experts/departure";
 
-
-
-import GuestsHome from "./pages/Guests/GuestsHome";
+// Guests
 import Guests from "./pages/Guests/Guests";
 import AddGuests from "./pages/Guests/AddGuests";
 import GuestArrival from "./pages/Guests/arrival";
 import GuestDeparture from "./pages/Guests/departure";
 
-
-
-import PastWorkersHome from "./pages/Past_Workers/PastWorkersHome";
+// Past Workers
 import PastOfficers from "./pages/Past_Workers/PastOfficers";
 import PastOfficerDetails from "./pages/Past_Workers/PastOfficerDetails";
 import PastNCOs from "./pages/Past_Workers/PastNCOs";
 import PastNCODetails from "./pages/Past_Workers/PastNCODetails";
 import SearchPastWorkers from "./pages/Past_Workers/SearchPastWorkers";
 
-
+// Users
 import Users from "./pages/Users/Users";
 import AddUsers from "./pages/Users/AddUsers";
 import UpdateUsers from "./pages/Users/UpdateUsers";
 
+// Security
+import SecurityOfficers from "./pages/Officers/SecurityOfficers";
+import SecurityNCOs from "./pages/NCOs/SecurityNCOs";
+import SecuritySoldiers from "./pages/Soldiers/SecuritySoldiers";
+import SecurityCivillians from "./pages/Civillians/SecurityCivillians";
+import SecurityExperts from "./pages/Experts/SecurityExperts";
+import SecurityGuests from "./pages/Guests/SecurityGuests"; 
 
-
-
-
-
-import ManageBuses from "./pages/Manage-buses/ManageBuses";
-import AddBus from "./pages/Manage-buses/AddBus";
-import UpdateBus from "./pages/Manage-buses/UpdateBus";
-import Travellers from "./pages/Travellers/Travellers";
-import AddTravellers from "./pages/Travellers/AddTravellers";
-import UpdateTravellers from "./pages/Travellers/UpdateTravellers";
-import Appointements from "./pages/Appointments/ManageAppointment";
-import AddAppointments from "./pages/Appointments/AddAppointments";
-import UpdateAppointments from "./pages/Appointments/UpdateAppointments";
-import Requests from "./pages/Requests/Requests";
-import RequestHistory from "./pages/Travellers/History";
-import Home from './pages/Home/Home'
-import UserDestinations from "./pages/Destinations/UserDestinations";
-import UserBusses from "./pages/Manage-buses/UserBusses";
-import UserRequests from "./pages/Requests/UserRequests";
-import NotFound from "./shared/NotFound";
-import { Navigate } from "react-router-dom";
-
-
-//import Dashboard from "./pages/Dashboard/Dashboard";
-//import Card from "./pages/Dashboard/Card";
 
 export const router = createBrowserRouter([
-   
-    {   
-        element:<Guest></Guest>,
-        children:[{
-            path: "/",
-            element: <Login />
-        }
-        ]
-    },
-    {
-        path: "/dashboard",
-        element: <App />,
-        //Nesting Children
+  {
+    element: <Guest />,
+    children: [{ path: "/", element: <Login /> }],
+  },
+  {
+    path: "/not-authorized",
+    element: <NotAuthorized />,
+  },
+  {
+    path: "/dashboard",
+    element: <App />,
+    children: [
+      { path: "home", element: <Home /> },
+
+      // Security Routes
+      {
+        path: "security-officers",
+        element: <ProtectedRoute allowedTypes={["قائد الامن"]} />,
+        children: [{ path: "", element: <SecurityOfficers /> }],
+      },
+      {
+        path: "security-ncos",
+        element: <ProtectedRoute allowedTypes={["قائد الامن"]} />,
+        children: [{ path: "", element: <SecurityNCOs /> }],
+      },
+      {
+        path: "security-soldiers",
+        element: <ProtectedRoute allowedTypes={["قائد الامن"]} />,
+        children: [{ path: "", element: <SecuritySoldiers /> }],
+      },
+      {
+        path: "security-civillians",
+        element: <ProtectedRoute allowedTypes={["قائد الامن"]} />,
+        children: [{ path: "", element: <SecurityCivillians /> }],
+      },
+      {
+        path: "security-experts",
+        element: <ProtectedRoute allowedTypes={["قائد الامن"]} />,
+        children: [{ path: "", element: <SecurityExperts /> }],
+      },
+      {
+        path: "security-guests",
+        element: <ProtectedRoute allowedTypes={["قائد الامن"]} />,
+        children: [{ path: "", element: <SecurityGuests /> }],
+      },
+
+      // Officers Routes
+      {
+        path: "officers",
+        element: (
+          <ProtectedRoute allowedTypes={["admin", "بوابة", "شؤون ضباط"]} />
+        ),
         children: [
-            {
-                path: "Home",
-                element: <Home />,
-            },
-            {
-                        path:'SecurityOfficers',
-                        element: <SecurityOfficers />,
-                    },
-            {
-                        path:'SecurityNCOs',
-                        element: <SecurityNCOs />,
-                    },
-
-            {
-                        path:'SecuritySoldiers',
-                        element: <SecuritySoldiers />,
-                    },
-
-            {
-                        path:'SecurityCivillians',
-                        element: <SecurityCivillians />,
-                    },
-            {
-                path: "OfficersHome",
-                element: <Gate />,
-                children: [
-                    {
-                        path: '',
-                        element: <OfficersHome />,
-                    },
-
-
-            
-            {
-                path: 'Officers',
-                element:<Gate />,
-                children: [
-                    {
-                        path:'',
-                        element: <Officers />,
-                    },
-
-                    {
-                        path:'AddOfficers',
-                        element: <AddOfficers />,
-                    },
-                    {
-                        path:':id',
-                        element: <UpdateOfficers />,
-                    },
-                    {
-                        path: 'details/:id',
-                        element: <OfficerDetails />
-                        // children: 
-                        // [{
-                        //     path: ':id',
-                        //     element: <OfficerDetails />
-                        // }]
-                    },
-                    {
-                        path: 'Tmam',
-                        element: <OfficersTmam />,
-                    },
-                    {
-                        path: 'log',
-                        element: <OfficersLog/>
-                    },
-                    {
-                        path: 'search',
-                        element: <SearchOfficers />
-                    },
-                    {
-                            path: 'Tmam/details/:id',
-                            element: <OfficersTmamDetails/>,
-                            // children:[{
-                            //     path: 'id',
-                            //     element: <OfficersTmamDetails/>
-                            // }]
-                        },
-
-                    {
-                        path: 'Arrival',
-                        element: <OfficerArrival />
-                    },
-
-                    {
-                        path: 'Departure',
-                        element: <OfficerDeparture />
-                    }
-                ]
-            },
-            
-                ]
-            },
-            {   path: "NCOsHome",
-                element: <Gate />,
-                children: [
-                    {
-                        path: '',
-                        element: <NCOsHome />,
-                    },
-
-            
-            {
-                path: 'NCOs',
-                element:<Gate />,
-                children: [
-                    {
-                        path:'',
-                        element: <NCOs />,
-                    },
-                    {
-                        path:'AddNCOs',
-                        element: <AddNCOs />,
-                    },
-                    {
-                        path:':id',
-                        element: <UpdateNCOs />,
-                    },
-                    {
-                        path: 'details/:id',
-                        element: <NCODetails />
-                        // children: 
-                        // [{
-                        //     path: ':id',
-                        //     element: <OfficerDetails />
-                        // }]
-                    },
-                    {
-                        path: 'Tmam',
-                        element: <NCOsTmam />,
-                    },
-                    {
-                        path: 'log',
-                        element: <NCOsLog/>
-                    },
-                    {
-                        path: 'search',
-                        element: <SearchNCOs />
-                    },
-                    {
-                            path: 'Tmam/details/:id',
-                            element: <NCOsTmamDetails/>,
-                            // children:[{
-                            //     path: 'id',
-                            //     element: <OfficersTmamDetails/>
-                            // }]
-                        }, 
-
-                    {
-                        path: 'Arrival',
-                        element: <NCOArrival  />
-                    },
-                    {
-                        path: 'Departure',
-                        element: <NCODeparture />
-                    },
-                ]
-            }
-                ]
-            },
-            {   path: "SoldiersHome",
-                element: <Gate />,
-                children: [
-                    {
-                        path: '',
-                        element: <SoldiersHome />,
-                    },
-
-            
-            {
-                path: 'Soldiers',
-                element:<Gate />,
-                children: [
-                    {
-                        path:'',
-                        element: <Soldiers />,
-                    },
-                    {
-                        path:'AddSoldiers',
-                        element: <AddSoldiers />,
-                    },
-                    {
-                        path:':id',
-                        element: <UpdateSoldiers />,
-                    },
-                    {
-                        path: 'details/:id',
-                        element: <SoldierDetails />
-                        // children: 
-                        // [{
-                        //     path: ':id',
-                        //     element: <OfficerDetails />
-                        // }]
-                    },
-                    {
-                        path: 'Tmam',
-                        element: <SoldiersTmam />,
-                    },
-                    {
-                        path: 'log',
-                        element: <SoldiersLog/>
-                    },
-                    {
-                        path: 'search',
-                        element: <SearchSoldiers />
-                    },
-                    {
-                            path: 'Tmam/details/:id',
-                            element: <SoldiersTmamDetails/>,
-                            // children:[{
-                            //     path: 'id',
-                            //     element: <OfficersTmamDetails/>
-                            // }]
-                        },
-                        {
-                        path: 'Arrival',
-                        element: <SoldierArrival  />
-                    },
-                    {
-                        path: 'Departure',
-                        element: <SoldierDeparture />
-                    },
-                ]
-            }
-                ]
-            },
-            {   path: "CivilliansHome",
-                element: <Gate />,
-                children: [
-                    {
-                        path: '',
-                        element: <CivilliansHome />,
-                    },
-
-            
-            {
-                path: 'Civillians',
-                element:<Gate/>,
-                children: [
-                    {
-                        path:'',
-                        element: <Civillians />,
-                    },
-                    {
-                        path:'AddCivillians',
-                        element: <AddCivillians />,
-                    },
-                    {
-                        path:':id',
-                        element: <UpdateCivillians />,
-                    },
-                    {
-                        path: 'details/:id',
-                        element: <CivillianDetails />
-                        // children: 
-                        // [{
-                        //     path: ':id',
-                        //     element: <OfficerDetails />
-                        // }]
-                    },
-                    {
-                        path: 'Tmam',
-                        element: <CivilliansTmam />,
-                    },
-                    {
-                        path: 'log',
-                        element: <CivilliansLog/>
-                    },
-                    {
-                        path: 'search',
-                        element: <SearchCivillians />
-                    },
-                    {
-                            path: 'Tmam/details/:id',
-                            element: <CivilliansTmamDetails/>,
-                            // children:[{
-                            //     path: 'id',
-                            //     element: <OfficersTmamDetails/>
-                            // }]
-                        },
-
-                                                {
-                        path: 'Arrival',
-                        element: <CivillianArrival  />
-                    },
-                    {
-                        path: 'Departure',
-                        element: <CivillianDeparture />
-                    },
-                ]
-            }
-                ]
-            },
-            {   path: "ExpertsHome",
-                element: <Gate />,
-                children: [
-                    {
-                        path: '',
-                        element: <ExpertsHome />,
-                    },
-
-            
-            {
-                path: 'Experts',
-                element:<Gate/>,
-                children: [
-                    {
-                        path:'',
-                        element: <Experts />,
-                    },
-                    {
-                        path:'AddExperts',
-                        element: <AddExperts />,
-                    },
-                    {
-                        path:':id',
-                        element: <UpdateExperts />,
-                    },
-                    {
-                        path: 'details/:id',
-                        element: <ExpertDetails />
-                        // children: 
-                        // [{
-                        //     path: ':id',
-                        //     element: <OfficerDetails />
-                        // }]
-                    },
-                    // {
-                    //     path: 'Tmam',
-                    //     element: <CivilliansTmam />,
-                    // },
-                    {
-                        path: 'log',
-                        element: <ExpertsLog />
-                    },
-                    {
-                        path: 'search',
-                        element: <SearchExperts />
-                    },
-                                            {
-                        path: 'Arrival',
-                        element: <ExpertArrival  />
-                    },
-                    {
-                        path: 'Departure',
-                        element: <ExpertDeparture />
-                    },
-                ]
-            }
-                ]
-            },
-
-            {   path: "GuestsHome",
-                element: <Gate />,
-                children: [
-                    {
-                        path: '',
-                        element: <GuestsHome />,
-                    },
-
-            
-            {
-                path: 'Guests',
-                element:<Gate/>,
-                children: [
-                    {
-                        path:'',
-                        element: <Guests />,
-                    },
-                    {
-                        path:'AddGuests',
-                        element: <AddGuests />,
-                    },
-                    {
-                        path:':id',
-                        element: <UpdateExperts />,
-                    },
-                    {
-                        path: 'details/:id',
-                        element: <ExpertDetails />
-                        // children: 
-                        // [{
-                        //     path: ':id',
-                        //     element: <OfficerDetails />
-                        // }]
-                    },
-                    // {
-                    //     path: 'Tmam',
-                    //     element: <CivilliansTmam />,
-                    // },
-                    {
-                        path: 'log',
-                        element: <ExpertsLog />
-                    },
-                    {
-                        path: 'search',
-                        element: <SearchExperts />
-                    },
-                    {
-                        path: 'Arrival',
-                        element: <GuestArrival  />
-                    },
-                    {
-                        path: 'Departure',
-                        element: <GuestDeparture />
-                    },
-                ]
-            }
-                ]
-            },
-
-             {   path: "PastWorkersHome",
-                element: <Admin />,
-                children: [
-                    {
-                        path: '',
-                        element: <PastWorkersHome />,
-                    },
-
-            
-            {
-                path: 'PastOfficers',
-                element:<Admin/>,
-                children: [
-                    {
-                        path:'',
-                        element: <PastOfficers />,
-                    },
-                    {
-                        path:'AddGuests',
-                        element: <AddGuests />,
-                    },
-                    {
-                        path:':id',
-                        element: <UpdateExperts />,
-                    },
-                    {
-                        path: 'details/:id',
-                        element: <PastOfficerDetails />
-                        // children: 
-                        // [{
-                        //     path: ':id',
-                        //     element: <OfficerDetails />
-                        // }]
-                    },
-                    // {
-                    //     path: 'Tmam',
-                    //     element: <CivilliansTmam />,
-                    // },
-                    {
-                        path: 'log',
-                        element: <ExpertsLog />
-                    },
-                    {
-                        path: 'search',
-                        element: <SearchExperts />
-                    },
-                    // {
-                    //         path: 'Tmam/details/:id',
-                    //         element: <CivilliansTmamDetails/>,
-                    //         // children:[{
-                    //         //     path: 'id',
-                    //         //     element: <OfficersTmamDetails/>
-                    //         // }]
-                    //     }
-                ]
-            }, 
-            {
-                path: 'PastNCOs',
-                element:<Admin/>,
-                children: [
-                    {
-                        path:'',
-                        element: <PastNCOs />,
-                    },
-                    {
-                        path:'AddGuests',
-                        element: <AddGuests />,
-                    },
-                    {
-                        path:':id',
-                        element: <UpdateExperts />,
-                    },
-                    {
-                        path: 'details/:id',
-                        element: <PastNCODetails />
-                        // children: 
-                        // [{
-                        //     path: ':id',
-                        //     element: <OfficerDetails />
-                        // }]
-                    },
-                    // {
-                    //     path: 'Tmam',
-                    //     element: <CivilliansTmam />,
-                    // },
-                    {
-                        path: 'log',
-                        element: <ExpertsLog />
-                    },
-                    {
-                        path: 'search',
-                        element: <SearchExperts />
-                    },
-                    // {
-                    //         path: 'Tmam/details/:id',
-                    //         element: <CivilliansTmamDetails/>,
-                    //         // children:[{
-                    //         //     path: 'id',
-                    //         //     element: <OfficersTmamDetails/>
-                    //         // }]
-                    //     }
-                ]
-            } ,
-            {
-                path: 'SearchPastWorkers',
-                element:<SearchPastWorkers/>,
-            }
-                ]
-            },
-
-
-
-
-            
-            {
-                path: 'Users',
-                element:<Admin/>,
-                children: [
-                    {
-                        path:'',
-                        element: <Users />,
-                    },
-                    {
-                        path:'AddUsers',
-                        element: <AddUsers />,
-                    },
-                    {
-                        path:':id',
-                        element: <UpdateUsers />,
-                    },
-                    {
-                        path: 'details/:id',
-                        element: <ExpertDetails />
-                        // children: 
-                        // [{
-                        //     path: ':id',
-                        //     element: <OfficerDetails />
-                        // }]
-                    },
-                    // {
-                    //     path: 'Tmam',
-                    //     element: <CivilliansTmam />,
-                    // },
-                    {
-                        path: 'log',
-                        element: <ExpertsLog />
-                    },
-                    {
-                        path: 'search',
-                        element: <SearchExperts />
-                    },
-                    // {
-                    //         path: 'Tmam/details/:id',
-                    //         element: <CivilliansTmamDetails/>,
-                    //         // children:[{
-                    //         //     path: 'id',
-                    //         //     element: <OfficersTmamDetails/>
-                    //         // }]
-                    //     }
-                ]
-            }
-            ,
-
-
-
-
-            {
-                path: "ManageBuses",
-                element:<Admin/>,
-                children: [
-                    {
-                        path:'',
-                        element: <ManageBuses />
-                    },
-                    {
-                        path:'AddBus',
-                        element: <AddBus />
-                    },
-                    {
-                        path:':id',
-                        element: <UpdateBus />
-                    },
-                ]
-                
-            },
-            {
-                path: "Travellers",
-                element:<Admin/>,
-                children: [
-                    {
-                        path:'',
-                        element: <Travellers />
-                    },
-                    {
-                        path:'AddTravellers',
-                        element: <AddTravellers />
-                    },
-                    {
-                        path:':id',
-                        element: <UpdateTravellers />
-                    },
-                    {
-                        path: 'History/:id',
-                        element: <RequestHistory/>
-                    },
-                ]
-            },
-            {
-                path: "Appointements",
-                element:<Admin/>,
-                children: [
-                    {
-                        path:'',
-                        element: <Appointements />
-                    },
-                    {
-                        path:'AddAppointments',
-                        element: <AddAppointments />
-                    },
-                    {
-                        path:':id',
-                        element: <UpdateAppointments />
-                    },
-                ]
-            },
-            {
-                path: "Requests",
-                element:<Admin/>,
-                children: [
-                    {
-                        path:'',
-                        element: <Requests />,
-                    },
-                ]
-            },
-            {
-                path: "*",
-                element: <NotFound/>
-            },
+          { path: "", element: <OfficersHome /> },
+          {
+            path: "list",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <Officers /> }],
+          },
+          {
+            path: "add",
+            element: <ProtectedRoute allowedTypes={["admin", "شؤون ضباط"]} />,
+            children: [{ path: "", element: <AddOfficers /> }],
+          },
+          {
+            path: ":id",
+            element: <ProtectedRoute allowedTypes={["admin", "شؤون ضباط"]} />,
+            children: [{ path: "", element: <UpdateOfficers /> }],
+          },
+          {
+            path: "details/:id",
+            element: <ProtectedRoute allowedTypes={["admin", "شؤون ضباط"]} />,
+            children: [{ path: "", element: <OfficerDetails /> }],
+          },
+          {
+            path: "tmam",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <OfficersTmam /> }],
+          },
+          {
+            path: "tmam/details/:id",
+            element: <ProtectedRoute allowedTypes={["admin", "شؤون ضباط"]} />,
+            children: [{ path: "", element: <OfficersTmamDetails /> }],
+          },
+          {
+            path: "log",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <OfficersLog /> }],
+          },
+          {
+            path: "search",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <SearchOfficers /> }],
+          },
+          { path: "arrival", element: <OfficerArrival /> },
+          { path: "departure", element: <OfficerDeparture /> },
+          {
+            path: "manage",
+            element: <ProtectedRoute allowedTypes={"شؤون ضباط"} />,
+            children: [{ path: "", element: <ManageOfficers /> }],
+          },
+          {
+            path: "manage-tmam",
+            element: <ProtectedRoute allowedTypes={"شؤون ضباط"} />,
+            children: [{ path: "", element: <ManageTmam /> }],
+          },
         ],
-    },
-    ]);
+      },
+
+      // NCOs Routes
+      {
+        path: "ncos",
+        element: <ProtectedRoute allowedTypes={["admin", "بوابة"]} />,
+        children: [
+          { path: "", element: <NCOsHome /> },
+          {
+            path: "list",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <NCOs /> }],
+          },
+          {
+            path: "add",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <AddNCOs /> }],
+          },
+          {
+            path: ":id",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <UpdateNCOs /> }],
+          },
+          {
+            path: "details/:id",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <NCODetails /> }],
+          },
+          {
+            path: "tmam",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <NCOsTmam /> }],
+          },
+          {
+            path: "tmam/details/:id",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <NCOsTmamDetails /> }],
+          },
+          {
+            path: "log",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <NCOsLog /> }],
+          },
+          {
+            path: "search",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <SearchNCOs /> }],
+          },
+          { path: "arrival", element: <NCOArrival /> },
+          { path: "departure", element: <NCODeparture /> },
+        ],
+      },
+
+      // Soldiers Routes
+      {
+        children: [
+          { path: "", element: <OfficersHome /> },
+          {
+            path: "list",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <Officers /> }],
+          },
+          {
+            path: "add",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <AddOfficers /> }],
+          },
+          {
+            path: ":id",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <UpdateOfficers /> }],
+          },
+          {
+            path: "details/:id",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <OfficerDetails /> }],
+          },
+          {
+            path: "tmam",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <OfficersTmam /> }],
+          },
+          {
+            path: "tmam/details/:id",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <OfficersTmamDetails /> }],
+          },
+          {
+            path: "log",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <OfficersLog /> }],
+          },
+          {
+            path: "search",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <SearchOfficers /> }],
+          },
+          { path: "arrival", element: <OfficerArrival /> },
+          { path: "departure", element: <OfficerDeparture /> },
+        ],
+        path: "soldiers",
+        element: <ProtectedRoute allowedTypes={["admin", "بوابة"]} />,
+        children: [
+          { path: "", element: <SoldiersHome /> },
+          {
+            path: "list",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <Soldiers /> }],
+          },
+          {
+            path: "add",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <AddSoldiers /> }],
+          },
+          {
+            path: ":id",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <UpdateSoldiers /> }],
+          },
+          {
+            path: "details/:id",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <SoldierDetails /> }],
+          },
+          {
+            path: "tmam",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <SoldiersTmam /> }],
+          },
+          {
+            path: "tmam/details/:id",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <SoldiersTmamDetails /> }],
+          },
+          {
+            path: "log",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <SoldiersLog /> }],
+          },
+          {
+            path: "search",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <SearchSoldiers /> }],
+          },
+          { path: "arrival", element: <SoldierArrival /> },
+          { path: "departure", element: <SoldierDeparture /> },
+        ],
+      },
+
+      // Civillians Routes
+      {
+        path: "civillians",
+        element: <ProtectedRoute allowedTypes={["admin", "بوابة"]} />,
+        children: [
+          { path: "", element: <CivilliansHome /> },
+          {
+            path: "list",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <Civillians /> }],
+          },
+          {
+            path: "add",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <AddCivillians /> }],
+          },
+          {
+            path: ":id",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <UpdateCivillians /> }],
+          },
+          {
+            path: "details/:id",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <CivillianDetails /> }],
+          },
+          {
+            path: "tmam",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <CivilliansTmam /> }],
+          },
+          {
+            path: "tmam/details/:id",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <CivilliansTmamDetails /> }],
+          },
+          {
+            path: "log",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <CivilliansLog /> }],
+          },
+          {
+            path: "search",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <SearchCivillians /> }],
+          },
+          { path: "arrival", element: <CivillianArrival /> },
+          { path: "departure", element: <CivillianDeparture /> },
+        ],
+      },
+
+      // Experts Routes
+      {
+        path: "experts",
+        element: <ProtectedRoute allowedTypes={["admin", "بوابة"]} />,
+        children: [
+          { path: "", element: <ExpertsHome /> },
+          {
+            path: "list",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <Experts /> }],
+          },
+          {
+            path: "add",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <AddExperts /> }],
+          },
+          {
+            path: ":id",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <UpdateExperts /> }],
+          },
+          {
+            path: "details/:id",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <ExpertDetails /> }],
+          },
+          {
+            path: "log",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <ExpertsLog /> }],
+          },
+          {
+            path: "search",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <SearchExperts /> }],
+          },
+          { path: "arrival", element: <ExpertArrival /> },
+          { path: "departure", element: <ExpertDeparture /> },
+        ],
+      },
+
+      // Guests Routes
+      {
+        path: "guests",
+        element: <ProtectedRoute allowedTypes={["admin", "بوابة"]} />,
+        children: [
+          { path: "", element: <GuestsHome /> },
+          {
+            path: "list",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <Guests /> }],
+          },
+          {
+            path: "add",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <AddGuests /> }],
+          },
+          { path: "arrival", element: <GuestArrival /> },
+          { path: "departure", element: <GuestDeparture /> },
+        ],
+      },
+
+      // Past Workers
+      {
+        path: "past-workers",
+        element: <Admin />,
+        children: [
+          { path: "", element: <PastWorkersHome /> },
+          {
+            path: "officers",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <PastOfficers /> }],
+          },
+          {
+            path: "officers/:id",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <PastOfficerDetails /> }],
+          },
+          {
+            path: "ncos",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <PastNCOs /> }],
+          },
+          {
+            path: "ncos/:id",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <PastNCODetails /> }],
+          },
+          {
+            path: "search",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <SearchPastWorkers /> }],
+          },
+        ],
+      },
+
+      // Users
+      {
+        path: "users",
+        element: <Admin />,
+        children: [
+          { path: "", element: <Users /> },
+          {
+            path: "add",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <AddUsers /> }],
+          },
+          {
+            path: ":id",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <UpdateUsers /> }],
+          },
+        ],
+      },
+
+      { path: "*", element: <NotFound /> },
+    ],
+  },
+]);

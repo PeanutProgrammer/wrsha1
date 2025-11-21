@@ -10,17 +10,7 @@ const PastWorkersHome = () => {
     const [officers, setOfficers] = useState([]);
   
 
-    // useEffect(() => {
-    //     // fetch the destinations from your API
-    //   axios.get('http://localhost:4001/Officer/',  {
-    //     headers: {
-    //         token: auth.token
-    //       }
-    //     })
-    //         .then(response => setOfficers(response.data))
-    //         .catch(error => console.error(error));
 
-    // });
 
     
 
@@ -46,7 +36,7 @@ const PastWorkersHome = () => {
           <h2>بيانات الضباط السابقين</h2>
         </div>
         {auth && auth.type === "admin" && (
-          <Link to={"PastOfficers"} className="button">Go</Link>
+          <Link to={"officers"} className="button">Go</Link>
         )}
       </div>
 
@@ -56,7 +46,7 @@ const PastWorkersHome = () => {
           <h2>بيانات ضباط الصف السابقين</h2>
         </div>
         {auth && auth.type === "admin" && (
-          <Link to={"PastNCOs"} className="button">Go</Link>
+          <Link to={"ncos"} className="button">Go</Link>
         )}
       </div>
 
@@ -76,7 +66,7 @@ const PastWorkersHome = () => {
             <FaSearch className="card-icon" />
             <h2>بحث</h2>
           </div>
-          <Link to="SearchPastWorkers" className="button">Go</Link>
+          <Link to="search" className="button">Go</Link>
         </div>
       )}
     </div>

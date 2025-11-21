@@ -115,7 +115,7 @@ const Civillians = () => {
     <div className="Officers p-5">
       <div className="header d-flex justify-content-between mb-3">
         <h3 className="text-center mb-3">إدارة المدنيين</h3>
-        <Link to={'Addcivillians'} className="btn btn-success mb-4">
+        <Link to={'../add'} className="btn btn-success mb-4">
           إنشاء مدني جديد +
         </Link>
       </div>
@@ -187,13 +187,13 @@ const Civillians = () => {
                       حذف
                     </button>
                     <Link
-                      to={`${civillian.id}`}
+                      to={`../${civillian.id}`}
                       className="btn btn-sm btn-primary"
                     >
                       تعديل
                     </Link>
                     <Link
-                      to={`details/${civillian.id}`}
+                      to={`../details/${civillian.id}`}
                       className="btn btn-sm btn-primary"
                     >
                       تفاصيل

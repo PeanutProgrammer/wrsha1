@@ -118,7 +118,7 @@ class PastOfficerController {
 
     // Filter by rank (common for both tables)
     if (req.query.rank) {
-      filters.push(`rank = ?`);
+      filters.push("`rank` = ?");
       params.push(req.query.rank);
     }
 

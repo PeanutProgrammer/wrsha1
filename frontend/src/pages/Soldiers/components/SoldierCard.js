@@ -15,7 +15,7 @@ const SoldierCard = ({ id, mil_id, name, department, join_date, end_date, rank }
             <strong>تاريخ الضم:</strong> {new Date(join_date).toLocaleDateString()}
             <strong>تاريخ التسريح:</strong> {new Date(end_date).toLocaleDateString()}
           </p>
-          <Link className="btn btn-primary w-100" to={`/dashboard/SoldiersHome/Soldiers/details/${id}`}>
+          <Link className="btn btn-primary w-100" to={`/dashboard/soldiers/details/${id}`}>
             تفاصيل
           </Link>
         </div>

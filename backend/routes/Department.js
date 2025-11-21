@@ -5,9 +5,10 @@ const admin = require("../middleware/admin");
 const shuoonOfficers = require("../middleware/shuoonOfficers");
 const DepartmentController = require("../controllers/departmentController");
 const gate = require("../middleware/gate");
+const allowAny = require("../middleware/allowAny");
 
 
-router.get("/", gate,(req, res) => {
+router.get("/", authorized,(req, res) => {
     DepartmentController.getDepartments(req, res);
 });
 

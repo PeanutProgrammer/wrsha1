@@ -1,42 +1,49 @@
 
 
 class OfficerLeaveTypeDetails {
-    constructor(start_date, end_date, destination) {
-        this._start_date = start_date;
-        this._end_date = end_date
-        this._destination = destination
-    }
+  constructor(leaveTypeID, start_date, end_date, destination) {
+    this._leaveTypeID = leaveTypeID;
+    this._start_date = start_date;
+    this._end_date = end_date;
+    this._destination = destination;
+  }
 
-    getStartDate = () => {
-        return this._start_date;
-    }
+  getLeaveTypeID = () => {
+    return this._leaveTypeID;
+  };
 
-    getEndDate = () => {
-        return this.end_date;
-    }
+  getStartDate = () => {
+    return this._start_date;
+  };
 
-    getDestination = () => {
-        return this._destination;
-    }
+  getEndDate = () => {
+    return this.end_date;
+  };
 
-    setStartDate = (start_date) => {
-        this._start_date = start_date;
-    }
+  getDestination = () => {
+    return this._destination;
+  };
 
-    setEndDate = (end_date) => {
-        this._end_date = end_date;
-    }
+  setLeaveTypeID = (leaveTypeID) => {
+    this._leaveTypeID = leaveTypeID;
+  };
 
-    setDestination = (destination) => {
-        this._destination = destination;
-    }
+  setStartDate = (start_date) => {
+    this._start_date = start_date;
+  };
 
+  setEndDate = (end_date) => {
+    this._end_date = end_date;
+  };
 
+  setDestination = (destination) => {
+    this._destination = destination;
+  };
 
-    toJSON() {
-        const { ...json } = this;
-        return json;
-      } 
+  toJSON() {
+    const { ...json } = this;
+    return json;
+  }
 }
 
 

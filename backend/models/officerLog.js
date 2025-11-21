@@ -1,11 +1,10 @@
 
 
 class OfficerLog {
-    constructor(event_type, event_time, officerID, leaveTypeID, notes, loggerID) {
+    constructor(event_type, event_time, officerID, notes, loggerID) {
         this._event_type = event_type;
         this._event_time = event_time;
         this._officerID = officerID;
-        this._leaveTypeID = leaveTypeID;
         this._notes = notes;
         this._loggerID = loggerID;
     }
@@ -22,9 +21,7 @@ class OfficerLog {
         return this._officerID;
     }
 
-    getLeaveTypeID = () => {
-        return this._leaveTypeID;
-    }
+
 
     getNotes = () => {
         return this._notes;
@@ -47,9 +44,7 @@ class OfficerLog {
         this._officerID = officerID;
     }
 
-    setLeaveTypeID = (leaveTypeID) => {
-        this._leaveTypeID = leaveTypeID;
-    }
+
 
     setNotes = (notes) => {
         this._notes = notes;

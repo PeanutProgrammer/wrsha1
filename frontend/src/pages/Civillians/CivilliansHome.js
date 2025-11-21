@@ -22,7 +22,7 @@ const CivilliansHome = () => {
           <h2>بيانات المدنيين</h2>
         </div>
         {auth && auth.type === "admin" && (
-          <Link to={"Civillians"} className="button">Go</Link>
+          <Link to={"list"} className="button">Go</Link>
         )}
       </div>
 
@@ -32,7 +32,7 @@ const CivilliansHome = () => {
           <h2>تمام المدنيين</h2>
         </div>
         {auth && auth.type === "admin" && (
-          <Link to={"Civillians/Tmam"} className="button">Go</Link>
+          <Link to={"tmam"} className="button">Go</Link>
         )}
       </div>
 
@@ -42,7 +42,7 @@ const CivilliansHome = () => {
           <h2>سجل دخول / خروج المدنيين</h2>
         </div>
         {auth && auth.type === "admin" && (
-          <Link to={"Civillians/log"} className="button">Go</Link>
+          <Link to={"log"} className="button">Go</Link>
         )}
       </div>
 
@@ -52,7 +52,7 @@ const CivilliansHome = () => {
             <FaSearch className="card-icon" />
             <h2>بحث</h2>
           </div>
-          <Link to="Civillians/search" className="button">Go</Link>
+          <Link to="search" className="button">Go</Link>
         </div>
       )}
              </>
@@ -65,7 +65,7 @@ const CivilliansHome = () => {
                        <FaClipboardCheck className="card-icon" />
                        <h2>تسجيل دخول المدنيين</h2>
                      </div>
-                     <Link to={"Civillians/Arrival"} className="button">تسجيل دخول</Link>
+                     <Link to={"arrival"} className="button">تسجيل دخول</Link>
                    </div>
          
                    <div className="card">
@@ -73,7 +73,7 @@ const CivilliansHome = () => {
                        <FaClipboardCheck className="card-icon" />
                        <h2>تسجيل خروج المدنيين</h2>
                      </div>
-                     <Link to={"Civillians/Departure"} className="button">تسجيل خروج</Link>
+                     <Link to={"departure"} className="button">تسجيل خروج</Link>
                    </div>
                  </>
                )}

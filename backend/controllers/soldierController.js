@@ -42,7 +42,7 @@ class SoldierController {
       );
 
       await query(
-        "insert into soldiers set name =?, join_date = ?, end_date = ?, department = ?, mil_id = ?, rank = ?, telephone_number =?, guardian_name = ?, guardian_telephone_number =?",
+        "insert into soldiers set name =?, join_date = ?, end_date = ?, department = ?, mil_id = ?, `rank` = ?, telephone_number =?, guardian_name = ?, guardian_telephone_number =?",
         [
           soldierObject.getName(),
           soldierObject.getJoinDate(),
@@ -100,7 +100,7 @@ class SoldierController {
       console.log("hello");
 
       await query(
-        `update soldiers set name =?, join_date = ?, end_date = ?, department = ?, rank = ?, telephone_number =?, guardian_name = ?, guardian_telephone_number =? where id = ?`,
+        "update soldiers set name =?, join_date = ?, end_date = ?, department = ?, `rank` = ?, telephone_number =?, guardian_name = ?, guardian_telephone_number =? where id = ?",
         [
           soldierObject.getName(),
           soldierObject.getJoinDate(),
@@ -380,7 +380,7 @@ LEFT JOIN leave_type lt
 
       // Filter by rank
       if (req.query.rank) {
-        filters.push(`rank = ?`);
+        filters.push("`rank` = ?");
         params.push(req.query.rank);
       }
 

@@ -14,7 +14,7 @@ const OfficerCard = ({ id, mil_id, name, department, join_date, rank }) => {
             <strong>الورشة / الفرع:</strong> {department} <br />
             <strong>تاريخ الضم:</strong> {new Date(join_date).toLocaleDateString()}
           </p>
-          <Link className="btn btn-primary w-100" to={`/dashboard/OfficersHome/Officers/details/${id}`}>
+          <Link className="btn btn-primary w-100" to={`/dashboard/officers/details/${id}`}>
             تفاصيل
           </Link>
         </div>

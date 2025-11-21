@@ -25,7 +25,7 @@ const NCOsHome = () => {
           <h2>بيانات ضباط الصف</h2>
         </div>
         {auth && auth.type === "admin" && (
-          <Link to={"NCOs"} className="button">Go</Link>
+          <Link to={"list"} className="button">Go</Link>
         )}
       </div>
 
@@ -35,7 +35,7 @@ const NCOsHome = () => {
           <h2>تمام ضباط الصف</h2>
         </div>
         {auth && auth.type === "admin" && (
-          <Link to={"NCOs/Tmam"} className="button">Go</Link>
+          <Link to={"tmam"} className="button">Go</Link>
         )}
       </div>
 
@@ -45,7 +45,7 @@ const NCOsHome = () => {
           <h2>سجل دخول / خروج ضباط الصف</h2>
         </div>
         {auth && auth.type === "admin" && (
-          <Link to={"NCOs/log"} className="button">Go</Link>
+          <Link to={"log"} className="button">Go</Link>
         )}
       </div>
 
@@ -54,7 +54,7 @@ const NCOsHome = () => {
             <FaSearch className="card-icon" />
             <h2>بحث</h2>
           </div>
-          <Link to="NCOs/search" className="button">Go</Link>
+            <Link to={"search"} className="button">Go</Link>
         </div>
         </>
       )}
@@ -66,7 +66,7 @@ const NCOsHome = () => {
                   <FaClipboardCheck className="card-icon" />
                   <h2>تسجيل دخول ضباط الصف</h2>
                 </div>
-                <Link to={"NCOs/Arrival"} className="button">تسجيل دخول</Link>
+                <Link to={"arrival"} className="button">تسجيل دخول</Link>
               </div>
     
               <div className="card">
@@ -74,7 +74,7 @@ const NCOsHome = () => {
                   <FaClipboardCheck className="card-icon" />
                   <h2>تسجيل خروج ضباط الصف</h2>
                 </div>
-                <Link to={"/dashboard/NCOsHome/NCOs/Departure"} className="button">تسجيل خروج</Link>
+                <Link to={"departure"} className="button">تسجيل خروج</Link>
               </div>
             </>
           )}

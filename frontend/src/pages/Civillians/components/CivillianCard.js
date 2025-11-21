@@ -13,7 +13,7 @@ const CivillianCard = ({ id, nationalID, name, department, join_date, address, d
             <strong>الورشة / الفرع:</strong> {department} <br />
             <strong>تاريخ الضم:</strong> {new Date(join_date).toLocaleDateString()}
           </p>
-          <Link className="btn btn-primary w-100" to={`/dashboard/CivilliansHome/Civillian/details/${id}`}>
+          <Link className="btn btn-primary w-100" to={`/dashboard/civillians/details/${id}`}>
             تفاصيل
           </Link>
         </div>

@@ -1,31 +1,34 @@
 const connection = require("../db/dbConnection");
 const util = require("util");
 
-
-const shuoonOfficers = async (req, res,next) => {
+const shuoonOfficers = async (req, res, next) => {
+  try {
     const query = util.promisify(connection.query).bind(connection);
-    const { token } = req.headers; 
-        console.log(token);
 
-    const userData = await query("select * from users where token = ?", [token]);
-    console.log(userData[0]);
-    if(userData[0].type == 5)
-        console.log("yes");
-    else
-        console.log("no");
-        
-        
-    
-    if (userData[0] && (userData[0].type == "شؤون ضباط" || userData[0].type == "admin" )) { 
-        next();
-    } else {
-        res.status(403).json({
-            msg: "you are not authorized to access this route "
-        })
+      const token = req.headers.token;
+      console.log("hey there from shuoonOfficers middleware, token:", token);
+      
+    if (!token) {
+      return next(new Error("shuoonOfficers"));
     }
-    
 
-}
+    const userData = await query("SELECT * FROM users WHERE token = ?", [
+      token,
+    ]);
 
+    if (
+      userData.length > 0 &&
+      (userData[0].type.trim() === "شؤون ضباط" ||
+        userData[0].type.trim() === "admin")
+    ) {
+      return next(); // authorized
+    }
 
-module.exports = shuoonOfficers; 
+    // unauthorized
+    return next(new Error("shuoonOfficers"));
+  } catch (err) {
+    return next(new Error("shuoonOfficers"));
+  }
+};
+
+module.exports = shuoonOfficers;

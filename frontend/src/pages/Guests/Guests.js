@@ -148,7 +148,7 @@ const Guests = () => {
     <div className="Officers p-5">
       <div className="header d-flex justify-content-between mb-3">
         <h3 className="text-center mb-3">إدارة الزوار</h3>
-        <Link to={'AddGuests'} className="btn btn-success mb-4">
+        <Link to={'../add'} className="btn btn-success mb-4">
           إنشاء زائر جديد +
         </Link>
       </div>
@@ -199,12 +199,7 @@ const Guests = () => {
                     >
                       حذف
                     </button>
-                    <Link
-                      to={`${guest.nationalID}`}
-                      className="btn btn-sm btn-primary"
-                    >
-                      تعديل
-                    </Link>
+
 
                     {/* Add End Visit button */}
                     {!guest.visit_end && (

@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Table, Alert, Modal, Button } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
-import { getAuthUser } from '../../helper/Storage';
-import moment from 'moment';
+import React, { useState, useEffect } from "react";
+import { Table, Alert, Modal, Button } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import { getAuthUser } from "../../helper/Storage";
+import moment from "moment";
 
-const Experts = () => {
+const SecurityExperts = () => {
   const auth = getAuthUser();
   const now = moment().format("YYYY-MM-DD HH:mm:ss");
   const [experts, setExperts] = useState({
@@ -19,14 +19,11 @@ const Experts = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [recordsPerPage] = useState(8);
 
-  // ✅ Modal state
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [selectedExpert, setSelectedExpert] = useState(null);
 
   useEffect(() => {
     setExperts({ ...experts, loading: true });
     axios
-      .get('http://localhost:4001/expert/', {
+      .get("http://localhost:4001/expert/", {
         headers: {
           token: auth.token,
         },
@@ -43,58 +40,19 @@ const Experts = () => {
         setExperts({
           ...experts,
           loading: false,
-          err:
-            err.response
-              ? JSON.stringify(err.response.data.errors)
-              : 'حدث خطأ أثناء تحميل البيانات.',
+          err: err.response
+            ? JSON.stringify(err.response.data.errors)
+            : "حدث خطأ أثناء تحميل البيانات.",
         });
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [experts.reload]);
 
   // ✅ Show confirmation modal before deleting
-  const handleDeleteClick = (expert) => {
-    setSelectedExpert(expert);
-    setShowConfirm(true);
-  };
+ 
 
   // ✅ Delete confirmation
-  const confirmDelete = () => {
-    if (!selectedExpert) return;
-
-    axios
-      .delete('http://localhost:4001/expert/' + selectedExpert.nationalID, {
-        headers: {
-          token: auth.token,
-        },
-      })
-      .then(() => {
-        setShowConfirm(false);
-        setSelectedExpert(null);
-
-        // ✅ Show success message
-        setExperts({
-          ...experts,
-          reload: experts.reload + 1,
-          success: 'تم حذف الخبير بنجاح ✅',
-          err: null,
-        });
-
-        // ✅ Hide message after 3 seconds
-        setTimeout(() => {
-          setExperts((prev) => ({ ...prev, success: null }));
-        }, 3000);
-      })
-      .catch((err) => {
-        setExperts({
-          ...experts,
-          err:
-            err.response?.data?.errors ||
-            'حدث خطأ أثناء محاولة حذف الخبير.',
-        });
-        setShowConfirm(false);
-      });
-  };
+ 
 
   // ✅ Pagination logic
   const indexOfLastRecord = currentPage * recordsPerPage;
@@ -115,9 +73,7 @@ const Experts = () => {
     <div className="Officers p-5">
       <div className="header d-flex justify-content-between mb-3">
         <h3 className="text-center mb-3">إدارة الخبراء</h3>
-        <Link to={"../add"} className="btn btn-success mb-4">
-          إنشاء خبير جديد +
-        </Link>
+
       </div>
 
       {/* ✅ Success Message */}
@@ -148,7 +104,6 @@ const Experts = () => {
               <th>اسم الشركة</th>
               <th>حالة التصديق</th>
               <th>التمام</th>
-              <th>الإجراءات</th>
             </tr>
           </thead>
           <tbody>
@@ -196,28 +151,6 @@ const Experts = () => {
                 >
                   {expert.in_unit ? "متواجد" : "غير موجود"}
                 </td>
-                <td>
-                  <div className="action-buttons">
-                    <button
-                      className="btn btn-sm btn-danger"
-                      onClick={() => handleDeleteClick(expert)}
-                    >
-                      حذف
-                    </button>
-                    <Link
-                      to={`../${expert.nationalID}`}
-                      className="btn btn-sm btn-primary"
-                    >
-                      تعديل
-                    </Link>
-                    <Link
-                      to={`../details/${expert.nationalID}`}
-                      className="btn btn-sm btn-primary"
-                    >
-                      تفاصيل
-                    </Link>
-                  </div>
-                </td>
               </tr>
             ))}
           </tbody>
@@ -255,26 +188,9 @@ const Experts = () => {
         </button>
       </div>
 
-      {/* ✅ Confirmation Modal */}
-      <Modal show={showConfirm} onHide={() => setShowConfirm(false)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>تأكيد الحذف</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          هل أنت متأكد أنك تريد حذف الخبير{" "}
-          <strong>{selectedExpert?.name}</strong>؟
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowConfirm(false)}>
-            إلغاء
-          </Button>
-          <Button variant="danger" onClick={confirmDelete}>
-            حذف
-          </Button>
-        </Modal.Footer>
-      </Modal>
+     
     </div>
   );
 };
 
-export default Experts;
+export default SecurityExperts;

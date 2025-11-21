@@ -31,7 +31,7 @@ const OfficersHome = () => {
               <FaUsers className="card-icon" />
               <h2>بيانات الضباط</h2>
             </div>
-            <Link to={"Officers"} className="button">Go</Link>
+            <Link to={"list"} className="button">Go</Link>
           </div>
 
           <div className="card">
@@ -39,7 +39,7 @@ const OfficersHome = () => {
               <FaClipboardCheck className="card-icon" />
               <h2>تمام الضباط</h2>
             </div>
-            <Link to={"Officers/Tmam"} className="button">Go</Link>
+            <Link to={"tmam"} className="button">Go</Link>
           </div>
 
           <div className="card">
@@ -47,7 +47,7 @@ const OfficersHome = () => {
               <FaHistory className="card-icon" />
               <h2>سجل دخول / خروج الضباط</h2>
             </div>
-            <Link to={"Officers/log"} className="button">Go</Link>
+            <Link to={"log"} className="button">Go</Link>
           </div>
 
           <div className="card">
@@ -55,7 +55,7 @@ const OfficersHome = () => {
               <FaSearch className="card-icon" />
               <h2>بحث</h2>
             </div>
-            <Link to="Officers/search" className="button">Go</Link>
+            <Link to="search" className="button">Go</Link>
           </div>
         </>
       )}
@@ -68,7 +68,7 @@ const OfficersHome = () => {
               <FaClipboardCheck className="card-icon" />
               <h2>تسجيل دخول الضباط</h2>
             </div>
-            <Link to={"Officers/arrival"} className="button">تسجيل دخول</Link>
+            <Link to={"arrival"} className="button">تسجيل دخول</Link>
           </div>
 
           <div className="card">
@@ -76,10 +76,12 @@ const OfficersHome = () => {
               <FaClipboardCheck className="card-icon" />
               <h2>تسجيل خروج الضباط</h2>
             </div>
-            <Link to={"Officers/departure"} className="button">تسجيل خروج</Link>
+            <Link to={"departure"} className="button">تسجيل خروج</Link>
           </div>
         </>
       )}
+
+  
 
     </div>
   );

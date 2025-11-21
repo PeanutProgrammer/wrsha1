@@ -25,54 +25,54 @@ const Aside = ({ setCollapsed, collapsed }) => {
       )}
 
       <ul>
-        {auth?.type === ("بوابة") && (
+        {auth?.type === "بوابة" && (
           <>
             <li className="tabs">
               <Link to={"Home"}>الصفحة الرئيسية</Link>
             </li>
             <li className="tabs">
-              <Link to={"OfficersHome"}>الضباط</Link>
+              <Link to={"officers"}>الضباط</Link>
             </li>
             <li className="tabs">
-              <Link to={"NCOsHome"}>الصف ضباط</Link>
+              <Link to={"ncos"}>الصف ضباط</Link>
             </li>
             <li className="tabs">
-              <Link to={"SoldiersHome"}>الجنود</Link>
+              <Link to={"soldiers"}>الجنود</Link>
             </li>
             <li className="tabs">
-              <Link to={"CivilliansHome"}>المدنيين</Link>
+              <Link to={"civillians"}>المدنيين</Link>
             </li>
             <li className="tabs">
-              <Link to={"ExpertsHome"}>الخبراء</Link>
+              <Link to={"experts"}>الخبراء</Link>
             </li>
             <li className="tabs">
-              <Link to={"GuestsHome"}>الزوار</Link>
+              <Link to={"guests"}>الزوار</Link>
             </li>
           </>
         )}
 
-        {auth?.type === ("قائد الامن") && (
+        {auth?.type === "قائد الامن" && (
           <>
             <li className="tabs">
               <Link to={"Home"}>الصفحة الرئيسية</Link>
             </li>
             <li className="tabs">
-              <Link to={"SecurityOfficers"}>الضباط</Link>
+              <Link to={"security-officers"}>الضباط</Link>
             </li>
             <li className="tabs">
-              <Link to={"SecurityNCOs"}>الصف ضباط</Link>
+              <Link to={"security-ncos"}>الصف ضباط</Link>
             </li>
             <li className="tabs">
-              <Link to={"SecuritySoldiers"}>الجنود</Link>
+              <Link to={"security-soldiers"}>الجنود</Link>
             </li>
             <li className="tabs">
-              <Link to={"SecurityCivillians"}>المدنيين</Link>
+              <Link to={"security-civillians"}>المدنيين</Link>
             </li>
             <li className="tabs">
-              <Link to={"ExpertsHome"}>الخبراء</Link>
+              <Link to={"security-experts"}>الخبراء</Link>
             </li>
             <li className="tabs">
-              <Link to={"GuestsHome"}>الزوار</Link>
+              <Link to={"security-guests"}>الزوار</Link>
             </li>
           </>
         )}
@@ -83,38 +83,59 @@ const Aside = ({ setCollapsed, collapsed }) => {
               <Link to={"Home"}>الصفحة الرئيسية</Link>
             </li>
             <li className="tabs">
-              <Link to={"OfficersHome"}>الضباط</Link>
+              <Link to={"officers"}>الضباط</Link>
             </li>
             <li className="tabs">
-              <Link to={"NCOsHome"}>الصف ضباط</Link>
+              <Link to={"ncos"}>الصف ضباط</Link>
             </li>
             <li className="tabs">
-              <Link to={"SoldiersHome"}>الجنود</Link>
+              <Link to={"soldiers"}>الجنود</Link>
             </li>
             <li className="tabs">
-              <Link to={"CivilliansHome"}>المدنيين</Link>
+              <Link to={"civillians"}>المدنيين</Link>
             </li>
             <li className="tabs">
-              <Link to={"ExpertsHome"}>الخبراء</Link>
+              <Link to={"experts"}>الخبراء</Link>
             </li>
             <li className="tabs">
-              <Link to={"GuestsHome"}>الزوار</Link>
+              <Link to={"guests"}>الزوار</Link>
             </li>
             <li className="tabs">
-              <Link to={"PastWorkersHome"}>العاملين السابقين</Link>
+              <Link to={"past-workers"}>العاملين السابقين</Link>
             </li>
             <li className="tabs">
               <Link to={"Home"}>الورش والأفرع</Link>
             </li>
             <li className="tabs">
-              <Link to={"Users"}>إدارة الحسابات</Link>
+              <Link to={"users"}>إدارة الحسابات</Link>
             </li>
           </>
         )}
 
-        {["مبنى القيادة", "شؤون ضباط", "شؤون ادارية"].includes(
-          auth?.type
-        ) && (
+        {auth?.type === "شؤون ضباط" && (
+          <>
+            <li className="tabs">
+              <Link to={"Home"}>الصفحة الرئيسية</Link>
+            </li>
+            <li className="tabs">
+              <Link to={"officers/manage"}>بيانات الضباط</Link>
+            </li>
+            <li className="tabs">
+              <Link to={"officers/manage-tmam"}>تمام الضباط</Link>
+            </li>
+            <li className="tabs">
+              <Link to={"ncos"}>الاجازات</Link>
+            </li>
+            <li className="tabs">
+              <Link to={"soldiers"}>المأموريات</Link>
+            </li>
+            <li className="tabs">
+              <Link to={"experts"}>الفرق</Link>
+            </li>
+          </>
+        )}
+
+        {["مبنى القيادة", "شؤون ادارية"].includes(auth?.type) && (
           <li className="tabs">
             <Link to={"Home"}>Home</Link>
           </li>

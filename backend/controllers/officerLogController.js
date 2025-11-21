@@ -23,8 +23,10 @@ class OfficerLogController {
                                           FROM officers
                                           LEFT JOIN officer_log
                                           ON officer_log.officerID = officers.id
+                                          LEFT JOIN officer_leave_details
+                                          ON officer_leave_details.movementID = officer_log.id
                                           LEFT JOIN leave_type
-                                          ON officer_log.leaveTypeID = leave_type.id
+                                          ON officer_leave_details.leaveTypeID = leave_type.id
                                           order by officer_log.event_time DESC`)
 
             if (officers.length == 0) {
@@ -89,7 +91,6 @@ class OfficerLogController {
                 req.body.event_type,
                 req.body.event_time,
                 req.body.officerID,
-                req.body.leaveTypeID,
                 req.body.notes,
                 req.body.loggerID
             );
@@ -97,12 +98,33 @@ class OfficerLogController {
             console.log(officerObject.toJSON());
             
 
-            await query("insert into officer_log set event_type = ?, event_time = ?, officerID = ?, leaveTypeID = ?, notes = ?, loggerID = ?",
-                [officerObject.getEventType(), officerObject.getEventTime(), officerObject.getOfficerID(), officerObject.getLeaveTypeID(), officerObject.getNotes(), officerObject.getLoggerID()]);
+            const officerLogResult =    await query(
+              "insert into officer_log set event_type = ?, event_time = ?, officerID = ?, notes = ?, loggerID = ?",
+              [
+                officerObject.getEventType(),
+                officerObject.getEventTime(),
+                officerObject.getOfficerID(),
+                officerObject.getNotes(),
+                officerObject.getLoggerID(),
+              ]
+            );
 
+            const officerLogId = officerLogResult.insertId;
 
             
             await query("update officers set in_unit = 1 where id = ?", [officerObject.getOfficerID()]);
+
+             await query(
+               "insert into officer_leave_details set movementID = ?, leaveTypeID = ?, officerID = ?, start_date = ?, end_date = ?, destination = ?",
+               [
+                 officerLogId,
+                   req.body.leaveTypeID,
+                 req.body.officerID,
+                 req.body.start_date,
+                 req.body.end_date,
+                 req.body.destination,
+               ]
+             );
 
 
             req.app.get("io").emit("officersUpdated");
@@ -110,7 +132,7 @@ class OfficerLogController {
 
 
         } catch (err) {  
-            return res.status(500).json({ err: "error" });
+            return res.status(500).json({ err: err.message});
         }
     }
 
@@ -155,7 +177,6 @@ class OfficerLogController {
                 req.body.event_type,
                 req.body.event_time,
                 req.body.officerID,
-                req.body.leaveTypeID,
                 req.body.notes,
                 req.body.loggerID
             );
@@ -165,14 +186,14 @@ class OfficerLogController {
             console.log(officerObject.toJSON());
             
 
-             const officerLogResult = await query("insert into officer_log set event_type = ?, event_time = ?, officerID = ?, leaveTypeID = ?, notes = ?, loggerID = ?",
-                [officerObject.getEventType(), officerObject.getEventTime(), officerObject.getOfficerID(), officerObject.getLeaveTypeID(), officerObject.getNotes(), officerObject.getLoggerID()]);
+             const officerLogResult = await query("insert into officer_log set event_type = ?, event_time = ?, officerID = ?, notes = ?, loggerID = ?",
+                [officerObject.getEventType(), officerObject.getEventTime(), officerObject.getOfficerID(), officerObject.getNotes(), officerObject.getLoggerID()]);
             
              const officerLogId = officerLogResult.insertId;
 
             await query("update officers set in_unit = 0 where id = ?", [officerObject.getOfficerID()]);
 
-            await query("insert into officer_leave_details set movementID = ?, start_date = ?, end_date = ?, destination = ?", [officerLogId, req.body.start_date, req.body.end_date, req.body.destination]);
+            await query("insert into officer_leave_details set movementID = ?, leaveTypeID = ?, officerID = ?, start_date = ?, end_date = ?, destination = ?", [officerLogId, req.body.leaveTypeID , req.body.officerID,req.body.start_date, req.body.end_date, req.body.destination]);
 
             req.app.get("io").emit("officersUpdated");
             return res.status(200).json(officerObject.toJSON());

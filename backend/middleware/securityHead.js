@@ -1,25 +1,21 @@
+// middlewares/securityHead.js
 const connection = require("../db/dbConnection");
 const util = require("util");
 
+const securityHead = async (req, res, next) => {
+  const query = util.promisify(connection.query).bind(connection);
+  const { token } = req.headers;
 
-const securityHead = async (req, res,next) => {
-    const query = util.promisify(connection.query).bind(connection);
-    const { token } = req.headers; 
-        console.log(token);
+  const userData = await query("SELECT * FROM users WHERE token = ?", [token]);
 
-    const userData = await query("select * from users where token = ?", [token]);
- 
-    
-    if (userData[0] && (userData[0].type == "قائد الامن" || userData[0].type == "admin" )) { 
-        next();
-    } else {
-        res.status(403).json({
-            msg: "you are not authorized to access this route "
-        })
-    }
-    
+  if (
+    userData[0] &&
+    (userData[0].type === "قائد الامن" || userData[0].type === "admin")
+  ) {
+    return next();
+  }
 
-}
+  throw new Error("securityHead");
+};
 
-
-module.exports = securityHead; 
+module.exports = securityHead;

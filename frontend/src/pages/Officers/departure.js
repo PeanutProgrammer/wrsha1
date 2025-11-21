@@ -12,12 +12,28 @@ import Select from 'react-select'; // Importing react-select
 
 // Validation schema using yup
 const schema = yup.object().shape({
-  notes: yup.string().max(500, 'الملاحظات يجب ألا تتجاوز 500 حرف').optional(),
-  officerID: yup.number().required(' اسم الضابط مطلوب '),
-  leaveTypeID: yup.number().optional('سبب الخروج مطلوب'),
-  start_date: yup.date().required('تاريخ البداية مطلوب').typeError('يرجى إدخال تاريخ صحيح'),
-  end_date: yup.date().required('تاريخ النهاية مطلوب').min(yup.ref('start_date'), 'تاريخ النهاية يجب أن يكون بعد تاريخ البداية').typeError('يرجى إدخال تاريخ صحيح'),
-  destination: yup.string().max(255, 'الوجهة يجب ألا تتجاوز 255 حرف').optional(),
+  notes: yup.string().max(500, "الملاحظات يجب ألا تتجاوز 500 حرف").optional(),
+  officerID: yup.number().required(" اسم الضابط مطلوب "),
+  leaveTypeID: yup
+    .number()
+    .nullable()
+    .transform((value, originalValue) => (originalValue === "" ? null : value))
+    .typeError("سبب الخروج مطلوب"),
+  start_date: yup
+    .date()
+    .nullable()
+    .transform((value, originalValue) => (originalValue === "" ? null : value))
+    .typeError("يرجى إدخال تاريخ صحيح"),
+  end_date: yup
+    .date()
+    .nullable()
+    .transform((value, originalValue) => (originalValue === "" ? null : value))
+    .min(yup.ref("start_date"), "تاريخ النهاية يجب أن يكون بعد تاريخ البداية")
+    .typeError("يرجى إدخال تاريخ صحيح"),
+  destination: yup
+    .string()
+    .max(255, "الوجهة يجب ألا تتجاوز 255 حرف")
+    .optional(),
 });
 
 const OfficerDeparture = () => {

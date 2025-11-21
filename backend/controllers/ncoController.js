@@ -41,7 +41,7 @@ class NCOController {
       );
 
       await query(
-        "insert into ncos set name =?, join_date = ?, department = ?, mil_id = ?, rank = ?, address = ?, height = ?, weight = ?, dob = ?",
+        "insert into ncos set name =?, join_date = ?, department = ?, mil_id = ?, `rank` = ?, address = ?, height = ?, weight = ?, dob = ?",
         [
           officerObject.getName(),
           officerObject.getJoinDate(),
@@ -98,7 +98,7 @@ class NCOController {
       console.log("hello");
 
       await query(
-        `update ncos set name =?, join_date = ?, department = ?, rank = ?, address = ?, height = ?, weight = ?, dob = ? where id = ?`,
+        "update ncos set name =?, join_date = ?, department = ?, `rank` = ?, address = ?, height = ?, weight = ?, dob = ? where id = ?",
         [
           officerObject.getName(),
           officerObject.getJoinDate(),
@@ -166,7 +166,7 @@ class NCOController {
 
       // Insert the officer data into the past_officers table
       await query(
-        "INSERT INTO past_ncos (mil_id, rank, name, join_date, address, height, weight, dob, end_date, transferID, transferred_to) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO past_ncos (mil_id, `rank`, name, join_date, address, height, weight, dob, end_date, transferID, transferred_to) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         [
           PastNCOObject.mil_id,
           PastNCOObject.rank,
@@ -402,7 +402,7 @@ LEFT JOIN leave_type lt
 
       // Filter by rank
       if (req.query.rank) {
-        filters.push(`rank = ?`);
+        filters.push("`rank` = ?");
         params.push(req.query.rank);
       }
 

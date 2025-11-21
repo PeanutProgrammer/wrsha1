@@ -4,8 +4,9 @@ const moment = require('moment');
 const ExpertController = require("../controllers/expertController"); 
 const authorized = require("../middleware/authorized");
 const admin = require("../middleware/admin");
-const shuoonSarya = require("../middleware/shuoonSarya");
 const gate = require("../middleware/gate");
+const allowAny = require("../middleware/allowAny");
+const securityHead = require("../middleware/securityHead");
 
 router.post("/", 
     // Add custom validation middleware for logical checks
@@ -157,24 +158,11 @@ router.get("/filter",  authorized,(req, res) => {
 
 
 
-router.get("/", gate,(req, res) => {
+router.get("/", allowAny(gate,securityHead),(req, res) => {
     ExpertController.getExperts(req, res);
 });
 
-// router.get("/tmam/:id", admin, (req,res) => {
-//     SoldierController.getSoldierTmamDetails(req,res);
-// });
 
-// router.get("/tmam", admin, (req,res) => {
-//     SoldierController.getSoldiersTmam(req,res);
-// });
-
-
-
-
-// router.get("/log", admin, (req,res) => {
-//     SoldierController.getSoldiersTmam(req,res);
-// });
 
 router.get("/:id", admin, (req, res) => {
     ExpertController.getExpert(req, res);

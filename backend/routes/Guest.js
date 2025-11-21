@@ -6,6 +6,8 @@ const authorized = require("../middleware/authorized");
 const admin = require("../middleware/admin");
 const shuoonSarya = require("../middleware/shuoonSarya");
 const gate = require("../middleware/gate");
+const allowAny = require("../middleware/allowAny");
+const securityHead = require("../middleware/securityHead");
 
 
 
@@ -146,14 +148,14 @@ router.delete("/:id", admin,  (req, res) => {
 
 
 
-    // Get all guests
+    // Get all current guests
 router.get("/current", gate,(req, res) => {
     GuestController.getCurrentGuests(req, res);
 });
 
 
     // Get all guests
-router.get("/", gate,(req, res) => {
+router.get("/", allowAny(gate,securityHead),(req, res) => {
     GuestController.getGuests(req, res);
 });
 

@@ -1,14 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { Table, Alert, Modal, Button, Form,  Dropdown, DropdownButton } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
-import { getAuthUser } from '../../helper/Storage';
-import moment from 'moment';
+import React, { useState, useEffect } from "react";
+import {
+  Table,
+  Alert,
+  Modal,
+  Button,
+  Form,
+  Dropdown,
+  DropdownButton,
+} from "react-bootstrap";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import { getAuthUser } from "../../helper/Storage";
+import moment from "moment";
 import { io } from "socket.io-client";
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';  // This imports the autoTable plugin
-import htmlDocx from 'html-docx-js/dist/html-docx';
-import { FaPrint } from 'react-icons/fa';  // Import the printer icon from react-icons
+import jsPDF from "jspdf";
+import "jspdf-autotable"; // This imports the autoTable plugin
+import htmlDocx from "html-docx-js/dist/html-docx";
+import { FaPrint } from "react-icons/fa"; // Import the printer icon from react-icons
 
 // Import react-pdf components
 // import pdfMake from 'pdfmake/build/pdfmake';
@@ -25,7 +33,7 @@ import { FaPrint } from 'react-icons/fa';  // Import the printer icon from react
 //   // You can add more fonts here
 // };
 
-const Officers = () => {
+const ManageOfficers = () => {
   const auth = getAuthUser();
   const [officers, setOfficers] = useState({
     loading: true,
@@ -35,12 +43,7 @@ const Officers = () => {
   });
   const [currentPage, setCurrentPage] = useState(1); // Current page number
   const [recordsPerPage] = useState(10); // Number of records per page
-  const [showConfirm, setShowConfirm] = useState(false);  // Modal state
-  const [selectedOfficer, setSelectedOfficer] = useState(null);  // Selected officer for deletion
 
-  const [endDate, setEndDate] = useState('');
-  const [transferID, setTransferID] = useState('');
-  const [transferredTo, setTransferredTo] = useState('');
 
   useEffect(() => {
     const socket = io("http://localhost:4001"); //  backend port
@@ -63,10 +66,9 @@ const Officers = () => {
           setOfficers({
             ...officers,
             loading: false,
-            err:
-              err.response
-                ? JSON.stringify(err.response.data.errors)
-                : "Something went wrong while fetching data.",
+            err: err.response
+              ? JSON.stringify(err.response.data.errors)
+              : "Something went wrong while fetching data.",
           });
         });
     };
@@ -86,59 +88,16 @@ const Officers = () => {
   }, []);
 
 
-  // Show confirmation modal before deleting
-  const handleDeleteClick = (officer) => {
-    setSelectedOfficer(officer);
-    setShowConfirm(true);
-  };
 
-  // Handle form data changes
-  const handleEndDateChange = (e) => setEndDate(e.target.value);
-  const handleTransferIDChange = (e) => setTransferID(e.target.value);
-  const handleTransferredToChange = (e) => setTransferredTo(e.target.value);
 
-  // Confirm deletion
-  const confirmDelete = () => {
-    if (!selectedOfficer) return;
-
-    // Prepare data to be sent for archiving the officer
-    const data = {
-      end_date: endDate,
-      transferID: transferID,
-      transferred_to: transferredTo,
-    };
-
-    // Change the API method to DELETE as per the new backend implementation
-    axios
-      .delete('http://localhost:4001/officer/' + selectedOfficer.mil_id, {
-        headers: { token: auth.token },
-        data: data,  // Send additional fields in the body of the DELETE request
-      })
-      .then(() => {
-        setShowConfirm(false);
-        setSelectedOfficer(null);
-        setEndDate('');
-        setTransferID('');
-        setTransferredTo('');
-        setOfficers({ ...officers, reload: officers.reload + 1, success: 'تم حذف الضابط  بنجاح ✅',
-          err: null, });
-      })
-      .catch((err) => {
-        setOfficers({
-          ...officers,
-          err:
-            err.response
-              ? JSON.stringify(err.response.data.errors)
-              : "Something went wrong. Please try again later.",
-        });
-        setShowConfirm(false);
-      });
-  };
 
   // Get current records for the current page
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = officers.results.slice(indexOfFirstRecord, indexOfLastRecord);
+  const currentRecords = officers.results.slice(
+    indexOfFirstRecord,
+    indexOfLastRecord
+  );
 
   // Change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
@@ -166,7 +125,7 @@ const Officers = () => {
   //         text: `تم طباعة هذا المستند في: ${getFormattedDate()}`,
   //         style: 'subheader',
   //         alignment: 'center',
-          
+
   //       },
   //       {
   //         table: {
@@ -223,54 +182,54 @@ const Officers = () => {
   //   // Generate and open the PDF
   //   pdfMake.createPdf(documentDefinition).open();
   // };
-// Function to get current date and time in Arabic format
-const getFormattedDate = () => {
-  const date = new Date();
-  const options = {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: false,
+  // Function to get current date and time in Arabic format
+  const getFormattedDate = () => {
+    const date = new Date();
+    const options = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    };
+    return date.toLocaleString("ar-EG", options); // Arabic (Egypt) locale for Arabic format
   };
-  return date.toLocaleString('ar-EG', options); // Arabic (Egypt) locale for Arabic format
-};
 
-// Export to Word
-const exportToWord = () => {
-  const table = document.getElementById('officer-table');
-  if (table) {
-    // Clone the table to modify it before export
-    const tableClone = table.cloneNode(true);
+  // Export to Word
+  const exportToWord = () => {
+    const table = document.getElementById("officer-table");
+    if (table) {
+      // Clone the table to modify it before export
+      const tableClone = table.cloneNode(true);
 
-    // Remove the "Actions" column (last column)
-    const rows = tableClone.querySelectorAll('tr');
-    rows.forEach(row => {
-      const cells = row.querySelectorAll('td, th'); // Include both headers and data cells
-      if (cells.length > 0) {
-        row.deleteCell(cells.length - 1); // Remove the last cell (Actions column)
-      }
-    });
+      // Remove the "Actions" column (last column)
+      const rows = tableClone.querySelectorAll("tr");
+      rows.forEach((row) => {
+        const cells = row.querySelectorAll("td, th"); // Include both headers and data cells
+        if (cells.length > 0) {
+          row.deleteCell(cells.length - 1); // Remove the last cell (Actions column)
+        }
+      });
 
-    // Get current date in Arabic format
-    const currentDate = getFormattedDate();
+      // Get current date in Arabic format
+      const currentDate = getFormattedDate();
 
-    // Create header and footer content
-    const header = `
+      // Create header and footer content
+      const header = `
       <div style="text-align: center; font-size: 16pt; font-weight: bold; font-family: 'Arial', sans-serif;">
         <p>إدارة الضباط</p>
       </div>
     `;
-    const footer = `
+      const footer = `
       <div style="text-align: center; font-size: 10pt; font-family: 'Arial', sans-serif; color: #888;">
         <p>تم طباعة هذا المستند في: ${currentDate}</p>
       </div>
     `;
 
-    // Set the direction to RTL for the Word document and include header, footer, and the table
-    const tableHTML = `
+      // Set the direction to RTL for the Word document and include header, footer, and the table
+      const tableHTML = `
       <div style="direction: rtl; font-family: 'Arial', sans-serif; font-size: 12pt;">
         <!-- Header -->
         ${header}
@@ -289,17 +248,23 @@ const exportToWord = () => {
           <tbody>
             ${Array.from(rows)
               .map((row, index) => {
-                const cells = row.querySelectorAll('td');
-                const rowStyle = index % 2 === 0 ? 'background-color: #ffffff;' : 'background-color: #f9f9f9;';
+                const cells = row.querySelectorAll("td");
+                const rowStyle =
+                  index % 2 === 0
+                    ? "background-color: #ffffff;"
+                    : "background-color: #f9f9f9;";
                 return `
                   <tr style="${rowStyle}">
                     ${Array.from(cells)
-                      .map(cell => `<td style="border: 1px solid black; padding: 5px;">${cell.innerHTML}</td>`)
-                      .join('')}
+                      .map(
+                        (cell) =>
+                          `<td style="border: 1px solid black; padding: 5px;">${cell.innerHTML}</td>`
+                      )
+                      .join("")}
                   </tr>
                 `;
               })
-              .join('')}
+              .join("")}
           </tbody>
         </table>
         <!-- Footer -->
@@ -307,45 +272,46 @@ const exportToWord = () => {
       </div>
     `;
 
-    // Convert HTML to Word format
-    const converted = htmlDocx.asBlob(tableHTML);
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(converted);
-    link.download = 'officers_table.docx';
-    link.click();
-  } else {
-    alert('Table not found!');
-  }
-};
+      // Convert HTML to Word format
+      const converted = htmlDocx.asBlob(tableHTML);
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(converted);
+      link.download = "officers_table.docx";
+      link.click();
+    } else {
+      alert("Table not found!");
+    }
+  };
   return (
     <div className="Officers p-5">
       <div className="header d-flex justify-content-between mb-3">
-  <h3 className="text-center mb-3">إدارة الضباط</h3>
+        <h3 className="text-center mb-3">إدارة الضباط</h3>
 
-  {/* Button container with d-flex */}
-  <div className="d-flex">
-    {/* Add New Officer Button */}
-    <Link to={"../add"} className="btn btn-success mb-4 mx-2">
-      إنشاء ضابط جديد +
-    </Link>
+        {/* Button container with d-flex */}
+        <div className="d-flex">
+          {/* Add New Officer Button */}
+          <Link to={"../add"} className="btn btn-success mb-4 mx-2">
+            إنشاء ضابط جديد +
+          </Link>
 
-    {/* Export Button with Dropdown */}
+          {/* Export Button with Dropdown */}
           <Dropdown className="mb-4">
             <DropdownButton
               variant="secondary"
               id="export-dropdown"
-              title={<><FaPrint className="mr-2 " />  طباعة </>}
+              title={
+                <>
+                  <FaPrint className="mr-2 " /> طباعة{" "}
+                </>
+              }
             >
               {/* Use PDFDownloadLink for PDF export */}
-                {/* <Dropdown.Item onClick={exportToPDF}>PDF</Dropdown.Item> */}
+              {/* <Dropdown.Item onClick={exportToPDF}>PDF</Dropdown.Item> */}
               <Dropdown.Item onClick={exportToWord}>Word</Dropdown.Item>
             </DropdownButton>
           </Dropdown>
         </div>
       </div>
-
-
-
 
       {officers.err && (
         <Alert variant="danger" className="p-2">
@@ -378,20 +344,20 @@ const exportToWord = () => {
                 <td>{officer.rank}</td>
                 <td>{officer.name}</td>
                 <td>{officer.department}</td>
-                <td>{moment(officer.join_date).format('YYYY-MM-DD')}</td>
-                <td>{officer.in_unit ? 'متواجد' : 'غير موجود'}</td>
+                <td>{moment(officer.join_date).format("YYYY-MM-DD")}</td>
+                <td>{officer.in_unit ? "متواجد" : "غير موجود"}</td>
                 <td>
                   <div className="action-buttons">
-                    <button
-                      className="btn btn-sm btn-danger"
-                      onClick={() => handleDeleteClick(officer)}
+                    <Link
+                      to={`../${officer.id}`}
+                      className="btn btn-sm btn-primary"
                     >
-                      حذف
-                    </button>
-                    <Link to={`../${officer.id}`} className="btn btn-sm btn-primary">
                       تعديل
                     </Link>
-                    <Link to={`../details/${officer.id}`} className="btn btn-sm btn-primary">
+                    <Link
+                      to={`../details/${officer.id}`}
+                      className="btn btn-sm btn-primary"
+                    >
                       تفاصيل
                     </Link>
                   </div>
@@ -416,7 +382,9 @@ const exportToWord = () => {
         {pageNumbers.map((number) => (
           <button
             key={number}
-            className={`btn btn-light page-btn ${currentPage === number ? 'active' : ''}`}
+            className={`btn btn-light page-btn ${
+              currentPage === number ? "active" : ""
+            }`}
             onClick={() => paginate(number)}
           >
             {number}
@@ -432,57 +400,9 @@ const exportToWord = () => {
         </button>
       </div>
 
-      {/* Confirmation Modal for Deleting Officer */}
-      <Modal show={showConfirm} onHide={() => setShowConfirm(false)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>تأكيد الحذف</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <div>
-            <p>هل أنت متأكد أنك تريد حذف الضابط <strong>{selectedOfficer?.name}</strong>؟</p>
-
-            {/* Additional Fields */}
-            <Form>
-              <Form.Group controlId="endDate">
-                <Form.Label>تاريخ النقل</Form.Label>
-                <Form.Control
-                  type="date"
-                  value={endDate}
-                  onChange={handleEndDateChange}
-                />
-              </Form.Group>
-
-              <Form.Group controlId="transferID">
-                <Form.Label>رقم بند أوامر النقل</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={transferID}
-                  onChange={handleTransferIDChange}
-                />
-              </Form.Group>
-
-              <Form.Group controlId="transferredTo">
-                <Form.Label>تم النقل إلى</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={transferredTo}
-                  onChange={handleTransferredToChange}
-                />
-              </Form.Group>
-            </Form>
-          </div>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowConfirm(false)}>
-            إلغاء
-          </Button>
-          <Button variant="danger" onClick={confirmDelete}>
-            حذف
-          </Button>
-        </Modal.Footer>
-      </Modal>
+     
     </div>
   );
 };
 
-export default Officers;
+export default ManageOfficers;

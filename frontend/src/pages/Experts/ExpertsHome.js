@@ -22,7 +22,7 @@ const ExpertsHome = () => {
           <h2>بيانات الخبراء</h2>
         </div>
         {auth && auth.type === "admin" && (
-          <Link to={"Experts"} className="button">Go</Link>
+          <Link to={"list"} className="button">Go</Link>
         )}
       </div>
 
@@ -33,7 +33,7 @@ const ExpertsHome = () => {
           <h2>سجل دخول / خروج الخبراء</h2>
         </div>
         {auth && auth.type === "admin" && (
-          <Link to={"Experts/log"} className="button">Go</Link>
+          <Link to={"log"} className="button">Go</Link>
         )}
       </div>
 
@@ -43,7 +43,7 @@ const ExpertsHome = () => {
             <FaSearch className="card-icon" />
             <h2>بحث</h2>
           </div>
-          <Link to="Experts/search" className="button">Go</Link>
+          <Link to="search" className="button">Go</Link>
         </div>
       )}</>
     )}
@@ -55,7 +55,7 @@ const ExpertsHome = () => {
                                  <FaClipboardCheck className="card-icon" />
                                  <h2>تسجيل دخول الخبراء</h2>
                                </div>
-                               <Link to={"Experts/Arrival"} className="button">تسجيل دخول</Link>
+                               <Link to={"arrival"} className="button">تسجيل دخول</Link>
                              </div>
                    
                              <div className="card">
@@ -63,7 +63,7 @@ const ExpertsHome = () => {
                                  <FaClipboardCheck className="card-icon" />
                                  <h2>تسجيل خروج الخبراء</h2>
                                </div>
-                               <Link to={"Experts/Departure"} className="button">تسجيل خروج</Link>
+                               <Link to={"departure"} className="button">تسجيل خروج</Link>
                              </div>
                            </>
                          )}

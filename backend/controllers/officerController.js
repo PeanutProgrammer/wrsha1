@@ -1,10 +1,9 @@
 const Officer = require("../models/officer");
 const PastOfficer = require("../models/pastOfficer");
-const { validationResult } = require('express-validator');
+const { validationResult } = require("express-validator");
 const connection = require("../db/dbConnection");
 const util = require("util");
 const moment = require("moment");
-
 
 class OfficerController {
   static async createOfficer(req, res) {
@@ -104,7 +103,7 @@ class OfficerController {
       console.log("hello");
 
       await query(
-        `update officers set name =?, join_date = ?, department = ?, rank = ?, address = ?,  height = ?, weight = ?, dob = ?, seniority_number = ? where id = ?`,
+        "update officers set name =?, join_date = ?, department = ?, `rank` = ?, address = ?,  height = ?, weight = ?, dob = ?, seniority_number = ? where id = ?",
         [
           officerObject.getName(),
           officerObject.getJoinDate(),
@@ -231,7 +230,7 @@ class OfficerController {
 
       return res.status(200).json(officers);
     } catch (err) {
-      return res.status(500).json({ err: err });
+      return res.status(500).json({ err: err.message || err });
     }
   }
 
@@ -311,8 +310,10 @@ LEFT JOIN (
     ON lastLog.officerID = o.id
 LEFT JOIN officer_log ol
     ON ol.officerID = o.id AND ol.event_time = lastLog.latest_event
+LEFT JOIN officer_leave_details old
+    ON old.movementID = ol.id
 LEFT JOIN leave_type lt
-    ON lt.id = ol.leaveTypeID
+    ON lt.id = old.leaveTypeID
 `);
 
       console.log(officers[0]);
@@ -365,10 +366,10 @@ LEFT JOIN leave_type lt
                                           FROM officers
                                           LEFT JOIN officer_log
                                           ON officers.id = officer_log.officerID
-                                          LEFT JOIN leave_type
-                                          on leave_type.id = officer_log.leaveTypeID
                                           LEFT JOIN officer_leave_details
-                                          ON officer_leave_details.MovementID = officer_log.id
+                                          ON officer_leave_details.officerID = officer_log.officerID
+                                          LEFT JOIN leave_type
+                                          on leave_type.id = officer_leave_details.leaveTypeID
                                           WHERE officers.mil_id = ?
                                           ORDER BY officer_log.id DESC
                                           `,
@@ -415,7 +416,7 @@ LEFT JOIN leave_type lt
 
       // Filter by rank
       if (req.query.rank) {
-        filters.push(`rank = ?`);
+        filters.push("`rank` = ?");
         params.push(req.query.rank);
       }
 
@@ -493,7 +494,7 @@ LEFT JOIN leave_type lt
       if (req.query.search) {
         search = `where name LIKE '%${req.query.search}%'`;
       }
-const officers = await query(`
+      const officers = await query(`
 SELECT
     o.id,
     o.mil_id,
@@ -529,7 +530,5 @@ WHERE o.in_unit = 0;
     }
   }
 }
-
-
 
 module.exports = OfficerController;

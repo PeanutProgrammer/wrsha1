@@ -134,7 +134,7 @@ const NCOs = () => {
     <div className="Officers p-5">
       <div className="header d-flex justify-content-between mb-3">
         <h3 className="text-center mb-3">إدارة ضباط الصف</h3>
-        <Link to={'AddNCOs'} className="btn btn-success mb-4">
+        <Link to={'../add'} className="btn btn-success mb-4">
           إنشاء ضابط صف جديد +
         </Link>
       </div>
@@ -182,7 +182,7 @@ const NCOs = () => {
                       حذف
                     </button>
                     <Link
-                      to={`${nco.id}`}
+                      to={`../${nco.id}`}
                       className="btn btn-sm btn-primary"
                     >
                       تعديل

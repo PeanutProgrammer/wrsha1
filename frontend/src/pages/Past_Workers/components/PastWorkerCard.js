@@ -7,10 +7,10 @@ const OfficerCard = ({ id, mil_id, name, join_date, rank, end_date }) => {
   const getDetailsLink = () => {
     if (rank === "عريف" || rank === "رقيب" || rank === "رقيب أول" || rank === "مساعد" || rank === "مساعد أول" || rank === "صانع ماهر" || rank === "صانع دقيق" || rank === "ملاحظ" || rank === "ملاحظ فني") {
       // This is an NCO, so link to the NCO details page
-      return `/dashboard/PastWorkersHome/PastNCOs/details/${id}`;
+      return `/dashboard/past-workers/ncos/${id}`;
     } else {
       // This is an officer, so link to the officer details page
-      return `/dashboard/PastWorkersHome/PastOfficers/details/${id}`;
+      return `/dashboard/past-workers/officers/${id}`;
     }
   };
 
