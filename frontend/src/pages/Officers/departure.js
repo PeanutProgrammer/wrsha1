@@ -11,30 +11,45 @@ import moment from 'moment';
 import Select from 'react-select'; // Importing react-select
 
 // Validation schema using yup
+// Validation schema using yup
 const schema = yup.object().shape({
   notes: yup.string().max(500, "الملاحظات يجب ألا تتجاوز 500 حرف").optional(),
-  officerID: yup.number().required(" اسم الضابط مطلوب "),
+
+  officerID: yup.number().required("اسم الضابط مطلوب"),
+
   leaveTypeID: yup
     .number()
     .nullable()
-    .transform((value, originalValue) => (originalValue === "" ? null : value))
-    .typeError("سبب الخروج مطلوب"),
+    .transform((v, o) => (o === "" ? null : v))
+    .typeError("سبب الخروج مطلوب")
+    .optional(),
+
   start_date: yup
     .date()
     .nullable()
-    .transform((value, originalValue) => (originalValue === "" ? null : value))
-    .typeError("يرجى إدخال تاريخ صحيح"),
+    .transform((v, o) => (o === "" ? null : v))
+    .typeError("يرجى إدخال تاريخ صحيح")
+    .optional(),
+
   end_date: yup
     .date()
     .nullable()
-    .transform((value, originalValue) => (originalValue === "" ? null : value))
-    .min(yup.ref("start_date"), "تاريخ النهاية يجب أن يكون بعد تاريخ البداية")
-    .typeError("يرجى إدخال تاريخ صحيح"),
-  destination: yup
-    .string()
-    .max(255, "الوجهة يجب ألا تتجاوز 255 حرف")
+    .transform((v, o) => (o === "" ? null : v))
+    .typeError("يرجى إدخال تاريخ صحيح")
+    .test(
+      "is-after-start",
+      "تاريخ العودة يجب أن يكون بعد تاريخ البداية",
+      function (value) {
+        const start = this.parent.start_date;
+        if (!start || !value) return true; // no validation if one is missing
+        return value >= start;
+      }
+    )
     .optional(),
+
+  destination: yup.string().max(255, "الوجهة يجب ألا تتجاوز 255 حرف").optional(),
 });
+
 
 const OfficerDeparture = () => {
   const [officer, setOfficer] = useState([]);
@@ -68,8 +83,9 @@ const OfficerDeparture = () => {
       event_type: 'خروج',
       event_time: moment().format("YYYY-MM-DD HH:mm:ss"),
       loggerID: auth.id,
-      start_date: moment(data.start_date).format("YYYY-MM-DD"),
-      end_date: moment(data.end_date).format("YYYY-MM-DD"),
+      start_date: data.start_date ? moment(data.start_date).format("YYYY-MM-DD") : null,
+      end_date: data.end_date ? moment(data.end_date).format("YYYY-MM-DD") : null,
+
     };
 
     console.log("Formatted Request Data:", formattedData);

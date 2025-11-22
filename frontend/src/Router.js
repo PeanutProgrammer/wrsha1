@@ -31,6 +31,7 @@ import OfficerArrival from "./pages/Officers/arrival";
 import OfficerDeparture from "./pages/Officers/departure";
 import ManageOfficers from "./pages/Officers/ManageOfficers";
 import ManageTmam from "./pages/Officers/ManageTmam";
+import UpdateTmam from "./pages/Officers/UpdateTmam";
 // NCOs
 import NCOs from "./pages/NCOs/NCOs";
 import AddNCOs from "./pages/NCOs/AddNCOs";
@@ -211,6 +212,7 @@ export const router = createBrowserRouter([
             element: <ProtectedRoute allowedTypes={"شؤون ضباط"} />,
             children: [{ path: "", element: <ManageTmam /> }],
           },
+          { path: "tmam/:id", element: <UpdateTmam /> },
         ],
       },
 

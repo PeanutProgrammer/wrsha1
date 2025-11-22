@@ -300,7 +300,8 @@ SELECT
     o.name,
     o.department,
     o.in_unit,
-    lt.name AS tmam
+    lt.name AS tmam,
+    old.id AS latest_leave_id   
 FROM officers o
 LEFT JOIN (
     SELECT officerID, MAX(event_time) AS latest_event
@@ -502,7 +503,7 @@ SELECT
     o.name,
     o.department,
     o.in_unit,
-    ol.leaveTypeID,
+    old.leaveTypeID,
     lt.name AS leave_type_name,
     ol.event_time
 FROM officers o
@@ -516,6 +517,8 @@ LEFT JOIN officer_log ol
     ON ol.officerID = o.id AND ol.event_time = lastLog.latest_event
 LEFT JOIN leave_type lt
     ON lt.id = ol.leaveTypeID
+LEFT JOIN officer_leave_details old
+    ON old.movementID = ol.id
 WHERE o.in_unit = 0;
 `);
       if (officers.length == 0) {
