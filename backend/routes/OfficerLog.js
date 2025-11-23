@@ -107,6 +107,10 @@ router.post("/departure", gate,
     }
 );
 
+router.post("/tmam", shuoonOfficers, (req, res) => {
+    OfficerLogController.createTmam(req, res);
+});
+
 
 router.put("/:id", allowAny(gate,shuoonOfficers),
     body("leaveTypeID")

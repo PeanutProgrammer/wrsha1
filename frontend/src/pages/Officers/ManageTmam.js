@@ -65,7 +65,7 @@ const ManageTmam = () => {
     <div className="Officers p-5">
       <div className="header d-flex justify-content-between mb-3">
         <h3 className="text-center mb-3">إدارة تمام الضباط</h3>
-        {/* <Link to={"AddOfficers"} className="btn btn-success mb-4"> إنشاء ضابط جديد +</Link> */}
+        { <Link to={"../tmam/add"} className="btn btn-success mb-4"> إنشاء تمام جديد +</Link> }
       </div>
 
       {officers.err && (

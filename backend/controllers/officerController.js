@@ -293,7 +293,7 @@ class OfficerController {
 
       console.log("hey");
 
-      const officers = await query(`
+const officers = await query(`
 SELECT 
     o.mil_id,
     o.rank,
@@ -301,21 +301,25 @@ SELECT
     o.department,
     o.in_unit,
     lt.name AS tmam,
-    old.id AS latest_leave_id   
+    old.id AS latest_leave_id
 FROM officers o
-LEFT JOIN (
-    SELECT officerID, MAX(event_time) AS latest_event
-    FROM officer_log
-    GROUP BY officerID
-) lastLog
-    ON lastLog.officerID = o.id
-LEFT JOIN officer_log ol
-    ON ol.officerID = o.id AND ol.event_time = lastLog.latest_event
 LEFT JOIN officer_leave_details old
-    ON old.movementID = ol.id
+    ON old.id = (
+        SELECT id
+        FROM officer_leave_details
+        WHERE officerID = o.id
+        ORDER BY id DESC
+        LIMIT 1
+    )
 LEFT JOIN leave_type lt
     ON lt.id = old.leaveTypeID
+ORDER BY o.mil_id;
+
+
 `);
+
+
+
 
       console.log(officers[0]);
       console.log("hello");
@@ -363,16 +367,16 @@ LEFT JOIN leave_type lt
         officer[0].in_unit
       );
       const officerTmam = await query(
-        `SELECT officers.mil_id ,officers.rank,officers.name, officers.department, officers.join_date, officer_log.event_type, leave_type.name AS 'tmam', officer_leave_details.start_date, officer_leave_details.end_date, officer_leave_details.destination, officer_log.notes
+        `SELECT officers.mil_id ,officers.rank,officers.name, officer_log.event_type, officers.department, leave_type.name AS 'tmam', officer_leave_details.start_date, officer_leave_details.end_date, officer_leave_details.destination, officer_log.notes
                                           FROM officers
-                                          LEFT JOIN officer_log
-                                          ON officers.id = officer_log.officerID
                                           LEFT JOIN officer_leave_details
-                                          ON officer_leave_details.officerID = officer_log.officerID
+                                          ON officer_leave_details.officerID = officers.id
                                           LEFT JOIN leave_type
                                           on leave_type.id = officer_leave_details.leaveTypeID
+                                          LEFT JOIN officer_log
+                                          ON officer_log.id = officer_leave_details.movementID
                                           WHERE officers.mil_id = ?
-                                          ORDER BY officer_log.id DESC
+                                          ORDER BY officer_leave_details.id DESC
                                           `,
         [officerObject.getMilID()]
       );
@@ -507,19 +511,35 @@ SELECT
     lt.name AS leave_type_name,
     ol.event_time
 FROM officers o
+
+-- latest log for other purposes (unchanged)
 LEFT JOIN (
     SELECT officerID, MAX(event_time) AS latest_event
     FROM officer_log
     GROUP BY officerID
 ) lastLog
     ON lastLog.officerID = o.id
+
 LEFT JOIN officer_log ol
-    ON ol.officerID = o.id AND ol.event_time = lastLog.latest_event
-LEFT JOIN leave_type lt
-    ON lt.id = ol.leaveTypeID
+    ON ol.officerID = o.id 
+    AND ol.event_time = lastLog.latest_event
+
+-- 🔥 Get the LATEST leave_details row for each officer
 LEFT JOIN officer_leave_details old
-    ON old.movementID = ol.id
+    ON old.id = (
+        SELECT id
+        FROM officer_leave_details
+        WHERE officerID = o.id
+        ORDER BY id DESC
+        LIMIT 1
+    )
+
+-- 🔥 Get leave type from officer_leave_details, not officer_log
+LEFT JOIN leave_type lt
+    ON lt.id = old.leaveTypeID
+
 WHERE o.in_unit = 0;
+
 `);
       if (officers.length == 0) {
         return res.status(404).json({

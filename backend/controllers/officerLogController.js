@@ -7,6 +7,29 @@ const OfficerLog = require("../models/officerLog");
 class OfficerLogController {
 
 
+    static async createTmam(req,res) {
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                console.log(errors.array()); // Log errors
+                return res.status(400).json({ errors: errors.array() });
+            }
+            const { officerID, leaveTypeID, start_date, end_date, destination } = req.body;
+
+            const query = util.promisify(connection.query).bind(connection);
+
+            const result = await query(
+                `INSERT INTO officer_leave_details (officerID, leaveTypeID, start_date, end_date, destination)
+                 VALUES (?, ?, ?, ?, ?)`,
+                [officerID, leaveTypeID, start_date, end_date, destination]
+            );
+
+            return res.status(201).json({ msg: "تمت الإضافة بنجاح", id: result.insertId });
+        } catch (err) {
+            return res.status(500).json({ err });
+        }
+    }
+
     static async updateTmam(req, res) {
     try {
       const errors = validationResult(req);

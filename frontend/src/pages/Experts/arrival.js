@@ -182,12 +182,12 @@ const ExpertArrival = () => {
         </Form.Group>
 
         {/* Radio Button for internal companion officer */}
-       {/* <Form.Group className="form-group">
+       <Form.Group className="form-group">
   <Form.Label>هل يوجد ضابط مرافِق داخلي؟</Form.Label>
   <div>
     <Form.Check
       type="radio"
-      label="نعم"
+      label="لا"
       name="hasInternalOfficer"
       checked={hasInternalOfficer}
       onChange={() => setHasInternalOfficer(true)}
@@ -195,14 +195,14 @@ const ExpertArrival = () => {
     />
     <Form.Check
       type="radio"
-      label="لا"
+      label="نعم"
       name="hasInternalOfficer"
       checked={!hasInternalOfficer}
       onChange={() => setHasInternalOfficer(false)}
       className="custom-radio" // Apply custom styles if needed
     />
   </div>
-</Form.Group> */}
+</Form.Group>
 
 
 
