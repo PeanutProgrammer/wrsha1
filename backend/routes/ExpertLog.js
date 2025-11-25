@@ -13,6 +13,8 @@ router.post("/", gate,
         .isNumeric().withMessage("من فضلك أدخل اسم خبير صحيح"),
     body("officerID")
         .isNumeric().withMessage("من فضلك أدخل الضابط المرافق للخبير").optional(),
+    body("external_officer")
+        .isString().withMessage("من فضلك أدخل اسم الضابط الخارجي المرافق للخبير").optional(),
     body("loggerID")
         .isNumeric(),
     body("start_date")

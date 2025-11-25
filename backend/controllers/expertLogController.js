@@ -19,7 +19,7 @@ class ExpertLogController {
             // if (req.query.search) {
             //     search =  `where name LIKE '%${req.query.search}%'`
             // }
-            const experts = await query(`SELECT experts.nationalID, experts.name, experts.security_clearance_number, experts.company_name, experts.valid_from, experts.valid_through, officers.rank, officers.name as officerName, expert_record.start_date, expert_record.end_date
+            const experts = await query(`SELECT experts.nationalID, experts.name, experts.department, experts.security_clearance_number, experts.company_name, experts.valid_from, experts.valid_through, officers.rank, officers.name as officerName, expert_record.start_date, expert_record.end_date, expert_record.external_officer
                                           FROM experts
                                           LEFT JOIN expert_record
                                           ON expert_record.expertID = experts.nationalID
@@ -193,6 +193,7 @@ class ExpertLogController {
                 req.body.end_date,
                 req.body.expertID,
                 req.body.officerID,
+                req.body.external_officer,
                 req.body.loggerID,
                 req.body.notes
 
@@ -201,8 +202,8 @@ class ExpertLogController {
             console.log(expertObject.toJSON());
             
 
-            await query("insert into expert_record set start_date = ?, end_date = ?, expertID = ?, officerID = ?, loggerID = ?, notes = ?",
-                [expertObject.getStartDate(), expertObject.getEndDate(), expertObject.getExpertID(), expertObject.getOfficerID(), expertObject.getLoggerID(), expertObject.getNotes()]);
+            await query("insert into expert_record set start_date = ?, end_date = ?, expertID = ?, officerID = ?, external_officer = ?,loggerID = ?, notes = ?",
+                [expertObject.getStartDate(), expertObject.getEndDate(), expertObject.getExpertID(), expertObject.getOfficerID(), expertObject.getExternalOfficer(), expertObject.getLoggerID(), expertObject.getNotes()]);
 
 
                     
@@ -261,6 +262,7 @@ class ExpertLogController {
                 req.body.end_date,
                 req.body.expertID,
                 req.body.officerID,
+                req.body.external_officer,
                 req.body.loggerID,
                 req.body.notes
             );
@@ -269,8 +271,8 @@ class ExpertLogController {
 
             console.log(expertObject.toJSON());
 
-             const expertRecordResult = await query("insert into expert_record set start_date = ?, end_date = ?, expertID = ?, officerID = ?, loggerID = ?, notes = ?",
-                [expertObject.getStartDate(), expertObject.getEndDate(), expertObject.getExpertID(), expertObject.getOfficerID(), expertObject.getLoggerID(), expertObject.getNotes()]);
+             const expertRecordResult = await query("insert into expert_record set start_date = ?, end_date = ?, expertID = ?, officerID = ?, external_officer = ?, loggerID = ?, notes = ?",
+                [expertObject.getStartDate(), expertObject.getEndDate(), expertObject.getExpertID(), expertObject.getOfficerID(), expertObject.getExternalOfficer(), expertObject.getLoggerID(), expertObject.getNotes()]);
 
              const expertRecordId = expertRecordResult.insertId;
 

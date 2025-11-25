@@ -67,6 +67,27 @@ const ExpertsHome = () => {
                              </div>
                            </>
                          )}
+
+                           {/* بوابة Cards */}
+           {auth && auth.type === "قائد الامن" && (
+                           <>
+                             <div className="card">
+                               <div className="card-header">
+                                 <FaClipboardCheck className="card-icon" />
+                                 <h2>بيانات الخبراء</h2>
+                               </div>
+                               <Link to={"../security-experts"} className="button">Go</Link>
+                             </div>
+                   
+                             <div className="card">
+                               <div className="card-header">
+                                 <FaClipboardCheck className="card-icon" />
+                                 <h2>بحث</h2>
+                               </div>
+                               <Link to={"search"} className="button">Go</Link>
+                             </div>
+                           </>
+                         )}
                    
                        </div>
                      );

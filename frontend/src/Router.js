@@ -104,6 +104,7 @@ import SecuritySoldiers from "./pages/Soldiers/SecuritySoldiers";
 import SecurityCivillians from "./pages/Civillians/SecurityCivillians";
 import SecurityExperts from "./pages/Experts/SecurityExperts";
 import SecurityGuests from "./pages/Guests/SecurityGuests"; 
+import AllInUnit from "./pages/Unit/AllInUnit";
 
 
 export const router = createBrowserRouter([
@@ -152,6 +153,12 @@ export const router = createBrowserRouter([
         element: <ProtectedRoute allowedTypes={["قائد الامن"]} />,
         children: [{ path: "", element: <SecurityGuests /> }],
       },
+      {
+        path: "security-unit",
+        element: <ProtectedRoute allowedTypes={["قائد الامن"]} />,
+        children: [{ path: "", element: <AllInUnit /> }],
+      },
+    
 
       // Officers Routes
       {
@@ -419,7 +426,7 @@ export const router = createBrowserRouter([
       // Experts Routes
       {
         path: "experts",
-        element: <ProtectedRoute allowedTypes={["admin", "بوابة"]} />,
+        element: <ProtectedRoute allowedTypes={["admin", "بوابة","قائد الامن"]} />,
         children: [
           { path: "", element: <ExpertsHome /> },
           {
@@ -439,7 +446,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "details/:id",
-            element: <ProtectedRoute allowedTypes={"admin"} />,
+            element: <ProtectedRoute allowedTypes={["admin", "قائد الامن"]} />,
             children: [{ path: "", element: <ExpertDetails /> }],
           },
           {
@@ -449,7 +456,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "search",
-            element: <ProtectedRoute allowedTypes={"admin"} />,
+            element: <ProtectedRoute allowedTypes={["admin", "قائد الامن"]} />,
             children: [{ path: "", element: <SearchExperts /> }],
           },
           { path: "arrival", element: <ExpertArrival /> },
@@ -530,6 +537,8 @@ export const router = createBrowserRouter([
           },
         ],
       },
+
+      
 
       { path: "*", element: <NotFound /> },
     ],

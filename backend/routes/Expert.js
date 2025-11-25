@@ -164,7 +164,7 @@ router.get("/", allowAny(gate,securityHead),(req, res) => {
 
 
 
-router.get("/:id", admin, (req, res) => {
+router.get("/:id", securityHead, (req, res) => {
     ExpertController.getExpert(req, res);
 });
 

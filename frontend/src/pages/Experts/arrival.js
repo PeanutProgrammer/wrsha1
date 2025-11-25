@@ -14,7 +14,8 @@ import Select from 'react-select'; // Importing react-select
 const schema = yup.object().shape({
   notes: yup.string().max(500, 'الملاحظات يجب ألا تتجاوز 500 حرف').optional(),
   expertID: yup.number().required(' اسم الخبير مطلوب '),
-  officerID: yup.string().required('الضابط المرافق مطلوب'),
+  officerID: yup.string().optional().nullable(),
+  external_officer: yup.string().optional().nullable()
 });
 
 const ExpertArrival = () => {
@@ -225,15 +226,15 @@ const ExpertArrival = () => {
             {errors.officerID && <div className="invalid-feedback">{errors.officerID.message}</div>}
           </Form.Group>
         ) : (
-          <Form.Group controlId="officerID" className="form-group">
-            <Form.Label>الضابط المرافق</Form.Label>
+          <Form.Group controlId="external_officer" className="form-group">
+            <Form.Label>الضابط الخارجي المرافق</Form.Label>
             <Form.Control
               type="text"
               placeholder="أدخل اسم الضابط"
-              {...register("officerID")}
-              className={`form-control ${errors.officerID ? 'is-invalid' : ''}`}
+              {...register("external_officer")}
+              className={`form-control ${errors.external_officer ? 'is-invalid' : ''}`}
             />
-            {errors.officerID && <div className="invalid-feedback">{errors.officerID.message}</div>}
+            {errors.external_officer && <div className="invalid-feedback">{errors.external_officer.message}</div>}
           </Form.Group>
         )}
 

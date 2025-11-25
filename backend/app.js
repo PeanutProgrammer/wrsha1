@@ -65,6 +65,7 @@ const guest = require("./routes/Guest");
 const pastOfficer = require("./routes/PastOfficer");
 const pastNCO = require("./routes/PastNCO");
 const leaveType = require("./routes/LeaveType");
+const unit = require("./routes/Unit");
 
 
 
@@ -94,6 +95,7 @@ app.use("/guest",guest);
 app.use("/pastOfficer", pastOfficer);
 app.use("/pastNCO", pastNCO);
 app.use("/leaveType", leaveType);
+app.use("/unit",unit);
 
 
 // app.use("/busses", busses);

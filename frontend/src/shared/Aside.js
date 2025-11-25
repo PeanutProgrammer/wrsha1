@@ -69,10 +69,13 @@ const Aside = ({ setCollapsed, collapsed }) => {
               <Link to={"security-civillians"}>المدنيين</Link>
             </li>
             <li className="tabs">
-              <Link to={"security-experts"}>الخبراء</Link>
+              <Link to={"experts"}>الخبراء</Link>
             </li>
             <li className="tabs">
               <Link to={"security-guests"}>الزوار</Link>
+            </li>
+            <li className="tabs">
+              <Link to={"security-unit"}>المتواجدين بالوحدة</Link>
             </li>
           </>
         )}

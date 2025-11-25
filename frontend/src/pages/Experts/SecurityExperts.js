@@ -101,9 +101,10 @@ const SecurityExperts = () => {
               <th>الفترة من</th>
               <th>الفترة إلى</th>
               <th>الفرع / الورشة</th>
-              <th>اسم الشركة</th>
               <th>حالة التصديق</th>
               <th>التمام</th>
+              <th>اسم الشركة</th>
+              <th>الإجراءات</th>
             </tr>
           </thead>
           <tbody>
@@ -116,7 +117,6 @@ const SecurityExperts = () => {
                 <td>{moment(expert.valid_from).format("YYYY-MM-DD")}</td>
                 <td>{moment(expert.valid_through).format("YYYY-MM-DD")}</td>
                 <td>{expert.department}</td>
-                <td>{expert.company_name}</td>
 
                 <td
                   className={
@@ -151,6 +151,19 @@ const SecurityExperts = () => {
                 >
                   {expert.in_unit ? "متواجد" : "غير موجود"}
                 </td>
+                                <td>{expert.company_name}</td>
+
+                                <td>
+                                  <div className="action-buttons">
+                                   
+                                    <Link
+                                      to={`../experts/details/${expert.nationalID}`}
+                                      className="btn btn-sm btn-primary"
+                                    >
+                                      تفاصيل
+                                    </Link>
+                                  </div>
+                                </td>
               </tr>
             ))}
           </tbody>

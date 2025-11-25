@@ -128,7 +128,7 @@ const ExpertsLog = () => {
 
 <td>{expert.department ? expert.department : "لا يوجد"}</td>
 
-            <td>{expert.rank} / {expert.officerName}</td>
+            <td>{expert.officerName? (`${expert.rank} / ${expert.officerName}`) : expert.external_officer}</td>
             <td>{expert.notes ? expert.notes : "لا يوجد"}</td>
 
             {/* <td >{officer.tmam? officer.tmam: "متواجد"}</td> */}
