@@ -15,19 +15,19 @@ class GuestController {
 
         const query = util.promisify(connection.query).bind(connection);
 
-        // Check if the guest already exists by name (assuming 'name' is unique)
-        const checkGuest = await query(
-            "SELECT * from guests where name = ?",  // Adjust to use 'name' or another unique identifier
-            [req.body.name]
-        );
+        // // Check if the guest already exists by name (assuming 'name' is unique)
+        // const checkGuest = await query(
+        //     "SELECT * from guests where name = ?",  // Adjust to use 'name' or another unique identifier
+        //     [req.body.name]
+        // );
 
-        if (checkGuest.length > 0) {
-            return res.status(400).json({
-                errors: [
-                    { msg: "Guest with this name already exists" }
-                ],
-            });
-        }
+        // if (checkGuest.length > 0) {
+        //     return res.status(400).json({
+        //         errors: [
+        //             { msg: "Guest with this name already exists" }
+        //         ],
+        //     });
+        // }
 
         // Ensure visit_start is set to current date and time if not provided
         const visitStart = req.body.visit_start || new Date().toISOString();  // Use current time if missing

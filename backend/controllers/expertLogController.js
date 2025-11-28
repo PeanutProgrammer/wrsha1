@@ -3,52 +3,74 @@ const connection = require("../db/dbConnection");
 const util = require("util");
 const ExpertRecord = require("../models/expertRecord");
 const moment = require('moment');
+const withTransaction = require("../utils/withTransaction");
 
 class ExpertLogController {
 
 
     static async getExpertsLog(req, res) {
-        try {
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-            }
+      try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+          return res.status(400).json({ errors: errors.array() });
+        }
 
-            const query = util.promisify(connection.query).bind(connection);
-            // let search = ""
-            // if (req.query.search) {
-            //     search =  `where name LIKE '%${req.query.search}%'`
-            // }
-            const experts = await query(`SELECT experts.nationalID, experts.name, experts.department, experts.security_clearance_number, experts.company_name, experts.valid_from, experts.valid_through, officers.rank, officers.name as officerName, expert_record.start_date, expert_record.end_date, expert_record.external_officer
+        const query = util.promisify(connection.query).bind(connection);
+
+        // --- Pagination params ---
+        const page = parseInt(req.query.page) || 1; // default to page 1
+        const limit = parseInt(req.query.limit) || 20; // default 20 rows per page
+        const offset = (page - 1) * limit;
+
+        // --- Search params ---
+        let searchClause = "";
+        const params = [];
+        if (req.query.search) {
+          searchClause =
+            "WHERE experts.name LIKE ? OR experts.department LIKE ? OR experts.nationalID LIKE ? OR experts.company_name LIKE ? OR experts.security_clearance_number LIKE ?";
+          const searchValue = `%${req.query.search}%`;
+          params.push(searchValue, searchValue, searchValue, searchValue, searchValue);
+        }
+
+        // --- Total count for pagination ---
+        const countQuery = `SELECT COUNT(*) AS total FROM experts ${searchClause}`;
+        const countResult = await query(countQuery, params);
+        const total = countResult[0].total;
+        const totalPages = Math.ceil(total / limit);
+
+        const dataQuery = `SELECT experts.nationalID, experts.name, experts.department, experts.security_clearance_number, experts.company_name, experts.valid_from, experts.valid_through, officers.rank, officers.name as officerName, expert_record.start_date, expert_record.end_date, expert_record.external_officer
                                           FROM experts
                                           LEFT JOIN expert_record
                                           ON expert_record.expertID = experts.nationalID
                                           LEFT JOIN officers
                                           ON expert_record.officerID = officers.id
-                                          `)
+                                        ${searchClause}
+                                        ORDER BY experts.name ASC
+                                        LIMIT ? OFFSET ?
+                                        `;
+        params.push(limit, offset);
+        const experts = await query(dataQuery, params);
 
-            if (experts.length == 0) {
-                return res.status(404).json({
-                    msg: "no experts found"
-                })
-            }
-
-    
-        
-
-
-            
-
-            
-  
-            return res.status(200).json(experts);
-
-
-
-        } catch (err) { 
-            return res.status(500).json({ err: err });
-            
+        if (!experts.length) {
+          return res.status(404).json({ msg: "No experts found" });
         }
+
+        return res.status(200).json({
+          page,
+          limit,
+          total,
+          totalPages,
+          data: experts,
+        });
+      } catch (err) {
+        console.error(err);
+        return res
+          .status(500)
+          .json({
+            message: "An unexpected error occurred",
+            error: err.message,
+          });
+      }
     }
 
         // New function to fetch experts with null end_date
@@ -92,7 +114,6 @@ class ExpertLogController {
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
-
         const query = util.promisify(connection.query).bind(connection);
 
         // Check if the expert exists
@@ -111,19 +132,36 @@ class ExpertLogController {
             });
         }
 
-        // Get the current time to set as visit_end
-        const visitEnd = moment().format("YYYY-MM-DD HH:mm:ss");
+        await withTransaction(async (query) => {
+            const [expert] = await query(
+                "SELECT expertID FROM expert_record WHERE id = ? FOR UPDATE",
+                [req.params.id]
+            );
+            
+            if (!expert) {
+                throw new Error("Expert record not found for locking.");
+            }
 
-        // Update the visit_end field in the database
-        await query(
-            "UPDATE expert_record SET end_date = ? WHERE id = ?",
-            [visitEnd, req.params.id]
-        );
+            if (expert.in_unit === 0) {
+                throw new Error("Expert is already marked as not in unit.");
+            }
 
-                    await query(
-                      "update experts set in_unit = 0 where nationalID = ?",
-                      [checkExpert[0].expertID]
-                    );
+            // Get the current time to set as visit_end
+            const visitEnd = moment().format("YYYY-MM-DD HH:mm:ss");
+
+            // Update the visit_end field in the database
+            await query(
+                "UPDATE expert_record SET end_date = ? WHERE id = ?",
+                [visitEnd, req.params.id]
+            );
+
+            await query(
+                "update experts set in_unit = 0 where nationalID = ?",
+                [checkExpert[0].expertID]
+            );
+            
+            
+        });
 
 
         // Emit the update via socket if needed
@@ -162,24 +200,6 @@ class ExpertLogController {
             return res.status(400).json({ errors: errors.array() });
             }
             
- 
-            const query = util.promisify(connection.query).bind(connection);
-            //  const checkOfficer = await query(
-            // "SELECT * from officer where mil_id = ?",
-            // [req.body.mil_id]
-            //  );
-            
-         
-            
-            //  if (checkOfficer.length > 0) {
-            //     return res.status(400).json({
-            //         errors: [
-            //             {
-            //                 msg: "Military ID already exists"
-            //             }
-            //         ],
-            //     }); 
-            //  }
 
             
 
@@ -200,17 +220,35 @@ class ExpertLogController {
             );
 
             console.log(expertObject.toJSON());
+
+            await withTransaction(async (query) => {
+                // 1) LOCK expert row to prevent race conditions
+                const [expert] = await query(
+                    "SELECT in_unit FROM experts WHERE nationalID = ? FOR UPDATE",
+                    [expertObject.getExpertID()]
+                );
+      
+                if (!expert) throw new Error("Expert not found");
+      
+                // 2) Prevent double arrival
+                if (expert.in_unit === 1) {
+                    throw new Error(
+                        "Expert already inside the unit (duplicate arrival prevented)"
+                    );
+                }
+            
+                
             
 
-            await query("insert into expert_record set start_date = ?, end_date = ?, expertID = ?, officerID = ?, external_officer = ?,loggerID = ?, notes = ?",
-                [expertObject.getStartDate(), expertObject.getEndDate(), expertObject.getExpertID(), expertObject.getOfficerID(), expertObject.getExternalOfficer(), expertObject.getLoggerID(), expertObject.getNotes()]);
+                await query("insert into expert_record set start_date = ?, end_date = ?, expertID = ?, officerID = ?, external_officer = ?,loggerID = ?, notes = ?",
+                    [expertObject.getStartDate(), expertObject.getEndDate(), expertObject.getExpertID(), expertObject.getOfficerID(), expertObject.getExternalOfficer(), expertObject.getLoggerID(), expertObject.getNotes()]);
 
 
                     
-            await query("update experts set in_unit = 1 where nationalID = ?", [expertObject.getExpertID()]);
+                await query("update experts set in_unit = 1 where nationalID = ?", [expertObject.getExpertID()]);
 
 
-
+            });
             req.app.get("io").emit("expertsUpdated");
             return res.status(200).json(expertObject.toJSON());
 
@@ -232,29 +270,6 @@ class ExpertLogController {
             }
 
             
- 
-            const query = util.promisify(connection.query).bind(connection);
-            //  const checkOfficer = await query(
-            // "SELECT * from officer where mil_id = ?",
-            // [req.body.mil_id]
-            //  );
-            
-         
-            
-            //  if (checkOfficer.length > 0) {
-            //     return res.status(400).json({
-            //         errors: [
-            //             {
-            //                 msg: "Military ID already exists"
-            //             }
-            //         ],
-            //     }); 
-            //  }
-
-            
-
-
-           
 
 
             const expertObject = new ExpertRecord(
@@ -271,13 +286,31 @@ class ExpertLogController {
 
             console.log(expertObject.toJSON());
 
-             const expertRecordResult = await query("insert into expert_record set start_date = ?, end_date = ?, expertID = ?, officerID = ?, external_officer = ?, loggerID = ?, notes = ?",
-                [expertObject.getStartDate(), expertObject.getEndDate(), expertObject.getExpertID(), expertObject.getOfficerID(), expertObject.getExternalOfficer(), expertObject.getLoggerID(), expertObject.getNotes()]);
 
-             const expertRecordId = expertRecordResult.insertId;
 
-            await query("update experts set in_unit = 0 where nationalID = ?", [expertObject.getExpertID()]);
+            await withTransaction(async (query) => {
+                // 1) LOCK expert row
+                const [expert] = await query(
+                    "SELECT in_unit FROM experts WHERE nationalID = ? FOR UPDATE",
+                    [expertObject.getExpertID()]
+                );
+      
+                if (!expert) throw new Error("Expert not found");
+      
+                // 2) Prevent double arrival
+                if (expert.in_unit === 0) {
+                    throw new Error(
+                        "Expert already outside the unit (duplicate departure prevented)"
+                    );
+                }
 
+                const expertRecordResult = await query("insert into expert_record set start_date = ?, end_date = ?, expertID = ?, officerID = ?, external_officer = ?, loggerID = ?, notes = ?",
+                    [expertObject.getStartDate(), expertObject.getEndDate(), expertObject.getExpertID(), expertObject.getOfficerID(), expertObject.getExternalOfficer(), expertObject.getLoggerID(), expertObject.getNotes()]);
+
+                const expertRecordId = expertRecordResult.insertId;
+
+                await query("update experts set in_unit = 0 where nationalID = ?", [expertObject.getExpertID()]);
+            });
 
 
             req.app.get("io").emit("expertsUpdated");

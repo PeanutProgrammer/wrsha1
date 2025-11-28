@@ -1,196 +1,226 @@
-const { validationResult } = require('express-validator');
-const connection = require("../db/dbConnection");
+const { validationResult } = require("express-validator");
 const util = require("util");
+const connection = require("../db/dbConnection");
 const SoldierLog = require("../models/soldierLog");
-
+const withTransaction = require("../utils/withTransaction");
 
 class SoldierLogController {
+  // ============================================================
+  // GET Soldiers Log
+  // ============================================================
+  static async getSoldiersLog(req, res) {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
 
+      const query = util.promisify(connection.query).bind(connection);
 
-    static async getSoldiersLog(req, res) {
-        try {
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-            }
+      // --- Pagination params ---
+      const page = parseInt(req.query.page) || 1; // default to page 1
+      const limit = parseInt(req.query.limit) || 20; // default 20 rows per page
+      const offset = (page - 1) * limit;
 
-            const query = util.promisify(connection.query).bind(connection);
-            // let search = ""
-            // if (req.query.search) {
-            //     search =  `where name LIKE '%${req.query.search}%'`
-            // }
-            const soldiers = await query(`SELECT soldiers.mil_id, soldiers.rank, soldiers.name, soldiers.department, soldier_log.event_type, soldier_log.event_time, leave_type.name AS reason, soldier_log.notes
+      // --- Search params ---
+      let searchClause = "";
+      const params = [];
+      if (req.query.search) {
+        searchClause =
+          "WHERE soldiers.name LIKE ? OR soldiers.department LIKE ? OR soldiers.mil_id LIKE ?";
+        const searchValue = `%${req.query.search}%`;
+        params.push(searchValue, searchValue, searchValue);
+      }
+
+      // --- Total count for pagination ---
+      const countQuery = `SELECT COUNT(*) AS total FROM soldiers ${searchClause}`;
+      const countResult = await query(countQuery, params);
+      const total = countResult[0].total;
+      const totalPages = Math.ceil(total / limit);
+
+      // --- Data query with pagination ---
+      const dataQuery = `SELECT soldiers.mil_id, soldiers.rank, soldiers.name, soldiers.department, soldier_log.event_type, soldier_log.event_time, leave_type.name AS reason, soldier_log.notes
                                           FROM soldiers
                                           LEFT JOIN soldier_log
                                           ON soldier_log.soldierID = soldiers.id
+                                          LEFT JOIN soldier_leave_details
+                                          ON soldier_leave_details.movementID = soldier_log.id
                                           LEFT JOIN leave_type
-                                          ON soldier_log.leaveTypeID = leave_type.id`)
+                                          ON soldier_leave_details.leaveTypeID = leave_type.id
+                                          ${searchClause}
+                                          order by soldier_log.event_time DESC
+                                          LIMIT ? OFFSET ?`;
+      params.push(limit, offset);
 
-            if (soldiers.length == 0) {
-                return res.status(404).json({
-                    msg: "no soldiers found"
-                })
-            }
+      const soldiers = await query(dataQuery, params);
 
-    
-        
+      if (!soldiers.length) {
+        return res.status(404).json({ msg: "no soldiers found" });
+      }
 
-
-            
-
-            
-  
-            return res.status(200).json(soldiers);
-
-
-
-        } catch (err) { 
-            return res.status(500).json({ err: err });
-            
-        }
+      return res.status(200).json({
+        page,
+        limit,
+        total,
+        totalPages,
+        data: soldiers,
+      });
+    } catch (err) {
+      console.error(err);
+      return res
+        .status(500)
+        .json({ message: "An unexpected error occurred", error: err.message });
     }
+  }
 
-
-      static async createArrival(req, res) {
-        try {
-
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-            }
-            
- 
-            const query = util.promisify(connection.query).bind(connection);
-            //  const checkOfficer = await query(
-            // "SELECT * from officer where mil_id = ?",
-            // [req.body.mil_id]
-            //  );
-            
-         
-            
-            //  if (checkOfficer.length > 0) {
-            //     return res.status(400).json({
-            //         errors: [
-            //             {
-            //                 msg: "Military ID already exists"
-            //             }
-            //         ],
-            //     }); 
-            //  }
-
-            
-
-
-           
-
-
-            
-            const soldierObject = new SoldierLog(
-                req.body.event_type,
-                req.body.event_time,
-                req.body.soldierID,
-                req.body.leaveTypeID,
-                req.body.notes,
-                req.body.loggerID
-            );
-
-            console.log(soldierObject.toJSON());
-            
-
-            await query("insert into soldier_log set event_type = ?, event_time = ?, soldierID = ?, leaveTypeID = ?, notes = ?, loggerID = ?",
-                [soldierObject.getEventType(), soldierObject.getEventTime(), soldierObject.getSoldierID(), soldierObject.getLeaveTypeID(), soldierObject.getNotes(), soldierObject.getLoggerID()]);
-
-
-            
-            await query("update soldiers set in_unit = 1 where id = ?", [soldierObject.getSoldierID()]);
-
-
-            req.app.get("io").emit("soldiersUpdated");
-            return res.status(200).json(soldierObject.toJSON());
-
-
-        } catch (err) {
-    console.error(err); // Log the error
-    return res.status(500).json({ message: 'An unexpected error occurred', error: err.message });
-}
-    }
-
-
-      static async createDeparture(req, res) {
-        try {
-
-          const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-        console.log(errors.array()); // Log errors
+  // ============================================================
+  // CREATE ARRIVAL  (Safe, Atomic)
+  // ============================================================
+  static async createArrival(req, res) {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
-            }
+      }
 
-            
- 
-            const query = util.promisify(connection.query).bind(connection);
-            //  const checkOfficer = await query(
-            // "SELECT * from officer where mil_id = ?",
-            // [req.body.mil_id]
-            //  );
-            
-         
-            
-            //  if (checkOfficer.length > 0) {
-            //     return res.status(400).json({
-            //         errors: [
-            //             {
-            //                 msg: "Military ID already exists"
-            //             }
-            //         ],
-            //     }); 
-            //  }
+      const soldierObject = new SoldierLog(
+        req.body.event_type,
+        req.body.event_time,
+        req.body.soldierID,
+        req.body.leaveTypeID,
+        req.body.notes,
+        req.body.loggerID
+      );
 
-            
+      await withTransaction(async (query) => {
+        // 1) LOCK soldier row to prevent race conditions
+        const [soldier] = await query(
+          "SELECT in_unit FROM soldiers WHERE id = ? FOR UPDATE",
+          [soldierObject.getSoldierID()]
+        );
 
+        if (!soldier) throw new Error("Soldier not found");
 
-           
+        // 2) Prevent double arrival
+        if (soldier.in_unit === 1) {
+          throw new Error(
+            "Soldier already inside the unit (duplicate arrival prevented)"
+          );
+        }
 
+        // 3) Insert movement log
+        const soldierLogResult = await query(
+          `INSERT INTO soldier_log SET event_type=?, event_time=?, soldierID=?, notes=?, loggerID=?`,
+          [
+            soldierObject.getEventType(),
+            soldierObject.getEventTime(),
+            soldierObject.getSoldierID(),
+            soldierObject.getNotes(),
+            soldierObject.getLoggerID(),
+          ]
+        );
+          
+          const soldierLogID = soldierLogResult.insertId;
 
-            
-            const soldierObject = new SoldierLog(
-                req.body.event_type,
-                req.body.event_time,
-                req.body.soldierID,
-                req.body.leaveTypeID,
-                req.body.notes,
-                req.body.loggerID
-            );
+        // 4) Update status
+        await query("UPDATE soldiers SET in_unit = 1 WHERE id = ?", [
+          soldierObject.getSoldierID(),
+        ]);
+          
+              await query(
+                "insert into soldier_leave_details set movementID = ?, leaveTypeID = ?, soldierID = ?, start_date = ?, end_date = ?, destination = ?",
+                [
+                  soldierLogID,
+                  req.body.leaveTypeID,
+                  req.body.soldierID,
+                  req.body.start_date,
+                  req.body.end_date,
+                  req.body.destination,
+                ]
+              );
+      });
 
-            
+      req.app.get("io").emit("soldiersUpdated");
+      return res.status(200).json(soldierObject.toJSON());
+    } catch (err) {
+      return res.status(500).json({ error: err.message });
+    }
+  }
 
-            console.log(soldierObject.toJSON());
-            
+  // ============================================================
+  // CREATE DEPARTURE  (Safe, Atomic)
+  // ============================================================
+  static async createDeparture(req, res) {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
 
-             const officerLogResult = await query("insert into soldier_log set event_type = ?, event_time = ?, soldierID = ?, leaveTypeID = ?, notes = ?, loggerID = ?",
-                [soldierObject.getEventType(), soldierObject.getEventTime(), soldierObject.getSoldierID(), soldierObject.getLeaveTypeID(), soldierObject.getNotes(), soldierObject.getLoggerID()]);
-            
-             const officerLogId = officerLogResult.insertId;
+      const soldierObject = new SoldierLog(
+        req.body.event_type,
+        req.body.event_time,
+        req.body.soldierID,
+        req.body.leaveTypeID,
+        req.body.notes,
+        req.body.loggerID
+      );
 
-            await query("update soldiers set in_unit = 0 where id = ?", [soldierObject.getSoldierID()]);
+      await withTransaction(async (query) => {
+        // 1) LOCK soldier row
+        const [soldier] = await query(
+          "SELECT in_unit FROM soldiers WHERE id = ? FOR UPDATE",
+          [soldierObject.getSoldierID()]
+        );
 
-            await query("insert into soldier_leave_details set movementID = ?, start_date = ?, end_date = ?, destination = ?", [officerLogId, req.body.start_date, req.body.end_date, req.body.destination]);
+        if (!soldier) throw new Error("Soldier not found");
 
-            req.app.get("io").emit("soldiersUpdated");
-            return res.status(200).json(soldierObject.toJSON());
+        // 2) Prevent leaving if already outside
+        if (soldier.in_unit === 0) {
+          throw new Error(
+            "Soldier is already outside (duplicate departure prevented)"
+          );
+        }
 
+        // 3) Insert departure log
+        const result = await query(
+          `INSERT INTO soldier_log SET event_type=?, event_time=?, soldierID=?, notes=?, loggerID=?`,
+          [
+            soldierObject.getEventType(),
+            soldierObject.getEventTime(),
+            soldierObject.getSoldierID(),
+            soldierObject.getNotes(),
+            soldierObject.getLoggerID(),
+          ]
+        );
 
-        } catch (err) {
-    console.error(err); // Log the error
-    return res.status(500).json({ message: 'An unexpected error occurred', error: err.message });
+        const movementID = result.insertId;
+
+        // 4) Mark soldier as outside
+        await query("UPDATE soldiers SET in_unit = 0 WHERE id = ?", [
+          soldierObject.getSoldierID(),
+        ]);
+
+        // 5) Insert leave data
+        await query(
+          `INSERT INTO soldier_leave_details SET movementID=?, leaveTypeID = ?, soldierID = ?, start_date=?, end_date=?, destination=?`,
+          [
+              movementID,
+              req.body.leaveTypeID,
+              req.body.soldierID,
+            req.body.start_date,
+            req.body.end_date,
+            req.body.destination,
+          ]
+        );
+      });
+
+      req.app.get("io").emit("soldiersUpdated");
+      return res.status(200).json(soldierObject.toJSON());
+    } catch (err) {
+      return res.status(500).json({ error: err.message });
+    }
+  }
 }
-
-    }
-
-
-
-    
-    }
-
-
 
 module.exports = SoldierLogController;

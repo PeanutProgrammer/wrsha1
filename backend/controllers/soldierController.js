@@ -252,8 +252,7 @@ class SoldierController {
 
       console.log("hey");
 
-      const soldiers =
-        await query(`
+      const soldiers = await query(`
 SELECT 
     o.mil_id,
     o.rank,
@@ -262,16 +261,17 @@ SELECT
     o.in_unit,
     lt.name AS tmam
 FROM soldiers o
-LEFT JOIN (
-    SELECT soldierID, MAX(event_time) AS latest_event
-    FROM soldier_log
-    GROUP BY soldierID
-) lastLog
-    ON lastLog.soldierID = o.id
-LEFT JOIN soldier_log ol
-    ON ol.soldierID = o.id AND ol.event_time = lastLog.latest_event
+LEFT JOIN soldier_leave_details old
+    ON old.id = (
+        SELECT id
+        FROM soldier_leave_details
+        WHERE soldierID = o.id
+        ORDER BY id DESC
+        LIMIT 1
+    )
 LEFT JOIN leave_type lt
-    ON lt.id = ol.leaveTypeID
+    ON lt.id = old.leaveTypeID
+ORDER BY o.mil_id;
 `);
 
       console.log(soldiers[0]);
@@ -326,14 +326,15 @@ LEFT JOIN leave_type lt
       const soldierTmam = await query(
         `SELECT soldiers.mil_id ,soldiers.rank,soldiers.name, soldiers.department, soldiers.join_date, leave_type.name AS 'tmam', soldier_leave_details.start_date, soldier_leave_details.end_date, soldier_leave_details.destination, soldier_log.notes
                                           FROM soldiers
-                                          LEFT JOIN soldier_log
-                                          ON soldiers.id = soldier_log.soldierID
-                                          LEFT JOIN leave_type
-                                          on leave_type.id = soldier_log.leaveTypeID
                                           LEFT JOIN soldier_leave_details
-                                          ON soldier_leave_details.MovementID = soldier_log.id
+                                          ON soldiers.id = soldier_leave_details.soldierID
+                                          LEFT JOIN leave_type
+                                          ON leave_type.id = soldier_leave_details.leaveTypeID
+                                          LEFT JOIN soldier_log
+                                          ON soldier_leave_details.movementID = soldier_log.id
+                                          
                                           WHERE soldiers.mil_id = ?
-                                          ORDER BY soldier_log.id DESC
+                                          ORDER BY soldier_leave_details.id DESC
                                           `,
         [soldierObject.getMilID()]
       );
@@ -458,7 +459,44 @@ LEFT JOIN leave_type lt
       if (req.query.search) {
         search = `where name LIKE '%${req.query.search}%'`;
       }
-      const soldiers = await query(`select * from soldiers where in_unit = 0 `);
+      const soldiers = await query(`SELECT
+    o.id,
+    o.mil_id,
+    o.rank,
+    o.name,
+    o.department,
+    o.in_unit,
+    old.leaveTypeID,
+    lt.name AS leave_type_name,
+    ol.event_time
+FROM soldiers o
+
+-- latest log for other purposes (unchanged)
+LEFT JOIN (
+    SELECT soldierID, MAX(event_time) AS latest_event
+    FROM soldier_log
+    GROUP BY soldierID
+) lastLog
+    ON lastLog.soldierID = o.id
+
+LEFT JOIN soldier_log ol
+    ON ol.soldierID = o.id 
+    AND ol.event_time = lastLog.latest_event
+
+-- 🔥 Get the LATEST leave_details row for each officer
+LEFT JOIN soldier_leave_details old
+    ON old.id = (
+        SELECT id
+        FROM soldier_leave_details
+        WHERE soldierID = o.id
+        ORDER BY id DESC
+        LIMIT 1
+    )
+
+LEFT JOIN leave_type lt
+    ON lt.id = old.leaveTypeID
+
+WHERE o.in_unit = 0;`);
 
       if (soldiers.length == 0) {
         return res.status(404).json({

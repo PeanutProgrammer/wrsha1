@@ -2,6 +2,7 @@ const { validationResult } = require('express-validator');
 const connection = require("../db/dbConnection");
 const util = require("util");
 const OfficerLog = require("../models/officerLog");
+const withTransaction = require("../utils/withTransaction");
 
 
 class OfficerLogController {
@@ -67,18 +68,36 @@ class OfficerLogController {
 
 
     static async getOfficersLog(req, res) {
-        try {
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-            }
+      try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+          return res.status(400).json({ errors: errors.array() });
+        }
 
-            const query = util.promisify(connection.query).bind(connection);
-            // let search = ""
-            // if (req.query.search) {
-            //     search =  `where name LIKE '%${req.query.search}%'`
-            // }
-            const officers = await query(`SELECT officers.mil_id, officers.rank, officers.name, officers.department, officer_log.event_type, officer_log.event_time, leave_type.name AS reason, officer_log.notes
+        const query = util.promisify(connection.query).bind(connection);
+        // --- Pagination params ---
+        const page = parseInt(req.query.page) || 1; // default to page 1
+        const limit = parseInt(req.query.limit) || 20; // default 20 rows per page
+        const offset = (page - 1) * limit;
+
+        // --- Search params ---
+        let searchClause = "";
+        const params = [];
+        if (req.query.search) {
+          searchClause =
+            "WHERE officers.name LIKE ? OR officers.department LIKE ? OR officers.mil_id LIKE ?";
+          const searchValue = `%${req.query.search}%`;
+          params.push(searchValue, searchValue, searchValue);
+        }
+
+        // --- Total count for pagination ---
+        const countQuery = `SELECT COUNT(*) AS total FROM officers ${searchClause}`;
+        const countResult = await query(countQuery, params);
+        const total = countResult[0].total;
+        const totalPages = Math.ceil(total / limit);
+
+        // --- Data query with pagination ---
+        const dataQuery = `SELECT officers.mil_id, officers.rank, officers.name, officers.department, officer_log.event_type, officer_log.event_time, leave_type.name AS reason, officer_log.notes
                                           FROM officers
                                           LEFT JOIN officer_log
                                           ON officer_log.officerID = officers.id
@@ -86,30 +105,32 @@ class OfficerLogController {
                                           ON officer_leave_details.movementID = officer_log.id
                                           LEFT JOIN leave_type
                                           ON officer_leave_details.leaveTypeID = leave_type.id
-                                          order by officer_log.event_time DESC`)
+                                          ${searchClause}
+                                          order by officer_log.event_time DESC
+                                          LIMIT ? OFFSET ?`;
+        params.push(limit, offset);
+        const officers = await query(dataQuery, params);
 
-            if (officers.length == 0) {
-                return res.status(404).json({
-                    msg: "no officers found"
-                })
-            }
-
-    
-        
-
-
-            
-
-            
-  
-            return res.status(200).json(officers);
-
-
-
-        } catch (err) { 
-            return res.status(500).json({ err: err });
-            
+        if (!officers.length) {
+          return res.status(404).json({ msg: "No officers found" });
         }
+
+        return res.status(200).json({
+          page,
+          limit,
+          total,
+          totalPages,
+          data: officers,
+        });
+      } catch (err) {
+        console.error(err);
+        return res
+          .status(500)
+          .json({
+            message: "An unexpected error occurred",
+            error: err.message,
+          });
+      }
     }
 
 
@@ -164,25 +185,7 @@ class OfficerLogController {
             }
             
  
-            const query = util.promisify(connection.query).bind(connection);
-            //  const checkOfficer = await query(
-            // "SELECT * from officer where mil_id = ?",
-            // [req.body.mil_id]
-            //  );
-            
-         
-            
-            //  if (checkOfficer.length > 0) {
-            //     return res.status(400).json({
-            //         errors: [
-            //             {
-            //                 msg: "Military ID already exists"
-            //             }
-            //         ],
-            //     }); 
-            //  }
 
-            
 
 
            
@@ -200,34 +203,53 @@ class OfficerLogController {
             console.log(officerObject.toJSON());
             
 
-            const officerLogResult =    await query(
-              "insert into officer_log set event_type = ?, event_time = ?, officerID = ?, notes = ?, loggerID = ?",
-              [
-                officerObject.getEventType(),
-                officerObject.getEventTime(),
+
+            await withTransaction(async (query) => {
+              // 1) LOCK officer row to prevent race conditions
+              const [officer] = await query(
+                "SELECT in_unit FROM officers WHERE id = ? FOR UPDATE",
+                [officerObject.getOfficerID()]
+              );
+              // 2) Validate officer is not already in unit
+              if (officer.in_unit === 1) {
+                return res.status(400).json({
+                  errors: [
+                    {
+                      msg: "Officer is already in unit",
+                    },
+                  ],
+                });
+              }
+
+              const officerLogResult = await query(
+                "insert into officer_log set event_type = ?, event_time = ?, officerID = ?, notes = ?, loggerID = ?",
+                [
+                  officerObject.getEventType(),
+                  officerObject.getEventTime(),
+                  officerObject.getOfficerID(),
+                  officerObject.getNotes(),
+                  officerObject.getLoggerID(),
+                ]
+              );
+
+              const officerLogId = officerLogResult.insertId;
+
+              await query("update officers set in_unit = 1 where id = ?", [
                 officerObject.getOfficerID(),
-                officerObject.getNotes(),
-                officerObject.getLoggerID(),
-              ]
-            );
+              ]);
 
-            const officerLogId = officerLogResult.insertId;
-
-            
-            await query("update officers set in_unit = 1 where id = ?", [officerObject.getOfficerID()]);
-
-             await query(
-               "insert into officer_leave_details set movementID = ?, leaveTypeID = ?, officerID = ?, start_date = ?, end_date = ?, destination = ?",
-               [
-                 officerLogId,
-                   req.body.leaveTypeID,
-                 req.body.officerID,
-                 req.body.start_date,
-                 req.body.end_date,
-                 req.body.destination,
-               ]
-             );
-
+              await query(
+                "insert into officer_leave_details set movementID = ?, leaveTypeID = ?, officerID = ?, start_date = ?, end_date = ?, destination = ?",
+                [
+                  officerLogId,
+                  req.body.leaveTypeID,
+                  req.body.officerID,
+                  req.body.start_date,
+                  req.body.end_date,
+                  req.body.destination,
+                ]
+              );
+            });
 
             req.app.get("io").emit("officersUpdated");
             return res.status(200).json(officerObject.toJSON());
@@ -250,28 +272,7 @@ class OfficerLogController {
 
             
  
-            const query = util.promisify(connection.query).bind(connection);
-            //  const checkOfficer = await query(
-            // "SELECT * from officer where mil_id = ?",
-            // [req.body.mil_id]
-            //  );
-            
-         
-            
-            //  if (checkOfficer.length > 0) {
-            //     return res.status(400).json({
-            //         errors: [
-            //             {
-            //                 msg: "Military ID already exists"
-            //             }
-            //         ],
-            //     }); 
-            //  }
-
-            
-
-
-           
+ 
 
 
             
@@ -288,15 +289,34 @@ class OfficerLogController {
             console.log(officerObject.toJSON());
             
 
-             const officerLogResult = await query("insert into officer_log set event_type = ?, event_time = ?, officerID = ?, notes = ?, loggerID = ?",
-                [officerObject.getEventType(), officerObject.getEventTime(), officerObject.getOfficerID(), officerObject.getNotes(), officerObject.getLoggerID()]);
+
+            await withTransaction(async (query) => {
+                // 1) LOCK officer row to prevent race conditions
+                const [officer] = await query(
+                    "SELECT in_unit FROM officers WHERE id = ? FOR UPDATE",
+                    [officerObject.getOfficerID()]
+                );
+                // 2) Validate officer is not already in unit
+                if (officer.in_unit === 0) {
+                    return res.status(400).json({
+                        errors: [
+                            {
+                                msg: "Officer is already outside",
+                            },
+                        ],
+                    });
+                }
+
+                const officerLogResult = await query("insert into officer_log set event_type = ?, event_time = ?, officerID = ?, notes = ?, loggerID = ?",
+                    [officerObject.getEventType(), officerObject.getEventTime(), officerObject.getOfficerID(), officerObject.getNotes(), officerObject.getLoggerID()]);
             
-             const officerLogId = officerLogResult.insertId;
+                const officerLogId = officerLogResult.insertId;
 
-            await query("update officers set in_unit = 0 where id = ?", [officerObject.getOfficerID()]);
+                await query("update officers set in_unit = 0 where id = ?", [officerObject.getOfficerID()]);
 
-            await query("insert into officer_leave_details set movementID = ?, leaveTypeID = ?, officerID = ?, start_date = ?, end_date = ?, destination = ?", [officerLogId, req.body.leaveTypeID , req.body.officerID,req.body.start_date, req.body.end_date, req.body.destination]);
+                await query("insert into officer_leave_details set movementID = ?, leaveTypeID = ?, officerID = ?, start_date = ?, end_date = ?, destination = ?", [officerLogId, req.body.leaveTypeID, req.body.officerID, req.body.start_date, req.body.end_date, req.body.destination]);
 
+            });
             req.app.get("io").emit("officersUpdated");
             return res.status(200).json(officerObject.toJSON());
 
@@ -309,75 +329,6 @@ class OfficerLogController {
     }
 
 
-//           static async updateTmam(req, res) {
-//         try {
-
-//         const errors = validationResult(req);
-//         if (!errors.isEmpty()) {
-//         console.log(errors.array()); // Log errors
-//         return res.status(400).json({ errors: errors.array() });
-//             }
-
-            
- 
-//             const query = util.promisify(connection.query).bind(connection);
-//             const checkOfficer = await query("SELECT * from officer_leave_details where id = ?", [
-//         req.params.id,
-//       ]);
-
-//       if (checkOfficer.length == 0) {
-//         return res.status(400).json({
-//           errors: [
-//             {
-//               msg: "Officer does not exist",
-//             },
-//           ],
-//         });
-//       }
-//             //  const checkOfficer = await query(
-//             // "SELECT * from officer where mil_id = ?",
-//             // [req.body.mil_id]
-//             //  );
-            
-         
-            
-//             //  if (checkOfficer.length > 0) {
-//             //     return res.status(400).json({
-//             //         errors: [
-//             //             {
-//             //                 msg: "Military ID already exists"
-//             //             }
-//             //         ],
-//             //     }); 
-//             //  }
-
-            
-
-
-           
-
-
-            
-
-
-            
-
-//             console.log(officerObject.toJSON());
-            
-
-//              await query("update officer_leave_details set leaveTypeID = ?, start_date = ?, end_Date = ?, destination = ?",
-//                 [req.body.leaveTypeID, req.body.start_date, req.body.end_date,req.body.destination]);
-
-//             req.app.get("io").emit("officersUpdated");
-//             return res.status(200).json(officerObject.toJSON());
-
-
-//         } catch (err) {
-//     console.error(err); // Log the error
-//     return res.status(500).json({ message: 'An unexpected error occurred', error: err.message });
-// }
-
-//     }
 
 
     static async getOneTmam(req, res) {

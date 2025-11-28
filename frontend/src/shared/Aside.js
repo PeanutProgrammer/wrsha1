@@ -48,6 +48,9 @@ const Aside = ({ setCollapsed, collapsed }) => {
             <li className="tabs">
               <Link to={"guests"}>الزوار</Link>
             </li>
+            <li className="tabs">
+              <Link to={"delegates"}>المناديب</Link>
+            </li>
           </>
         )}
 
@@ -73,6 +76,9 @@ const Aside = ({ setCollapsed, collapsed }) => {
             </li>
             <li className="tabs">
               <Link to={"security-guests"}>الزوار</Link>
+            </li>
+            <li className="tabs">
+              <Link to={"security-delegates"}>المناديب</Link>
             </li>
             <li className="tabs">
               <Link to={"security-unit"}>المتواجدين بالوحدة</Link>
@@ -102,6 +108,9 @@ const Aside = ({ setCollapsed, collapsed }) => {
             </li>
             <li className="tabs">
               <Link to={"guests"}>الزوار</Link>
+            </li>
+            <li className="tabs">
+              <Link to={"delegates"}>المناديب</Link>
             </li>
             <li className="tabs">
               <Link to={"past-workers"}>العاملين السابقين</Link>

@@ -18,19 +18,19 @@ class UnitController {
             // if (req.query.search) {
             //     search =  `where name LIKE '%${req.query.search}%'`
             // }
-            const all = await query(`SELECT mil_id, rank, name, department, join_date, in_unit, 'officer' AS role
+            const all = await query(`SELECT mil_id, officers.rank, name, department, join_date, in_unit, 'officer' AS role
                                     FROM officers
                                     WHERE in_unit = 1
 
                                     UNION
 
-                                    SELECT mil_id, rank, name, department, join_date, in_unit, 'nco' AS role
+                                    SELECT mil_id, ncos.rank, name, department, join_date, in_unit, 'nco' AS role
                                     FROM ncos
                                     WHERE in_unit = 1
 
                                     UNION
 
-                                    SELECT mil_id, rank, name, department, join_date, in_unit, 'soldier' AS role
+                                    SELECT mil_id, soldiers.rank, name, department, join_date, in_unit, 'soldier' AS role
                                     FROM soldiers
                                     WHERE in_unit = 1;
                                                         `)

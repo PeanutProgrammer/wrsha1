@@ -11,7 +11,6 @@ import moment from 'moment';
 import Select from 'react-select'; // Importing react-select
 
 // Validation schema using yup
-// Validation schema using yup
 const schema = yup.object().shape({
   notes: yup.string().max(500, "الملاحظات يجب ألا تتجاوز 500 حرف").optional(),
 

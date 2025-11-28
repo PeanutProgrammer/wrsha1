@@ -5,10 +5,9 @@ import axios from 'axios';
 import { getAuthUser } from '../../helper/Storage';
 import moment from 'moment';
 
-const Civillians = () => {
+const Delegates = () => {
   const auth = getAuthUser();
-    const now = moment().format("YYYY-MM-DD HH:mm:ss");
-  const [civillians, setCivillians] = useState({
+  const [Delegates, setDelegates] = useState({
     loading: true,
     err: null,
     success: null, // ✅ Added success message
@@ -21,27 +20,27 @@ const Civillians = () => {
 
   // ✅ Modal state
   const [showConfirm, setShowConfirm] = useState(false);
-  const [selectedCivillian, setSelectedCivillian] = useState(null);
+  const [selectedDelegate, setSelectedDelegate] = useState(null);
 
   useEffect(() => {
-    setCivillians({ ...civillians, loading: true });
+    setDelegates({ ...Delegates, loading: true });
     axios
-      .get('http://localhost:4001/civillian/', {
+      .get('http://localhost:4001/delegate/', {
         headers: {
           token: auth.token,
         },
       })
       .then((resp) => {
-        setCivillians({
-          ...civillians,
+        setDelegates({
+          ...Delegates,
           results: resp.data,
           loading: false,
           err: null,
         });
       })
       .catch((err) => {
-        setCivillians({
-          ...civillians,
+        setDelegates({
+          ...Delegates,
           loading: false,
           err:
             err.response
@@ -50,59 +49,96 @@ const Civillians = () => {
         });
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [civillians.reload]);
+  }, [Delegates.reload]);
 
   // ✅ Show confirmation modal before deleting
-  const handleDeleteClick = (civillian) => {
-    setSelectedCivillian(civillian);
+  const handleDeleteClick = (delegate) => {
+    setSelectedDelegate(delegate);
     setShowConfirm(true);
   };
 
   // ✅ Delete confirmation
   const confirmDelete = () => {
-    if (!selectedCivillian) return;
+    if (!selectedDelegate) return;
 
     axios
-      .delete('http://localhost:4001/civillian/' + selectedCivillian.mil_id, {
+      .delete('http://localhost:4001/delegate/' + selectedDelegate.id, {
         headers: {
           token: auth.token,
         },
       })
       .then(() => {
         setShowConfirm(false);
-        setSelectedCivillian(null);
+        setSelectedDelegate(null);
 
         // ✅ Show success message
-        setCivillians({
-          ...civillians,
-          reload: civillians.reload + 1,
-          success: 'تم حذف المدني بنجاح ✅',
+        setDelegates({
+          ...Delegates,
+          reload: Delegates.reload + 1,
+          success: 'تم حذف المندوب بنجاح ✅',
           err: null,
         });
 
         // ✅ Hide message after 3 seconds
         setTimeout(() => {
-          setCivillians((prev) => ({ ...prev, success: null }));
+          setDelegates((prev) => ({ ...prev, success: null }));
         }, 3000);
       })
       .catch((err) => {
-        setCivillians({
-          ...civillians,
+        setDelegates({
+          ...Delegates,
           err:
             err.response?.data?.errors ||
-            'حدث خطأ أثناء محاولة حذف المدني.',
+            'حدث خطأ أثناء محاولة حذف المندوب.',
         });
         setShowConfirm(false);
+      });
+  };
+
+  // ✅ Function to end the visit (update visit_end)
+  const endVisit = (delegateId) => {
+    const visitEnd = moment().format("YYYY-MM-DD HH:mm:ss");  // Current time
+
+    axios
+      .put(`http://localhost:4001/delegate/end-visit/${delegateId}`, { visit_end: visitEnd }, {
+        headers: {
+          token: auth.token,
+        },
+      })
+      .then((response) => {
+        // Refresh the delegate data after updating
+        setDelegates({
+          ...Delegates,
+          reload: Delegates.reload + 1,
+          success: 'تم إنهاء الزيارة بنجاح ✅',
+          err: null,
+        });
+
+        // ✅ Hide message after 3 seconds
+        setTimeout(() => {
+          setDelegates((prev) => ({ ...prev, success: null }));
+        }, 3000);
+      })
+      .catch((err) => {
+        setDelegates({
+          ...Delegates,
+          err:
+            err.response?.data?.errors ||
+            'حدث خطأ أثناء محاولة إنهاء الزيارة.',
+        });
       });
   };
 
   // ✅ Pagination logic
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = civillians.results
+  const currentRecords = Delegates.results.slice(
+    indexOfFirstRecord,
+    indexOfLastRecord
+  );
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
-  const totalPages = Math.ceil(civillians.results.length / recordsPerPage);
+  const totalPages = Math.ceil(Delegates.results.length / recordsPerPage);
   const pageNumbers = [];
   for (let i = 1; i <= totalPages; i++) {
     pageNumbers.push(i);
@@ -111,23 +147,23 @@ const Civillians = () => {
   return (
     <div className="Officers p-5">
       <div className="header d-flex justify-content-between mb-3">
-        <h3 className="text-center mb-3">إدارة المدنيين</h3>
+        <h3 className="text-center mb-3">إدارة المناديب</h3>
         <Link to={'../add'} className="btn btn-success mb-4">
-          إنشاء مدني جديد +
+          إنشاء مندوب جديد +
         </Link>
       </div>
 
       {/* ✅ Success Message */}
-      {civillians.success && (
+      {Delegates.success && (
         <Alert variant="success" className="p-2 text-center">
-          {civillians.success}
+          {Delegates.success}
         </Alert>
       )}
 
       {/* ❌ Error Message */}
-      {civillians.err && (
+      {Delegates.err && (
         <Alert variant="danger" className="p-2 text-center">
-          {civillians.err}
+          {Delegates.err}
         </Alert>
       )}
 
@@ -135,66 +171,47 @@ const Civillians = () => {
         <Table striped bordered hover>
           <thead>
             <tr>
-              <th>الرقم القومي</th>
-              <th>الإسم</th>
-              <th>الورشة / الفرع</th>
-              <th>تاريخ الضم</th>
-              <th>رقم التصديق الأمني</th>
-              <th>الفترة من</th>
-              <th>الفترة إلى</th>
-              <th>حالة التصديق</th>
-              <th>التمام</th>
+              <th>#</th>
+              <th>الرتبة / الدرجة</th>
+              <th>الاسم</th>
+              <th>اسم الوحدة</th>
+              <th>وقت الدخول</th>
+              <th>وقت الخروج</th>
+              <th>سبب الزيارة</th>
               <th>الإجراءات</th>
             </tr>
           </thead>
           <tbody>
-            {currentRecords.map((civillian) => (
-              <tr key={civillian.nationalID}>
-                <td>{civillian.nationalID}</td>
-                <td>{civillian.name}</td>
-                <td>{civillian.department}</td>
-                <td>{moment(civillian.join_date).format('YYYY-MM-DD')}</td>
-                <td>{civillian.security_clearance_number}</td>
-                <td>{moment(civillian.valid_from).format('YYYY-MM-DD')}</td>
-                <td>{moment(civillian.valid_through).format('YYYY-MM-DD')}</td>
-                <td
-                                className={
-                    moment(civillian.valid_from).isBefore(now) && moment(civillian.valid_through).isAfter(now)
-                      ? 'bg-success text-white' // Valid: green
-                      : moment(civillian.valid_through).isBefore(now)
-                      ? 'bg-danger text-white' // Expired: red
-                      : moment(civillian.valid_from).isAfter(now)
-                      ? 'bg-warning text-dark'  // Not started yet: yellow
-                      : 'bg-danger text-white'  // fallback
-                  }> {moment(civillian.valid_from).isBefore(now) && moment(civillian.valid_through).isAfter(now)
-                    ? 'ساري'
-                    : moment(civillian.valid_through).isBefore(now)
-                    ? 'منتهي'
-                    : moment(civillian.valid_from).isAfter(now)
-                    ? 'لم يبدأ بعد'  // Optional, if you want to display something for experts who haven't started yet
-                    : 'منتهي' // fallback for invalid state
-                  }</td>
-                <td>{civillian.in_unit ? 'متواجد' : 'غير موجود'}</td>
+            {currentRecords.map((delegate) => (
+              <tr key={delegate.id}>
+                <td>{delegate.id}</td>
+                <td>{delegate.rank}</td>
+                <td>{delegate.name}</td>
+                <td>{delegate.unit}</td>
+                <td>{moment(delegate.visit_start).format('YYYY-MM-DD HH:mm')}</td>
+                {/* Conditionally show visit_end */}
+                <td>{delegate.visit_end ? moment(delegate.visit_end).format('YYYY-MM-DD HH:mm') : 'لا يوجد'}</td>
+                <td>{delegate.notes ? delegate.notes : "لا يوجد"}</td>
+
                 <td>
                   <div className="action-buttons">
                     <button
                       className="btn btn-sm btn-danger"
-                      onClick={() => handleDeleteClick(civillian)}
+                      onClick={() => handleDeleteClick(delegate)}
                     >
                       حذف
                     </button>
-                    <Link
-                      to={`../${civillian.id}`}
-                      className="btn btn-sm btn-primary"
-                    >
-                      تعديل
-                    </Link>
-                    <Link
-                      to={`../details/${civillian.id}`}
-                      className="btn btn-sm btn-primary"
-                    >
-                      تفاصيل
-                    </Link>
+
+
+                    {/* Add End Visit button */}
+                    {!delegate.visit_end && (
+                      <button
+                        className="btn btn-sm btn-success"
+                        onClick={() => endVisit(delegate.id)}
+                      >
+                        إنهاء الزيارة
+                      </button>
+                    )}
                   </div>
                 </td>
               </tr>
@@ -240,8 +257,8 @@ const Civillians = () => {
           <Modal.Title>تأكيد الحذف</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          هل أنت متأكد أنك تريد حذف المدني{' '}
-          <strong>{selectedCivillian?.name}</strong>؟
+          هل أنت متأكد أنك تريد حذف المندوب{' '}
+          <strong>{selectedDelegate?.name}</strong>؟
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowConfirm(false)}>
@@ -256,4 +273,4 @@ const Civillians = () => {
   );
 };
 
-export default Civillians;
+export default Delegates;

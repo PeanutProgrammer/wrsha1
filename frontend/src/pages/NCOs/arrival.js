@@ -104,12 +104,14 @@ const NCOArrival = () => {
   const officerOptions = officer.map((officer) => ({
     value: officer.id,
     label: `${officer.rank} / ${officer.name}`,
+    leaveTypeID: officer.leaveTypeID, // Attach latest leave type
   }));
 
   // Handle when an officer is selected
   const handleOfficerChange = (selectedOption) => {
     if (selectedOption) {
       setValue("ncoID", selectedOption.value); // Set the ncoID field in react-hook-form
+      setValue("leaveTypeID", selectedOption.leaveTypeID); // Set the leaveTypeID field based on selected officer
     }
   };
 

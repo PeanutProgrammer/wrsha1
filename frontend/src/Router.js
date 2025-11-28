@@ -16,7 +16,10 @@ import SoldiersHome from "./pages/Soldiers/SoldiersHome";
 import CivilliansHome from "./pages/Civillians/CivilliansHome";
 import ExpertsHome from "./pages/Experts/ExpertsHome";
 import GuestsHome from "./pages/Guests/GuestsHome";
+import DelegatesHome from "./pages/Delegates/DelegatesHome";
 import PastWorkersHome from "./pages/Past_Workers/PastWorkersHome";
+
+
 
 // Officers
 import Officers from "./pages/Officers/Officers";
@@ -56,6 +59,7 @@ import SearchSoldiers from "./pages/Soldiers/SearchSoldiers";
 import SoldiersTmamDetails from "./pages/Soldiers/SoldierTmamDetails";
 import SoldierArrival from "./pages/Soldiers/arrival";
 import SoldierDeparture from "./pages/Soldiers/departure";
+// import RealTimeMonitor from "./pages/Soldiers/RealTimeMonitor";
 
 // Civillians
 import Civillians from "./pages/Civillians/Civillians";
@@ -85,6 +89,12 @@ import AddGuests from "./pages/Guests/AddGuests";
 import GuestArrival from "./pages/Guests/arrival";
 import GuestDeparture from "./pages/Guests/departure";
 
+//Delegates
+import Delegates from "./pages/Delegates/Delegates";
+import AddDelegates from "./pages/Delegates/AddDelegates";
+import DelegateArrival from "./pages/Delegates/arrival";
+import DelegateDeparture from "./pages/Delegates/departure";
+
 // Past Workers
 import PastOfficers from "./pages/Past_Workers/PastOfficers";
 import PastOfficerDetails from "./pages/Past_Workers/PastOfficerDetails";
@@ -104,6 +114,7 @@ import SecuritySoldiers from "./pages/Soldiers/SecuritySoldiers";
 import SecurityCivillians from "./pages/Civillians/SecurityCivillians";
 import SecurityExperts from "./pages/Experts/SecurityExperts";
 import SecurityGuests from "./pages/Guests/SecurityGuests"; 
+import SecurityDelegates from "./pages/Delegates/SecurityDelegates";
 import AllInUnit from "./pages/Unit/AllInUnit";
 
 
@@ -154,11 +165,15 @@ export const router = createBrowserRouter([
         children: [{ path: "", element: <SecurityGuests /> }],
       },
       {
+        path: "security-delegates",
+        element: <ProtectedRoute allowedTypes={["قائد الامن"]} />,
+        children: [{ path: "", element: <SecurityDelegates /> }],
+      },
+      {
         path: "security-unit",
         element: <ProtectedRoute allowedTypes={["قائد الامن"]} />,
         children: [{ path: "", element: <AllInUnit /> }],
       },
-    
 
       // Officers Routes
       {
@@ -208,8 +223,16 @@ export const router = createBrowserRouter([
             element: <ProtectedRoute allowedTypes={"admin"} />,
             children: [{ path: "", element: <SearchOfficers /> }],
           },
-          { path: "arrival", element: <ProtectedRoute allowedTypes={["بوابة"]} />, children: [{ path: "", element: <OfficerArrival /> }] },
-          { path: "departure", element: <ProtectedRoute allowedTypes={["بوابة"]} />, children: [{ path: "", element: <OfficerDeparture /> }] },
+          {
+            path: "arrival",
+            element: <ProtectedRoute allowedTypes={["بوابة"]} />,
+            children: [{ path: "", element: <OfficerArrival /> }],
+          },
+          {
+            path: "departure",
+            element: <ProtectedRoute allowedTypes={["بوابة"]} />,
+            children: [{ path: "", element: <OfficerDeparture /> }],
+          },
           {
             path: "manage",
             element: <ProtectedRoute allowedTypes={"شؤون ضباط"} />,
@@ -220,8 +243,16 @@ export const router = createBrowserRouter([
             element: <ProtectedRoute allowedTypes={"شؤون ضباط"} />,
             children: [{ path: "", element: <ManageTmam /> }],
           },
-          { path: "tmam/:id", element: <ProtectedRoute allowedTypes={["شؤون ضباط"]} />, children: [{ path: "", element: <UpdateTmam /> }] },
-          { path: "tmam/add", element: <ProtectedRoute allowedTypes={["شؤون ضباط"]} />, children: [{ path: "", element: <AddTmam /> }] }
+          {
+            path: "tmam/:id",
+            element: <ProtectedRoute allowedTypes={["شؤون ضباط"]} />,
+            children: [{ path: "", element: <UpdateTmam /> }],
+          },
+          {
+            path: "tmam/add",
+            element: <ProtectedRoute allowedTypes={["شؤون ضباط"]} />,
+            children: [{ path: "", element: <AddTmam /> }],
+          },
         ],
       },
 
@@ -278,51 +309,6 @@ export const router = createBrowserRouter([
 
       // Soldiers Routes
       {
-        children: [
-          { path: "", element: <OfficersHome /> },
-          {
-            path: "list",
-            element: <ProtectedRoute allowedTypes={"admin"} />,
-            children: [{ path: "", element: <Officers /> }],
-          },
-          {
-            path: "add",
-            element: <ProtectedRoute allowedTypes={"admin"} />,
-            children: [{ path: "", element: <AddOfficers /> }],
-          },
-          {
-            path: ":id",
-            element: <ProtectedRoute allowedTypes={"admin"} />,
-            children: [{ path: "", element: <UpdateOfficers /> }],
-          },
-          {
-            path: "details/:id",
-            element: <ProtectedRoute allowedTypes={"admin"} />,
-            children: [{ path: "", element: <OfficerDetails /> }],
-          },
-          {
-            path: "tmam",
-            element: <ProtectedRoute allowedTypes={"admin"} />,
-            children: [{ path: "", element: <OfficersTmam /> }],
-          },
-          {
-            path: "tmam/details/:id",
-            element: <ProtectedRoute allowedTypes={"admin"} />,
-            children: [{ path: "", element: <OfficersTmamDetails /> }],
-          },
-          {
-            path: "log",
-            element: <ProtectedRoute allowedTypes={"admin"} />,
-            children: [{ path: "", element: <OfficersLog /> }],
-          },
-          {
-            path: "search",
-            element: <ProtectedRoute allowedTypes={"admin"} />,
-            children: [{ path: "", element: <SearchOfficers /> }],
-          },
-          { path: "arrival", element: <OfficerArrival /> },
-          { path: "departure", element: <OfficerDeparture /> },
-        ],
         path: "soldiers",
         element: <ProtectedRoute allowedTypes={["admin", "بوابة"]} />,
         children: [
@@ -367,6 +353,12 @@ export const router = createBrowserRouter([
             element: <ProtectedRoute allowedTypes={"admin"} />,
             children: [{ path: "", element: <SearchSoldiers /> }],
           },
+          // {
+          //   path: "monitor",
+          //   element: <ProtectedRoute allowedTypes={["بوابة","admin"]} />,
+          //   children: [{ path: "", element: <RealTimeMonitor /> }],
+
+          // },
           { path: "arrival", element: <SoldierArrival /> },
           { path: "departure", element: <SoldierDeparture /> },
         ],
@@ -426,7 +418,9 @@ export const router = createBrowserRouter([
       // Experts Routes
       {
         path: "experts",
-        element: <ProtectedRoute allowedTypes={["admin", "بوابة","قائد الامن"]} />,
+        element: (
+          <ProtectedRoute allowedTypes={["admin", "بوابة", "قائد الامن"]} />
+        ),
         children: [
           { path: "", element: <ExpertsHome /> },
           {
@@ -485,6 +479,38 @@ export const router = createBrowserRouter([
         ],
       },
 
+      // Delegates Routes
+
+      {
+        path: "delegates",
+        element: (
+          <ProtectedRoute allowedTypes={["admin", "بوابة", "قائد الامن"]} />
+        ),
+        children: [
+          { path: "", element: <DelegatesHome /> },
+          {
+            path: "list",
+            element: <ProtectedRoute allowedTypes={["admin", "قائد الامن"]} />,
+            children: [{ path: "", element: <Delegates /> }],
+          },
+          {
+            path: "add",
+            element: <ProtectedRoute allowedTypes={"admin"} />,
+            children: [{ path: "", element: <AddDelegates /> }],
+          },
+          {
+            path: "arrival",
+            element: <ProtectedRoute allowedTypes={"بوابة"} />,
+            children: [{ path: "", element: <DelegateArrival /> }],
+          },
+          {
+            path: "departure",
+            element: <ProtectedRoute allowedTypes={"بوابة"} />,
+            children: [{ path: "", element: <DelegateDeparture /> }],
+          },
+        ],
+      },
+
       // Past Workers
       {
         path: "past-workers",
@@ -537,8 +563,6 @@ export const router = createBrowserRouter([
           },
         ],
       },
-
-      
 
       { path: "*", element: <NotFound /> },
     ],

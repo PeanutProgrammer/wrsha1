@@ -1,64 +1,153 @@
 import React, { useState, useEffect } from 'react';
 import './Soldier.css';
-import { Table ,Alert} from 'react-bootstrap';
+import { Table, Alert, Button, InputGroup, Form } from "react-bootstrap";
 import { Link ,useParams} from 'react-router-dom';
 import axios from 'axios';
 import { getAuthUser } from '../../helper/Storage';
 
+// Helper: Convert Arabic-Indic digits to Western digits
+const toWesternDigits = (str) => {
+  return str.replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
+};
 const SoldiersLog = () => {
   const auth = getAuthUser()
   let {mil_id} = useParams();
   const [soldiers, setSoldiers] = useState({
-    loading : true ,
-    err : null , 
-    results : [] ,
-    reload : 0 ,
+    loading: true,
+    err: null,
+    results: [],
+    page: 1,
+    totalPages: 1,
+    search: "",
+    tempSearch: "",
   });
 
-  useEffect(() => {
-    setSoldiers({ ...soldiers,loading : true});
-    axios.get('http://localhost:4001/SoldierLog',  {
-      headers: {
-        token: auth.token
-      }
-    })
-      .then(resp => {
-        setSoldiers({ ...soldiers, results: resp.data, loading: false, err: null });
-        console.log(resp.data);
-      })
-      .catch(err => {
-        setSoldiers({
-          ...soldiers,
-            loading : false , 
-            err: err.response ? JSON.stringify(err.response.data.errors) : "Something went wrong. Please try again later." ,
-          });
+   const fetchSoldiers = async () => {
+     setSoldiers((prev) => ({ ...prev, loading: true, results: [] }));
+     try {
+       const searchValue = toWesternDigits(soldiers.search.trim());
+       const resp = await axios.get(
+         `http://localhost:4001/SoldierLog?page=${soldiers.page}&limit=20&search=${searchValue}`,
+         { headers: { token: auth.token } }
+       );
+       setSoldiers((prev) => ({
+         ...prev,
+         results: resp.data.data || [],
+         totalPages: resp.data.totalPages || 1,
+         loading: false,
+         err: null,
+       }));
+     } catch (err) {
+       setSoldiers((prev) => ({
+         ...prev,
+         loading: false,
+         err: err.response
+           ? JSON.stringify(err.response.data.errors)
+           : "حدث خطأ أثناء تحميل البيانات.",
+       }));
+     }
+   };
 
-      }); 
-  }, [soldiers.reload]);
+   useEffect(() => {
+     fetchSoldiers();
+   }, [soldiers.page, soldiers.search]);
 
-//   const deleteOfficer = (mil_id) =>{
-//     axios.delete('http://localhost:4001/Officer/' + mil_id, {
-//       headers: {
-//         token: auth.token
-//       }
-//     })
-//       .then(resp => {
-//         setOfficers ({...officers , reload : officers.reload +1})
-//       })
-//       .catch(err => {
-//         setOfficers({ 
-//             err: err.response ? JSON.stringify(err.response.data.errors) : "Something went wrong. Please try again later." ,
-//           });
+   const handleSearchSubmit = (e) => {
+     e.preventDefault();
+     const normalized = toWesternDigits(soldiers.tempSearch.trim());
+     setSoldiers((prev) => ({
+       ...prev,
+       search: normalized,
+       page: 1,
+       results: [],
+     }));
+   };
 
-//       });
+   const handleClearSearch = () => {
+     setSoldiers((prev) => ({
+       ...prev,
+       search: "",
+       tempSearch: "",
+       page: 1,
+       results: [],
+     }));
+   };
 
-//   }
+   const handlePrevPage = () => {
+     if (soldiers.page > 1)
+       setSoldiers((prev) => ({ ...prev, page: prev.page - 1 }));
+   };
+
+   const handleNextPage = () => {
+     if (soldiers.page < soldiers.totalPages)
+       setSoldiers((prev) => ({ ...prev, page: prev.page + 1 }));
+   };
+
+   const handleJumpToPage = (number) => {
+     if (number >= 1 && number <= soldiers.totalPages) {
+       setSoldiers((prev) => ({ ...prev, page: number }));
+     }
+   };
+
+   const renderPageButtons = () => {
+     const pages = [];
+     const maxButtons = 5;
+     let start = Math.max(soldiers.page - 2, 1);
+     let end = Math.min(start + maxButtons - 1, soldiers.totalPages);
+     start = Math.max(end - maxButtons + 1, 1);
+
+     for (let num = start; num <= end; num++) {
+       pages.push(
+         <Button
+           key={num}
+           onClick={() => handleJumpToPage(num)}
+           variant={num === soldiers.page ? "primary" : "outline-primary"}
+           className="mx-1 btn-sm"
+         >
+           {num}
+         </Button>
+       );
+     }
+     return pages;
+   };
 
   return (
     <div className="Officers p-5">
-      <div className="header d-flex justify-content-between mb-3">
+      <div className="header d-flex justify-content-between mb-3 align-items-center">
         <h3 className="text-center mb-3">إدارة تمام الجنود</h3>
-        {/* <Link to={"AddOfficers"} className="btn btn-success mb-4"> إنشاء ضابط جديد +</Link> */}
+ <Form onSubmit={handleSearchSubmit}>
+          <InputGroup style={{ width: "220px" }}>
+            <Form.Control
+              size="sm"
+              placeholder="بحث"
+              value={soldiers.tempSearch}
+              onChange={(e) =>
+                setSoldiers((prev) => ({
+                  ...prev,
+                  tempSearch: e.target.value,
+                }))
+              }
+            />
+            <Button
+              size="sm"
+              variant="primary"
+              onClick={handleSearchSubmit}
+              className="p-1"
+            >
+              🔍
+            </Button>
+            {soldiers.tempSearch && (
+              <Button
+                size="sm"
+                variant="outline-secondary"
+                onClick={handleClearSearch}
+                className="p-1"
+              >
+                ×
+              </Button>
+            )}
+          </InputGroup>
+        </Form>
       </div>
 
 
@@ -88,7 +177,9 @@ const SoldiersLog = () => {
           </tr>
         </thead>
         <tbody>
-        {soldiers.results.map((soldier) => (
+          {Array.isArray(soldiers.results) &&
+          soldiers.results.length > 0 ? (
+            soldiers.results.map((soldier) => (
             <tr key={soldier.mil_id}>
             <td>{soldier.mil_id}</td>    
             <td>{soldier.rank}</td>
@@ -111,16 +202,35 @@ const SoldiersLog = () => {
             <td>{(soldier.event_type? (soldier.event_type == "دخول"? "دخول" : soldier.reason): "لا يوجد")}</td>
             <td>{soldier.notes? soldier.notes: "لا يوجد"}</td>
 
-            {/* <td >{officer.tmam? officer.tmam: "متواجد"}</td> */}
-              {/* <td> */}
-                {/* <button className="btn btn-sm btn-danger mx-1 p-2" onClick ={(e) =>  {deleteOfficer(officer.mil_id)}}>حذف</button> */}
-                {/* <Link to={`${officer.mil_id}`} className="btn btn-sm btn-primary mx-1 p-2">تعديل</Link> */}
-                {/* <Link to={`details/${soldier.mil_id}`} className="btn btn-sm btn-primary mx-1 p-2">تفاصيل </Link> */}
-              {/* </td> */}
+    
             </tr>
-          ))}
+            ))
+        ) : (
+            <tr>
+              <td colSpan="8" className="text-center">لا توجد بيانات</td>
+            </tr>
+          )}
         </tbody>
       </Table>
+      <div className="d-flex justify-content-between align-items-center mt-3">
+              <Button
+                onClick={handlePrevPage}
+                disabled={soldiers.page === 1}
+                variant="secondary"
+                size="sm"
+              >
+                السابق
+              </Button>
+              <div>{renderPageButtons()}</div>
+              <Button
+                onClick={handleNextPage}
+                disabled={soldiers.page === soldiers.totalPages}
+                variant="secondary"
+                size="sm"
+              >
+                التالي
+              </Button>
+            </div>
     </div>
   );
 };

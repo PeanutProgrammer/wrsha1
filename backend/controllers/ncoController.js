@@ -277,26 +277,27 @@ class NCOController {
 
       console.log("hey");
 
-      const ncos =
-        await query(`
+      const ncos = await query(`
 SELECT 
     o.mil_id,
     o.rank,
     o.name,
     o.department,
     o.in_unit,
-    lt.name AS tmam
+    lt.name AS tmam,
+    old.id AS latest_leave_id
 FROM ncos o
-LEFT JOIN (
-    SELECT ncoID, MAX(event_time) AS latest_event
-    FROM nco_log
-    GROUP BY ncoID
-) lastLog
-    ON lastLog.ncoID = o.id
-LEFT JOIN nco_log ol
-    ON ol.ncoID = o.id AND ol.event_time = lastLog.latest_event
+LEFT JOIN nco_leave_details old
+    ON old.id = (
+        SELECT id
+        FROM nco_leave_details
+        WHERE ncoID = o.id
+        ORDER BY id DESC
+        LIMIT 1
+    )
 LEFT JOIN leave_type lt
-    ON lt.id = ol.leaveTypeID
+    ON lt.id = old.leaveTypeID
+ORDER BY o.mil_id;
 `);
       console.log(ncos[0]);
       console.log("hello");
@@ -480,8 +481,46 @@ LEFT JOIN leave_type lt
       if (req.query.search) {
         search = `where name LIKE '%${req.query.search}%'`;
       }
-      const ncos = await query(`select * from ncos where in_unit = 0`);
+      const ncos = await query(`SELECT
+    o.id,
+    o.mil_id,
+    o.rank,
+    o.name,
+    o.department,
+    o.in_unit,
+    old.leaveTypeID,
+    lt.name AS leave_type_name,
+    ol.event_time
+FROM ncos o
 
+-- latest log for other purposes (unchanged)
+LEFT JOIN (
+    SELECT ncoID, MAX(event_time) AS latest_event
+    FROM nco_log
+    GROUP BY ncoID
+) lastLog
+    ON lastLog.ncoID = o.id
+
+LEFT JOIN nco_log ol
+    ON ol.ncoID = o.id 
+    AND ol.event_time = lastLog.latest_event
+
+-- 🔥 Get the LATEST leave_details row for each officer
+LEFT JOIN nco_leave_details old
+    ON old.id = (
+        SELECT id
+        FROM nco_leave_details
+        WHERE ncoID = o.id
+        ORDER BY id DESC
+        LIMIT 1
+    )
+
+LEFT JOIN leave_type lt
+    ON lt.id = old.leaveTypeID
+
+WHERE o.in_unit = 0; `);
+      
+      
       if (ncos.length == 0) {
         return res.status(404).json({
           msg: "no ncos found hey",

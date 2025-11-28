@@ -256,26 +256,28 @@ class CivillianController {
 
       console.log("hey");
 
-      const civillians =
-        await query(`
+      const civillians = await query(`
 SELECT 
     o.nationalID,
     o.name,
     o.department,
+    o.join_date,
     o.security_clearance_number,
     o.in_unit,
-    lt.name AS tmam
+    lt.name AS tmam,
+    old.id AS latest_leave_id
 FROM civillians o
-LEFT JOIN (
-    SELECT civillianID, MAX(event_time) AS latest_event
-    FROM civillian_log
-    GROUP BY civillianID
-) lastLog
-    ON lastLog.civillianID = o.id
-LEFT JOIN civillian_log ol
-    ON ol.civillianID = o.id AND ol.event_time = lastLog.latest_event
+LEFT JOIN civillian_leave_details old
+    ON old.id = (
+        SELECT id
+        FROM civillian_leave_details
+        WHERE civillianID = o.id
+        ORDER BY id DESC
+        LIMIT 1
+    )
 LEFT JOIN leave_type lt
-    ON lt.id = ol.leaveTypeID
+    ON lt.id = old.leaveTypeID
+ORDER BY o.nationalID;
 `);
 
       console.log(civillians[0]);
@@ -458,7 +460,44 @@ LEFT JOIN leave_type lt
         search = `where name LIKE '%${req.query.search}%'`;
       }
       const civillians = await query(
-        `select * from civillians where in_unit = 0`
+        `SELECT
+    o.id,
+    o.nationalID,
+    o.name,
+    o.department,
+    o.in_unit,
+    old.leaveTypeID,
+    lt.name AS leave_type_name,
+    ol.event_time
+FROM civillians o
+
+-- latest log for other purposes (unchanged)
+LEFT JOIN (
+    SELECT civillianID, MAX(event_time) AS latest_event
+    FROM civillian_log
+    GROUP BY civillianID
+) lastLog
+    ON lastLog.civillianID = o.id
+
+LEFT JOIN civillian_log ol
+    ON ol.civillianID = o.id 
+    AND ol.event_time = lastLog.latest_event
+
+-- 🔥 Get the LATEST leave_details row for each officer
+LEFT JOIN civillian_leave_details old
+    ON old.id = (
+        SELECT id
+        FROM civillian_leave_details
+        WHERE civillianID = o.id
+        ORDER BY id DESC
+        LIMIT 1
+    )
+
+-- 🔥 Get leave type from officer_leave_details, not officer_log
+LEFT JOIN leave_type lt
+    ON lt.id = old.leaveTypeID
+
+WHERE o.in_unit = 0;`
       );
 
       if (civillians.length == 0) {
@@ -477,3 +516,4 @@ LEFT JOIN leave_type lt
 
 
 module.exports = CivillianController;
+

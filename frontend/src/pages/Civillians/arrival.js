@@ -9,6 +9,7 @@ import * as yup from 'yup';
 import "react-datetime/css/react-datetime.css";
 import moment from 'moment';
 import Select from 'react-select'; // Importing react-select
+import { se } from 'date-fns/locale';
 
 // Validation schema using yup
 const schema = yup.object().shape({
@@ -104,12 +105,14 @@ const CivillianArrival = () => {
   const civillianOptions = civillian.map((civillian) => ({
     value: civillian.id,
     label: `السيد / ${civillian.name}`,
+    leaveTypeID: civillian.leaveTypeID, // Attach latest leave type
   }));
 
   // Handle when an civillian is selected
   const handleCivillianChange = (selectedOption) => {
     if (selectedOption) {
       setValue("civillianID", selectedOption.value); // Set the civillianID field in react-hook-form
+      setValue("leaveTypeID", selectedOption.leaveTypeID); // Set the leaveTypeID field based on selected civillian
     }
   };
 
