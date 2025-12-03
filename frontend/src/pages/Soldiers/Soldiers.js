@@ -25,7 +25,7 @@ const Soldiers = () => {
   useEffect(() => {
     setSoldiers({ ...soldiers, loading: true });
     axios
-      .get('http://localhost:4001/soldier/', {
+      .get('http://192.168.1.3:4001/soldier/', {
         headers: {
           token: auth.token,
         },
@@ -62,7 +62,7 @@ const Soldiers = () => {
     if (!selectedSoldier) return;
 
     axios
-      .delete('http://localhost:4001/soldier/' + selectedSoldier.mil_id, {
+      .delete('http://192.168.1.3:4001/soldier/' + selectedSoldier.mil_id, {
         headers: {
           token: auth.token,
         },

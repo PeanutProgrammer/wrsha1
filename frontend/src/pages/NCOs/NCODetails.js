@@ -18,7 +18,7 @@ const NCODetails = () => {
 
   useEffect(() => {
     setNCOs({ ...nco,loading : true});
-      axios.get('http://localhost:4001/nco/' + id, {
+      axios.get('http://192.168.1.3:4001/nco/' + id, {
           headers: {
         token: auth.token
     }})

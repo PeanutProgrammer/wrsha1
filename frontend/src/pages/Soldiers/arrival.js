@@ -44,7 +44,7 @@ const SoldierArrival = () => {
   // Fetch soldiers
   useEffect(() => {
     axios
-      .get("http://localhost:4001/soldier/absent", {
+      .get("http://192.168.1.3:4001/soldier/absent", {
         headers: { token: auth.token },
       })
       .then((resp) => setSoldier(resp.data))
@@ -54,7 +54,7 @@ const SoldierArrival = () => {
   // Fetch leave types
   useEffect(() => {
     axios
-      .get("http://localhost:4001/leaveType/", {
+      .get("http://192.168.1.3:4001/leaveType/", {
         headers: { token: auth.token },
       })
       .then((resp) => setLeaveType(resp.data))
@@ -90,7 +90,7 @@ const SoldierArrival = () => {
     };
 
     try {
-      await axios.post("http://localhost:4001/soldierLog/", formattedData, {
+      await axios.post("http://192.168.1.3:4001/soldierLog/", formattedData, {
         headers: { token: auth.token },
       });
 

@@ -60,7 +60,7 @@ const createGuest = async (data) => {
     console.log("Request Data with visit_end:", formattedData);
 
     try {
-        await axios.post('http://localhost:4001/guest/', formattedData, {
+        await axios.post('http://192.168.1.3:4001/guest/', formattedData, {
             headers: {
                 token: auth.token,
             },
@@ -98,7 +98,7 @@ const createGuest = async (data) => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:4001/officer/', {
+      .get('http://192.168.1.3:4001/officer/', {
         headers: {
           token: auth.token,
         },

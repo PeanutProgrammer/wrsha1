@@ -20,7 +20,7 @@ const CivilliansTmamDetails = () => {
   useEffect(() => {
     setCivillians({ ...civillian, loading: true });
     axios
-      .get(`http://localhost:4001/civillian/tmam/${id}`, {
+      .get(`http://192.168.1.3:4001/civillian/tmam/${id}`, {
         headers: {
           token: auth.token,
         },

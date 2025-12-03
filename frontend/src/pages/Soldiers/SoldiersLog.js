@@ -27,7 +27,7 @@ const SoldiersLog = () => {
      try {
        const searchValue = toWesternDigits(soldiers.search.trim());
        const resp = await axios.get(
-         `http://localhost:4001/SoldierLog?page=${soldiers.page}&limit=20&search=${searchValue}`,
+         `http://192.168.1.3:4001/SoldierLog?page=${soldiers.page}&limit=20&search=${searchValue}`,
          { headers: { token: auth.token } }
        );
        setSoldiers((prev) => ({

@@ -29,7 +29,7 @@ const NCOs = () => {
   useEffect(() => {
     setNCOs({ ...ncos, loading: true });
     axios
-      .get('http://localhost:4001/nco/', {
+      .get('http://192.168.1.3:4001/nco/', {
         headers: {
           token: auth.token,
         },
@@ -78,7 +78,7 @@ const NCOs = () => {
 
     // Send DELETE request with additional fields
     axios
-      .delete('http://localhost:4001/nco/' + selectedNCO.mil_id, {
+      .delete('http://192.168.1.3:4001/nco/' + selectedNCO.mil_id, {
         headers: {
           token: auth.token,
         },

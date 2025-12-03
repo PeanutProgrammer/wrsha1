@@ -26,7 +26,7 @@ const Experts = () => {
   useEffect(() => {
     setExperts({ ...experts, loading: true });
     axios
-      .get('http://localhost:4001/expert/', {
+      .get('http://192.168.1.3:4001/expert/', {
         headers: {
           token: auth.token,
         },
@@ -63,7 +63,7 @@ const Experts = () => {
     if (!selectedExpert) return;
 
     axios
-      .delete('http://localhost:4001/expert/' + selectedExpert.nationalID, {
+      .delete('http://192.168.1.3:4001/expert/' + selectedExpert.nationalID, {
         headers: {
           token: auth.token,
         },

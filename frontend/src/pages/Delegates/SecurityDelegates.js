@@ -23,7 +23,7 @@ const SecurityDelegates = () => {
   useEffect(() => {
     setDelegates({ ...Delegates, loading: true });
     axios
-      .get("http://localhost:4001/delegate/", {
+      .get("http://192.168.1.3:4001/delegate/", {
         headers: {
           token: auth.token,
         },

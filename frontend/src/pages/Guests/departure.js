@@ -22,7 +22,7 @@ const GuestDeparture = () => {
   useEffect(() => {
     setGuests({ ...Guests, loading: true });
     axios
-      .get('http://localhost:4001/guest/current', {
+      .get('http://192.168.1.3:4001/guest/current', {
         headers: { token: auth.token },
       })
       .then((resp) => {
@@ -63,7 +63,7 @@ const GuestDeparture = () => {
     const visitEnd = moment().format("YYYY-MM-DD HH:mm:ss"); // Current time
 
     axios
-      .put(`http://localhost:4001/guest/end-visit/${guestId}`, { visit_end: visitEnd }, {
+      .put(`http://192.168.1.3:4001/guest/end-visit/${guestId}`, { visit_end: visitEnd }, {
         headers: {
           token: auth.token,
         },

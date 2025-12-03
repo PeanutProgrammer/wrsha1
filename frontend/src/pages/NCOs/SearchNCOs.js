@@ -32,7 +32,7 @@ const SearchNCOs = () => {
     setNCOs({ ...ncos, loading: true });
 
     axios
-      .get("http://localhost:4001/nco/filter/", {
+      .get("http://192.168.1.3:4001/nco/filter/", {
         headers: { token: auth.token },
         params: {
           search: filters.search,
@@ -73,7 +73,7 @@ const SearchNCOs = () => {
   // ✅ Fetch departments
   useEffect(() => {
     axios
-      .get("http://localhost:4001/department/", {
+      .get("http://192.168.1.3:4001/department/", {
         headers: { token: auth.token },
       })
       .then((resp) => setDept(resp.data))

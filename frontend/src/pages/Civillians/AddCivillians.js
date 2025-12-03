@@ -65,7 +65,7 @@ const AddCivillians = () => {
   };
 
     try {
-      await axios.post('http://localhost:4001/civillian/', formattedData, {
+      await axios.post('http://192.168.1.3:4001/civillian/', formattedData, {
         headers: {
           token: auth.token,
         },
@@ -93,7 +93,7 @@ const AddCivillians = () => {
 
   useEffect(() => {
       axios
-        .get('http://localhost:4001/department/', {
+        .get('http://192.168.1.3:4001/department/', {
           headers: {
             token: auth.token,
           },

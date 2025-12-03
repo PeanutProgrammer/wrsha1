@@ -77,7 +77,7 @@ const AddUsers = () => {
 
 
     try {
-      await axios.post('http://localhost:4001/User/', data, {
+      await axios.post('http://192.168.1.3:4001/User/', data, {
         headers: { token: auth.token },
       });
 

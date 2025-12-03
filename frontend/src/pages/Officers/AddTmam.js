@@ -85,7 +85,7 @@ const AddTmam = () => {
     console.log("Formatted Request Data:", formattedData);
 
     try {
-      await axios.post('http://localhost:4001/officerLog/tmam', formattedData, {
+      await axios.post('http://192.168.1.3:4001/officerLog/tmam', formattedData, {
         headers: { token: auth.token },
       });
 
@@ -118,7 +118,7 @@ const AddTmam = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:4001/officer/', {
+      .get('http://192.168.1.3:4001/officer/', {
         headers: {
           token: auth.token,
         },
@@ -129,7 +129,7 @@ const AddTmam = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:4001/leaveType/', {
+      .get('http://192.168.1.3:4001/leaveType/', {
         headers: {
           token: auth.token,
         },

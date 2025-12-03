@@ -26,7 +26,7 @@ const Civillians = () => {
   useEffect(() => {
     setCivillians({ ...civillians, loading: true });
     axios
-      .get('http://localhost:4001/civillian/', {
+      .get('http://192.168.1.3:4001/civillian/', {
         headers: {
           token: auth.token,
         },
@@ -63,7 +63,7 @@ const Civillians = () => {
     if (!selectedCivillian) return;
 
     axios
-      .delete('http://localhost:4001/civillian/' + selectedCivillian.mil_id, {
+      .delete('http://192.168.1.3:4001/civillian/' + selectedCivillian.mil_id, {
         headers: {
           token: auth.token,
         },

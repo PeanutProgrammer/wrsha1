@@ -19,7 +19,7 @@ const OfficerDetails = () => {
   useEffect(() => {
     setOfficers({ ...officer, loading: true });
     axios
-      .get('http://localhost:4001/Officer/' + id, {
+      .get('http://192.168.1.3:4001/Officer/' + id, {
         headers: {
           token: auth.token,
         },

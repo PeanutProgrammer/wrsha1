@@ -17,7 +17,7 @@ const CivilliansTmam = () => {
 
   useEffect(() => {
     setCivillians({ ...civillians,loading : true});
-    axios.get('http://localhost:4001/civillian/tmam',  {
+    axios.get('http://192.168.1.3:4001/civillian/tmam',  {
       headers: {
         token: auth.token
       }
@@ -37,7 +37,7 @@ const CivilliansTmam = () => {
   }, [civillians.reload]);
 
 //   const deleteOfficer = (mil_id) =>{
-//     axios.delete('http://localhost:4001/Officer/' + mil_id, {
+//     axios.delete('http://192.168.1.3:4001/Officer/' + mil_id, {
 //       headers: {
 //         token: auth.token
 //       }

@@ -24,7 +24,7 @@ const ExpertDeparture = () => {
   useEffect(() => {
     setExperts({ ...Experts, loading: true });
     axios
-      .get('http://localhost:4001/expertLog/current', {
+      .get('http://192.168.1.3:4001/expertLog/current', {
         headers: {
           token: auth.token,
         },
@@ -55,7 +55,7 @@ const ExpertDeparture = () => {
     const visitEnd = moment().format("YYYY-MM-DD HH:mm:ss"); // Current time
 
     axios
-      .put(`http://localhost:4001/expertLog/end-visit/${expertId}`, { visit_end: visitEnd }, {
+      .put(`http://192.168.1.3:4001/expertLog/end-visit/${expertId}`, { visit_end: visitEnd }, {
         headers: {
           token: auth.token,
         },

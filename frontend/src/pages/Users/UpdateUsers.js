@@ -64,7 +64,7 @@ const UpdateUsers = () => {
     setUser({ ...user, loading: true });
 
     axios
-      .put('http://localhost:4001/User/' + id, data, {
+      .put('http://192.168.1.3:4001/User/' + id, data, {
         headers: {
           token: auth.token,
         },
@@ -95,7 +95,7 @@ const UpdateUsers = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:4001/User/' + id, {
+      .get('http://192.168.1.3:4001/User/' + id, {
         headers: {
           token: auth.token,
         },

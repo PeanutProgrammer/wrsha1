@@ -53,7 +53,7 @@ const OfficerArrival = () => {
 
 
     try {
-      await axios.post('http://localhost:4001/officerLog/', formattedData, {
+      await axios.post('http://192.168.1.3:4001/officerLog/', formattedData, {
         headers: { token: auth.token },
       });
 
@@ -83,7 +83,7 @@ const OfficerArrival = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:4001/officer/absent', {
+      .get('http://192.168.1.3:4001/officer/absent', {
         headers: {
           token: auth.token,
         },
@@ -94,7 +94,7 @@ const OfficerArrival = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:4001/leaveType/', {
+      .get('http://192.168.1.3:4001/leaveType/', {
         headers: {
           token: auth.token,
         },

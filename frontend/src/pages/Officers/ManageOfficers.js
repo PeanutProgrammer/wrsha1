@@ -46,12 +46,12 @@ const ManageOfficers = () => {
 
 
   useEffect(() => {
-    const socket = io("http://localhost:4001"); //  backend port
+    const socket = io("http://192.168.1.3:4001"); //  backend port
 
     // 🔁 Initial fetch
     const fetchData = () => {
       axios
-        .get("http://localhost:4001/officer/", {
+        .get("http://192.168.1.3:4001/officer/", {
           headers: { token: auth.token },
         })
         .then((resp) => {

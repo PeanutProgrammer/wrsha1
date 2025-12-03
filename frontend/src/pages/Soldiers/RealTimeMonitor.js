@@ -2,7 +2,7 @@
 // import { io } from "socket.io-client";
 // import axios from "axios";
 
-// const socket = io("localhost:4001", {
+// const socket = io("192.168.1.3:4001", {
 //   transports: ["websocket"],
 // });
 
@@ -13,7 +13,7 @@
 //   // Fetch soldiers from backend
 //   const fetchSoldiers = async () => {
 //     try {
-//       const res = await axios.get("localhost:4001/soldierLog");
+//       const res = await axios.get("192.168.1.3:4001/soldierLog");
 //       setSoldiers(res.data);
 //     } catch (err) {
 //       console.error("Fetch error:", err);

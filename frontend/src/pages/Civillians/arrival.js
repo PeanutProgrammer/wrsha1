@@ -51,7 +51,7 @@ const CivillianArrival = () => {
 
 
     try {
-      await axios.post('http://localhost:4001/civillianLog/', formattedData, {
+      await axios.post('http://192.168.1.3:4001/civillianLog/', formattedData, {
         headers: { token: auth.token },
       });
 
@@ -81,7 +81,7 @@ const CivillianArrival = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:4001/civillian/absent', {
+      .get('http://192.168.1.3:4001/civillian/absent', {
         headers: {
           token: auth.token,
         },
@@ -92,7 +92,7 @@ const CivillianArrival = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:4001/leaveType/', {
+      .get('http://192.168.1.3:4001/leaveType/', {
         headers: {
           token: auth.token,
         },

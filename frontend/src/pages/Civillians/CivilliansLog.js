@@ -27,7 +27,7 @@ const CivilliansLog = () => {
     try {
       const searchValue = toWesternDigits(civillians.search.trim());
       const resp = await axios.get(
-        `http://localhost:4001/CivillianLog?page=${civillians.page}&limit=20&search=${searchValue}`,
+        `http://192.168.1.3:4001/CivillianLog?page=${civillians.page}&limit=20&search=${searchValue}`,
         { headers: { token: auth.token } }
       );
       setCivillians((prev) => ({

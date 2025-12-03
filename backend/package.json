@@ -5,7 +5,8 @@
   "description": "hello",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index",
+    "start": "node index",
+    "start:dev": "nodemon index",
     "build": "node index"
   },
   "author": "mohamed",

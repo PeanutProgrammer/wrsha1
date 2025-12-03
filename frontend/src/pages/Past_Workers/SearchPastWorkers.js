@@ -32,7 +32,7 @@ const SearchPastWorkers = () => {
     setWorkers({ ...workers, loading: true });
 
     axios
-      .get("http://localhost:4001/pastOfficer/filter", {
+      .get("http://192.168.1.3:4001/pastOfficer/filter", {
         headers: { token: auth.token },
         params: {
           search: filters.search,

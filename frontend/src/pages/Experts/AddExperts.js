@@ -59,7 +59,7 @@ const AddExperts = () => {
   };
 
     try {
-      await axios.post('http://localhost:4001/expert/', formattedData, {
+      await axios.post('http://192.168.1.3:4001/expert/', formattedData, {
         headers: {
           token: auth.token,
         },
@@ -88,7 +88,7 @@ const AddExperts = () => {
 
    useEffect(() => {
         axios
-          .get('http://localhost:4001/department/', {
+          .get('http://192.168.1.3:4001/department/', {
             headers: {
               token: auth.token,
             },

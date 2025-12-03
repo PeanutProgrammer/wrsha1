@@ -20,7 +20,7 @@ const SoldiersTmamDetails = () => {
   useEffect(() => {
     setSoldiers({ ...soldier, loading: true });
     axios
-      .get(`http://localhost:4001/soldier/tmam/${id}`, {
+      .get(`http://192.168.1.3:4001/soldier/tmam/${id}`, {
         headers: {
           token: auth.token,
         },

@@ -31,7 +31,7 @@ const ExpertsLog = () => {
       try {
         const searchValue = toWesternDigits(experts.search.trim());
         const resp = await axios.get(
-          `http://localhost:4001/ExpertLog?page=${experts.page}&limit=20&search=${searchValue}`,
+          `http://192.168.1.3:4001/ExpertLog?page=${experts.page}&limit=20&search=${searchValue}`,
           { headers: { token: auth.token } }
         );
         setExperts((prev) => ({

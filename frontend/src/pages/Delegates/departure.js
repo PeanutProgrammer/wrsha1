@@ -22,7 +22,7 @@ const DelegateDeparture = () => {
   useEffect(() => {
     setDelegates({ ...delegates, loading: true });
     axios
-      .get('http://localhost:4001/delegate/current', {
+      .get('http://192.168.1.3:4001/delegate/current', {
         headers: { token: auth.token },
       })
       .then((resp) => {
@@ -63,7 +63,7 @@ const DelegateDeparture = () => {
     const visitEnd = moment().format("YYYY-MM-DD HH:mm:ss"); // Current time
 
     axios
-      .put(`http://localhost:4001/delegate/end-visit/${delegateId}`, { visit_end: visitEnd }, {
+      .put(`http://192.168.1.3:4001/delegate/end-visit/${delegateId}`, { visit_end: visitEnd }, {
         headers: {
           token: auth.token,
         },

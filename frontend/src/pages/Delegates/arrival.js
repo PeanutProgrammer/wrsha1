@@ -66,7 +66,7 @@ const DelegateArrival = () => {
     console.log("Request Data with visit_end:", formattedData);
 
     try {
-      await axios.post("http://localhost:4001/delegate/", formattedData, {
+      await axios.post("http://192.168.1.3:4001/delegate/", formattedData, {
         headers: {
           token: auth.token,
         },

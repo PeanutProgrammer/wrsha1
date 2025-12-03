@@ -18,7 +18,7 @@ const ManageTmam = () => {
   useEffect(() => {
     setOfficers({ ...officers, loading: true });
     axios
-      .get("http://localhost:4001/Officer/tmam", {
+      .get("http://192.168.1.3:4001/Officer/tmam", {
         headers: {
           token: auth.token,
         },
@@ -44,7 +44,7 @@ const ManageTmam = () => {
   }, [officers.reload]);
 
   //   const deleteOfficer = (mil_id) =>{
-  //     axios.delete('http://localhost:4001/Officer/' + mil_id, {
+  //     axios.delete('http://192.168.1.3:4001/Officer/' + mil_id, {
   //       headers: {
   //         token: auth.token
   //       }

@@ -71,7 +71,7 @@ const UpdateOfficers = () => {
 
 
     axios
-      .put('http://localhost:4001/NCO/' + id, formattedData, {
+      .put('http://192.168.1.3:4001/NCO/' + id, formattedData, {
         headers: {
           token: auth.token,
         },
@@ -102,7 +102,7 @@ const UpdateOfficers = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:4001/NCO/' + id, {
+      .get('http://192.168.1.3:4001/NCO/' + id, {
         headers: {
           token: auth.token,
         },
@@ -146,7 +146,7 @@ const UpdateOfficers = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:4001/department/', {
+      .get('http://192.168.1.3:4001/department/', {
         headers: {
           token: auth.token,
         },

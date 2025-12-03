@@ -25,7 +25,7 @@ const Guests = () => {
   useEffect(() => {
     setGuests({ ...Guests, loading: true });
     axios
-      .get('http://localhost:4001/guest/', {
+      .get('http://192.168.1.3:4001/guest/', {
         headers: {
           token: auth.token,
         },
@@ -62,7 +62,7 @@ const Guests = () => {
     if (!selectedGuest) return;
 
     axios
-      .delete('http://localhost:4001/guest/' + selectedGuest.id, {
+      .delete('http://192.168.1.3:4001/guest/' + selectedGuest.id, {
         headers: {
           token: auth.token,
         },
@@ -100,7 +100,7 @@ const Guests = () => {
     const visitEnd = moment().format("YYYY-MM-DD HH:mm:ss");  // Current time
 
     axios
-      .put(`http://localhost:4001/guest/end-visit/${guestId}`, { visit_end: visitEnd }, {
+      .put(`http://192.168.1.3:4001/guest/end-visit/${guestId}`, { visit_end: visitEnd }, {
         headers: {
           token: auth.token,
         },

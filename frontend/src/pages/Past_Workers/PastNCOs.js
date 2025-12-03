@@ -20,12 +20,12 @@ const PastNCOs = () => {
 
 
   useEffect(() => {
-    const socket = io("http://localhost:4001"); // your backend port
+    const socket = io("http://192.168.1.3:4001"); // your backend port
 
     // 🔁 Initial fetch
     const fetchData = () => {
       axios
-        .get("http://localhost:4001/pastNCO/", {
+        .get("http://192.168.1.3:4001/pastNCO/", {
           headers: { token: auth.token },
         })
         .then((resp) => {

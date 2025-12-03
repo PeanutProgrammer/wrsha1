@@ -59,7 +59,7 @@ const SoldierDeparture = () => {
     console.log("Formatted Request Data:", formattedData);
 
     try {
-      await axios.post('http://localhost:4001/soldierLog/departure', formattedData, {
+      await axios.post('http://192.168.1.3:4001/soldierLog/departure', formattedData, {
         headers: { token: auth.token },
       });
 
@@ -92,7 +92,7 @@ const SoldierDeparture = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:4001/soldier/current', {
+      .get('http://192.168.1.3:4001/soldier/current', {
         headers: {
           token: auth.token,
         },
@@ -103,7 +103,7 @@ const SoldierDeparture = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:4001/leaveType/', {
+      .get('http://192.168.1.3:4001/leaveType/', {
         headers: {
           token: auth.token,
         },

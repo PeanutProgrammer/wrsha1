@@ -31,7 +31,7 @@ const SearchCivillians = () => {
     setCivillians({ ...civillians, loading: true });
 
     axios
-      .get("http://localhost:4001/civillian/filter/", {
+      .get("http://192.168.1.3:4001/civillian/filter/", {
         headers: { token: auth.token },
         params: {
           search: filters.search,
@@ -71,7 +71,7 @@ const SearchCivillians = () => {
   // ✅ Fetch departments
   useEffect(() => {
     axios
-      .get("http://localhost:4001/department/", {
+      .get("http://192.168.1.3:4001/department/", {
         headers: { token: auth.token },
       })
       .then((resp) => setDept(resp.data))

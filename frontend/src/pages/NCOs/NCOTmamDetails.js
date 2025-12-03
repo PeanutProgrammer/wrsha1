@@ -20,7 +20,7 @@ const NCOsTmamDetails = () => {
   useEffect(() => {
     setNCOs({ ...nco, loading: true });
     axios
-      .get(`http://localhost:4001/nco/tmam/${id}`, {
+      .get(`http://192.168.1.3:4001/nco/tmam/${id}`, {
         headers: {
           token: auth.token,
         },

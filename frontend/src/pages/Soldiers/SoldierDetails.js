@@ -18,7 +18,7 @@ const SoldierDetails = () => {
 
   useEffect(() => {
     setSoldiers({ ...soldier,loading : true});
-      axios.get('http://localhost:4001/soldier/' + id, {
+      axios.get('http://192.168.1.3:4001/soldier/' + id, {
           headers: {
         token: auth.token
     }})

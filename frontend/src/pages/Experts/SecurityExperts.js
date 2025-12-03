@@ -23,7 +23,7 @@ const SecurityExperts = () => {
   useEffect(() => {
     setExperts({ ...experts, loading: true });
     axios
-      .get("http://localhost:4001/expert/", {
+      .get("http://192.168.1.3:4001/expert/", {
         headers: {
           token: auth.token,
         },

@@ -18,7 +18,7 @@ const ExpertDetails = () => {
 
   useEffect(() => {
     setExperts({ ...expert,loading : true});
-      axios.get('http://localhost:4001/expert/' + id, {
+      axios.get('http://192.168.1.3:4001/expert/' + id, {
           headers: {
         token: auth.token
     }})

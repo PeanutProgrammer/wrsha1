@@ -77,7 +77,7 @@ const AddOfficers = () => {
 
 
     try {
-      await axios.post('http://localhost:4001/Officer/', formattedData, {
+      await axios.post('http://192.168.1.3:4001/Officer/', formattedData, {
         headers: { token: auth.token },
       });
 
@@ -114,7 +114,7 @@ const AddOfficers = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:4001/department/', {
+      .get('http://192.168.1.3:4001/department/', {
         headers: {
           token: auth.token,
         },
