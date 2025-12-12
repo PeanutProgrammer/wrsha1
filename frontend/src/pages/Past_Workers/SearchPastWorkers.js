@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./SearchOfficers.css";
+import "../../style/card.css";
 import PastWorkerCard from "./components/PastWorkerCard";
 import axios from "axios";
 import { getAuthUser } from "../../helper/Storage";
@@ -32,7 +32,7 @@ const SearchPastWorkers = () => {
     setWorkers({ ...workers, loading: true });
 
     axios
-      .get("http://192.168.1.3:4001/pastOfficer/filter", {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/pastOfficer/filter`, {
         headers: { token: auth.token },
         params: {
           search: filters.search,
@@ -146,7 +146,8 @@ const SearchPastWorkers = () => {
             <option value="مساعد">مساعد</option> 
             <option value="مساعد أول">مساعد أول</option> 
             <option value="صانع ماهر">صانع ماهر</option> 
-            <option value="صانع دقيق">صانع دقيق</option> 
+              <option value="صانع دقيق">صانع دقيق</option> 
+            <option value="صانع ممتاز">صانع ممتاز</option>
             <option value="ملاحظ">ملاحظ</option> 
             <option value="ملاحظ فني">ملاحظ فني</option> 
               {/* Add more ranks as needed */}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./Civillian.css";
+import "../../style/style.css";
 import { Table, Alert, Button, InputGroup, Form } from "react-bootstrap";
 import axios from "axios";
 import { getAuthUser } from "../../helper/Storage";
@@ -27,7 +27,7 @@ const CivilliansLog = () => {
     try {
       const searchValue = toWesternDigits(civillians.search.trim());
       const resp = await axios.get(
-        `http://192.168.1.3:4001/CivillianLog?page=${civillians.page}&limit=20&search=${searchValue}`,
+        `${process.env.REACT_APP_BACKEND_BASE_URL}/CivillianLog?page=${civillians.page}&limit=20&search=${searchValue}`,
         { headers: { token: auth.token } }
       );
       setCivillians((prev) => ({

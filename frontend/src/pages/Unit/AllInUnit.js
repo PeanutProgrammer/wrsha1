@@ -40,12 +40,12 @@ const AllInUnit = () => {
 
 
   useEffect(() => {
-    const socket = io("http://192.168.1.3:4001"); //  backend port
+    const socket = io(`${process.env.REACT_APP_BACKEND_BASE_URL}`); //  backend port
 
     // 🔁 Initial fetch
     const fetchData = () => {
       axios
-        .get("http://192.168.1.3:4001/unit/", {
+        .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/unit/`, {
           headers: { token: auth.token },
         })
         .then((resp) => {

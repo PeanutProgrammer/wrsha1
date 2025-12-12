@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
-import './UpdateUsers.css';
+import '../../style/update.css';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { getAuthUser } from '../../helper/Storage';
@@ -64,7 +64,7 @@ const UpdateUsers = () => {
     setUser({ ...user, loading: true });
 
     axios
-      .put('http://192.168.1.3:4001/User/' + id, data, {
+      .put(`${process.env.REACT_APP_BACKEND_BASE_URL}/User/` + id, data, {
         headers: {
           token: auth.token,
         },
@@ -95,7 +95,7 @@ const UpdateUsers = () => {
 
   useEffect(() => {
     axios
-      .get('http://192.168.1.3:4001/User/' + id, {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/User/` + id, {
         headers: {
           token: auth.token,
         },
@@ -199,7 +199,7 @@ const UpdateUsers = () => {
             <option value="مبنى القيادة">مبنى القيادة</option>
             <option value="شؤون ضباط">شؤون ضباط</option>
             <option value="شؤون ادارية">شؤون ادارية</option>
-            <option value="قائد الأمن">قائد الأمن</option>
+            <option value="قائد الامن">قائد الامن</option>
           </Form.Control>
           {errors.type && <div className="invalid-feedback">{errors.type.message}</div>}
         </Form.Group>

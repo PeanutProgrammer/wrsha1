@@ -67,8 +67,8 @@ const UpdateTmam = () => {
       try {
         // run in parallel
         const [leaveTypesResp, logResp] = await Promise.all([
-          axios.get("http://192.168.1.3:4001/leaveType/", { headers: { token: auth.token } }),
-          axios.get(`http://192.168.1.3:4001/officerLog/${id}`, { headers: { token: auth.token } }),
+          axios.get(`${process.env.REACT_APP_BACKEND_BASE_URL}/leaveType/`, { headers: { token: auth.token } }),
+          axios.get(`${process.env.REACT_APP_BACKEND_BASE_URL}/officerLog/${id}`, { headers: { token: auth.token } }),
         ]);
 
         if (cancelled) return;
@@ -129,9 +129,13 @@ const UpdateTmam = () => {
 
       console.log("PUT payload:", payload);
 
-      const resp = await axios.put(`http://192.168.1.3:4001/officerLog/${id}`, payload, {
-        headers: { token: auth.token },
-      });
+      const resp = await axios.put(
+        `${process.env.REACT_APP_BACKEND_BASE_URL}/officerLog/${id}`,
+        payload,
+        {
+          headers: { token: auth.token },
+        }
+      );
 
       console.log("PUT response:", resp.data);
 

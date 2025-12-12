@@ -25,7 +25,7 @@ const Guests = () => {
   useEffect(() => {
     setGuests({ ...Guests, loading: true });
     axios
-      .get('http://192.168.1.3:4001/guest/', {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/guest/`, {
         headers: {
           token: auth.token,
         },
@@ -62,7 +62,7 @@ const Guests = () => {
     if (!selectedGuest) return;
 
     axios
-      .delete('http://192.168.1.3:4001/guest/' + selectedGuest.id, {
+      .delete(`${process.env.REACT_APP_BACKEND_BASE_URL}/guest/` + selectedGuest.id, {
         headers: {
           token: auth.token,
         },
@@ -100,17 +100,21 @@ const Guests = () => {
     const visitEnd = moment().format("YYYY-MM-DD HH:mm:ss");  // Current time
 
     axios
-      .put(`http://192.168.1.3:4001/guest/end-visit/${guestId}`, { visit_end: visitEnd }, {
-        headers: {
-          token: auth.token,
-        },
-      })
+      .put(
+        `${process.env.REACT_APP_BACKEND_BASE_URL}/guest/end-visit/${guestId}`,
+        { visit_end: visitEnd },
+        {
+          headers: {
+            token: auth.token,
+          },
+        }
+      )
       .then((response) => {
         // Refresh the guest data after updating
         setGuests({
           ...Guests,
           reload: Guests.reload + 1,
-          success: 'تم إنهاء الزيارة بنجاح ✅',
+          success: "تم إنهاء الزيارة بنجاح ✅",
           err: null,
         });
 
@@ -123,8 +127,7 @@ const Guests = () => {
         setGuests({
           ...Guests,
           err:
-            err.response?.data?.errors ||
-            'حدث خطأ أثناء محاولة إنهاء الزيارة.',
+            err.response?.data?.errors || "حدث خطأ أثناء محاولة إنهاء الزيارة.",
         });
       });
   };

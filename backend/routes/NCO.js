@@ -22,39 +22,31 @@ router.post("/", shuoonSarya,
         .isString().withMessage("يرجى إدخال رتبة صحيحة"),
     body("department")
         .isString().withMessage("يرجى إدخال الفرع أو الورشة بشكل صحيح"),
-    body("height")
-        .isNumeric().withMessage("يرجى إدخال طول صحيح"),
-    body("weight")
-        .isNumeric().withMessage("يرجى إدخال وزن صحيح"),
     body("dob")
         .isDate().withMessage("يرجى إدخال تاريخ ميلاد صحيح"),
+    body("attached")
+        .isBoolean().withMessage("يرجى إدخال قيمة صحيحة للملحق"),
     (req, res) => {
             NCOController.createOfficer(req, res);
         }
 );
 
 
-router.put("/:id", admin,
+router.put(
+  "/:id",
+  admin,
 
-    body("rank")
-        .isString().withMessage("يرجى إدخال رتبة صحيحة"),
-    body("name")
-        .isString().withMessage("يرجى إدخال اسم الضابط"),
-    body("department")
-        .isString().withMessage("يرجى إدخال اسم الفرع أو الورشة"),
-    body("join_date")
-        .isDate().withMessage("يرجى إدخال تاريخ الضم بشكل صحيح"),
-    body("height")
-        .isNumeric().withMessage("يرجى إدخال طول صحيح"),
-    body("weight")
-        .isNumeric().withMessage("يرجى إدخال وزن صحيح"),
-    body("dob")
-        .isDate().withMessage("يرجى إدخال تاريخ الميلاد بشكل صحيح"),
-          (req, res) => {
+  body("rank").isString().withMessage("يرجى إدخال رتبة صحيحة"),
+  body("name").isString().withMessage("يرجى إدخال اسم الضابط"),
+  body("department").isString().withMessage("يرجى إدخال اسم الفرع أو الورشة"),
+  body("join_date").isDate().withMessage("يرجى إدخال تاريخ الضم بشكل صحيح"),
+  body("dob").isDate().withMessage("يرجى إدخال تاريخ الميلاد بشكل صحيح"),
+  body("attached").isBoolean().withMessage("يرجى إدخال قيمة صحيحة للملحق"),
+  (req, res) => {
     NCOController.updateOfficer(req, res);
     console.log("BODY RECEIVED:", req.body);
-
-});
+  }
+);
 
 
 

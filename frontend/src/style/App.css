@@ -20,10 +20,14 @@ html, body, #root {
   overflow-y: auto;    /* Allow vertical scroll if needed */
   direction: rtl;      /* Right-to-left layout */
   text-align: right;   /* Align text to the right */
+    background-color: #e9ecef; /* soft gray to reduce glare */
+
 }
 
 body {
   min-height: 100vh; /* Ensure at least full viewport height */
+  
+  
 }
 
 /* Sidebar widths */

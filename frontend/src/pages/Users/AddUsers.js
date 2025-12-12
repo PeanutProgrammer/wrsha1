@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
-import './Users.css';
+import '../../style/style.css';
 import axios from 'axios';
 import { getAuthUser } from '../../helper/Storage';
 import { useForm } from 'react-hook-form';
@@ -77,7 +77,7 @@ const AddUsers = () => {
 
 
     try {
-      await axios.post('http://192.168.1.3:4001/User/', data, {
+      await axios.post(`${process.env.REACT_APP_BACKEND_BASE_URL}/User/`, data, {
         headers: { token: auth.token },
       });
 

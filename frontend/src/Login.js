@@ -18,23 +18,27 @@ const Login = () => {
         e.preventDefault();
         setlogin({ ...login, loading: true, err: [] });
         axios
-            .post("http://192.168.1.3:4001/auth/login", {
-                username: login.username,
-                password: login.password,
-            })
-            .then((resp) => {
-                setlogin({ ...login, loading: false, err: [] });
-                setAuthUser(resp.data);
-                navigate("dashboard/Home");
-            })
-            .catch((err) => {
-                console.log(err + "");
-                setlogin({ ...login, loading: false, err: err.response.data.errors });
-
-                 setTimeout(() => {
-    setlogin((prev) => ({ ...prev, err: [] }));
-  }, 3000);
+          .post(`${process.env.REACT_APP_BACKEND_BASE_URL}/auth/login`, {
+            username: login.username,
+            password: login.password,
+          })
+          .then((resp) => {
+            setlogin({ ...login, loading: false, err: [] });
+            setAuthUser(resp.data);
+            navigate("dashboard/Home");
+          })
+          .catch((err) => {
+            console.log(err + "");
+            setlogin({
+              ...login,
+              loading: false,
+              err: err.response.data.errors,
             });
+
+            setTimeout(() => {
+              setlogin((prev) => ({ ...prev, err: [] }));
+            }, 3000);
+          });
     }
 
     return (

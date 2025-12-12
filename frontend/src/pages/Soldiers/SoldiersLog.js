@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './Soldier.css';
+import "../../style/style.css";
 import { Table, Alert, Button, InputGroup, Form } from "react-bootstrap";
 import { Link ,useParams} from 'react-router-dom';
 import axios from 'axios';
@@ -27,7 +27,7 @@ const SoldiersLog = () => {
      try {
        const searchValue = toWesternDigits(soldiers.search.trim());
        const resp = await axios.get(
-         `http://192.168.1.3:4001/SoldierLog?page=${soldiers.page}&limit=20&search=${searchValue}`,
+         `${process.env.REACT_APP_BACKEND_BASE_URL}/SoldierLog?page=${soldiers.page}&limit=20&search=${searchValue}`,
          { headers: { token: auth.token } }
        );
        setSoldiers((prev) => ({

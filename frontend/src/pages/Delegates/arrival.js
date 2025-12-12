@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Form, Button, Alert } from "react-bootstrap";
-import "./delegate.css";
+import "../../style/style.css";
 import axios from "axios";
 import { getAuthUser } from "../../helper/Storage";
 import { useForm } from "react-hook-form";
@@ -66,7 +66,7 @@ const DelegateArrival = () => {
     console.log("Request Data with visit_end:", formattedData);
 
     try {
-      await axios.post("http://192.168.1.3:4001/delegate/", formattedData, {
+      await axios.post(`${process.env.REACT_APP_BACKEND_BASE_URL}/delegate/`, formattedData, {
         headers: {
           token: auth.token,
         },
@@ -100,6 +100,16 @@ const DelegateArrival = () => {
     }
   };
 
+  const notesOptions = [
+    { value: "اصلاح سلاح", label: "اصلاح سلاح" },
+    { value: "اصلاح معدات", label: "اصلاح معدات" },
+    { value: "اصلاح مدافع", label: "اصلاح مدافع" },
+    { value: "قرار حالة سلاح", label: "قرار حالة سلاح" },
+    { value: "قرار حالة معدات", label: "قرار حالة معدات" },
+    { value: "قرار حالة مدافع", label: "قرار حالة مدافع" },
+    { value: "صرف", label: "صرف" },
+  ];
+
   const rankOptions = [
     "جندي",
     "عريف مجند",
@@ -110,6 +120,7 @@ const DelegateArrival = () => {
     "مساعد أول",
     "صانع ماهر",
     "صانع دقيق",
+    "صانع ممتاز",
     "ملاحظ",
     "ملاحظ فني",
     "ملازم",
@@ -226,11 +237,18 @@ const DelegateArrival = () => {
 
         <Form.Group controlId="notes" className="form-group">
           <Form.Label>سبب الزيارة</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="أدخل سبب الزيارة"
-            {...register("notes")}
-            className={`form-control ${errors.notes ? "is-invalid" : ""}`}
+          <Select
+            options={notesOptions}
+            placeholder="اختر سبب الزيارة"
+            isSearchable
+            styles={{
+              ...rankSelectStyles,
+              menuPortal: (base) => ({ ...base, zIndex: 9999 }), // ensure on top
+            }}
+            menuPortalTarget={document.body} // render dropdown on body
+            onChange={(selectedOption) =>
+              setValue("notes", selectedOption ? selectedOption.value : "")
+            }
           />
           {errors.notes && (
             <div className="invalid-feedback">{errors.notes.message}</div>

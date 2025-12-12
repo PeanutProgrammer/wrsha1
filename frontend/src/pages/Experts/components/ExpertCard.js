@@ -1,5 +1,5 @@
 import React from "react";
-import '../style/ExpertCard.css';
+import "../../../style/card.css";
 import { Link } from "react-router-dom";
 
 const ExpertCard = ({ id, nationalID, name, company_name, security_clearance_number }) => {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
-import './UpdateNCOs.css';
+import "../../style/update.css";
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { getAuthUser } from '../../helper/Storage';
@@ -17,9 +17,8 @@ const schema = yup.object().shape({
   department: yup.string().required('الفرع / الورشة مطلوب'),
   join_date: yup.date().required('تاريخ الضم مطلوب').typeError('يرجى إدخال تاريخ صحيح'),
   address: yup.string().required('العنوان مطلوب'),
-  height: yup.number().typeError('الطول يجب أن يكون رقماً').required('الطول مطلوب'),
-  weight: yup.number().typeError('الوزن يجب أن يكون رقماً').required('الوزن مطلوب'),
   dob: yup.date().required('تاريخ الميلاد مطلوب').typeError('يرجى إدخال تاريخ صحيح'),
+  attached: yup.boolean().required('حقل الملحق مطلوب'),
 });
 
 const UpdateOfficers = () => {
@@ -36,9 +35,8 @@ const UpdateOfficers = () => {
     department: '',
     join_date: '',  // store as string "YYYY-MM-DD"
     address: '',
-    height: '',
-    weight: '',
     dob: '',
+    attached: false,
     success: null,
     reload: false,
   });
@@ -65,13 +63,14 @@ const UpdateOfficers = () => {
            const formattedData = {
     ...data,
     join_date: data.join_date ? formatDateToInput(data.join_date) : '',
-    dob: data.dob ? formatDateToInput(data.dob) : '',
+             dob: data.dob ? formatDateToInput(data.dob) : '',
+             attached: data.attached === true ? true : false,
   };
 
 
 
     axios
-      .put('http://192.168.1.3:4001/NCO/' + id, formattedData, {
+      .put(`${process.env.REACT_APP_BACKEND_BASE_URL}/NCO/` + id, formattedData, {
         headers: {
           token: auth.token,
         },
@@ -102,7 +101,7 @@ const UpdateOfficers = () => {
 
   useEffect(() => {
     axios
-      .get('http://192.168.1.3:4001/NCO/' + id, {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/NCO/` + id, {
         headers: {
           token: auth.token,
         },
@@ -116,9 +115,10 @@ const UpdateOfficers = () => {
           department: resp.data._department,
           join_date: resp.data._join_date ? formatDateToInput(resp.data._join_date) : '',
           address: resp.data._address,
-          height: resp.data._height,
-          weight: resp.data._weight,
           dob: resp.data._dob ? formatDateToInput(resp.data._dob) : '',
+          attached: resp.data._attached,
+          loading: false,
+          err: '',
         });
         reset({
           mil_id: resp.data._mil_id,
@@ -127,9 +127,8 @@ const UpdateOfficers = () => {
           department: resp.data._department,
           join_date: resp.data._join_date ? formatDateToInput(resp.data._join_date) : '',
           address: resp.data._address,
-          height: resp.data._height,
-          weight: resp.data._weight,
           dob: resp.data._dob ? formatDateToInput(resp.data._dob) : '',
+          attached: resp.data._attached,
         });
       })
       .catch((err) => {
@@ -146,7 +145,7 @@ const UpdateOfficers = () => {
 
   useEffect(() => {
     axios
-      .get('http://192.168.1.3:4001/department/', {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/department/`, {
         headers: {
           token: auth.token,
         },
@@ -199,7 +198,8 @@ const UpdateOfficers = () => {
             <option value="مساعد">مساعد</option> 
             <option value="مساعد أول">مساعد أول</option> 
             <option value="صانع ماهر">صانع ماهر</option> 
-            <option value="صانع دقيق">صانع دقيق</option> 
+            <option value="صانع دقيق">صانع دقيق</option>
+            <option value="صانع ممتاز">صانع ممتاز</option>
             <option value="ملاحظ">ملاحظ</option> 
             <option value="ملاحظ فني">ملاحظ فني</option> 
           </Form.Control>
@@ -255,27 +255,6 @@ const UpdateOfficers = () => {
           {errors.address && <div className="invalid-feedback">{errors.address.message}</div>}
         </Form.Group>
 
-        <Form.Group controlId="height" className="form-group">
-          <Form.Label>الطول</Form.Label>
-          <Form.Control
-            type="number"
-            placeholder="أدخل الطول"
-            {...register('height')}
-            className={`form-control ${errors.height ? 'is-invalid' : ''}`}
-          />
-          {errors.height && <div className="invalid-feedback">{errors.height.message}</div>}
-        </Form.Group>
-
-        <Form.Group controlId="weight" className="form-group">
-          <Form.Label>الوزن</Form.Label>
-          <Form.Control
-            type="number"
-            placeholder="أدخل الوزن"
-            {...register('weight')}
-            className={`form-control ${errors.weight ? 'is-invalid' : ''}`}
-          />
-          {errors.weight && <div className="invalid-feedback">{errors.weight.message}</div>}
-        </Form.Group>
 
         <Form.Group controlId="dob" className="form-group">
           <Form.Label>تاريخ الميلاد</Form.Label>
@@ -287,6 +266,21 @@ const UpdateOfficers = () => {
           />
           {errors.dob && <div className="invalid-feedback">{errors.dob.message}</div>}
         </Form.Group>
+
+        <Form.Group controlId="attached" className="form-group">
+          <Form.Label>ملحق</Form.Label>
+          <Form.Control
+            as="select"
+            {...register('attached')}
+            className={`form-control ${errors.attached ? 'is-invalid' : ''}`}
+          >
+            <option value={false}>لا</option>
+            <option value={true}>نعم</option>
+          </Form.Control>
+          {errors.attached && <div className="invalid-feedback">{errors.attached.message}</div>}
+        </Form.Group>
+
+
 
         <Button variant="primary" type="submit" className="mt-3" disabled={officer.loading}>
           {officer.loading ? 'جاري التعديل...' : 'تعديل ضابط الصف'}

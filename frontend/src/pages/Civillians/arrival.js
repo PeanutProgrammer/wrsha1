@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
-import './Civillian.css';
+import "../../style/style.css";
 import axios from 'axios';
 import { getAuthUser } from '../../helper/Storage';
 import { useForm } from 'react-hook-form';
@@ -21,6 +21,7 @@ const schema = yup.object().shape({
 const CivillianArrival = () => {
   const [civillian, setCivillian] = useState([]);
   const [leaveType, setLeaveType] = useState([]);
+  const [selectedLeaveType, setSelectedLeaveType] = useState(null);
   const auth = getAuthUser();
   const [civillianLog, setCivillianLog] = useState({
     loading: false,
@@ -44,16 +45,22 @@ const CivillianArrival = () => {
       ...data,
       event_type: 'دخول',
       event_time: moment().format("YYYY-MM-DD HH:mm:ss"),
-      loggerID: auth.id
+      loggerID: auth.id,
+      start_date: moment(data.start_date).format("YYYY-MM-DD"),
+      end_date: null,
     };
 
         console.log("Formatted Request Data:", formattedData);
 
 
     try {
-      await axios.post('http://192.168.1.3:4001/civillianLog/', formattedData, {
-        headers: { token: auth.token },
-      });
+      await axios.post(
+        `${process.env.REACT_APP_BACKEND_BASE_URL}/civillianLog/`,
+        formattedData,
+        {
+          headers: { token: auth.token },
+        }
+      );
 
       setCivillianLog({
         loading: false,
@@ -81,7 +88,7 @@ const CivillianArrival = () => {
 
   useEffect(() => {
     axios
-      .get('http://192.168.1.3:4001/civillian/absent', {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/civillian/absent`, {
         headers: {
           token: auth.token,
         },
@@ -92,7 +99,7 @@ const CivillianArrival = () => {
 
   useEffect(() => {
     axios
-      .get('http://192.168.1.3:4001/leaveType/', {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/leaveType/`, {
         headers: {
           token: auth.token,
         },
@@ -101,10 +108,19 @@ const CivillianArrival = () => {
       .catch((err) => console.log(err));
   }, []);
 
+      const filteredLeaveTypes = leaveType.filter(
+        (type) => [4,9,10,17,18].includes(type.id)
+      );
+  
+  const leaveTypeOptions = filteredLeaveTypes.map((type) => ({
+    value: type.id,
+    label: type.name,
+  }));
+
   // Transform civillians into format required by react-select
   const civillianOptions = civillian.map((civillian) => ({
     value: civillian.id,
-    label: `السيد / ${civillian.name}`,
+    label: civillian.name,
     leaveTypeID: civillian.leaveTypeID, // Attach latest leave type
   }));
 
@@ -113,6 +129,12 @@ const CivillianArrival = () => {
     if (selectedOption) {
       setValue("civillianID", selectedOption.value); // Set the civillianID field in react-hook-form
       setValue("leaveTypeID", selectedOption.leaveTypeID); // Set the leaveTypeID field based on selected civillian
+
+      // NEW: Auto-select UI of leaveType
+      const found = leaveTypeOptions.find(
+        (opt) => opt.value === selectedOption.leaveTypeID
+      );
+      setSelectedLeaveType(found || null);
     }
   };
 
@@ -133,6 +155,7 @@ const CivillianArrival = () => {
       ...provided,
       backgroundColor: state.isSelected ? '#007bff' : state.isFocused ? '#f8f9fa' : null,
       color: state.isSelected ? '#fff' : '#495057',
+      fontWeight: state.isSelected ? '600' : '500',
     }),
   };
 
@@ -168,23 +191,33 @@ const CivillianArrival = () => {
             styles={customStyles} // Apply custom styles to fix overlap issues
             placeholder="اختر المدني"
           />
-          {errors.civillianID && <div className="invalid-feedback">{errors.civillianID.message}</div>}
+          {errors.civillianID && (
+            <div className="invalid-feedback">{errors.civillianID.message}</div>
+          )}
         </Form.Group>
 
         {/* Leave Type Dropdown */}
         <Form.Group controlId="leaveTypeID" className="form-group">
           <Form.Label>نوع العودة</Form.Label>
-          <Form.Control
-            as="select"
-            {...register("leaveTypeID")}
-            className={`form-control ${errors.leaveTypeID ? 'is-invalid' : ''}`}
-          >
-            <option value="">إختر نوع العودة</option>
-            {leaveType.map((type) => (
-              <option key={type.id} value={type.id}>{type.name}</option>
-            ))}
-          </Form.Control>
-          {errors.leaveTypeID && <div className="invalid-feedback">{errors.leaveTypeID.message}</div>}
+          <Select
+            options={leaveTypeOptions}
+            placeholder="اختر نوع العودة"
+            value={selectedLeaveType} // AUTO SELECTED
+            onChange={(selectedOption) => {
+              setSelectedLeaveType(selectedOption); // Update UI
+              setValue("leaveTypeID", selectedOption.value);
+            }}
+            styles={customStyles}
+            className="react-select"
+          />
+          {errors.leaveTypeID && (
+            <div className="invalid-feedback d-block">
+              {errors.leaveTypeID.message}
+            </div>
+          )}
+          {errors.leaveTypeID && (
+            <div className="invalid-feedback">{errors.leaveTypeID.message}</div>
+          )}
         </Form.Group>
 
         {/* Notes */}
@@ -195,14 +228,21 @@ const CivillianArrival = () => {
             rows={3}
             placeholder="أدخل ملاحظات"
             {...register("notes")}
-            className={`form-control ${errors.notes ? 'is-invalid' : ''}`}
+            className={`form-control ${errors.notes ? "is-invalid" : ""}`}
           />
-          {errors.notes && <div className="invalid-feedback">{errors.notes.message}</div>}
+          {errors.notes && (
+            <div className="invalid-feedback">{errors.notes.message}</div>
+          )}
         </Form.Group>
 
         {/* Submit Button */}
-        <Button type="submit" variant="primary" className='submit-btn' disabled={civillianLog.loading}>
-          {civillianLog.loading ? 'جاري الإضافة...' : 'تسجيل دخول'}
+        <Button
+          type="submit"
+          variant="primary"
+          className="submit-btn"
+          disabled={civillianLog.loading}
+        >
+          {civillianLog.loading ? "جاري الإضافة..." : "تسجيل دخول"}
         </Button>
       </Form>
     </div>

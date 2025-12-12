@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
-import './Expert.css';
+import "../../style/style.css";
 import axios from 'axios';
 import { getAuthUser } from '../../helper/Storage';
 import { useForm } from 'react-hook-form';
@@ -51,7 +51,7 @@ const ExpertArrival = () => {
     console.log("Formatted Request Data:", formattedData);
 
     try {
-      await axios.post('http://192.168.1.3:4001/expertLog/', formattedData, {
+      await axios.post(`${process.env.REACT_APP_BACKEND_BASE_URL}/expertLog/`, formattedData, {
         headers: { token: auth.token },
       });
 
@@ -81,7 +81,7 @@ const ExpertArrival = () => {
 
   useEffect(() => {
     axios
-      .get('http://192.168.1.3:4001/expert/', {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/expert/`, {
         headers: {
           token: auth.token,
         },
@@ -92,7 +92,7 @@ const ExpertArrival = () => {
 
   useEffect(() => {
     axios
-      .get('http://192.168.1.3:4001/officer/', {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/officer/`, {
         headers: {
           token: auth.token,
         },
@@ -144,6 +144,7 @@ const ExpertArrival = () => {
       ...provided,
       backgroundColor: state.isSelected ? '#007bff' : state.isFocused ? '#f8f9fa' : null,
       color: state.isSelected ? '#fff' : '#495057',
+      fontWeight: state.isSelected ? '600' : '500',
     }),
   };
 

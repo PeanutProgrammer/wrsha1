@@ -22,12 +22,12 @@ const Users = () => {
 
 
   useEffect(() => {
-    const socket = io("http://192.168.1.3:4001"); //  backend port
+    const socket = io(`${process.env.REACT_APP_BACKEND_BASE_URL}`); //  backend port
 
     // 🔁 Initial fetch
     const fetchData = () => {
       axios
-        .get("http://192.168.1.3:4001/user/", {
+        .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/user/`, {
           headers: { token: auth.token },
         })
         .then((resp) => {
@@ -81,7 +81,7 @@ const Users = () => {
 
     // Change the API method to DELETE as per the new backend implementation
     axios
-      .delete('http://192.168.1.3:4001/user/' + selectedUser.id, {
+      .delete(`${process.env.REACT_APP_BACKEND_BASE_URL}/user/` + selectedUser.id, {
         headers: { token: auth.token },
       })
       .then(() => {

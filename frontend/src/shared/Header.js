@@ -10,7 +10,7 @@ const Header = () => {
     const navigate = useNavigate();
 
     const logout = () => {
-        axios.post('http://192.168.1.3:4001/auth/logout', {}, {
+        axios.post(`${process.env.REACT_APP_BACKEND_BASE_URL}/auth/logout`, {}, {
             headers: {
                 token: auth.token
             }

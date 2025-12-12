@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './Soldier.css';
+import "../../style/style.css";
 import { Table ,Alert} from 'react-bootstrap';
 import { Link ,useParams} from 'react-router-dom';
 import axios from 'axios';
@@ -17,7 +17,7 @@ const SoldiersTmam = () => {
 
   useEffect(() => {
     setSoldiers({ ...soldiers,loading : true});
-    axios.get('http://192.168.1.3:4001/soldier/tmam',  {
+    axios.get(`${process.env.REACT_APP_BACKEND_BASE_URL}/soldier/tmam`,  {
       headers: {
         token: auth.token
       }
@@ -61,7 +61,6 @@ const SoldiersTmam = () => {
         {/* <Link to={"AddOfficers"} className="btn btn-success mb-4"> إنشاء ضابط جديد +</Link> */}
       </div>
 
-
       {soldiers.err && (
         <Alert variant="danger" className="p-2">
           {soldiers.err}
@@ -72,7 +71,6 @@ const SoldiersTmam = () => {
           {soldiers.success}
         </Alert>
       )}
-
 
       <Table striped bordered hover>
         <thead>
@@ -86,17 +84,28 @@ const SoldiersTmam = () => {
           </tr>
         </thead>
         <tbody>
-        {soldiers.results.map((soldier) => (
+          {soldiers.results.map((soldier) => (
             <tr key={soldier.mil_id}>
-            <td>{soldier.mil_id}</td>    
-            <td>{soldier.rank}</td>
-            <td>{soldier.name}</td>
-            <td>{soldier.department}</td>
-            <td >{soldier.tmam? soldier.tmam: "متواجد"}</td>
+              <td>{soldier.mil_id}</td>
+              <td>{soldier.rank}</td>
+              <td>{soldier.name}</td>
+              <td>{soldier.department}</td>
+              <td>
+                {soldier.in_unit
+                  ? "متواجد"
+                  : soldier.tmam
+                  ? soldier.tmam
+                  : "غير متواجد"}
+              </td>
               <td>
                 {/* <button className="btn btn-sm btn-danger mx-1 p-2" onClick ={(e) =>  {deleteOfficer(officer.mil_id)}}>حذف</button> */}
                 {/* <Link to={`${officer.mil_id}`} className="btn btn-sm btn-primary mx-1 p-2">تعديل</Link> */}
-                <Link to={`details/${soldier.mil_id}`} className="btn btn-sm btn-primary mx-1 p-2">تفاصيل </Link>
+                <Link
+                  to={`details/${soldier.mil_id}`}
+                  className="btn btn-sm btn-primary mx-1 p-2"
+                >
+                  تفاصيل{" "}
+                </Link>
               </td>
             </tr>
           ))}

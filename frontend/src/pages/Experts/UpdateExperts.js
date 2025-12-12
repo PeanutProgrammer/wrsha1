@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
-import './UpdateExperts.css';
+import "../../style/update.css";
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { getAuthUser } from '../../helper/Storage';
@@ -71,7 +71,7 @@ const UpdateExperts = () => {
 
 
     axios
-      .put('http://192.168.1.3:4001/Expert/' + id, formattedData, {
+      .put(`${process.env.REACT_APP_BACKEND_BASE_URL}/Expert/` + id, formattedData, {
         headers: {
           token: auth.token,
         },
@@ -105,7 +105,7 @@ const UpdateExperts = () => {
 
   useEffect(() => {
     axios
-      .get('http://192.168.1.3:4001/Expert/' + id, {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/Expert/` + id, {
         headers: {
           token: auth.token,
         },
@@ -151,7 +151,7 @@ const UpdateExperts = () => {
 
    useEffect(() => {
           axios
-            .get('http://192.168.1.3:4001/department/', {
+            .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/department/`, {
               headers: {
                 token: auth.token,
               },

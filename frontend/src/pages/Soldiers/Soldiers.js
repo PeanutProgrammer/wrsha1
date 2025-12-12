@@ -25,7 +25,7 @@ const Soldiers = () => {
   useEffect(() => {
     setSoldiers({ ...soldiers, loading: true });
     axios
-      .get('http://192.168.1.3:4001/soldier/', {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/soldier/`, {
         headers: {
           token: auth.token,
         },
@@ -62,7 +62,7 @@ const Soldiers = () => {
     if (!selectedSoldier) return;
 
     axios
-      .delete('http://192.168.1.3:4001/soldier/' + selectedSoldier.mil_id, {
+      .delete(`${process.env.REACT_APP_BACKEND_BASE_URL}/soldier/` + selectedSoldier.mil_id, {
         headers: {
           token: auth.token,
         },
@@ -114,7 +114,7 @@ const Soldiers = () => {
     <div className="Officers p-5">
       <div className="header d-flex justify-content-between mb-3">
         <h3 className="text-center mb-3">إدارة الجنود</h3>
-        <Link to={'../add'} className="btn btn-success mb-4">
+        <Link to={"../add"} className="btn btn-success mb-4">
           إنشاء جندي جديد +
         </Link>
       </div>
@@ -143,6 +143,7 @@ const Soldiers = () => {
               <th>الورشة / الفرع</th>
               <th>تاريخ الضم</th>
               <th>تاريخ التسريح</th>
+              <th>ملحق؟</th>
               <th>التمام</th>
               <th>الإجراءات</th>
             </tr>
@@ -154,9 +155,10 @@ const Soldiers = () => {
                 <td>{soldier.rank}</td>
                 <td>{soldier.name}</td>
                 <td>{soldier.department}</td>
-                <td>{moment(soldier.join_date).format('YYYY-MM-DD')}</td>
-                <td>{moment(soldier.end_date).format('YYYY-MM-DD')}</td>
-                <td>{soldier.in_unit ? 'متواجد' : 'غير موجود'}</td>
+                <td>{moment(soldier.join_date).format("YYYY-MM-DD")}</td>
+                <td>{moment(soldier.end_date).format("YYYY-MM-DD")}</td>
+                <td>{soldier.attached ? "نعم" : "لا"}</td>
+                <td>{soldier.in_unit ? "متواجد" : "غير موجود"}</td>
                 <td>
                   <div className="action-buttons">
                     <button
@@ -199,7 +201,7 @@ const Soldiers = () => {
           <button
             key={number}
             className={`btn btn-light page-btn ${
-              currentPage === number ? 'active' : ''
+              currentPage === number ? "active" : ""
             }`}
             onClick={() => paginate(number)}
           >
@@ -222,7 +224,7 @@ const Soldiers = () => {
           <Modal.Title>تأكيد الحذف</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          هل أنت متأكد أنك تريد حذف الجندي{' '}
+          هل أنت متأكد أنك تريد حذف الجندي{" "}
           <strong>{selectedSoldier?.name}</strong>؟
         </Modal.Body>
         <Modal.Footer>

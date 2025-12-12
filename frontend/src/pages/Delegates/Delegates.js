@@ -25,7 +25,7 @@ const Delegates = () => {
   useEffect(() => {
     setDelegates({ ...Delegates, loading: true });
     axios
-      .get('http://192.168.1.3:4001/delegate/', {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/delegate/`, {
         headers: {
           token: auth.token,
         },
@@ -62,7 +62,7 @@ const Delegates = () => {
     if (!selectedDelegate) return;
 
     axios
-      .delete('http://192.168.1.3:4001/delegate/' + selectedDelegate.id, {
+      .delete(`${process.env.REACT_APP_BACKEND_BASE_URL}/delegate/` + selectedDelegate.id, {
         headers: {
           token: auth.token,
         },
@@ -100,17 +100,21 @@ const Delegates = () => {
     const visitEnd = moment().format("YYYY-MM-DD HH:mm:ss");  // Current time
 
     axios
-      .put(`http://192.168.1.3:4001/delegate/end-visit/${delegateId}`, { visit_end: visitEnd }, {
-        headers: {
-          token: auth.token,
-        },
-      })
+      .put(
+        `${process.env.REACT_APP_BACKEND_BASE_URL}/delegate/end-visit/${delegateId}`,
+        { visit_end: visitEnd },
+        {
+          headers: {
+            token: auth.token,
+          },
+        }
+      )
       .then((response) => {
         // Refresh the delegate data after updating
         setDelegates({
           ...Delegates,
           reload: Delegates.reload + 1,
-          success: 'تم إنهاء الزيارة بنجاح ✅',
+          success: "تم إنهاء الزيارة بنجاح ✅",
           err: null,
         });
 
@@ -123,8 +127,7 @@ const Delegates = () => {
         setDelegates({
           ...Delegates,
           err:
-            err.response?.data?.errors ||
-            'حدث خطأ أثناء محاولة إنهاء الزيارة.',
+            err.response?.data?.errors || "حدث خطأ أثناء محاولة إنهاء الزيارة.",
         });
       });
   };

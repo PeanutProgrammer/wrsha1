@@ -26,7 +26,7 @@ const Civillians = () => {
   useEffect(() => {
     setCivillians({ ...civillians, loading: true });
     axios
-      .get('http://192.168.1.3:4001/civillian/', {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/civillian/`, {
         headers: {
           token: auth.token,
         },
@@ -63,7 +63,7 @@ const Civillians = () => {
     if (!selectedCivillian) return;
 
     axios
-      .delete('http://192.168.1.3:4001/civillian/' + selectedCivillian.mil_id, {
+      .delete(`${process.env.REACT_APP_BACKEND_BASE_URL}/civillian/` + selectedCivillian.mil_id, {
         headers: {
           token: auth.token,
         },
@@ -139,10 +139,6 @@ const Civillians = () => {
               <th>الإسم</th>
               <th>الورشة / الفرع</th>
               <th>تاريخ الضم</th>
-              <th>رقم التصديق الأمني</th>
-              <th>الفترة من</th>
-              <th>الفترة إلى</th>
-              <th>حالة التصديق</th>
               <th>التمام</th>
               <th>الإجراءات</th>
             </tr>
@@ -154,26 +150,6 @@ const Civillians = () => {
                 <td>{civillian.name}</td>
                 <td>{civillian.department}</td>
                 <td>{moment(civillian.join_date).format('YYYY-MM-DD')}</td>
-                <td>{civillian.security_clearance_number}</td>
-                <td>{moment(civillian.valid_from).format('YYYY-MM-DD')}</td>
-                <td>{moment(civillian.valid_through).format('YYYY-MM-DD')}</td>
-                <td
-                                className={
-                    moment(civillian.valid_from).isBefore(now) && moment(civillian.valid_through).isAfter(now)
-                      ? 'bg-success text-white' // Valid: green
-                      : moment(civillian.valid_through).isBefore(now)
-                      ? 'bg-danger text-white' // Expired: red
-                      : moment(civillian.valid_from).isAfter(now)
-                      ? 'bg-warning text-dark'  // Not started yet: yellow
-                      : 'bg-danger text-white'  // fallback
-                  }> {moment(civillian.valid_from).isBefore(now) && moment(civillian.valid_through).isAfter(now)
-                    ? 'ساري'
-                    : moment(civillian.valid_through).isBefore(now)
-                    ? 'منتهي'
-                    : moment(civillian.valid_from).isAfter(now)
-                    ? 'لم يبدأ بعد'  // Optional, if you want to display something for experts who haven't started yet
-                    : 'منتهي' // fallback for invalid state
-                  }</td>
                 <td>{civillian.in_unit ? 'متواجد' : 'غير موجود'}</td>
                 <td>
                   <div className="action-buttons">

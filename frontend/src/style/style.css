@@ -1,0 +1,179 @@
+/* ==========================
+   Common Officers Page Styles
+   Applies to: Users, Soldiers, NCOs, Guests, Experts, Delegates, Civilians
+   ========================== */
+
+.Officers {
+  width: 100%;
+  max-width: 1500px; /* Optional max width */
+  box-sizing: border-box; /* Include padding in width */
+  padding: 20px;    /* Optional spacing */
+}
+
+.Officers .header {
+  position: relative; /* or remove fixed/sticky */
+  top: auto;
+  z-index: auto;
+  background-color: #212529;
+  padding: 10px 15px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+.Officers .header h3 {
+  color: #fff;
+  margin: 0;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.action-buttons .btn {
+  min-width: 70px;
+  padding: 4px 8px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.add-officer-form {
+  max-width: 600px;
+  margin: 50px auto;
+  padding: 20px;
+  background: #f8f9fa; /* slightly gray for less glare */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* slightly stronger shadow for contrast */
+  border-radius: 10px;
+}
+
+h1 {
+  font-size: 2rem;
+  font-weight: 700; /* bold */
+  color: #212529;   /* darker text for contrast */
+}
+
+.form-group label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #212529;
+}
+
+.form-control {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #212529;
+  padding: 12px;
+}
+
+/* Form Styling */
+.form-group {
+  margin-bottom: 20px;
+}
+
+
+
+
+
+.form-control:focus {
+  border-color: #5c6bc0;
+  box-shadow: 0 0 5px rgba(92, 107, 192, 0.5);
+}
+
+.form-control::placeholder {
+  color: #6c757d;  /* darker gray */
+  opacity: 1;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 12px;
+  text-align: center;
+  font-size: 1.3rem;
+  font-weight: 600;
+  background-color: #0d6efd; /* Bootstrap primary blue */
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submit-btn:hover {
+  background-color: #0b5ed7; /* darker blue */
+}
+
+.submit-btn:disabled {
+  background-color: #b0bec5;
+  cursor: not-allowed;
+}
+
+/* Alerts */
+.alert {
+  margin-bottom: 20px;
+}
+
+/* Pagination */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.page-btn {
+  padding: 6px 12px;
+  background-color: #f1f1f1;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+.page-btn:hover {
+  background-color: #e1e1e1;
+}
+
+.page-btn.active {
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
+}
+
+.btn-light:disabled {
+  background-color: #e9ecef;
+  cursor: not-allowed;
+}
+
+/* ==========================
+   Mobile Responsiveness
+   ========================== */
+@media (max-width: 768px) {
+  .add-officer-form {
+    padding: 15px;
+  }
+  h1 {
+    font-size: 1.6rem;
+  }
+}
+
+/* ==========================
+   Role-specific tweaks
+   ========================== */
+
+/* Expert role: custom radio buttons */
+.custom-radio .form-check-input {
+  transform: scale(0.8);
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  margin-top: 0.2rem;
+  margin-right: 1.5rem;
+}
+
+/* Guest role: text-align fix on submit button */
+.guest .submit-btn {
+  text-align: center !important;
+}
+
+/* Add more role-specific tweaks below as needed */

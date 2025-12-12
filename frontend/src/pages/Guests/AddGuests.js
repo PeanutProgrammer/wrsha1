@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
-import './Guest.css';
+import "../../style/style.css";
 import axios from 'axios';
 import { getAuthUser } from '../../helper/Storage';
 import { useForm } from 'react-hook-form';
@@ -60,7 +60,7 @@ const createGuest = async (data) => {
     console.log("Request Data with visit_end:", formattedData);
 
     try {
-        await axios.post('http://192.168.1.3:4001/guest/', formattedData, {
+        await axios.post(`${process.env.REACT_APP_BACKEND_BASE_URL}/guest/`, formattedData, {
             headers: {
                 token: auth.token,
             },
@@ -98,7 +98,7 @@ const createGuest = async (data) => {
 
   useEffect(() => {
     axios
-      .get('http://192.168.1.3:4001/officer/', {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/officer/`, {
         headers: {
           token: auth.token,
         },

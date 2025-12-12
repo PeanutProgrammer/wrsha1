@@ -1,7 +1,7 @@
 
 
 class Civillian {
-    constructor(name, join_date, department, nationalID, telephone_number, address, dob,  security_clearance_number, valid_from, valid_through, in_unit) {
+    constructor(name, join_date, department, nationalID, telephone_number, address, dob, in_unit) {
         this._name = name;
         this._join_date = join_date;
         this._department = department;
@@ -9,9 +9,6 @@ class Civillian {
         this._telephone_number = telephone_number;
         this._address = address;
         this._dob = dob;
-        this._security_clearance_number = security_clearance_number;
-        this._valid_from = valid_from;
-        this._valid_through = valid_through;
         this._in_unit = in_unit;
 
     }
@@ -30,19 +27,6 @@ class Civillian {
 
     getNationalID = () => {
         return this._nationalID;
-    }
-
-    getSecurityClearanceNumber = () => {
-        return this._security_clearance_number;
-    }
-
-
-    getValidFrom = () => {
-        return this._valid_from;
-    }
-
-    getValidThrough = () => {
-        return this._valid_through;
     }
 
     getInUnit = () => {
@@ -80,17 +64,6 @@ class Civillian {
         this._nationalID = nationalID;
     }
 
-    setSecurityClearanceNumber = (security_clearance_number) => {
-        this._security_clearance_number = security_clearance_number;
-    }
-
-    setValidFrom = (valid_from) => {
-        this._valid_from = valid_from;
-    }
-
-    setValidThrough = (valid_through) => {
-        this._valid_through = valid_through;
-    }
 
     setInUnit = (in_unit) => {
         this._in_unit = in_unit;

@@ -14,32 +14,6 @@ router.post("/", shuoonOfficers,
           .isString().withMessage("من فضلك أدخل اسم صحيح")
           .isLength({ min: 3, max: 30 }).withMessage("الاسم يجب أن يكون بين 3 و 30 حرفًا"),
   
-      // Validate 'valid_from' and 'valid_through' dates
-    body("valid_from")
-          .isDate().withMessage("من فضلك أدخل تاريخ بدء صحيح (YYYY-MM-DD)")
-          .custom((value, { req }) => {
-              if (!moment(value, "YYYY-MM-DD", true).isValid()) {
-                  throw new Error("تاريخ بدء الخبرة يجب أن يكون بالتنسيق الصحيح (YYYY-MM-DD).");
-              }
-              if (moment(value).isAfter(req.body.valid_through)) {
-                  throw new Error("تاريخ بدء الخبرة يجب أن يكون قبل تاريخ الانتهاء.");
-              }
-              return true;
-          }),
-    body("valid_through")
-          .isDate().withMessage("من فضلك أدخل تاريخ انتهاء صحيح (YYYY-MM-DD)")
-          .custom((value, { req }) => {
-              if (!moment(value, "YYYY-MM-DD", true).isValid()) {
-                  throw new Error("تاريخ انتهاء الخبرة يجب أن يكون بالتنسيق الصحيح (YYYY-MM-DD).");
-              }
-              if (moment(value).isBefore(req.body.valid_from)) {
-                  throw new Error("تاريخ انتهاء الخبرة يجب أن يكون بعد تاريخ البدء.");
-              }
-              return true;
-          }),
-    // Validate 'security_clearance_number'
-    body("security_clearance_number")
-        .isString().withMessage("من فضلك أدخل رقم التصديق الأمني صحيح"),
     body("join_date")
         .isDate(format = "yyyy-MM-DD").withMessage("من فضلك أدخل تاريخ ضم صحيح (YYYY-MM-DD)"),
     body("department")
@@ -65,32 +39,6 @@ router.put("/:id", admin,
           .isString().withMessage("من فضلك أدخل اسم صحيح")
           .isLength({ min: 3, max: 30 }).withMessage("الاسم يجب أن يكون بين 3 و 30 حرفًا"),
   
-      // Validate 'valid_from' and 'valid_through' dates
-    body("valid_from")
-          .isDate(format = "yyyy-MM-DD").withMessage("من فضلك أدخل تاريخ بدء صحيح (YYYY-MM-DD)")
-          .custom((value, { req }) => {
-              if (!moment(value, "YYYY-MM-DD", true).isValid()) {
-                  throw new Error("تاريخ بدء الخبرة يجب أن يكون بالتنسيق الصحيح (YYYY-MM-DD).");
-              }
-              if (moment(value).isAfter(req.body.valid_through)) {
-                  throw new Error("تاريخ بدء الخبرة يجب أن يكون قبل تاريخ الانتهاء.");
-              }
-              return true;
-          }),
-    body("valid_through")
-          .isDate(format = "yyyy-MM-DD").withMessage("من فضلك أدخل تاريخ انتهاء صحيح (YYYY-MM-DD)")
-          .custom((value, { req }) => {
-              if (!moment(value, "YYYY-MM-DD", true).isValid()) {
-                  throw new Error("تاريخ انتهاء الخبرة يجب أن يكون بالتنسيق الصحيح (YYYY-MM-DD).");
-              }
-              if (moment(value).isBefore(req.body.valid_from)) {
-                  throw new Error("تاريخ انتهاء الخبرة يجب أن يكون بعد تاريخ البدء.");
-              }
-              return true;
-          }),
-    // Validate 'security_clearance_number'
-    body("security_clearance_number")
-        .isString().withMessage("من فضلك أدخل رقم التصديق الأمني صحيح"),
     body("join_date")
         .isDate(format = "yyyy-MM-DD").withMessage("من فضلك أدخل تاريخ ضم صحيح (YYYY-MM-DD)"),
     body("department")

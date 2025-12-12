@@ -37,13 +37,10 @@ class CivillianController {
         req.body.telephone_number,
         req.body.address,
         req.body.dob,
-        req.body.security_clearance_number,
-        req.body.valid_from,
-        req.body.valid_through
       );
 
       await query(
-        "insert into civillians set name =?, join_date = ?, department = ?, nationalID = ?, telephone_number = ?, address = ?, dob = ?, security_clearance_number = ?, valid_from = ?, valid_through = ?",
+        "insert into civillians set name =?, join_date = ?, department = ?, nationalID = ?, telephone_number = ?, address = ?, dob = ?",
         [
           civillianObject.getName(),
           civillianObject.getJoinDate(),
@@ -52,9 +49,6 @@ class CivillianController {
           civillianObject.getTelephoneNumber(),
           civillianObject.getAddress(),
           civillianObject.getDOB(),
-          civillianObject.getSecurityClearanceNumber(),
-          civillianObject.getValidFrom(),
-          civillianObject.getValidThrough(),
         ]
       );
 
@@ -96,15 +90,12 @@ class CivillianController {
         req.body.telephone_number,
         req.body.address,
         req.body.dob,
-        req.body.security_clearance_number,
-        req.body.valid_from,
-        req.body.valid_through
       );
 
       console.log("hello");
 
       await query(
-        `update civillians set name =?, join_date = ?, department = ?, nationalID = ?, telephone_number = ?, address = ?, dob = ?, security_clearance_number = ?, valid_from = ?, valid_through = ? where id = ?`,
+        `update civillians set name =?, join_date = ?, department = ?, nationalID = ?, telephone_number = ?, address = ?, dob = ? where id = ?`,
         [
           civillianObject.getName(),
           civillianObject.getJoinDate(),
@@ -113,9 +104,6 @@ class CivillianController {
           civillianObject.getTelephoneNumber(),
           civillianObject.getAddress(),
           civillianObject.getDOB(),
-          civillianObject.getSecurityClearanceNumber(),
-          civillianObject.getValidFrom(),
-          civillianObject.getValidThrough(),
           req.params.id,
         ]
       );
@@ -227,9 +215,6 @@ class CivillianController {
         civillian[0].telephone_number,
         civillian[0].address,
         civillian[0].dob,
-        civillian[0].security_clearance_number,
-        civillian[0].valid_from,
-        civillian[0].valid_through,
         civillian[0].in_unit
       );
 
@@ -261,11 +246,27 @@ SELECT
     o.nationalID,
     o.name,
     o.department,
-    o.join_date,
-    o.security_clearance_number,
     o.in_unit,
-    lt.name AS tmam,
-    old.id AS latest_leave_id
+
+    -- Last departure
+    (
+        SELECT ol.event_time
+        FROM civillian_log ol
+        WHERE ol.civillianID = o.id AND ol.event_type = 'خروج'
+        ORDER BY ol.event_time DESC
+        LIMIT 1
+    ) AS latest_departure,
+
+    -- Last arrival
+    (
+        SELECT ol.event_time
+        FROM civillian_log ol
+        WHERE ol.civillianID = o.id AND ol.event_type = 'دخول'
+        ORDER BY ol.event_time DESC
+        LIMIT 1
+    ) AS latest_arrival,
+
+    lt.name AS tmam
 FROM civillians o
 LEFT JOIN civillian_leave_details old
     ON old.id = (
@@ -326,19 +327,16 @@ ORDER BY o.nationalID;
         civillian[0].telephone_number,
         civillian[0].address,
         civillian[0].dob,
-        civillian[0].security_clearance_number,
-        civillian[0].valid_from,
-        civillian[0].valid_through
       );
       const civillianTmam = await query(
-        `SELECT civillians.nationalID,civillians.name, civillians.department, civillians.security_clearance_number, civillians.join_date, leave_type.name AS 'tmam', civillian_leave_details.start_date, civillian_leave_details.end_date, civillian_leave_details.destination, civillian_log.notes
+        `SELECT civillians.nationalID,civillians.name, civillians.department, civillians.join_date, leave_type.name AS 'tmam', civillian_leave_details.start_date, civillian_leave_details.end_date, civillian_leave_details.destination, civillian_log.notes, civillian_log.event_type
                                           FROM civillians
-                                          LEFT JOIN civillian_log
-                                          ON civillians.id = civillian_log.civillianID
-                                          LEFT JOIN leave_type
-                                          on leave_type.id = civillian_log.leaveTypeID
                                           LEFT JOIN civillian_leave_details
-                                          ON civillian_leave_details.MovementID = civillian_log.id
+                                          ON civillians.id = civillian_leave_details.civillianID
+                                          LEFT JOIN civillian_log
+                                          ON civillian_leave_details.movementID = civillian_log.id
+                                          LEFT JOIN leave_type
+                                          on leave_type.id = civillian_leave_details.leaveTypeID
                                           WHERE civillians.nationalID = ?
                                           ORDER BY civillian_log.id DESC
                                           `,
@@ -483,7 +481,7 @@ LEFT JOIN civillian_log ol
     ON ol.civillianID = o.id 
     AND ol.event_time = lastLog.latest_event
 
--- 🔥 Get the LATEST leave_details row for each officer
+-- 🔥 Get the LATEST leave_details row for each civillian
 LEFT JOIN civillian_leave_details old
     ON old.id = (
         SELECT id
@@ -493,7 +491,7 @@ LEFT JOIN civillian_leave_details old
         LIMIT 1
     )
 
--- 🔥 Get leave type from officer_leave_details, not officer_log
+-- 🔥 Get leave type from civillian_leave_details, not civillian_log
 LEFT JOIN leave_type lt
     ON lt.id = old.leaveTypeID
 

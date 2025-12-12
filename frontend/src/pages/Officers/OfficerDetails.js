@@ -19,7 +19,7 @@ const OfficerDetails = () => {
   useEffect(() => {
     setOfficers({ ...officer, loading: true });
     axios
-      .get('http://192.168.1.3:4001/Officer/' + id, {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/Officer/` + id, {
         headers: {
           token: auth.token,
         },
@@ -105,6 +105,10 @@ const OfficerDetails = () => {
               <tr>
                 <td><strong>تاريخ الميلاد:</strong></td>
                 <td>{moment(officer.results._dob).format('YYYY-MM-DD')}</td>
+              </tr>
+              <tr>
+                <td><strong>ملحق؟</strong></td>
+                <td>{officer.results._attached ? 'نعم' : 'لا'}</td>
               </tr>
               <tr>
                 <td><strong>التمام:</strong></td>

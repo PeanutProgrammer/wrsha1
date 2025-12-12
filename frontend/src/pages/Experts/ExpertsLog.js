@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './Expert.css';
+import "../../style/style.css";
 import { Table, Alert, Button, InputGroup, Form } from "react-bootstrap";
 import { Link ,useParams} from 'react-router-dom';
 import axios from 'axios';
@@ -31,7 +31,7 @@ const ExpertsLog = () => {
       try {
         const searchValue = toWesternDigits(experts.search.trim());
         const resp = await axios.get(
-          `http://192.168.1.3:4001/ExpertLog?page=${experts.page}&limit=20&search=${searchValue}`,
+          `${process.env.REACT_APP_BACKEND_BASE_URL}/ExpertLog?page=${experts.page}&limit=20&search=${searchValue}`,
           { headers: { token: auth.token } }
         );
         setExperts((prev) => ({

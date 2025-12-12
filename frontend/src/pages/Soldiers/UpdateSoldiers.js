@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
-import './UpdateSoldiers.css';
+import "../../style/update.css";
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { getAuthUser } from '../../helper/Storage';
@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
   import moment from 'moment';
+import autoTable from 'jspdf-autotable';
 
 // Validation schema using yup
 const schema = yup.object().shape({
@@ -19,7 +20,8 @@ const schema = yup.object().shape({
   end_date: yup.date().required('تاريخ التسريح مطلوب').typeError('يرجى إدخال تاريخ صحيح'),
   telephone_number: yup.string().required('رقم الهاتف مطلوب'),
   guardian_name: yup.string().required('اسم ولي الأمر مطلوب'),
-  guardian_telephone_number: yup.string().required('رقم ولي الأمر مطلوب')
+  guardian_telephone_number: yup.string().required('رقم ولي الأمر مطلوب'),
+  attached: yup.boolean().required(),
 
 });
 
@@ -40,6 +42,7 @@ const UpdateSoldiers = () => {
     telephone_number: '',
     guardian_name: '',
     guardian_telephone_number: '',
+    attached: false,
     success: null,
     reload: false,
   });
@@ -66,13 +69,14 @@ const UpdateSoldiers = () => {
            const formattedData = {
     ...data,
     join_date: data.join_date ? formatDateToInput(data.join_date) : '',
-    end_date: data.end_date ? formatDateToInput(data.end_date) : ''
+             end_date: data.end_date ? formatDateToInput(data.end_date) : '',
+    attached: data.attached === true ? true : false, // default to false if unchecked
   };
 
 
 
     axios
-      .put('http://192.168.1.3:4001/Soldier/' + id, formattedData, {
+      .put(`${process.env.REACT_APP_BACKEND_BASE_URL}/Soldier/` + id, formattedData, {
         headers: {
           token: auth.token,
         },
@@ -103,7 +107,7 @@ const UpdateSoldiers = () => {
 
   useEffect(() => {
     axios
-      .get('http://192.168.1.3:4001/Soldier/' + id, {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/Soldier/` + id, {
         headers: {
           token: auth.token,
         },
@@ -119,7 +123,9 @@ const UpdateSoldiers = () => {
           end_date: resp.data._end_date ? formatDateToInput(resp.data._end_date) : '',
           telephone_number: resp.data._telephone_number,
           guardian_name: resp.data._guardian_name,
-          guardian_telephone_number: resp.data._guardian_telephone_number
+          guardian_telephone_number: resp.data._guardian_telephone_number,
+          attached: resp.data._attached,
+          loading: false,
         });
         reset({
           mil_id: resp.data._mil_id,
@@ -130,7 +136,8 @@ const UpdateSoldiers = () => {
           end_date: resp.data._end_date ? formatDateToInput(resp.data._end_date) : '',
           telephone_number: resp.data._telephone_number,
           guardian_name: resp.data._guardian_name,
-          guardian_telephone_number: resp.data._guardian_telephone_number
+          guardian_telephone_number: resp.data._guardian_telephone_number,
+          attached: resp.data._attached,
         });
       })
       .catch((err) => {
@@ -147,7 +154,7 @@ const UpdateSoldiers = () => {
 
   useEffect(() => {
     axios
-      .get('http://192.168.1.3:4001/department/', {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/department/`, {
         headers: {
           token: auth.token,
         },
@@ -249,6 +256,8 @@ const UpdateSoldiers = () => {
           {errors.end_date && <div className="invalid-feedback">{errors.end_date.message}</div>}
         </Form.Group>
 
+        
+
         <Form.Group controlId="telephone_number" className="form-group">
           <Form.Label>رقم الهاتف</Form.Label>
           <Form.Control
@@ -280,6 +289,19 @@ const UpdateSoldiers = () => {
           />
           {errors.guardian_telephone_number && <div className="invalid-feedback">{errors.guardian_telephone_number.message}</div>}
         </Form.Group>
+
+                <Form.Group controlId="attached" className="form-group">
+                  <Form.Label>هل الجندي ملحق؟</Form.Label>
+                  <Form.Control
+                    as="select"
+                    {...register("attached")}
+                    className="form-control"
+                  >
+                    <option value="">إختر</option> {/* optional default */}
+                    <option value={true}>نعم</option>
+                    <option value={false}>لا</option>
+                  </Form.Control>
+                </Form.Group>
 
 
       

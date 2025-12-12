@@ -29,7 +29,7 @@ const NCOs = () => {
   useEffect(() => {
     setNCOs({ ...ncos, loading: true });
     axios
-      .get('http://192.168.1.3:4001/nco/', {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/nco/`, {
         headers: {
           token: auth.token,
         },
@@ -78,7 +78,7 @@ const NCOs = () => {
 
     // Send DELETE request with additional fields
     axios
-      .delete('http://192.168.1.3:4001/nco/' + selectedNCO.mil_id, {
+      .delete(`${process.env.REACT_APP_BACKEND_BASE_URL}/nco/` + selectedNCO.mil_id, {
         headers: {
           token: auth.token,
         },
@@ -160,6 +160,7 @@ const NCOs = () => {
               <th>الإسم</th>
               <th>الورشة / الفرع</th>
               <th>تاريخ الضم</th>
+              <th>ملحق؟</th>
               <th>التمام</th>
               <th>الإجراءات</th>
             </tr>
@@ -172,6 +173,7 @@ const NCOs = () => {
                 <td>{nco.name}</td>
                 <td>{nco.department}</td>
                 <td>{moment(nco.join_date).format('YYYY-MM-DD')}</td>
+                <td>{nco.attached ? 'نعم' : 'لا'}</td>
                 <td>{nco.in_unit ? 'متواجد' : 'غير موجود'}</td>
                 <td>
                   <div className="action-buttons">
@@ -188,7 +190,7 @@ const NCOs = () => {
                       تعديل
                     </Link>
                     <Link
-                      to={`details/${nco.id}`}
+                      to={`../details/${nco.id}`}
                       className="btn btn-sm btn-primary"
                     >
                       تفاصيل

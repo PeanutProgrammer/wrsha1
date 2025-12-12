@@ -1,7 +1,7 @@
 
 
 class Officer {
-    constructor(name, join_date, department, mil_id, rank, address, height, weight, dob, seniority_number, in_unit) {
+    constructor(name, join_date, department, mil_id, rank, address, height, weight, dob, seniority_number, in_unit, attached) {
         this._name = name;
         this._join_date = join_date;
         this._department = department;
@@ -13,6 +13,7 @@ class Officer {
         this._dob = dob;
         this._seniority_number = seniority_number;
         this._in_unit = in_unit;
+        this._attached = attached;
     }
 
     getName = () => {
@@ -65,6 +66,9 @@ class Officer {
         return this._in_unit;
     }
 
+    getAttached = () => {
+        return this._attached;
+    }
 
     setName = (name) => {
         this._name = name;
@@ -120,6 +124,9 @@ class Officer {
         this._in_unit = in_unit;
     }
 
+    setAttached = (attached) => {
+        this._attached = attached;
+    }
 
 
     toJSON() {

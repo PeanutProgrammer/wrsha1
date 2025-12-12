@@ -23,7 +23,7 @@ const SecurityGuests = () => {
   useEffect(() => {
     setGuests({ ...Guests, loading: true });
     axios
-      .get("http://192.168.1.3:4001/guest/", {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/guest/`, {
         headers: {
           token: auth.token,
         },

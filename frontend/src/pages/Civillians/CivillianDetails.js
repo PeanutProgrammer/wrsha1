@@ -18,7 +18,7 @@ const CivillianDetails = () => {
 
   useEffect(() => {
     setCivillians({ ...civillian,loading : true});
-      axios.get('http://192.168.1.3:4001/civillian/' + id, {
+      axios.get(`${process.env.REACT_APP_BACKEND_BASE_URL}/civillian/` + id, {
           headers: {
         token: auth.token
     }})

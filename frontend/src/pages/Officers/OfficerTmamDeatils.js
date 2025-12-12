@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './Officers.css';
+import "../../style/style.css";
 import { Table, Alert } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
@@ -20,7 +20,7 @@ const OfficersTmamDetails = () => {
   useEffect(() => {
     setOfficers({ ...officer, loading: true });
     axios
-      .get(`http://192.168.1.3:4001/Officer/tmam/${id}`, {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/Officer/tmam/${id}`, {
         headers: {
           token: auth.token,
         },
@@ -39,7 +39,7 @@ const OfficersTmamDetails = () => {
           loading: false,
           err: err.response
             ? JSON.stringify(err.response.data.errors)
-            : 'Something went wrong. Please try again later.',
+            : "Something went wrong. Please try again later.",
         });
       });
   }, [officer.reload]);

@@ -23,7 +23,7 @@ const SecurityExperts = () => {
   useEffect(() => {
     setExperts({ ...experts, loading: true });
     axios
-      .get("http://192.168.1.3:4001/expert/", {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/expert/`, {
         headers: {
           token: auth.token,
         },

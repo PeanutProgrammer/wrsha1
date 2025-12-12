@@ -43,12 +43,12 @@ const Officers = () => {
   const [transferredTo, setTransferredTo] = useState('');
 
   useEffect(() => {
-    const socket = io("http://192.168.1.3:4001"); //  backend port
+    const socket = io(`${process.env.REACT_APP_BACKEND_BASE_URL}`); //  backend port
 
     // 🔁 Initial fetch
     const fetchData = () => {
       axios
-        .get("http://192.168.1.3:4001/officer/", {
+        .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/officer/`, {
           headers: { token: auth.token },
         })
         .then((resp) => {
@@ -110,7 +110,7 @@ const Officers = () => {
 
     // Change the API method to DELETE as per the new backend implementation
     axios
-      .delete('http://192.168.1.3:4001/officer/' + selectedOfficer.mil_id, {
+      .delete(`${process.env.REACT_APP_BACKEND_BASE_URL}/officer/` + selectedOfficer.mil_id, {
         headers: { token: auth.token },
         data: data,  // Send additional fields in the body of the DELETE request
       })
@@ -367,6 +367,7 @@ const exportToWord = () => {
               <th>الاسم</th>
               <th>الورشة / الفرع</th>
               <th>تاريخ الضم</th>
+              <th>ملحق؟</th>
               <th>التمام</th>
               <th>Action</th>
             </tr>
@@ -379,6 +380,7 @@ const exportToWord = () => {
                 <td>{officer.name}</td>
                 <td>{officer.department}</td>
                 <td>{moment(officer.join_date).format('YYYY-MM-DD')}</td>
+                <td>{officer.attached ? 'نعم' : 'لا'}</td>
                 <td>{officer.in_unit ? 'متواجد' : 'غير موجود'}</td>
                 <td>
                   <div className="action-buttons">

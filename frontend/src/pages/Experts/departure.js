@@ -24,7 +24,7 @@ const ExpertDeparture = () => {
   useEffect(() => {
     setExperts({ ...Experts, loading: true });
     axios
-      .get('http://192.168.1.3:4001/expertLog/current', {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/expertLog/current`, {
         headers: {
           token: auth.token,
         },
@@ -55,16 +55,20 @@ const ExpertDeparture = () => {
     const visitEnd = moment().format("YYYY-MM-DD HH:mm:ss"); // Current time
 
     axios
-      .put(`http://192.168.1.3:4001/expertLog/end-visit/${expertId}`, { visit_end: visitEnd }, {
-        headers: {
-          token: auth.token,
-        },
-      })
+      .put(
+        `${process.env.REACT_APP_BACKEND_BASE_URL}/expertLog/end-visit/${expertId}`,
+        { visit_end: visitEnd },
+        {
+          headers: {
+            token: auth.token,
+          },
+        }
+      )
       .then((response) => {
         setExperts({
           ...Experts,
           reload: Experts.reload + 1,
-          success: 'تم إنهاء الزيارة بنجاح ✅',
+          success: "تم إنهاء الزيارة بنجاح ✅",
           err: null,
         });
 
@@ -85,8 +89,7 @@ const ExpertDeparture = () => {
         setExperts({
           ...Experts,
           err:
-            err.response?.data?.errors ||
-            'حدث خطأ أثناء محاولة إنهاء الزيارة.',
+            err.response?.data?.errors || "حدث خطأ أثناء محاولة إنهاء الزيارة.",
         });
       });
   };

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Form, Button, Alert } from "react-bootstrap";
-import "./Soldier.css";
+import "../../style/style.css";
 import axios from "axios";
 import { getAuthUser } from "../../helper/Storage";
 import { useForm } from "react-hook-form";
@@ -20,6 +20,7 @@ const schema = yup.object().shape({
 const SoldierArrival = () => {
   const [soldier, setSoldier] = useState([]);
   const [leaveType, setLeaveType] = useState([]);
+  const [selectedLeaveType, setSelectedLeaveType] = useState(null);
   const auth = getAuthUser();
 
   const [soldierLog, setSoldierLog] = useState({
@@ -44,7 +45,7 @@ const SoldierArrival = () => {
   // Fetch soldiers
   useEffect(() => {
     axios
-      .get("http://192.168.1.3:4001/soldier/absent", {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/soldier/absent`, {
         headers: { token: auth.token },
       })
       .then((resp) => setSoldier(resp.data))
@@ -54,13 +55,21 @@ const SoldierArrival = () => {
   // Fetch leave types
   useEffect(() => {
     axios
-      .get("http://192.168.1.3:4001/leaveType/", {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/leaveType/`, {
         headers: { token: auth.token },
       })
       .then((resp) => setLeaveType(resp.data))
       .catch((err) => console.log(err));
   }, []);
 
+    const filteredLeaveTypes = leaveType.filter(
+      (type) => ![1,6,7,8,9,17,18].includes(type.id)
+    );
+  const leaveTypeOptions = filteredLeaveTypes.map((type) => ({
+    value: type.id,
+    label: type.name,
+  }));
+  
   // Convert soldiers into react-select format
   const soldierOptions = soldier.map((s) => ({
     value: s.id,
@@ -70,11 +79,17 @@ const SoldierArrival = () => {
 
   // When soldier is selected
   const handleSoldierChange = (selectedOption) => {
-    setValue("soldierID", selectedOption.value, { shouldValidate: true });
-    setValue("leaveTypeID", selectedOption.leaveTypeID || "", {
-      shouldValidate: true,
-    });
-  };
+    if (selectedOption) {
+      setValue("soldierID", selectedOption.value, { shouldValidate: true });
+      setValue("leaveTypeID", selectedOption.leaveTypeID || "");
+
+      // NEW: Auto-select UI of leaveType
+      const found = leaveTypeOptions.find(
+        (opt) => opt.value === selectedOption.leaveTypeID
+      );
+      setSelectedLeaveType(found || null);
+    };
+  }
 
   // Submit
   const createSoldierLog = async (data) => {
@@ -90,7 +105,7 @@ const SoldierArrival = () => {
     };
 
     try {
-      await axios.post("http://192.168.1.3:4001/soldierLog/", formattedData, {
+      await axios.post(`${process.env.REACT_APP_BACKEND_BASE_URL}/soldierLog/`, formattedData, {
         headers: { token: auth.token },
       });
 
@@ -133,6 +148,16 @@ const SoldierArrival = () => {
       ...provided,
       zIndex: 1050,
     }),
+    option: (provided, state) => ({
+      ...provided,
+      backgroundColor: state.isSelected
+        ? "#007bff"
+        : state.isFocused
+        ? "#f8f9fa"
+        : null,
+      color: state.isSelected ? "#fff" : "#495057",
+      fontWeight: state.isSelected ? "600" : "500",
+    }),
   };
 
   return (
@@ -173,18 +198,22 @@ const SoldierArrival = () => {
         {/* Leave Type */}
         <Form.Group controlId="leaveTypeID" className="form-group">
           <Form.Label>نوع العودة</Form.Label>
-          <Form.Control
-            as="select"
-            {...register("leaveTypeID")}
-            className={errors.leaveTypeID ? "is-invalid" : ""}
-          >
-            <option value="">إختر نوع العودة</option>
-            {leaveType.map((type) => (
-              <option key={type.id} value={type.id}>
-                {type.name}
-              </option>
-            ))}
-          </Form.Control>
+          <Select
+            options={leaveTypeOptions}
+            placeholder="اختر نوع العودة"
+            value={selectedLeaveType} // AUTO SELECTED
+            onChange={(selectedOption) => {
+              setSelectedLeaveType(selectedOption); // Update UI
+              setValue("leaveTypeID", selectedOption.value);
+            }}
+            styles={customStyles}
+            className="react-select"
+          />
+          {errors.leaveTypeID && (
+            <div className="invalid-feedback d-block">
+              {errors.leaveTypeID.message}
+            </div>
+          )}
           {errors.leaveTypeID && (
             <div className="invalid-feedback">{errors.leaveTypeID.message}</div>
           )}

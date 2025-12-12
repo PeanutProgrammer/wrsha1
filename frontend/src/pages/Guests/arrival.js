@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
-import './Guest.css';
+import "../../style/style.css";
 import axios from 'axios';
 import { getAuthUser } from '../../helper/Storage';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import "react-datetime/css/react-datetime.css";
+import Select from 'react-select'; // Importing react-select
 
 // Validation schema using yup
 const schema = yup.object().shape({
@@ -60,7 +61,7 @@ const createGuest = async (data) => {
     console.log("Request Data with visit_end:", formattedData);
 
     try {
-        await axios.post('http://192.168.1.3:4001/guest/', formattedData, {
+        await axios.post(`${process.env.REACT_APP_BACKEND_BASE_URL}/guest/`, formattedData, {
             headers: {
                 token: auth.token,
             },
@@ -98,7 +99,7 @@ const createGuest = async (data) => {
 
   useEffect(() => {
     axios
-      .get('http://192.168.1.3:4001/officer/', {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/officer/`, {
         headers: {
           token: auth.token,
         },
@@ -107,21 +108,57 @@ const createGuest = async (data) => {
       .catch((err) => console.log(err));
   }, []);
 
+
+    const officerOptions = officer.map((officer) => ({
+      value: officer.id,
+      label: `${officer.rank} / ${officer.name}`,
+      leaveTypeID: officer.leaveTypeID, // attach latest leave type
+    }));
+
+    // Handle when an officer is selected
+    const handleOfficerChange = (selectedOption) => {
+      if (selectedOption) {
+        setValue("officerID", selectedOption.value); // Set the officerID field in react-hook-form
+      }
+    };
+
+    // Custom styles for react-select to prevent conflict with Bootstrap's form-control
+    const customStyles = {
+      control: (provided) => ({
+        ...provided,
+        width: "100%",
+        padding: "0.375rem 0.75rem",
+        borderRadius: "0.25rem",
+        border: "1px solid #ced4da",
+      }),
+      menu: (provided) => ({
+        ...provided,
+        zIndex: 1050, // Make sure the dropdown appears above other elements
+      }),
+      option: (provided, state) => ({
+        ...provided,
+        backgroundColor: state.isSelected
+          ? "#007bff"
+          : state.isFocused
+          ? "#f8f9fa"
+          : null,
+        color: state.isSelected ? "#fff" : "#495057",
+        fontWeight: state.isSelected ? "600" : "500",
+      }),
+    };
+
   return (
     <div className="add-officer-form">
       <h1 className="text-center mb-4">تسجيل دخول زائر</h1>
 
       {/* Display Errors */}
-{guest.err && (
-    <Alert variant="danger" className="p-2">
-        {Array.isArray(guest.err) ? (
-            guest.err.map((error, index) => <div key={index}>{error}</div>)
-        ) : (
-            guest.err
-        )}
-    </Alert>
-)}
-
+      {guest.err && (
+        <Alert variant="danger" className="p-2">
+          {Array.isArray(guest.err)
+            ? guest.err.map((error, index) => <div key={index}>{error}</div>)
+            : guest.err}
+        </Alert>
+      )}
 
       {/* Display Success Message */}
       {guest.success && (
@@ -139,25 +176,26 @@ const createGuest = async (data) => {
             {...register("name")}
             className={`form-control ${errors.name ? "is-invalid" : ""}`}
           />
-          {errors.name && <div className="invalid-feedback">{errors.name.message}</div>}
+          {errors.name && (
+            <div className="invalid-feedback">{errors.name.message}</div>
+          )}
         </Form.Group>
 
         <Form.Group controlId="visit_to" className="form-group">
           <Form.Label>المسؤول الذي تتم زيارته</Form.Label>
-          <Form.Control
-            as="select"
-            {...register("visit_to")}
-            className={`form-control ${errors.visit_to ? "is-invalid" : ""}`}
-            defaultValue=""
-          >
-            <option value="">اختر المسؤول</option>
-            {officer.map((officer) => (
-              <option key={officer.id} value={officer.id}>
-                {officer.rank + " / " + officer.name}
-              </option>
-            ))}
-          </Form.Control>
-          {errors.visit_to && <div className="invalid-feedback">{errors.visit_to.message}</div>}
+          <Select
+            {...register("officerID")}
+            options={officerOptions}
+            getOptionLabel={(e) => e.label}
+            getOptionValue={(e) => e.value}
+            onChange={handleOfficerChange}
+            className="react-select"
+            styles={customStyles}
+            placeholder="اختر الضابط المرافق"
+          />
+          {errors.visit_to && (
+            <div className="invalid-feedback">{errors.visit_to.message}</div>
+          )}
         </Form.Group>
 
         <Form.Group controlId="reason" className="form-group">
@@ -168,7 +206,9 @@ const createGuest = async (data) => {
             {...register("reason")}
             className={`form-control ${errors.reason ? "is-invalid" : ""}`}
           />
-          {errors.reason && <div className="invalid-feedback">{errors.reason.message}</div>}
+          {errors.reason && (
+            <div className="invalid-feedback">{errors.reason.message}</div>
+          )}
         </Form.Group>
 
         <Button

@@ -31,10 +31,14 @@ router.post("/", shuoonOfficers,
         .isDate().withMessage("يرجى إدخال تاريخ ميلاد صحيح"),
     body("seniority_number")
         .isString().withMessage("يرجى إدخال رقم الأقدمية بشكل صحيح"),
+    body("attached")
+        .optional()
+        .isBoolean().withMessage("يرجى إدخال قيمة صحيحة للملحق"),
     (req, res) => {
         OfficerController.createOfficer(req, res);
     }
 );
+
 
 router.put("/:id", shuoonOfficers,
 
@@ -54,6 +58,9 @@ router.put("/:id", shuoonOfficers,
         .isDate().withMessage("يرجى إدخال تاريخ الميلاد بشكل صحيح"),
     body("seniority_number")
         .isString().withMessage("يرجى إدخال رقم الأقدمية بشكل صحيح"),
+    body("attached")
+        .optional()
+        .isBoolean().withMessage("يرجى إدخال قيمة صحيحة للملحق"),
     (req, res) => {
         OfficerController.updateOfficer(req, res);
         console.log("BODY RECEIVED:", req.body);

@@ -1,5 +1,5 @@
 import React from "react";
-import '../style/CivillianCard.css';
+import "../../../style/card.css";
 import { Link } from "react-router-dom";
 
 const CivillianCard = ({ id, nationalID, name, department, join_date, address, dob, telephone_number }) => {

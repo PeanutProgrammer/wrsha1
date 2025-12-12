@@ -117,12 +117,25 @@ class NcoLogController {
 
             
 
-                await query("insert into nco_log set event_type = ?, event_time = ?, ncoID = ?, leaveTypeID = ?, notes = ?, loggerID = ?",
+              const officerLogResult =   await query("insert into nco_log set event_type = ?, event_time = ?, ncoID = ?, leaveTypeID = ?, notes = ?, loggerID = ?",
                     [officerObject.getEventType(), officerObject.getEventTime(), officerObject.getNcoID(), officerObject.getLeaveTypeID(), officerObject.getNotes(), officerObject.getLoggerID()]);
 
+              const officerLogId = officerLogResult.insertId;
 
             
-                await query("update ncos set in_unit = 1 where id = ?", [officerObject.getNcoID()]);
+              await query("update ncos set in_unit = 1 where id = ?", [officerObject.getNcoID()]);
+              
+               await query(
+                 "insert into nco_leave_details set movementID = ?, leaveTypeID = ?, ncoID = ?, start_date = ?, end_date = ?, destination = ?",
+                 [
+                   officerLogId,
+                   req.body.leaveTypeID,
+                   req.body.ncoID,
+                   req.body.start_date,
+                   req.body.end_date,
+                   req.body.destination,
+                 ]
+               );
             });
 
             req.app.get("io").emit("officersUpdated");

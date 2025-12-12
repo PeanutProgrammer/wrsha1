@@ -20,12 +20,12 @@ const PastNCOs = () => {
 
 
   useEffect(() => {
-    const socket = io("http://192.168.1.3:4001"); // your backend port
+    const socket = io(`${process.env.REACT_APP_BACKEND_BASE_URL}`); // your backend port
 
     // 🔁 Initial fetch
     const fetchData = () => {
       axios
-        .get("http://192.168.1.3:4001/pastNCO/", {
+        .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/pastNCO/`, {
           headers: { token: auth.token },
         })
         .then((resp) => {
@@ -110,7 +110,7 @@ const PastNCOs = () => {
           <thead>
             <tr>
               <th>الرقم العسكري</th>
-              <th>الرتبة</th>
+              <th>الدرجة</th>
               <th>الإسم</th>
               <th>تاريخ الضم</th>
               <th>تاريخ النقل</th>

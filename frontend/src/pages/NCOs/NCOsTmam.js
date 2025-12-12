@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './NCO.css';
+import "../../style/style.css";
 import { Table ,Alert} from 'react-bootstrap';
 import { Link ,useParams} from 'react-router-dom';
 import axios from 'axios';
@@ -17,7 +17,7 @@ const NCOsTmam = () => {
 
   useEffect(() => {
     setNCOs({ ...ncos,loading : true});
-    axios.get('http://192.168.1.3:4001/NCO/tmam',  {
+    axios.get(`${process.env.REACT_APP_BACKEND_BASE_URL}/NCO/tmam`,  {
       headers: {
         token: auth.token
       }
@@ -61,7 +61,6 @@ const NCOsTmam = () => {
         {/* <Link to={"AddOfficers"} className="btn btn-success mb-4"> إنشاء ضابط جديد +</Link> */}
       </div>
 
-
       {ncos.err && (
         <Alert variant="danger" className="p-2">
           {ncos.err}
@@ -72,7 +71,6 @@ const NCOsTmam = () => {
           {ncos.success}
         </Alert>
       )}
-
 
       <Table striped bordered hover>
         <thead>
@@ -86,17 +84,28 @@ const NCOsTmam = () => {
           </tr>
         </thead>
         <tbody>
-        {ncos.results.map((officer) => (
+          {ncos.results.map((officer) => (
             <tr key={officer.mil_id}>
-            <td>{officer.mil_id}</td>    
-            <td>{officer.rank}</td>
-            <td>{officer.name}</td>
-            <td>{officer.department}</td>
-            <td >{officer.tmam? officer.tmam: "متواجد"}</td>
+              <td>{officer.mil_id}</td>
+              <td>{officer.rank}</td>
+              <td>{officer.name}</td>
+              <td>{officer.department}</td>
+              <td>
+                {officer.in_unit
+                  ? "متواجد"
+                  : officer.tmam
+                  ? officer.tmam
+                  : "غير متواجد"}
+              </td>
               <td>
                 {/* <button className="btn btn-sm btn-danger mx-1 p-2" onClick ={(e) =>  {deleteOfficer(officer.mil_id)}}>حذف</button> */}
                 {/* <Link to={`${officer.mil_id}`} className="btn btn-sm btn-primary mx-1 p-2">تعديل</Link> */}
-                <Link to={`details/${officer.mil_id}`} className="btn btn-sm btn-primary mx-1 p-2">تفاصيل </Link>
+                <Link
+                  to={`details/${officer.mil_id}`}
+                  className="btn btn-sm btn-primary mx-1 p-2"
+                >
+                  تفاصيل{" "}
+                </Link>
               </td>
             </tr>
           ))}

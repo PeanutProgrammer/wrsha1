@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './Soldier.css';
+import "../../style/style.css";
 import { Table, Alert } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
@@ -20,7 +20,7 @@ const SoldiersTmamDetails = () => {
   useEffect(() => {
     setSoldiers({ ...soldier, loading: true });
     axios
-      .get(`http://192.168.1.3:4001/soldier/tmam/${id}`, {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/soldier/tmam/${id}`, {
         headers: {
           token: auth.token,
         },
@@ -39,7 +39,7 @@ const SoldiersTmamDetails = () => {
           loading: false,
           err: err.response
             ? JSON.stringify(err.response.data.errors)
-            : 'Something went wrong. Please try again later.',
+            : "Something went wrong. Please try again later.",
         });
       });
   }, [soldier.reload]);
@@ -88,22 +88,36 @@ const SoldiersTmamDetails = () => {
           </tr>
         </thead>
         <tbody>
-          {hasData ? (
-            records.map((rec, index) => (
-              <tr key={index}>
-                <td>{index + 1}</td>
-                <td>{rec.tmam || 'متواجد'}</td>
-                <td>{rec.destination || '—'}</td>
-                <td>{rec.start_date ? moment(rec.start_date).format("YYYY-MM-DD") : '—'}</td>
-                <td>{rec.end_date ? moment(rec.end_date).format("YYYY-MM-DD") : '—'}</td>
-                <td>{rec.notes || '—'}</td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="6" className="text-center">لا يوجد سجلات تمام.</td>
-            </tr>
-          )}
+                    {hasData ? (
+                      records.map((rec, index) => (
+                        <tr key={index}>
+                          <td>{index + 1}</td>
+                          <td>
+                            {rec.event_type === "دخول"
+                              ? `عودة ${rec.tmam || ""}` // show "عودة" + leave type if exists
+                              : rec.tmam || "متواجد"}{" "}
+                          </td>{" "}
+                          <td>{rec.destination || "—"}</td>
+                          <td>
+                            {rec.start_date
+                              ? moment(rec.start_date).format("YYYY-MM-DD")
+                              : "—"}
+                          </td>
+                          <td>
+                            {rec.end_date
+                              ? moment(rec.end_date).format("YYYY-MM-DD")
+                              : "—"}
+                          </td>
+                          <td>{rec.notes || "—"}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="6" className="text-center">
+                          لا يوجد سجلات تمام.
+                        </td>
+                      </tr>
+                    )}
         </tbody>
       </Table>
     </div>

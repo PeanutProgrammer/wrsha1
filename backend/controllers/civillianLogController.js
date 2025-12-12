@@ -107,7 +107,7 @@ class CivillianLogController {
           );
         }
 
-        await query(
+        const civillianLogResult = await query(
           "insert into civillian_log set event_type = ?, event_time = ?, civillianID = ?, leaveTypeID = ?, notes = ?, loggerID = ?",
           [
             civillianObject.getEventType(),
@@ -119,9 +119,23 @@ class CivillianLogController {
           ]
         );
 
+        const civillianLogId = civillianLogResult.insertId;
+
         await query("update civillians set in_unit = 1 where id = ?", [
           civillianObject.getCivillianID(),
         ]);
+
+        await query(
+          "insert into civillian_leave_details set movementID = ?, civillianID = ?, leaveTypeID = ?, start_date = ?, end_date = ?, destination = ?",
+          [
+            civillianLogId,
+            civillianObject.getCivillianID(),
+            req.body.leaveTypeID,
+            req.body.start_date,
+            req.body.end_date,
+            req.body.destination,
+          ]
+        );
       });
 
       req.app.get("io").emit("civilliansUpdated");

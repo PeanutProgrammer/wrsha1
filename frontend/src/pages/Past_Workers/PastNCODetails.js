@@ -19,7 +19,7 @@ const PastNCODetails = () => {
   useEffect(() => {
     setOfficers({ ...officer, loading: true });
     axios
-      .get('http://192.168.1.3:4001/pastNCO/' + id, {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/pastNCO/` + id, {
         headers: {
           token: auth.token,
         },
@@ -71,7 +71,7 @@ const PastNCODetails = () => {
                 <td>{officer.results._mil_id}</td>
               </tr>
               <tr>
-                <td><strong>الرتبة:</strong></td>
+                <td><strong>الدرجة:</strong></td>
                 <td>{officer.results._rank}</td>
               </tr>
               <tr>

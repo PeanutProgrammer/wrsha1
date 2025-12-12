@@ -43,12 +43,12 @@ const SecurityOfficers = () => {
   const [transferredTo, setTransferredTo] = useState('');
 
   useEffect(() => {
-    const socket = io("http://192.168.1.3:4001"); //  backend port
+    const socket = io(`${process.env.REACT_APP_BACKEND_BASE_URL}`); //  backend port
 
     // 🔁 Initial fetch
     const fetchData = () => {
       axios
-        .get("http://192.168.1.3:4001/officer/tmam", {
+        .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/officer/tmam`, {
           headers: { token: auth.token },
         })
         .then((resp) => {
@@ -110,7 +110,7 @@ const SecurityOfficers = () => {
 
     // Change the API method to DELETE as per the new backend implementation
     axios
-      .delete('http://192.168.1.3:4001/officer/' + selectedOfficer.mil_id, {
+      .delete(`${process.env.REACT_APP_BACKEND_BASE_URL}/officer/` + selectedOfficer.mil_id, {
         headers: { token: auth.token },
         data: data,  // Send additional fields in the body of the DELETE request
       })
@@ -322,28 +322,28 @@ const exportToWord = () => {
   return (
     <div className="Officers p-5">
       <div className="header d-flex justify-content-between mb-3">
-  <h3 className="text-center mb-3">إدارة الضباط</h3>
+        <h3 className="text-center mb-3">إدارة الضباط</h3>
 
-  {/* Button container with d-flex */}
-  <div className="d-flex">
-   
-    {/* Export Button with Dropdown */}
+        {/* Button container with d-flex */}
+        <div className="d-flex">
+          {/* Export Button with Dropdown */}
           <Dropdown className="mb-4">
             <DropdownButton
               variant="secondary"
               id="export-dropdown"
-              title={<><FaPrint className="mr-2 " />  طباعة </>}
+              title={
+                <>
+                  <FaPrint className="mr-2 " /> طباعة{" "}
+                </>
+              }
             >
               {/* Use PDFDownloadLink for PDF export */}
-                {/* <Dropdown.Item onClick={exportToPDF}>PDF</Dropdown.Item> */}
+              {/* <Dropdown.Item onClick={exportToPDF}>PDF</Dropdown.Item> */}
               <Dropdown.Item onClick={exportToWord}>Word</Dropdown.Item>
             </DropdownButton>
           </Dropdown>
         </div>
       </div>
-
-
-
 
       {officers.err && (
         <Alert variant="danger" className="p-2">
@@ -364,7 +364,8 @@ const exportToWord = () => {
               <th>الرتبة</th>
               <th>الاسم</th>
               <th>الورشة / الفرع</th>
-              <th>تاريخ الضم</th>
+              <th>اخر دخول</th>
+              <th>اخر خروج</th>
               <th>التمام</th>
               <th>ملاحظات</th>
             </tr>
@@ -376,14 +377,18 @@ const exportToWord = () => {
                 <td>{officer.rank}</td>
                 <td>{officer.name}</td>
                 <td>{officer.department}</td>
-                <td>{moment(officer.join_date).format('YYYY-MM-DD')}</td>
-                <td  className={
+                <td>{officer.latest_arrival ? moment(officer.latest_arrival).format('YYYY-MM-DD HH:mm:ss') : 'لا يوجد'}</td>
+                <td>{officer.latest_departure ? moment(officer.latest_departure).format('YYYY-MM-DD HH:mm:ss') : 'لا يوجد'}</td>
+                <td
+                  className={
                     officer.in_unit
                       ? "bg-success text-white"
                       : "bg-danger text-white"
                   }
-                >{officer.in_unit ? 'متواجد' : 'غير موجود'}</td>
-                <td >{officer.in_unit? "لا يوجد" : officer.tmam}</td>
+                >
+                  {officer.in_unit ? "متواجد" : "غير موجود"}
+                </td>
+                <td>{officer.in_unit ? "لا يوجد" : officer.tmam}</td>
                 {/* <td>
                   <div className="action-buttons">
                     <button
@@ -420,7 +425,9 @@ const exportToWord = () => {
         {pageNumbers.map((number) => (
           <button
             key={number}
-            className={`btn btn-light page-btn ${currentPage === number ? 'active' : ''}`}
+            className={`btn btn-light page-btn ${
+              currentPage === number ? "active" : ""
+            }`}
             onClick={() => paginate(number)}
           >
             {number}
@@ -443,7 +450,10 @@ const exportToWord = () => {
         </Modal.Header>
         <Modal.Body>
           <div>
-            <p>هل أنت متأكد أنك تريد حذف الضابط <strong>{selectedOfficer?.name}</strong>؟</p>
+            <p>
+              هل أنت متأكد أنك تريد حذف الضابط{" "}
+              <strong>{selectedOfficer?.name}</strong>؟
+            </p>
 
             {/* Additional Fields */}
             <Form>

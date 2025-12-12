@@ -18,7 +18,7 @@ const SoldierDetails = () => {
 
   useEffect(() => {
     setSoldiers({ ...soldier,loading : true});
-      axios.get('http://192.168.1.3:4001/soldier/' + id, {
+      axios.get(`${process.env.REACT_APP_BACKEND_BASE_URL}/soldier/` + id, {
           headers: {
         token: auth.token
     }})
@@ -64,45 +64,85 @@ const SoldierDetails = () => {
           <table className="officer-details-table">
             <tbody>
               <tr>
-                <td><strong>الرقم العسكري:</strong></td>
+                <td>
+                  <strong>الرقم العسكري:</strong>
+                </td>
                 <td>{soldier.results._mil_id}</td>
               </tr>
 
               <tr>
-                <td><strong>الدرجة:</strong></td>
+                <td>
+                  <strong>الدرجة:</strong>
+                </td>
                 <td>{soldier.results._rank}</td>
               </tr>
               <tr>
-                <td><strong>الاسم:</strong></td>
+                <td>
+                  <strong>الاسم:</strong>
+                </td>
                 <td>{soldier.results._name}</td>
               </tr>
               <tr>
-                <td><strong>الورشة / الفرع:</strong></td>
+                <td>
+                  <strong>الورشة / الفرع:</strong>
+                </td>
                 <td>{soldier.results._department}</td>
               </tr>
               <tr>
-                <td><strong>تاريخ الضم:</strong></td>
-                <td>{moment(soldier.results._join_date).format('YYYY-MM-DD')}</td>
+                <td>
+                  <strong>تاريخ الضم:</strong>
+                </td>
+                <td>
+                  {moment(soldier.results._join_date).format("YYYY-MM-DD")}
+                </td>
               </tr>
 
               <tr>
-                <td><strong>تاريخ التسريح:</strong></td>
-                <td>{moment(soldier.results._end_date).format('YYYY-MM-DD')}</td>
+                <td>
+                  <strong>تاريخ التسريح:</strong>
+                </td>
+                <td>
+                  {moment(soldier.results._end_date).format("YYYY-MM-DD")}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>ملحق؟</strong>
+                </td>
+                <td>{soldier.results._attached ? "نعم" : "لا"}</td>
               </tr>
 
               <tr>
-                <td><strong>رقم الهاتف:</strong></td>
-                <td>{soldier.results._telephone_number ? soldier.results._telephone_number : "لا يوجد" }</td>
+                <td>
+                  <strong>رقم الهاتف:</strong>
+                </td>
+                <td>
+                  {soldier.results._telephone_number
+                    ? soldier.results._telephone_number
+                    : "لا يوجد"}
+                </td>
               </tr>
 
               <tr>
-                <td><strong>اسم ولي الأمر:</strong></td>
-                <td>{soldier.results._guardian_name ? soldier.results._guardian_name : "لا يوجد" }</td>
+                <td>
+                  <strong>اسم ولي الأمر:</strong>
+                </td>
+                <td>
+                  {soldier.results._guardian_name
+                    ? soldier.results._guardian_name
+                    : "لا يوجد"}
+                </td>
               </tr>
 
               <tr>
-                <td><strong>رقم هاتف ولي الأمر:</strong></td>
-                <td>{soldier.results._guardian_telephone_number ? soldier.results._guardian_telephone_number : "لا يوجد"}</td>
+                <td>
+                  <strong>رقم هاتف ولي الأمر:</strong>
+                </td>
+                <td>
+                  {soldier.results._guardian_telephone_number
+                    ? soldier.results._guardian_telephone_number
+                    : "لا يوجد"}
+                </td>
               </tr>
 
               {/* <tr>
@@ -122,8 +162,10 @@ const SoldierDetails = () => {
                 <td>{moment(soldier.results._dob).format('YYYY-MM-DD')}</td>
               </tr> */}
               <tr>
-                <td><strong>التمام:</strong></td>
-                <td>{soldier.results._in_unit ? 'متواجد' : 'غير موجود'}</td>
+                <td>
+                  <strong>التمام:</strong>
+                </td>
+                <td>{soldier.results._in_unit ? "متواجد" : "غير موجود"}</td>
               </tr>
             </tbody>
           </table>

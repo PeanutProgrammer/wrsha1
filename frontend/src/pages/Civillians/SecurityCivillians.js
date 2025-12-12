@@ -37,12 +37,12 @@ const SecurityCivillians = () => {
 
 
   useEffect(() => {
-    const socket = io("http://192.168.1.3:4001"); //  backend port
+    const socket = io(`${process.env.REACT_APP_BACKEND_BASE_URL}`); //  backend port
 
     // 🔁 Initial fetch
     const fetchData = () => {
       axios
-        .get("http://192.168.1.3:4001/civillian/tmam", {
+        .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/civillian/tmam`, {
           headers: { token: auth.token },
         })
         .then((resp) => {
@@ -272,28 +272,28 @@ const exportToWord = () => {
   return (
     <div className="Officers p-5">
       <div className="header d-flex justify-content-between mb-3">
-  <h3 className="text-center mb-3">إدارة المدنيين</h3>
+        <h3 className="text-center mb-3">إدارة المدنيين</h3>
 
-  {/* Button container with d-flex */}
-  <div className="d-flex">
-   
-    {/* Export Button with Dropdown */}
+        {/* Button container with d-flex */}
+        <div className="d-flex">
+          {/* Export Button with Dropdown */}
           <Dropdown className="mb-4">
             <DropdownButton
               variant="secondary"
               id="export-dropdown"
-              title={<><FaPrint className="mr-2 " />  طباعة </>}
+              title={
+                <>
+                  <FaPrint className="mr-2 " /> طباعة{" "}
+                </>
+              }
             >
               {/* Use PDFDownloadLink for PDF export */}
-                {/* <Dropdown.Item onClick={exportToPDF}>PDF</Dropdown.Item> */}
+              {/* <Dropdown.Item onClick={exportToPDF}>PDF</Dropdown.Item> */}
               <Dropdown.Item onClick={exportToWord}>Word</Dropdown.Item>
             </DropdownButton>
           </Dropdown>
         </div>
       </div>
-
-
-
 
       {civillians.err && (
         <Alert variant="danger" className="p-2">
@@ -313,8 +313,8 @@ const exportToWord = () => {
               <th>الرقم القومي</th>
               <th>الاسم</th>
               <th>الورشة / الفرع</th>
-              <th>تاريخ الضم</th>
-              <th> رقم التصديق الأمني</th>
+              <th>اخر دخول</th>
+              <th>اخر خروج</th>
               <th>التمام</th>
               <th>ملاحظات</th>
             </tr>
@@ -325,15 +325,17 @@ const exportToWord = () => {
                 <td>{civillian.nationalID}</td>
                 <td>{civillian.name}</td>
                 <td>{civillian.department}</td>
-                <td>{moment(civillian.join_date).format('YYYY-MM-DD')}</td>
-                <td>{civillian.security_clearance_number}</td>
-                <td  className={
+                <td>{civillian.latest_arrival ? moment(civillian.latest_arrival).format('YYYY-MM-DD HH:mm:ss') : 'لا يوجد'}</td>
+                <td>{civillian.latest_departure ? moment(civillian.latest_departure).format('YYYY-MM-DD HH:mm:ss') : 'لا يوجد'}</td>                <td
+                  className={
                     civillian.in_unit
                       ? "bg-success text-white"
                       : "bg-danger text-white"
                   }
-                >{civillian.in_unit ? 'متواجد' : 'غير موجود'}</td>
-                <td >{civillian.in_unit? "لا يوجد" : civillian.tmam}</td>
+                >
+                  {civillian.in_unit ? "متواجد" : "غير موجود"}
+                </td>
+                <td>{civillian.in_unit ? "لا يوجد" : civillian.tmam}</td>
                 {/* <td>
                   <div className="action-buttons">
                     <button
@@ -370,7 +372,9 @@ const exportToWord = () => {
         {pageNumbers.map((number) => (
           <button
             key={number}
-            className={`btn btn-light page-btn ${currentPage === number ? 'active' : ''}`}
+            className={`btn btn-light page-btn ${
+              currentPage === number ? "active" : ""
+            }`}
             onClick={() => paginate(number)}
           >
             {number}
@@ -385,8 +389,6 @@ const exportToWord = () => {
           Next
         </button>
       </div>
-
-     
     </div>
   );
 };

@@ -39,11 +39,13 @@ class OfficerController {
         req.body.height,
         req.body.weight,
         req.body.dob,
-        req.body.seniority_number
+        req.body.seniority_number,
+        true,
+        req.body.attached || false
       );
 
       await query(
-        "insert into officers set name =?, join_date = ?, department = ?, mil_id = ?, `rank` = ?, address = ?, height = ?, weight = ?, dob = ?, seniority_number = ?",
+        "insert into officers set name =?, join_date = ?, department = ?, mil_id = ?, `rank` = ?, address = ?, height = ?, weight = ?, dob = ?, seniority_number = ?, attached = ?",
         [
           officerObject.getName(),
           officerObject.getJoinDate(),
@@ -55,6 +57,7 @@ class OfficerController {
           officerObject.getWeight(),
           officerObject.getDOB(),
           officerObject.getSeniorityNumber(),
+          officerObject.getAttached(),
         ]
       );
 
@@ -97,13 +100,15 @@ class OfficerController {
         req.body.height,
         req.body.weight,
         req.body.dob,
-        req.body.seniority_number
+        req.body.seniority_number,
+        checkOfficer[0].in_unit,
+        req.body.attached || false
       );
 
       console.log("hello");
 
       await query(
-        "update officers set name =?, join_date = ?, department = ?, `rank` = ?, address = ?,  height = ?, weight = ?, dob = ?, seniority_number = ? where id = ?",
+        "update officers set name =?, join_date = ?, department = ?, `rank` = ?, address = ?,  height = ?, weight = ?, dob = ?, seniority_number = ?, attached = ? where id = ?",
         [
           officerObject.getName(),
           officerObject.getJoinDate(),
@@ -114,6 +119,7 @@ class OfficerController {
           officerObject.getWeight(),
           officerObject.getDOB(),
           officerObject.getSeniorityNumber(),
+          officerObject.getAttached(),
           checkOfficer[0].id,
         ]
       );
@@ -269,7 +275,8 @@ class OfficerController {
         officer[0].weight,
         officer[0].dob,
         officer[0].seniority_number,
-        officer[0].in_unit
+        officer[0].in_unit,
+        officer[0].attached
       );
       console.log(officerObject.toJSON());
       return res.status(200).json(officerObject.toJSON());
@@ -300,8 +307,26 @@ SELECT
     o.name,
     o.department,
     o.in_unit,
-    lt.name AS tmam,
-    old.id AS latest_leave_id
+
+    -- Last departure
+    (
+        SELECT ol.event_time
+        FROM officer_log ol
+        WHERE ol.officerID = o.id AND ol.event_type = 'خروج'
+        ORDER BY ol.event_time DESC
+        LIMIT 1
+    ) AS latest_departure,
+
+    -- Last arrival
+    (
+        SELECT ol.event_time
+        FROM officer_log ol
+        WHERE ol.officerID = o.id AND ol.event_type = 'دخول'
+        ORDER BY ol.event_time DESC
+        LIMIT 1
+    ) AS latest_arrival,
+
+    lt.name AS tmam
 FROM officers o
 LEFT JOIN officer_leave_details old
     ON old.id = (
@@ -367,7 +392,7 @@ ORDER BY o.mil_id;
         officer[0].in_unit
       );
       const officerTmam = await query(
-        `SELECT officers.mil_id ,officers.rank,officers.name, officer_log.event_type, officers.department, leave_type.name AS 'tmam', officer_leave_details.start_date, officer_leave_details.end_date, officer_leave_details.destination, officer_log.notes
+        `SELECT officers.mil_id ,officers.rank,officers.name, officer_log.event_type, officer_log.event_time, officers.department, leave_type.name AS 'tmam', officer_leave_details.start_date, officer_leave_details.end_date, officer_leave_details.destination, officer_log.notes
                                           FROM officers
                                           LEFT JOIN officer_leave_details
                                           ON officer_leave_details.officerID = officers.id

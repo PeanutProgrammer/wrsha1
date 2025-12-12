@@ -35,13 +35,14 @@ class NCOController {
         req.body.mil_id,
         req.body.rank,
         req.body.address,
-        req.body.height,
-        req.body.weight,
-        req.body.dob
+
+        req.body.dob,
+        true, // in_unit defaults to true on creation
+        req.body.attached
       );
 
       await query(
-        "insert into ncos set name =?, join_date = ?, department = ?, mil_id = ?, `rank` = ?, address = ?, height = ?, weight = ?, dob = ?",
+        "insert into ncos set name =?, join_date = ?, department = ?, mil_id = ?, `rank` = ?, address = ?, dob = ?, attached = ? ",
         [
           officerObject.getName(),
           officerObject.getJoinDate(),
@@ -49,9 +50,8 @@ class NCOController {
           officerObject.getMilID(),
           officerObject.getRank(),
           officerObject.getAddress(),
-          officerObject.getHeight(),
-          officerObject.getWeight(),
           officerObject.getDOB(),
+          officerObject.getAttached(),
         ]
       );
 
@@ -90,24 +90,23 @@ class NCOController {
         req.body.mil_id,
         req.body.rank,
         req.body.address,
-        req.body.height,
-        req.body.weight,
-        req.body.dob
+        req.body.dob,
+        checkOfficer[0].in_unit,
+        req.body.attached
       );
 
       console.log("hello");
 
       await query(
-        "update ncos set name =?, join_date = ?, department = ?, `rank` = ?, address = ?, height = ?, weight = ?, dob = ? where id = ?",
+        "update ncos set name =?, join_date = ?, department = ?, `rank` = ?, address = ?, dob = ?, attached = ? where id = ?",
         [
           officerObject.getName(),
           officerObject.getJoinDate(),
           officerObject.getDepartment(),
           officerObject.getRank(),
           officerObject.getAddress(),
-          officerObject.getHeight(),
-          officerObject.getWeight(),
           officerObject.getDOB(),
+          officerObject.getAttached(),
           checkOfficer[0].id,
         ]
       );
@@ -155,8 +154,6 @@ class NCOController {
         name: checkOfficer[0].name,
         join_date: checkOfficer[0].join_date,
         address: checkOfficer[0].address,
-        height: checkOfficer[0].height,
-        weight: checkOfficer[0].weight,
         dob: checkOfficer[0].dob,
         // If you have additional fields such as 'end_date', 'transferID', etc.
         end_date: req.body.end_date || new Date().toISOString(),
@@ -166,15 +163,14 @@ class NCOController {
 
       // Insert the officer data into the past_officers table
       await query(
-        "INSERT INTO past_ncos (mil_id, `rank`, name, join_date, address, height, weight, dob, end_date, transferID, transferred_to) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO past_ncos (mil_id, `rank`, name, join_date, address, dob, end_date, transferID, transferred_to) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
         [
           PastNCOObject.mil_id,
           PastNCOObject.rank,
           PastNCOObject.name,
           PastNCOObject.join_date,
           PastNCOObject.address,
-          PastNCOObject.height,
-          PastNCOObject.weight,
+
           PastNCOObject.dob,
           PastNCOObject.end_date,
           PastNCOObject.transferID,
@@ -251,10 +247,9 @@ class NCOController {
         nco[0].mil_id,
         nco[0].rank,
         nco[0].address,
-        nco[0].height,
-        nco[0].weight,
         nco[0].dob,
-        nco[0].in_unit
+        nco[0].in_unit,
+        nco[0].attached
       );
       return res.status(200).json(officerObject.toJSON());
     } catch (err) {
@@ -284,8 +279,26 @@ SELECT
     o.name,
     o.department,
     o.in_unit,
-    lt.name AS tmam,
-    old.id AS latest_leave_id
+
+    -- Last departure
+    (
+        SELECT ol.event_time
+        FROM nco_log ol
+        WHERE ol.ncoID = o.id AND ol.event_type = 'خروج'
+        ORDER BY ol.event_time DESC
+        LIMIT 1
+    ) AS latest_departure,
+
+    -- Last arrival
+    (
+        SELECT ol.event_time
+        FROM nco_log ol
+        WHERE ol.ncoID = o.id AND ol.event_type = 'دخول'
+        ORDER BY ol.event_time DESC
+        LIMIT 1
+    ) AS latest_arrival,
+
+    lt.name AS tmam
 FROM ncos o
 LEFT JOIN nco_leave_details old
     ON old.id = (
@@ -343,20 +356,20 @@ ORDER BY o.mil_id;
         nco[0].mil_id,
         nco[0].rank,
         nco[0].address,
-        nco[0].height,
-        nco[0].weight,
         nco[0].dob,
-        nco[0].in_unit
+        nco[0].in_unit,
+        nco[0].attached
       );
       const officerTmam = await query(
-        `SELECT ncos.mil_id ,ncos.rank,ncos.name, ncos.department, ncos.join_date, leave_type.name AS 'tmam', nco_leave_details.start_date, nco_leave_details.end_date, nco_leave_details.destination, nco_log.notes
+        `SELECT ncos.mil_id ,ncos.rank,ncos.name, ncos.department, ncos.join_date, leave_type.name AS 'tmam', nco_leave_details.start_date, nco_leave_details.end_date, nco_leave_details.destination, nco_log.notes, nco_log.event_type
                                           FROM ncos
-                                          LEFT JOIN nco_log
-                                          ON ncos.id = nco_log.ncoID
-                                          LEFT JOIN leave_type
-                                          on leave_type.id = nco_log.leaveTypeID
                                           LEFT JOIN nco_leave_details
+                                          ON ncos.id = nco_leave_details.ncoID
+                                          LEFT JOIN nco_log
                                           ON nco_leave_details.MovementID = nco_log.id
+                                          LEFT JOIN leave_type
+                                          on leave_type.id = nco_leave_details.leaveTypeID
+
                                           WHERE ncos.mil_id = ?
                                           ORDER BY nco_log.id DESC
                                           `,

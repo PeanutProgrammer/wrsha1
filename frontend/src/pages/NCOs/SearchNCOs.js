@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./SearchNCOs.css";
+import "../../style/card.css";
 import OfficerCard from "./components/NCOCard";
 import axios from "axios";
 import { getAuthUser } from "../../helper/Storage";
@@ -32,7 +32,7 @@ const SearchNCOs = () => {
     setNCOs({ ...ncos, loading: true });
 
     axios
-      .get("http://192.168.1.3:4001/nco/filter/", {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/nco/filter/`, {
         headers: { token: auth.token },
         params: {
           search: filters.search,
@@ -73,7 +73,7 @@ const SearchNCOs = () => {
   // ✅ Fetch departments
   useEffect(() => {
     axios
-      .get("http://192.168.1.3:4001/department/", {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/department/`, {
         headers: { token: auth.token },
       })
       .then((resp) => setDept(resp.data))
@@ -137,7 +137,8 @@ const SearchNCOs = () => {
             <option value="مساعد">مساعد</option> 
             <option value="مساعد أول">مساعد أول</option> 
             <option value="صانع ماهر">صانع ماهر</option> 
-            <option value="صانع دقيق">صانع دقيق</option> 
+              <option value="صانع دقيق">صانع دقيق</option> 
+            <option value="صانع ممتاز">صانع ممتاز</option>
             <option value="ملاحظ">ملاحظ</option> 
             <option value="ملاحظ فني">ملاحظ فني</option>
             </select>

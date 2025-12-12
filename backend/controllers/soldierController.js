@@ -38,11 +38,13 @@ class SoldierController {
         req.body.rank,
         req.body.telephone_number,
         req.body.guardian_name,
-        req.body.guardian_telephone_number
+        req.body.guardian_telephone_number,
+        true,
+        req.body.attached
       );
 
       await query(
-        "insert into soldiers set name =?, join_date = ?, end_date = ?, department = ?, mil_id = ?, `rank` = ?, telephone_number =?, guardian_name = ?, guardian_telephone_number =?",
+        "insert into soldiers set name =?, join_date = ?, end_date = ?, department = ?, mil_id = ?, `rank` = ?, telephone_number =?, guardian_name = ?, guardian_telephone_number =?, attached = ?",
         [
           soldierObject.getName(),
           soldierObject.getJoinDate(),
@@ -53,6 +55,7 @@ class SoldierController {
           soldierObject.getTelephoneNumber(),
           soldierObject.getGuardianName(),
           soldierObject.getGuardianTelephoneNumber(),
+          soldierObject.getAttached(),
         ]
       );
 
@@ -94,13 +97,15 @@ class SoldierController {
         req.body.rank,
         req.body.telephone_number,
         req.body.guardian_name,
-        req.body.guardian_telephone_number
+        req.body.guardian_telephone_number,
+        checkSoldier[0].in_unit,
+        req.body.attached
       );
 
       console.log("hello");
 
       await query(
-        "update soldiers set name =?, join_date = ?, end_date = ?, department = ?, `rank` = ?, telephone_number =?, guardian_name = ?, guardian_telephone_number =? where id = ?",
+        "update soldiers set name =?, join_date = ?, end_date = ?, department = ?, `rank` = ?, telephone_number =?, guardian_name = ?, guardian_telephone_number =?, attached = ? where id = ?",
         [
           soldierObject.getName(),
           soldierObject.getJoinDate(),
@@ -110,6 +115,7 @@ class SoldierController {
           soldierObject.getTelephoneNumber(),
           soldierObject.getGuardianName(),
           soldierObject.getGuardianTelephoneNumber(),
+          soldierObject.getAttached(),
           req.params.id,
         ]
       );
@@ -227,7 +233,8 @@ class SoldierController {
         soldier[0].telephone_number,
         soldier[0].guardian_name,
         soldier[0].guardian_telephone_number,
-        soldier[0].in_unit
+        soldier[0].in_unit,
+        soldier[0].attached
       );
       console.log(soldierObject.toJSON());
 
@@ -258,7 +265,27 @@ SELECT
     o.rank,
     o.name,
     o.department,
+    o.end_date,
     o.in_unit,
+
+    -- Last departure
+    (
+        SELECT ol.event_time
+        FROM soldier_log ol
+        WHERE ol.soldierID = o.id AND ol.event_type = 'خروج'
+        ORDER BY ol.event_time DESC
+        LIMIT 1
+    ) AS latest_departure,
+
+    -- Last arrival
+    (
+        SELECT ol.event_time
+        FROM soldier_log ol
+        WHERE ol.soldierID = o.id AND ol.event_type = 'دخول'
+        ORDER BY ol.event_time DESC
+        LIMIT 1
+    ) AS latest_arrival,
+
     lt.name AS tmam
 FROM soldiers o
 LEFT JOIN soldier_leave_details old
@@ -321,10 +348,11 @@ ORDER BY o.mil_id;
         soldier[0].telephone_number,
         soldier[0].guardian_name,
         soldier[0].guardian_telephone_number,
-        soldier[0].in_unit
+        soldier[0].in_unit,
+        soldier[0].attached
       );
       const soldierTmam = await query(
-        `SELECT soldiers.mil_id ,soldiers.rank,soldiers.name, soldiers.department, soldiers.join_date, leave_type.name AS 'tmam', soldier_leave_details.start_date, soldier_leave_details.end_date, soldier_leave_details.destination, soldier_log.notes
+        `SELECT soldiers.mil_id ,soldiers.rank,soldiers.name, soldiers.department, soldiers.join_date, leave_type.name AS 'tmam', soldier_leave_details.start_date, soldier_leave_details.end_date, soldier_leave_details.destination, soldier_log.notes, soldier_log.event_type
                                           FROM soldiers
                                           LEFT JOIN soldier_leave_details
                                           ON soldiers.id = soldier_leave_details.soldierID
@@ -483,7 +511,7 @@ LEFT JOIN soldier_log ol
     ON ol.soldierID = o.id 
     AND ol.event_time = lastLog.latest_event
 
--- 🔥 Get the LATEST leave_details row for each officer
+-- 🔥 Get the LATEST leave_details row for each soldier
 LEFT JOIN soldier_leave_details old
     ON old.id = (
         SELECT id

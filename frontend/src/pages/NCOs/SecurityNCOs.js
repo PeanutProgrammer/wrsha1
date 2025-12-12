@@ -37,12 +37,12 @@ const SecurityNCOs = () => {
 
 
   useEffect(() => {
-    const socket = io("http://192.168.1.3:4001"); //  backend port
+    const socket = io(`${process.env.REACT_APP_BACKEND_BASE_URL}`); //  backend port
 
     // 🔁 Initial fetch
     const fetchData = () => {
       axios
-        .get("http://192.168.1.3:4001/nco/tmam", {
+        .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/nco/tmam`, {
           headers: { token: auth.token },
         })
         .then((resp) => {
@@ -273,28 +273,28 @@ const exportToWord = () => {
   return (
     <div className="Officers p-5">
       <div className="header d-flex justify-content-between mb-3">
-  <h3 className="text-center mb-3">إدارة ضباط الصف</h3>
+        <h3 className="text-center mb-3">إدارة ضباط الصف</h3>
 
-  {/* Button container with d-flex */}
-  <div className="d-flex">
-   
-    {/* Export Button with Dropdown */}
+        {/* Button container with d-flex */}
+        <div className="d-flex">
+          {/* Export Button with Dropdown */}
           <Dropdown className="mb-4">
             <DropdownButton
               variant="secondary"
               id="export-dropdown"
-              title={<><FaPrint className="mr-2 " />  طباعة </>}
+              title={
+                <>
+                  <FaPrint className="mr-2 " /> طباعة{" "}
+                </>
+              }
             >
               {/* Use PDFDownloadLink for PDF export */}
-                {/* <Dropdown.Item onClick={exportToPDF}>PDF</Dropdown.Item> */}
+              {/* <Dropdown.Item onClick={exportToPDF}>PDF</Dropdown.Item> */}
               <Dropdown.Item onClick={exportToWord}>Word</Dropdown.Item>
             </DropdownButton>
           </Dropdown>
         </div>
       </div>
-
-
-
 
       {ncos.err && (
         <Alert variant="danger" className="p-2">
@@ -315,7 +315,8 @@ const exportToWord = () => {
               <th>الدرجة</th>
               <th>الاسم</th>
               <th>الورشة / الفرع</th>
-              <th>تاريخ الضم</th>
+              <th>اخر دخول</th>
+              <th>اخر خروج</th>
               <th>التمام</th>
               <th>ملاحظات</th>
             </tr>
@@ -327,14 +328,30 @@ const exportToWord = () => {
                 <td>{officer.rank}</td>
                 <td>{officer.name}</td>
                 <td>{officer.department}</td>
-                <td>{moment(officer.join_date).format('YYYY-MM-DD')}</td>
-                <td  className={
+                <td>
+                  {officer.latest_arrival
+                    ? moment(officer.latest_arrival).format(
+                        "YYYY-MM-DD HH:mm:ss"
+                      )
+                    : "لا يوجد"}
+                </td>
+                <td>
+                  {officer.latest_departure
+                    ? moment(officer.latest_departure).format(
+                        "YYYY-MM-DD HH:mm:ss"
+                      )
+                    : "لا يوجد"}
+                </td>{" "}
+                <td
+                  className={
                     officer.in_unit
                       ? "bg-success text-white"
                       : "bg-danger text-white"
                   }
-                >{officer.in_unit ? 'متواجد' : 'غير موجود'}</td>
-                <td >{officer.in_unit? "لا يوجد" : officer.tmam}</td>
+                >
+                  {officer.in_unit ? "متواجد" : "غير موجود"}
+                </td>
+                <td>{officer.in_unit ? "لا يوجد" : officer.tmam}</td>
                 {/* <td>
                   <div className="action-buttons">
                     <button
@@ -371,7 +388,9 @@ const exportToWord = () => {
         {pageNumbers.map((number) => (
           <button
             key={number}
-            className={`btn btn-light page-btn ${currentPage === number ? 'active' : ''}`}
+            className={`btn btn-light page-btn ${
+              currentPage === number ? "active" : ""
+            }`}
             onClick={() => paginate(number)}
           >
             {number}
@@ -386,8 +405,6 @@ const exportToWord = () => {
           Next
         </button>
       </div>
-
-     
     </div>
   );
 };

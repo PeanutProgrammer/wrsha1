@@ -1,5 +1,5 @@
 import React from "react";
-import '../style/OfficerCard.css';  // Update path if necessary
+import "../../../style/card.css";
 import { Link } from "react-router-dom";
 
 const OfficerCard = ({ id, mil_id, name, join_date, rank, end_date }) => {

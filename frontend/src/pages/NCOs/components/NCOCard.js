@@ -1,5 +1,5 @@
 import React from "react";
-import '../style/NCOCard.css';
+import "../../../style/card.css";
 import { Link } from "react-router-dom";
 
 const NCOCard = ({ id, mil_id, name, department, join_date, rank }) => {

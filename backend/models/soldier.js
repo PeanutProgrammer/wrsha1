@@ -1,7 +1,7 @@
 
 
 class Soldier {
-    constructor(name, join_date, end_date, department, mil_id, rank, telephone_number, guardian_name, guardian_telephone_number, in_unit) {
+    constructor(name, join_date, end_date, department, mil_id, rank, telephone_number, guardian_name, guardian_telephone_number, in_unit, attached) {
         this._name = name;
         this._join_date = join_date;
         this._end_date = end_date;
@@ -12,6 +12,7 @@ class Soldier {
         this._guardian_name = guardian_name;
         this._guardian_telephone_number = guardian_telephone_number;
         this._in_unit = in_unit;
+        this._attached = attached;
     }
 
     getName = () => {
@@ -56,6 +57,10 @@ class Soldier {
         return this._in_unit;
     }
 
+    getAttached = () => {
+        return this._attached;
+    }
+
 
     setName = (name) => {
         this._name = name;
@@ -98,6 +103,10 @@ class Soldier {
 
     setInUnit = (in_unit) => {
         this._in_unit = in_unit;
+    }
+
+    setAttached = (attached) => {
+        this._attached = attached;
     }
 
 

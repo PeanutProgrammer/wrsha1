@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './Officers.css';
+import "../../style/style.css";
 import { Table ,Alert} from 'react-bootstrap';
 import { Link ,useParams} from 'react-router-dom';
 import axios from 'axios';
@@ -17,7 +17,7 @@ const OfficersTmam = () => {
 
   useEffect(() => {
     setOfficers({ ...officers,loading : true});
-    axios.get('http://192.168.1.3:4001/Officer/tmam',  {
+    axios.get(`${process.env.REACT_APP_BACKEND_BASE_URL}/Officer/tmam`,  {
       headers: {
         token: auth.token
       }

@@ -13,27 +13,29 @@
 /* 🔹 SEARCH BOX / FILTER FORM */
 /* ============================= */
 .search-box {
-  background-color: #7e7e71;
-  padding: 25px;
-  border-radius: 12px;
-  max-width: 700px;
+  background: linear-gradient(145deg, #fdf3e7, #e2cca5);
+  padding: 30px;
+  border-radius: 15px;
+  max-width: 750px;
   width: 100%;
   margin: 0 auto;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.25);
+  border: 1px solid #ffcc70;
 }
 
 .search-title {
   text-align: center;
-  margin-bottom: 20px;
-  color: #efc428;
-  font-size: 1.5rem;
+  margin-bottom: 25px;
+  color: #1e1e2f; /* darker for contrast */
+  font-size: 1.8rem;
   font-weight: 700;
+  text-shadow: 1px 1px 2px rgba(255, 204, 112, 0.6);
 }
 
 .filter-form {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 15px;
+  gap: 18px;
 }
 
 .filter-form .form-group {
@@ -42,43 +44,82 @@
 }
 
 .filter-form label {
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   font-weight: 600;
-  color: #ffffff;
-}
-
-.filter-form input {
-  padding: 10px 12px;
-  border-radius: 6px;
-  border: 1px solid #555;
-  background-color: #ffffff;
   color: #333;
-  outline: none;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  font-size: 0.95rem;
 }
 
-.filter-form input:focus {
+/* Inputs and selects */
+.filter-form input,
+.filter-form select {
+  padding: 12px 15px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  font-size: 0.95rem;
+  color: #1e1e2f;
+  outline: none;
+  width: 100%;
+  transition: all 0.3s ease;
+  background-color: #fff;
+}
+
+.filter-form input:focus,
+.filter-form select:focus {
   border-color: #ffcc70;
-  box-shadow: 0 0 5px rgba(255, 204, 112, 0.6);
+  box-shadow: 0 0 8px rgba(255, 204, 112, 0.5);
+}
+
+/* Adjust select font & appearance */
+.filter-form select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background: url("data:image/svg+xml,%3Csvg fill='%23333' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3C/svg%3E") no-repeat right 12px center;
+  background-size: 18px 18px;
+  padding-right: 40px;
+  background-color: #fff;
 }
 
 /* Search button */
+/* Search Button */
 .search-btn {
   grid-column: span 2;
-  background-color: #ffcc70;
-  color: #1e1e2f;
+  background-color: #4a90e2; /* blue */
+  color: #ffffff; /* white text */
   font-weight: bold;
   border: none;
   padding: 12px 20px;
   border-radius: 6px;
   cursor: pointer;
   text-transform: uppercase;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
+/* Hover with bounce */
 .search-btn:hover {
-  background-color: #e6b85f;
-  transform: translateY(-2px);
+  background-color: #357ab8; /* darker blue */
+  animation: bounce 0.4s forwards; /* triggers the bounce keyframes */
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Bounce keyframes */
+@keyframes bounce {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  30% {
+    transform: translateY(-3px) scale(1.03);
+  }
+  50% {
+    transform: translateY(0) scale(1.02);
+  }
+  70% {
+    transform: translateY(-2px) scale(1.03);
+  }
+  100% {
+    transform: translateY(0) scale(1.02);
+  }
 }
 
 /* ============================= */

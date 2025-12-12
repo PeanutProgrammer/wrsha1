@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Alert, } from 'react-bootstrap';
-import './Civillian.css';
+import "../../style/style.css";
 import axios from 'axios';
 import { getAuthUser } from '../../helper/Storage';
 import DatePicker from 'react-datepicker';
@@ -15,9 +15,6 @@ import { useForm } from 'react-hook-form';
 const schema = yup.object().shape({
   nationalID: yup.string().matches(/^\d+$/, 'الرقم القومي يجب أن يحتوي على أرقام فقط').required('الرقم القومي مطلوب'),
   name: yup.string().min(3, 'اسم المدني يجب أن يكون أكثر من 3 حروف').max(30, 'اسم المدني يجب ألا يتجاوز 30 حرف').required('اسم المدني مطلوب'),
-  security_clearance_number: yup.string().required('رقم التصديق الأمني مطلوب'),
-  valid_from: yup.date().required('تاريخ بداية التصديق الأمني مطلوب').typeError('يرجى إدخال تاريخ صحيح'),
-  valid_through: yup.date().required('تاريخ انتهاء التصديق الأمني مطلوب').min(yup.ref('valid_from'), 'تاريخ الانتهاء يجب أن يكون بعد تاريخ البداية').typeError('يرجى إدخال تاريخ صحيح'),
   dob: yup.date().required('تاريخ الميلاد مطلوب').typeError('يرجى إدخال تاريخ صحيح'),
   department: yup.string().required('الفرع / الورشة مطلوب'),
   join_date: yup.date().required('تاريخ الضم مطلوب').typeError('يرجى إدخال تاريخ صحيح'),
@@ -60,12 +57,10 @@ const AddCivillians = () => {
     ...data,
     join_date: data.join_date ? formatDateToLocalString(data.join_date) : '',
     dob: data.dob ? formatDateToLocalString(data.dob) : '',
-  valid_from: data.valid_from ? formatDateToLocalString(data.valid_from) : '',
-  valid_through: data.valid_through ? formatDateToLocalString(data.valid_through) : '',
   };
 
     try {
-      await axios.post('http://192.168.1.3:4001/civillian/', formattedData, {
+      await axios.post(`${process.env.REACT_APP_BACKEND_BASE_URL}/civillian/`, formattedData, {
         headers: {
           token: auth.token,
         },
@@ -93,7 +88,7 @@ const AddCivillians = () => {
 
   useEffect(() => {
       axios
-        .get('http://192.168.1.3:4001/department/', {
+        .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/department/`, {
           headers: {
             token: auth.token,
           },
@@ -176,38 +171,6 @@ const AddCivillians = () => {
         </Form.Group>
 
 
-        <Form.Group controlId="security_clearance_number" className="form-group">
-          <Form.Label>رقم التصديق الأمني</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="أدخل رقم التصديق الأمني"
-            {...register("security_clearance_number")}
-            className={`form-control ${errors.security_clearance_number ? 'is-invalid' : ''}`}
-          />
-          {errors.security_clearance_number && <div className="invalid-feedback">{errors.security_clearance_number.message}</div>}
-        </Form.Group>
-
-        <Form.Group controlId="valid_from" className="form-group">
-          <Form.Label>الفترة من</Form.Label>
-          <Form.Control
-            type="date"
-            placeholder="أدخل تاريخ بداية التصديق الأمني"
-            {...register("valid_from")}
-            className={`form-control ${errors.valid_from ? 'is-invalid' : ''}`}
-          />
-          {errors.valid_from && <div className="invalid-feedback">{errors.valid_from.message}</div>}
-        </Form.Group>
-
-        <Form.Group controlId="valid_through" className="form-group">
-          <Form.Label>الفترة إلى</Form.Label>
-          <Form.Control
-            type="date"
-            placeholder="أدخل تاريخ انتهاء التصديق الأمني"
-            {...register("valid_through")}
-            className={`form-control ${errors.valid_through ? 'is-invalid' : ''}`}
-          />
-          {errors.valid_through && <div className="invalid-feedback">{errors.valid_through.message}</div>}
-        </Form.Group>
         <Form.Group controlId="dob" className="form-group">
           <Form.Label>تاريخ الميلاد</Form.Label>
           <Form.Control

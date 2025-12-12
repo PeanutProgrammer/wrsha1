@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./SearchExperts.css";
+import "../../style/card.css";
 import ExpertCard from "./components/ExpertCard";
 import axios from "axios";
 import { getAuthUser } from "../../helper/Storage";
@@ -33,7 +33,7 @@ const SearchExperts = () => {
     setExperts({ ...experts, loading: true });
 
     axios
-      .get("http://192.168.1.3:4001/expert/filter/", {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/expert/filter/`, {
         headers: { token: auth.token },
         params: {
           search: filters.search,
@@ -74,7 +74,7 @@ const SearchExperts = () => {
   // ✅ Fetch departments
   useEffect(() => {
     axios
-      .get("http://192.168.1.3:4001/department/", {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/department/`, {
         headers: { token: auth.token },
       })
       .then((resp) => setDept(resp.data))

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
-import './Officers.css';
+import "../../style/style.css";
 import axios from 'axios';
 import { getAuthUser } from '../../helper/Storage';
 import { useForm } from 'react-hook-form';
@@ -85,7 +85,7 @@ const AddTmam = () => {
     console.log("Formatted Request Data:", formattedData);
 
     try {
-      await axios.post('http://192.168.1.3:4001/officerLog/tmam', formattedData, {
+      await axios.post(`${process.env.REACT_APP_BACKEND_BASE_URL}/officerLog/tmam`, formattedData, {
         headers: { token: auth.token },
       });
 
@@ -118,7 +118,7 @@ const AddTmam = () => {
 
   useEffect(() => {
     axios
-      .get('http://192.168.1.3:4001/officer/', {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/officer/`, {
         headers: {
           token: auth.token,
         },
@@ -129,7 +129,7 @@ const AddTmam = () => {
 
   useEffect(() => {
     axios
-      .get('http://192.168.1.3:4001/leaveType/', {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/leaveType/`, {
         headers: {
           token: auth.token,
         },

@@ -20,12 +20,12 @@ const PastOfficers = () => {
 
 
   useEffect(() => {
-    const socket = io("http://192.168.1.3:4001"); // your backend port
+    const socket = io(`${process.env.REACT_APP_BACKEND_BASE_URL}`); // your backend port
 
     // 🔁 Initial fetch
     const fetchData = () => {
       axios
-        .get("http://192.168.1.3:4001/pastOfficer/", {
+        .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/pastOfficer/`, {
           headers: { token: auth.token },
         })
         .then((resp) => {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './Civillian.css';
+import "../../style/style.css";
 import { Table ,Alert} from 'react-bootstrap';
 import { Link ,useParams} from 'react-router-dom';
 import axios from 'axios';
@@ -17,7 +17,7 @@ const CivilliansTmam = () => {
 
   useEffect(() => {
     setCivillians({ ...civillians,loading : true});
-    axios.get('http://192.168.1.3:4001/civillian/tmam',  {
+    axios.get(`${process.env.REACT_APP_BACKEND_BASE_URL}/civillian/tmam`,  {
       headers: {
         token: auth.token
       }
@@ -36,23 +36,7 @@ const CivilliansTmam = () => {
       }); 
   }, [civillians.reload]);
 
-//   const deleteOfficer = (mil_id) =>{
-//     axios.delete('http://192.168.1.3:4001/Officer/' + mil_id, {
-//       headers: {
-//         token: auth.token
-//       }
-//     })
-//       .then(resp => {
-//         setOfficers ({...officers , reload : officers.reload +1})
-//       })
-//       .catch(err => {
-//         setOfficers({ 
-//             err: err.response ? JSON.stringify(err.response.data.errors) : "Something went wrong. Please try again later." ,
-//           });
 
-//       });
-
-//   }
 
   return (
     <div className="Officers p-5">
@@ -60,7 +44,6 @@ const CivilliansTmam = () => {
         <h3 className="text-center mb-3">إدارة تمام المدنيين</h3>
         {/* <Link to={"AddOfficers"} className="btn btn-success mb-4"> إنشاء ضابط جديد +</Link> */}
       </div>
-
 
       {civillians.err && (
         <Alert variant="danger" className="p-2">
@@ -73,7 +56,6 @@ const CivilliansTmam = () => {
         </Alert>
       )}
 
-
       <Table striped bordered hover>
         <thead>
           <tr>
@@ -85,16 +67,27 @@ const CivilliansTmam = () => {
           </tr>
         </thead>
         <tbody>
-        {civillians.results.map((civillian) => (
+          {civillians.results.map((civillian) => (
             <tr key={civillian.nationalID}>
-            <td>{civillian.nationalID}</td>    
-            <td>{civillian.name}</td>
-            <td>{civillian.department}</td>
-            <td >{civillian.tmam? civillian.tmam: "متواجد"}</td>
+              <td>{civillian.nationalID}</td>
+              <td>{civillian.name}</td>
+              <td>{civillian.department}</td>
+              <td>
+                {civillian.in_unit
+                  ? "متواجد"
+                  : civillian.tmam
+                  ? civillian.tmam
+                  : "غير متواجد"}
+              </td>
               <td>
                 {/* <button className="btn btn-sm btn-danger mx-1 p-2" onClick ={(e) =>  {deleteOfficer(officer.mil_id)}}>حذف</button> */}
                 {/* <Link to={`${officer.mil_id}`} className="btn btn-sm btn-primary mx-1 p-2">تعديل</Link> */}
-                <Link to={`details/${civillian.nationalID}`} className="btn btn-sm btn-primary mx-1 p-2">تفاصيل </Link>
+                <Link
+                  to={`details/${civillian.nationalID}`}
+                  className="btn btn-sm btn-primary mx-1 p-2"
+                >
+                  تفاصيل{" "}
+                </Link>
               </td>
             </tr>
           ))}

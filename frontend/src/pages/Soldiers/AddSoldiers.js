@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
-import './Soldier.css';
+import "../../style/style.css";
 import axios from 'axios';
 import { getAuthUser } from '../../helper/Storage';
 import { useForm } from 'react-hook-form';
@@ -18,7 +18,8 @@ const schema = yup.object().shape({
   end_date: yup.date().required('تاريخ التسريح مطلوب').typeError('يرجى إدخال تاريخ صحيح'),
   telephone_number: yup.string().required('رقم الهاتف مطلوب'),
   guardian_name: yup.string().required('اسم ولي الأمر مطلوب'),
-  guardian_telephone_number: yup.string().required('رقم ولي الأمر مطلوب')
+  guardian_telephone_number: yup.string().required('رقم ولي الأمر مطلوب'),
+  attached: yup.boolean().required(),
 
 });
 
@@ -37,6 +38,7 @@ const AddSoldiers = () => {
     telephone_number: '',
     guardian_name: '',
     guardian_telephone_number: '',
+    attached: false,
     success: null,
   });
 
@@ -62,8 +64,9 @@ const AddSoldiers = () => {
   // Format the dates (join_date and dob) to yyyy-MM-DD format
   const formattedData = {
     ...data,
-    join_date: data.join_date ? formatDateToLocalString(data.join_date) : '',
-    end_date: data.end_date ? formatDateToLocalString(data.end_date) : ''
+    join_date: data.join_date ? formatDateToLocalString(data.join_date) : "",
+    end_date: data.end_date ? formatDateToLocalString(data.end_date) : "",
+    attached: data.attached === true ? true : false, // default to false if unchecked
   };
 
   // Log the formatted data
@@ -71,7 +74,7 @@ const AddSoldiers = () => {
 
 
     try {
-      await axios.post('http://192.168.1.3:4001/Soldier/', formattedData, {
+      await axios.post(`${process.env.REACT_APP_BACKEND_BASE_URL}/Soldier/`, formattedData, {
         headers: { token: auth.token },
       });
 
@@ -88,6 +91,7 @@ const AddSoldiers = () => {
         telephone_number: '',
         guardian_name: '',
         guardian_telephone_number: '',
+        attached: false,
       });
 
       reset(); // Reset form after successful submission
@@ -107,7 +111,7 @@ const AddSoldiers = () => {
 
   useEffect(() => {
     axios
-      .get('http://192.168.1.3:4001/department/', {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/department/`, {
         headers: {
           token: auth.token,
         },
@@ -246,7 +250,20 @@ const AddSoldiers = () => {
           {errors.guardian_telephone_number && <div className="invalid-feedback">{errors.guardian_telephone_number.message}</div>}
 
 
-        </Form.Group>
+         </Form.Group>
+         
+                  <Form.Group controlId="attached" className="form-group">
+                    <Form.Label>هل الجندي ملحق؟</Form.Label>
+                    <Form.Control
+                      as="select"
+                      {...register("attached")}
+                      className="form-control"
+                    >
+                      <option value="">إختر</option> {/* optional default */}
+                      <option value={true}>نعم</option>
+                      <option value={false}>لا</option>
+                    </Form.Control>
+                  </Form.Group>
 
 
 

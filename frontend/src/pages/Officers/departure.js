@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
-import './Officers.css';
+import "../../style/style.css";
 import axios from 'axios';
 import { getAuthUser } from '../../helper/Storage';
 import { useForm } from 'react-hook-form';
@@ -90,7 +90,7 @@ const OfficerDeparture = () => {
     console.log("Formatted Request Data:", formattedData);
 
     try {
-      await axios.post('http://192.168.1.3:4001/officerLog/departure', formattedData, {
+      await axios.post(`${process.env.REACT_APP_BACKEND_BASE_URL}/officerLog/departure`, formattedData, {
         headers: { token: auth.token },
       });
 
@@ -123,7 +123,7 @@ const OfficerDeparture = () => {
 
   useEffect(() => {
     axios
-      .get('http://192.168.1.3:4001/officer/current', {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/officer/current`, {
         headers: {
           token: auth.token,
         },
@@ -134,7 +134,7 @@ const OfficerDeparture = () => {
 
   useEffect(() => {
     axios
-      .get('http://192.168.1.3:4001/leaveType/', {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/leaveType/`, {
         headers: {
           token: auth.token,
         },
@@ -142,6 +142,15 @@ const OfficerDeparture = () => {
       .then((resp) => setLeaveType(resp.data))
       .catch((err) => console.log(err));
   }, []);
+
+    const filteredLeaveTypes = leaveType.filter(
+      (type) => ![16, 17, 18].includes(type.id)
+    );
+  const leaveTypeOptions = filteredLeaveTypes.map((type) => ({
+    value: type.id,
+    label: type.name,
+  }));
+  
 
   // Transform officers into format required by react-select
   const officerOptions = officer.map((officer) => ({
@@ -160,10 +169,10 @@ const OfficerDeparture = () => {
   const customStyles = {
     control: (provided) => ({
       ...provided,
-      width: '100%',
-      padding: '0.375rem 0.75rem',
-      borderRadius: '0.25rem',
-      border: '1px solid #ced4da',
+      width: "100%",
+      padding: "0.375rem 0.75rem",
+      borderRadius: "0.25rem",
+      border: "1px solid #ced4da",
     }),
     menu: (provided) => ({
       ...provided,
@@ -171,8 +180,13 @@ const OfficerDeparture = () => {
     }),
     option: (provided, state) => ({
       ...provided,
-      backgroundColor: state.isSelected ? '#007bff' : state.isFocused ? '#f8f9fa' : null,
-      color: state.isSelected ? '#fff' : '#495057',
+      backgroundColor: state.isSelected
+        ? "#007bff"
+        : state.isFocused
+        ? "#f8f9fa"
+        : null,
+      color: state.isSelected ? "#fff" : "#495057",
+      fontWeight: state.isSelected ? "600" : "500",
     }),
   };
 
@@ -208,56 +222,70 @@ const OfficerDeparture = () => {
             styles={customStyles} // Apply custom styles to fix overlap issues
             placeholder="اختر الضابط"
           />
-          {errors.officerID && <div className="invalid-feedback">{errors.officerID.message}</div>}
+          {errors.officerID && (
+            <div className="invalid-feedback">{errors.officerID.message}</div>
+          )}
         </Form.Group>
 
         {/* Leave Type Dropdown */}
         <Form.Group controlId="leaveTypeID" className="form-group">
           <Form.Label>سبب الخروج</Form.Label>
-          <Form.Control
-            as="select"
-            {...register("leaveTypeID")}
-            className={`form-control ${errors.leaveTypeID ? 'is-invalid' : ''}`}
-          >
-            <option value="">إختر سبب الخروج</option>
-            {leaveType.map((type) => (
-              <option key={type.id} value={type.id}>{type.name}</option>
-            ))}
-          </Form.Control>
-          {errors.leaveTypeID && <div className="invalid-feedback">{errors.leaveTypeID.message}</div>}
+          <Select
+            options={leaveTypeOptions}
+            placeholder="اختر سبب الخروج"
+            onChange={(selectedOption) => {
+              setValue("leaveTypeID", selectedOption.value);
+            }}
+            styles={customStyles}
+            className="react-select"
+          />
+          {errors.leaveTypeID && (
+            <div className="invalid-feedback d-block">
+              {errors.leaveTypeID.message}
+            </div>
+          )}
+          {errors.leaveTypeID && (
+            <div className="invalid-feedback">{errors.leaveTypeID.message}</div>
+          )}
         </Form.Group>
 
-                <Form.Group controlId="destination" className="form-group">
+        <Form.Group controlId="destination" className="form-group">
           <Form.Label>إلى</Form.Label>
           <Form.Control
             as="textarea"
             rows={3}
             placeholder="أدخل الوجهة"
             {...register("destination")}
-            className={`form-control ${errors.destination ? 'is-invalid' : ''}`}
+            className={`form-control ${errors.destination ? "is-invalid" : ""}`}
           />
-          {errors.destination && <div className="invalid-feedback">{errors.destination.message}</div>}
+          {errors.destination && (
+            <div className="invalid-feedback">{errors.destination.message}</div>
+          )}
         </Form.Group>
 
-         <Form.Group controlId="start_date" className="form-group">
-                  <Form.Label>الفترة من</Form.Label>
-                  <Form.Control
-                    type="date"
-                    {...register("start_date")}
-                    className={`form-control ${errors.start_date ? 'is-invalid' : ''}`}
-                  />
-                  {errors.start_date && <div className="invalid-feedback">{errors.start_date.message}</div>}
-                </Form.Group>
+        <Form.Group controlId="start_date" className="form-group">
+          <Form.Label>الفترة من</Form.Label>
+          <Form.Control
+            type="date"
+            {...register("start_date")}
+            className={`form-control ${errors.start_date ? "is-invalid" : ""}`}
+          />
+          {errors.start_date && (
+            <div className="invalid-feedback">{errors.start_date.message}</div>
+          )}
+        </Form.Group>
 
         <Form.Group controlId="end_date" className="form-group">
-                  <Form.Label>الفترة إلى</Form.Label>
-                  <Form.Control
-                    type="date"
-                    {...register("end_date")}
-                    className={`form-control ${errors.end_date ? 'is-invalid' : ''}`}
-                  />
-                  {errors.end_date && <div className="invalid-feedback">{errors.end_date.message}</div>}
-                </Form.Group>
+          <Form.Label>الفترة إلى</Form.Label>
+          <Form.Control
+            type="date"
+            {...register("end_date")}
+            className={`form-control ${errors.end_date ? "is-invalid" : ""}`}
+          />
+          {errors.end_date && (
+            <div className="invalid-feedback">{errors.end_date.message}</div>
+          )}
+        </Form.Group>
 
         {/* Notes */}
         <Form.Group controlId="notes" className="form-group">
@@ -267,14 +295,21 @@ const OfficerDeparture = () => {
             rows={3}
             placeholder="أدخل ملاحظات"
             {...register("notes")}
-            className={`form-control ${errors.notes ? 'is-invalid' : ''}`}
+            className={`form-control ${errors.notes ? "is-invalid" : ""}`}
           />
-          {errors.notes && <div className="invalid-feedback">{errors.notes.message}</div>}
+          {errors.notes && (
+            <div className="invalid-feedback">{errors.notes.message}</div>
+          )}
         </Form.Group>
 
         {/* Submit Button */}
-        <Button type="submit" variant="primary" className='submit-btn' disabled={officerLog.loading}>
-          {officerLog.loading ? 'جاري الإضافة...' : 'تسجيل خروج'}
+        <Button
+          type="submit"
+          variant="primary"
+          className="submit-btn"
+          disabled={officerLog.loading}
+        >
+          {officerLog.loading ? "جاري الإضافة..." : "تسجيل خروج"}
         </Button>
       </Form>
     </div>

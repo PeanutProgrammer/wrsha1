@@ -19,7 +19,7 @@ const PastOfficerDetails = () => {
   useEffect(() => {
     setOfficers({ ...officer, loading: true });
     axios
-      .get('http://192.168.1.3:4001/pastOfficer/' + id, {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/pastOfficer/` + id, {
         headers: {
           token: auth.token,
         },

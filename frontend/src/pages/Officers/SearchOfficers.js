@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./SearchOfficers.css";
+import "../../style/card.css";
 import OfficerCard from "./components/OfficerCard";
 import axios from "axios";
 import { getAuthUser } from "../../helper/Storage";
@@ -32,7 +32,7 @@ const SearchOfficers = () => {
     setOfficers({ ...officers, loading: true });
 
     axios
-      .get("http://192.168.1.3:4001/Officer/filter/", {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/Officer/filter/`, {
         headers: { token: auth.token },
         params: {
           search: filters.search,
@@ -73,7 +73,7 @@ const SearchOfficers = () => {
   // ✅ Fetch departments
   useEffect(() => {
     axios
-      .get("http://192.168.1.3:4001/department/", {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/department/`, {
         headers: { token: auth.token },
       })
       .then((resp) => setDept(resp.data))
