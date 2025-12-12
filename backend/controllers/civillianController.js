@@ -371,8 +371,8 @@ ORDER BY o.nationalID;
       }
 
       if (req.query.name) {
-        filters.push(`(name = ?)`);
-        params.push(`${req.query.name}`);
+        filters.push(`(name LIKE ?)`);
+        params.push(`%${req.query.name}%`);
       }
 
       // Filter by department

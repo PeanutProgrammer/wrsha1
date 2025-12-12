@@ -168,7 +168,7 @@ const ExpertsLog = () => {
       <Table striped bordered hover>
         <thead>
           <tr>
-            <th>الرقم القومي</th>
+            <th>رقم تحقيق الشخصية</th>
             <th>الإسم</th>
             <th>رقم التصديق الأمني</th>
             <th>اسم الشركة</th>

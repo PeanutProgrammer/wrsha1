@@ -10,9 +10,8 @@ import "react-datetime/css/react-datetime.css";
 
 // Validation schema using yup
 const schema = yup.object().shape({
-  nationalID: yup.string().matches(/^\d+$/, 'الرقم القومي يجب أن يحتوي على أرقام فقط').required('الرقم القومي مطلوب'),
+  nationalID: yup.string().matches(/^\d+$/, 'رقم تحقيق الشخصية يجب أن يحتوي على أرقام فقط').required('رقم تحقيق الشخصية مطلوب'),
   name: yup.string().min(3, 'اسم الخبير يجب أن يكون أكثر من 3 حروف').max(30, 'اسم الخبير يجب ألا يتجاوز 30 حرف').required('اسم الخبير مطلوب'),
-  passport_number: yup.string().min(6, 'رقم جواز السفر يجب أن يكون على الأقل 6 أحرف').required('رقم جواز السفر مطلوب'),
   security_clearance_number: yup.string().required('رقم التصديق الأمني مطلوب'),
   valid_from: yup.date().required('تاريخ بداية التصديق الأمني مطلوب').typeError('يرجى إدخال تاريخ صحيح'),
   valid_through: yup.date().required('تاريخ انتهاء التصديق الأمني مطلوب').min(yup.ref('valid_from'), 'تاريخ الانتهاء يجب أن يكون بعد تاريخ البداية').typeError('يرجى إدخال تاريخ صحيح'),
@@ -121,10 +120,10 @@ const AddExperts = () => {
       
       <Form onSubmit={handleSubmit(createExpert)} className="form">
         <Form.Group controlId="nationalID" className="form-group">
-          <Form.Label>الرقم القومي</Form.Label>
+          <Form.Label>رقم تحقيق الشخصية</Form.Label>
           <Form.Control
             type="text"
-            placeholder="أدخل الرقم القومي"
+            placeholder="أدخل رقم تحقيق الشخصية"
             {...register("nationalID")}
             className={`form-control ${errors.nationalID ? 'is-invalid' : ''}`}
           />
@@ -140,17 +139,6 @@ const AddExperts = () => {
             className={`form-control ${errors.name ? 'is-invalid' : ''}`}
           />
           {errors.name && <div className="invalid-feedback">{errors.name.message}</div>}
-        </Form.Group>
-
-        <Form.Group controlId="passport_number" className="form-group">
-          <Form.Label>جواز السفر</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="أدخل رقم جواز السفر"
-            {...register("passport_number")}
-            className={`form-control ${errors.passport_number ? 'is-invalid' : ''}`}
-          />
-          {errors.passport_number && <div className="invalid-feedback">{errors.passport_number.message}</div>}
         </Form.Group>
 
         <Form.Group controlId="security_clearance_number" className="form-group">
@@ -187,7 +175,7 @@ const AddExperts = () => {
         </Form.Group>
 
          <Form.Group controlId="department">
-                                  <Form.Label>الورشة / الفرع</Form.Label>
+                                  <Form.Label>مكان التواجد</Form.Label>
                                   <Form.Control
                                     as="select"
                                     {...register('department')}

@@ -63,17 +63,13 @@ const ExpertDetails = () => {
           <table className="officer-details-table">
             <tbody>
               <tr>
-                <td><strong>الرقم القومي:</strong></td>
+                <td><strong>رقم تحقيق الشخصية:</strong></td>
                 <td>{expert.results._nationalID}</td>
               </tr>
 
               <tr>
                 <td><strong>الاسم:</strong></td>
                 <td>{expert.results._name}</td>
-              </tr>
-              <tr>
-                <td><strong>رقم جواز السفر:</strong></td>
-                <td>{expert.results._passport_number}</td>
               </tr>
 
               <tr>

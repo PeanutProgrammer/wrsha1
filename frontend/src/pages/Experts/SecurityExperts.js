@@ -94,8 +94,7 @@ const SecurityExperts = () => {
         <Table striped bordered hover>
           <thead>
             <tr>
-              <th>الرقم القومي</th>
-              <th>جواز السفر</th>
+              <th>رقم تحقيق الشخصية</th>
               <th>الإسم</th>
               <th>رقم التصديق الأمني</th>
               <th>الفترة من</th>
@@ -111,7 +110,6 @@ const SecurityExperts = () => {
             {currentRecords.map((expert) => (
               <tr key={expert.nationalID}>
                 <td>{expert.nationalID}</td>
-                <td>{expert.passport_number}</td>
                 <td>{expert.name}</td>
                 <td>{expert.security_clearance_number}</td>
                 <td>{moment(expert.valid_from).format("YYYY-MM-DD")}</td>

@@ -40,14 +40,9 @@ router.post("/",
             return true;
         }),
 
-    // Validate 'passport_number'
-    body("passport_number")
-        .isString().withMessage("من فضلك أدخل رقم جواز السفر صحيح")
-        .isLength({ min: 6 }).withMessage("رقم جواز السفر يجب أن يكون على الأقل 6 أحرف"),
-
     // Validate 'nationalID'
     body("nationalID")
-        .isNumeric().withMessage("من فضلك أدخل رقم الهوية الوطنية صحيح"),
+        .isString().withMessage("من فضلك أدخل رقم تحقيق شخصي  صحيح"),
 
     // Validate 'company_name'
     body("company_name")
@@ -75,71 +70,80 @@ router.post("/",
     }
 );
 
-router.put("/:id", admin,
-    // Validate National ID (numeric)
-    body("nationalID")
-        .isNumeric().withMessage("من فضلك أدخل رقم الهوية الوطنية صحيح"),
+router.put(
+  "/:id",
+  admin,
 
-    // Validate valid_from and valid_through dates with custom validation
-    body("valid_from")
-        .isDate().withMessage("من فضلك أدخل تاريخ بدء صحيح (YYYY-MM-DD)")
-        .custom((value, { req }) => {
-            if (!moment(value, "YYYY-MM-DD", true).isValid()) {
-                throw new Error("تاريخ بدء الخبرة يجب أن يكون بالتنسيق الصحيح (YYYY-MM-DD).");
-            }
-            if (moment(value).isAfter(req.body.valid_through)) {
-                throw new Error("تاريخ بدء الخبرة يجب أن يكون قبل تاريخ الانتهاء.");
-            }
-            return true;
-        }),
+  // Validate 'nationalID'
+  body("nationalID")
+    .isString()
+    .withMessage("من فضلك أدخل رقم تحقيق شخصي  صحيح"),
 
-    body("valid_through")
-        .isDate().withMessage("من فضلك أدخل تاريخ انتهاء صحيح (YYYY-MM-DD)")
-        .custom((value, { req }) => {
-            if (!moment(value, "YYYY-MM-DD", true).isValid()) {
-                throw new Error("تاريخ انتهاء الخبرة يجب أن يكون بالتنسيق الصحيح (YYYY-MM-DD).");
-            }
-            if (moment(value).isBefore(req.body.valid_from)) {
-                throw new Error("تاريخ انتهاء الخبرة يجب أن يكون بعد تاريخ البدء.");
-            }
-            return true;
-        }),
+  // Validate valid_from and valid_through dates with custom validation
+  body("valid_from")
+    .isDate()
+    .withMessage("من فضلك أدخل تاريخ بدء صحيح (YYYY-MM-DD)")
+    .custom((value, { req }) => {
+      if (!moment(value, "YYYY-MM-DD", true).isValid()) {
+        throw new Error(
+          "تاريخ بدء الخبرة يجب أن يكون بالتنسيق الصحيح (YYYY-MM-DD)."
+        );
+      }
+      if (moment(value).isAfter(req.body.valid_through)) {
+        throw new Error("تاريخ بدء الخبرة يجب أن يكون قبل تاريخ الانتهاء.");
+      }
+      return true;
+    }),
 
-    // Validate name (should be a string between 3 and 30 characters)
-    body("name")
-        .isString().withMessage("من فضلك أدخل اسم صحيح")
-        .isLength({ min: 3, max: 30 }).withMessage("الاسم يجب أن يكون بين 3 و 30 حرفًا"),
+  body("valid_through")
+    .isDate()
+    .withMessage("من فضلك أدخل تاريخ انتهاء صحيح (YYYY-MM-DD)")
+    .custom((value, { req }) => {
+      if (!moment(value, "YYYY-MM-DD", true).isValid()) {
+        throw new Error(
+          "تاريخ انتهاء الخبرة يجب أن يكون بالتنسيق الصحيح (YYYY-MM-DD)."
+        );
+      }
+      if (moment(value).isBefore(req.body.valid_from)) {
+        throw new Error("تاريخ انتهاء الخبرة يجب أن يكون بعد تاريخ البدء.");
+      }
+      return true;
+    }),
 
-    // Validate passport number (ensure it's a valid passport number)
-    body("passport_number")
-        .isString().withMessage("من فضلك أدخل رقم جواز السفر صحيح")
-        .isLength({ min: 6 }).withMessage("رقم جواز السفر يجب أن يكون على الأقل 6 أحرف"),
+  // Validate name (should be a string between 3 and 30 characters)
+  body("name")
+    .isString()
+    .withMessage("من فضلك أدخل اسم صحيح")
+    .isLength({ min: 3, max: 30 })
+    .withMessage("الاسم يجب أن يكون بين 3 و 30 حرفًا"),
 
-    // Validate company name (should be a string)
-    body("company_name")
-        .isString().withMessage("من فضلك أدخل اسم الشركة صحيح"),
 
-    // Validate security clearance number (should be a string)
-    body("security_clearance_number")
-        .isString().withMessage("من فضلك أدخل رقم التصديق الأمني صحيح"),
+  // Validate company name (should be a string)
+  body("company_name").isString().withMessage("من فضلك أدخل اسم الشركة صحيح"),
 
-    body("department")
-        .isString().withMessage("من فضلك أدخل الورشة / الفرع بشكل صحيح"),
+  // Validate security clearance number (should be a string)
+  body("security_clearance_number")
+    .isString()
+    .withMessage("من فضلك أدخل رقم التصديق الأمني صحيح"),
 
-    // Handle validation results
-    (req, res) => {
-        // Get validation errors
-        const errors = validationResult(req);
+  body("department")
+    .isString()
+    .withMessage("من فضلك أدخل الورشة / الفرع بشكل صحيح"),
 
-        if (!errors.isEmpty()) {
-            // Return a response with errors if validation fails
-            return res.status(400).json({ errors: errors.array() });
-        }
+  // Handle validation results
+  (req, res) => {
+    // Get validation errors
+    const errors = validationResult(req);
 
-        // If validation passes, proceed to controller action
-        ExpertController.updateExpert(req, res);
-        console.log("BODY RECEIVED:", req.body);
+    if (!errors.isEmpty()) {
+      // Return a response with errors if validation fails
+      return res.status(400).json({ errors: errors.array() });
     }
+
+    // If validation passes, proceed to controller action
+    ExpertController.updateExpert(req, res);
+    console.log("BODY RECEIVED:", req.body);
+  }
 );
 
 

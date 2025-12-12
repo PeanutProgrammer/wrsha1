@@ -106,8 +106,8 @@ class PastOfficerController {
 
     // Handle search by name (common for both tables)
     if (req.query.name) {
-      filters.push(`(name = ?)`);
-      params.push(`${req.query.name}`);
+      filters.push(`(name LIKE ?)`);
+      params.push(`%${req.query.name}%`);
     }
 
     // Handle filter by end date (common for both tables)

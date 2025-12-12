@@ -11,9 +11,8 @@ import * as yup from 'yup';
 
 // Validation schema using yup
 const schema = yup.object().shape({
-  nationalID: yup.string().matches(/^\d+$/, 'الرقم القومي يجب أن يحتوي على أرقام فقط').required('الرقم القومي مطلوب'),
+  nationalID: yup.string().matches(/^\d+$/, 'رقم تحقيق الشخصية يجب أن يحتوي على أرقام فقط').required('رقم تحقيق الشخصية مطلوب'),
   name: yup.string().min(3, 'اسم الخبير يجب أن يكون أكثر من 3 حروف').max(30, 'اسم الخبير يجب ألا يتجاوز 30 حرف').required('اسم الخبير مطلوب'),
-  passport_number: yup.string().min(6, 'رقم جواز السفر يجب أن يكون على الأقل 6 أحرف').required('رقم جواز السفر مطلوب'),
   security_clearance_number: yup.string().required('رقم التصديق الأمني مطلوب'),
   valid_from: yup.date().required('تاريخ بداية التصديق الأمني مطلوب').typeError('يرجى إدخال تاريخ صحيح'),
   valid_through: yup.date().required('تاريخ انتهاء التصديق الأمني مطلوب').min(yup.ref('valid_from'), 'تاريخ الانتهاء يجب أن يكون بعد تاريخ البداية').typeError('يرجى إدخال تاريخ صحيح'),
@@ -33,7 +32,6 @@ const UpdateExperts = () => {
     err: '',
     nationalID: '',
     name: '',
-    passport_number: '',
     security_clearance_number: '',
     valid_from: '',
     valid_through: '',
@@ -117,7 +115,6 @@ const UpdateExperts = () => {
           ...expert,
           nationalID: resp.data._nationalID,
           name: resp.data._name,
-          passport_number: resp.data.passport_number,
           security_clearance_number: resp.data._security_clearance_number,
           valid_from: resp.data._valid_from ? formatDateToInput(resp.data._valid_from) : '',
           valid_through: resp.data._valid_through ? formatDateToInput(resp.data._valid_through) : '',
@@ -129,7 +126,6 @@ const UpdateExperts = () => {
         reset({
           nationalID: resp.data._nationalID,
           name: resp.data._name,
-          passport_number: resp.data._passport_number,
           security_clearance_number: resp.data._security_clearance_number,
           valid_from: resp.data._valid_from ? formatDateToInput(resp.data._valid_from) : '',
           valid_through: resp.data._valid_through ? formatDateToInput(resp.data._valid_through) : '',
@@ -178,10 +174,10 @@ const UpdateExperts = () => {
 
       <Form onSubmit={handleSubmit(updateExperts)}>
        <Form.Group controlId="nationalID">
-  <Form.Label>الرقم القومي</Form.Label>
+  <Form.Label>رقم تحقيق الشخصية</Form.Label>
   <Form.Control
     type="text"
-    placeholder="أدخل الرقم القومي"
+    placeholder="أدخل رقم تحقيق الشخصية"
     {...register('nationalID')}
     className={`form-control ${errors.nationalID ? 'is-invalid' : ''}`}
     disabled // Make it uneditable
@@ -203,16 +199,6 @@ const UpdateExperts = () => {
           {errors.name && <div className="invalid-feedback">{errors.name.message}</div>}
         </Form.Group>
 
-        <Form.Group controlId="passport_number" className="form-group">
-          <Form.Label>رقم جواز السفر</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="أدخل رقم جواز السفر"
-            {...register('passport_number')}
-            className={`form-control ${errors.passport_number ? 'is-invalid' : ''}`}
-          />
-          {errors.passport_number && <div className="invalid-feedback">{errors.passport_number.message}</div>}
-        </Form.Group>
 
         <Form.Group controlId="security_clearance_number" className="form-group">
           <Form.Label>رقم التصديق الأمني</Form.Label>

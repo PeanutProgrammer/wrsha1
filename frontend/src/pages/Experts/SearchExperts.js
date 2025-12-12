@@ -106,12 +106,12 @@ const SearchExperts = () => {
 
         <form onSubmit={handleSearch} className="filter-form">
           <div className="form-group">
-            <label>الرقم القومي</label>
+            <label>رقم تحقيق الشخصية</label>
             <input
               type="text"
               value={filters.nationalID}
               onChange={(e) => setFilters({ ...filters, nationalID: e.target.value })}
-              placeholder="ادخل الرقم القومي"
+              placeholder="ادخل رقم تحقيق الشخصية"
             />
           </div>
 
