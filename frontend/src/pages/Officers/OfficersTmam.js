@@ -77,6 +77,7 @@ const OfficersTmam = () => {
       <Table striped bordered hover>
         <thead>
           <tr>
+            <th>م</th>
             <th>الرقم العسكري</th>
             <th>الرتبة</th>
             <th>الإسم</th>
@@ -86,8 +87,9 @@ const OfficersTmam = () => {
           </tr>
         </thead>
         <tbody>
-        {officers.results.map((officer) => (
+        {officers.results.map((officer, index) => (
             <tr key={officer.mil_id}>
+            <td>{index + 1}</td> {/* Arabic numbering, starting from 1 */}
             <td>{officer.mil_id}</td>    
             <td>{officer.rank}</td>
             <td>{officer.name}</td>

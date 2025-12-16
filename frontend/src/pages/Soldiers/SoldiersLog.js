@@ -166,6 +166,7 @@ const SoldiersLog = () => {
       <Table striped bordered hover>
         <thead>
           <tr>
+            <th>م</th>
             <th>الرقم العسكري</th>
             <th>الدرجة</th>
             <th>الإسم</th>
@@ -179,8 +180,9 @@ const SoldiersLog = () => {
         <tbody>
           {Array.isArray(soldiers.results) &&
           soldiers.results.length > 0 ? (
-            soldiers.results.map((soldier) => (
+            soldiers.results.map((soldier, index) => (
             <tr key={soldier.mil_id}>
+            <td>{index + 1}</td> {/* Arabic numbering, starting from 1 */}
             <td>{soldier.mil_id}</td>    
             <td>{soldier.rank}</td>
             <td>{soldier.name}</td>
@@ -199,8 +201,9 @@ const SoldiersLog = () => {
     : "لا يوجد"}
 </td>
 
-            <td>{(soldier.event_type? (soldier.event_type == "دخول"? "دخول" : soldier.reason): "لا يوجد")}</td>
-            <td>{soldier.notes? soldier.notes: "لا يوجد"}</td>
+            <td>{(soldier.event_type ? (soldier.event_type == "دخول" ?
+              `عودة ${soldier.reason || ""}`
+              : soldier.reason) : "لا يوجد")}</td>            <td>{soldier.notes? soldier.notes: "لا يوجد"}</td>
 
     
             </tr>

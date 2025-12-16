@@ -286,6 +286,15 @@ SELECT
         LIMIT 1
     ) AS latest_arrival,
 
+        -- Latest leave ID
+    (
+        SELECT id
+        FROM soldier_leave_details old
+        WHERE old.soldierID = o.id
+        ORDER BY old.id DESC
+        LIMIT 1
+    ) AS latest_leave_id,
+
     lt.name AS tmam
 FROM soldiers o
 LEFT JOIN soldier_leave_details old
@@ -298,7 +307,7 @@ LEFT JOIN soldier_leave_details old
     )
 LEFT JOIN leave_type lt
     ON lt.id = old.leaveTypeID
-ORDER BY o.mil_id;
+ORDER BY o.id;
 `);
 
       console.log(soldiers[0]);
@@ -352,7 +361,7 @@ ORDER BY o.mil_id;
         soldier[0].attached
       );
       const soldierTmam = await query(
-        `SELECT soldiers.mil_id ,soldiers.rank,soldiers.name, soldiers.department, soldiers.join_date, leave_type.name AS 'tmam', soldier_leave_details.start_date, soldier_leave_details.end_date, soldier_leave_details.destination, soldier_log.notes, soldier_log.event_type
+        `SELECT soldiers.mil_id ,soldiers.rank,soldiers.name, soldiers.department, soldiers.in_unit,  soldiers.join_date, leave_type.name AS 'tmam', soldier_leave_details.start_date, soldier_leave_details.end_date, soldier_leave_details.destination, soldier_log.notes, soldier_log.event_type, soldier_log.event_time
                                           FROM soldiers
                                           LEFT JOIN soldier_leave_details
                                           ON soldiers.id = soldier_leave_details.soldierID

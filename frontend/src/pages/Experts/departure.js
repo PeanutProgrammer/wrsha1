@@ -144,7 +144,7 @@ const ExpertDeparture = () => {
           </thead>
           <tbody>
             {currentRecords.map((expert) => (
-              <tr key={expert.nationalID}>
+              <tr key={expert.id}>
                 <td>{expert.nationalID}</td>
                 <td>{expert.name}</td>
                 <td>{expert.security_clearance_number}</td>

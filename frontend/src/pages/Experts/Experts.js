@@ -138,11 +138,12 @@ const Experts = () => {
         <Table striped bordered hover>
           <thead>
             <tr>
+              <th>م</th>
               <th>رقم تحقيق الشخصية</th>
-              <th>الإسم</th>
+              <th>الاسم</th>
               <th>رقم التصديق الأمني</th>
-              <th>الفترة من</th>
-              <th>الفترة إلى</th>
+              {/* <th>الفترة من</th>
+              <th>الفترة إلى</th> */}
               <th>الفرع / الورشة</th>
               <th>اسم الشركة</th>
               <th>حالة التصديق</th>
@@ -151,13 +152,14 @@ const Experts = () => {
             </tr>
           </thead>
           <tbody>
-            {currentRecords.map((expert) => (
+            {currentRecords.map((expert, index) => (
               <tr key={expert.nationalID}>
+                <td>{index + 1}</td>
                 <td>{expert.nationalID}</td>
                 <td>{expert.name}</td>
                 <td>{expert.security_clearance_number}</td>
-                <td>{moment(expert.valid_from).format("YYYY-MM-DD")}</td>
-                <td>{moment(expert.valid_through).format("YYYY-MM-DD")}</td>
+                {/* <td>{moment(expert.valid_from).format("YYYY-MM-DD")}</td>
+                <td>{moment(expert.valid_through).format("YYYY-MM-DD")}</td> */}
                 <td>{expert.department}</td>
                 <td>{expert.company_name}</td>
 

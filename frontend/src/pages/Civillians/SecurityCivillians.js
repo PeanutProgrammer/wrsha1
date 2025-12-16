@@ -310,6 +310,7 @@ const exportToWord = () => {
         <Table id="civillian-table" striped bordered hover>
           <thead>
             <tr>
+              <th>م</th>
               <th>الرقم القومي</th>
               <th>الاسم</th>
               <th>الورشة / الفرع</th>
@@ -320,8 +321,9 @@ const exportToWord = () => {
             </tr>
           </thead>
           <tbody>
-            {currentRecords.map((civillian) => (
+            {currentRecords.map((civillian, index) => (
               <tr key={civillian.nationalID}>
+                <td>{index+1}</td>
                 <td>{civillian.nationalID}</td>
                 <td>{civillian.name}</td>
                 <td>{civillian.department}</td>

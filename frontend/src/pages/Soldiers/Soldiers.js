@@ -137,9 +137,10 @@ const Soldiers = () => {
         <Table striped bordered hover>
           <thead>
             <tr>
+              <th>م</th>
               <th>الرقم العسكري</th>
               <th>الدرجة</th>
-              <th>الإسم</th>
+              <th>الاسم</th>
               <th>الورشة / الفرع</th>
               <th>تاريخ الضم</th>
               <th>تاريخ التسريح</th>
@@ -149,8 +150,9 @@ const Soldiers = () => {
             </tr>
           </thead>
           <tbody>
-            {currentRecords.map((soldier) => (
+            {currentRecords.map((soldier, index) => (
               <tr key={soldier.mil_id}>
+                <td>{index + 1}</td> {/* Arabic numbering, starting from 1 */}
                 <td>{soldier.mil_id}</td>
                 <td>{soldier.rank}</td>
                 <td>{soldier.name}</td>

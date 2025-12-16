@@ -5,6 +5,7 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { getAuthUser } from '../../helper/Storage';
 import moment from 'moment';
+moment.locale('ar-EG');
 
 const OfficersTmamDetails = () => {
   const auth = getAuthUser();
@@ -86,11 +87,12 @@ const OfficersTmamDetails = () => {
       <Table striped bordered hover>
         <thead>
           <tr>
-            <th>#</th>
+            <th>م</th>
             <th>نوع التمام</th>
             <th>إلى</th>
             <th>الفترة من</th>
             <th>الفترة إلى</th>
+                        <th>وقت الدخول/الخروج</th> {/* New column header */}
             <th>ملاحظات</th>
           </tr>
         </thead>
@@ -100,10 +102,15 @@ const OfficersTmamDetails = () => {
               <tr key={index}>
                 <td>{index + 1}</td>
                 <td>
-                  {rec.event_type === "دخول"
-                    ? `عودة ${rec.tmam || ""}` // show "عودة" + leave type if exists
-                    : rec.tmam || "متواجد"}{" "}
-                </td>{" "}
+        {rec.event_type 
+          ? rec.event_type === "دخول"
+            ? `عودة ${rec.tmam || ""}` // If "دخول", show "عودة" with leave type
+            : `خروج ${rec.tmam || ""}` // If "خروج", show "خروج" with leave type
+          : rec.tmam
+          ? `خروج ${rec.tmam}` // If event_type is null, check in_unit
+          : rec.in_unit ? "متواجد" : "غير متواجد"} 
+
+                </td>
                 <td>{rec.destination || "—"}</td>
                 <td>
                   {rec.start_date
@@ -115,12 +122,19 @@ const OfficersTmamDetails = () => {
                     ? moment(rec.end_date).format("YYYY-MM-DD")
                     : "—"}
                 </td>
+                                <td>
+                  {/* Time and Event Type */}
+                  {rec.event_type && rec.event_time
+                    ? ` ${moment(rec.event_time).format("YYYY-MM-DD HH:mm ")}`
+                    : "—"}
+                </td>
                 <td>{rec.notes || "—"}</td>
+
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="6" className="text-center">
+              <td colSpan="7" className="text-center">
                 لا يوجد سجلات تمام.
               </td>
             </tr>

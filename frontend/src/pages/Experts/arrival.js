@@ -81,7 +81,7 @@ const ExpertArrival = () => {
 
   useEffect(() => {
     axios
-      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/expert/`, {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/expert/absent`, {
         headers: {
           token: auth.token,
         },
@@ -103,7 +103,7 @@ const ExpertArrival = () => {
 
   // Transform experts into format required by react-select
   const expertOptions = expert.map((expert) => ({
-    value: expert.nationalID,
+    value: expert.id,
     label: `${expert.name}`,
   }));
 
@@ -176,7 +176,7 @@ const ExpertArrival = () => {
             getOptionLabel={(e) => e.label}
             getOptionValue={(e) => e.value}
             onChange={handleExpertChange}
-            className="react-select"
+            className="react-select" 
             styles={customStyles}
             placeholder="اختر الخبير"
           />

@@ -174,7 +174,7 @@ const Delegates = () => {
         <Table striped bordered hover>
           <thead>
             <tr>
-              <th>#</th>
+              <th>م</th>
               <th>الرتبة / الدرجة</th>
               <th>الاسم</th>
               <th>اسم الوحدة</th>
@@ -185,9 +185,9 @@ const Delegates = () => {
             </tr>
           </thead>
           <tbody>
-            {currentRecords.map((delegate) => (
+            {currentRecords.map((delegate, index) => (
               <tr key={delegate.id}>
-                <td>{delegate.id}</td>
+                <td>{index + 1}</td>
                 <td>{delegate.rank}</td>
                 <td>{delegate.name}</td>
                 <td>{delegate.unit}</td>

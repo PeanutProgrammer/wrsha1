@@ -94,7 +94,7 @@ const SecurityGuests = () => {
         <Table striped bordered hover>
           <thead>
             <tr>
-              <th>#</th>
+              <th>م</th>
               <th>الإسم</th>
               <th>زيارة إلى</th>
               <th>وقت الدخول</th>
@@ -103,9 +103,9 @@ const SecurityGuests = () => {
             </tr>
           </thead>
           <tbody>
-            {currentRecords.map((guest) => (
+            {currentRecords.map((guest, index) => (
               <tr key={guest.id}>
-                <td>{guest.id}</td>
+                <td>{index + 1}</td>
                 <td>{guest.name}</td>
                 <td>{guest.rank + " " + guest.officer_name}</td>
                 <td>{moment(guest.visit_start).format("YYYY-MM-DD HH:mm")}</td>

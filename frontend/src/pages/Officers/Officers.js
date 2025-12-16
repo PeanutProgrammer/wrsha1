@@ -362,6 +362,7 @@ const exportToWord = () => {
         <Table id="officer-table" striped bordered hover>
           <thead>
             <tr>
+              <th>م</th> {/* Arabic numbering column */}
               <th>الرقم العسكري</th>
               <th>الرتبة</th>
               <th>الاسم</th>
@@ -369,12 +370,13 @@ const exportToWord = () => {
               <th>تاريخ الضم</th>
               <th>ملحق؟</th>
               <th>التمام</th>
-              <th>Action</th>
+              <th className="action-col" >Action</th>
             </tr>
           </thead>
           <tbody>
-            {currentRecords.map((officer) => (
-              <tr key={officer.mil_id}>
+            {currentRecords.map((officer, index) => (
+              <tr key={officer.mil_id }>
+              <td>{index + 1}</td> {/* Arabic numbering, starting from 1 */}
                 <td>{officer.mil_id}</td>
                 <td>{officer.rank}</td>
                 <td>{officer.name}</td>
@@ -382,7 +384,7 @@ const exportToWord = () => {
                 <td>{moment(officer.join_date).format('YYYY-MM-DD')}</td>
                 <td>{officer.attached ? 'نعم' : 'لا'}</td>
                 <td>{officer.in_unit ? 'متواجد' : 'غير موجود'}</td>
-                <td>
+                <td className="action-col">
                   <div className="action-buttons">
                     <button
                       className="btn btn-sm btn-danger"
@@ -411,7 +413,7 @@ const exportToWord = () => {
           onClick={() => paginate(currentPage - 1)}
           disabled={currentPage === 1}
         >
-          Previous
+          السابق
         </button>
 
         {/* Page Numbers */}
@@ -430,7 +432,7 @@ const exportToWord = () => {
           onClick={() => paginate(currentPage + 1)}
           disabled={currentPage === totalPages}
         >
-          Next
+          التالي
         </button>
       </div>
 

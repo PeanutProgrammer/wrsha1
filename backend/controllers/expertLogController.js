@@ -38,14 +38,14 @@ class ExpertLogController {
         const total = countResult[0].total;
         const totalPages = Math.ceil(total / limit);
 
-        const dataQuery = `SELECT experts.nationalID, experts.name, experts.department, experts.security_clearance_number, experts.company_name, experts.valid_from, experts.valid_through, officers.rank, officers.name as officerName, expert_record.start_date, expert_record.end_date, expert_record.external_officer
+        const dataQuery = `SELECT experts.id ,experts.nationalID, experts.name, experts.department, experts.security_clearance_number, experts.company_name, experts.valid_from, experts.valid_through, officers.rank, officers.name as officerName, expert_record.start_date, expert_record.end_date, expert_record.external_officer
                                           FROM experts
                                           LEFT JOIN expert_record
-                                          ON expert_record.expertID = experts.nationalID
+                                          ON expert_record.expertID = experts.id
                                           LEFT JOIN officers
                                           ON expert_record.officerID = officers.id
                                         ${searchClause}
-                                        ORDER BY experts.name ASC
+                                        ORDER BY expert_record.start_date desc
                                         LIMIT ? OFFSET ?
                                         `;
         params.push(limit, offset);
@@ -85,11 +85,11 @@ class ExpertLogController {
 
             // SQL query to fetch experts with null end_date in expert_record
             const experts = await query(`
-                SELECT experts.nationalID, experts.name, experts.security_clearance_number, 
+                SELECT experts.id ,experts.nationalID, experts.name, experts.security_clearance_number, 
                        experts.company_name, experts.valid_from, experts.valid_through, expert_record.id, 
                        officers.rank, officers.name as officerName, expert_record.start_date, expert_record.end_date
                 FROM experts
-                LEFT JOIN expert_record ON expert_record.expertID = experts.nationalID
+                LEFT JOIN expert_record ON expert_record.expertID = experts.id
                 LEFT JOIN officers ON expert_record.officerID = officers.id
                 WHERE expert_record.end_date IS NULL AND expert_record.start_date IS NOT NULL
             `);
@@ -147,16 +147,16 @@ class ExpertLogController {
             }
 
             // Get the current time to set as visit_end
-            const visitEnd = moment().format("YYYY-MM-DD HH:mm:ss");
+            const visit_end = moment().format("YYYY-MM-DD HH:mm:ss");
 
             // Update the visit_end field in the database
             await query(
                 "UPDATE expert_record SET end_date = ? WHERE id = ?",
-                [visitEnd, req.params.id]
+                [visit_end, req.params.id]
             );
 
             await query(
-                "update experts set in_unit = 0 where nationalID = ?",
+                "update experts set in_unit = 0 where id = ?",
                 [checkExpert[0].expertID]
             );
             
@@ -170,7 +170,6 @@ class ExpertLogController {
         // Respond with a success message
         return res.status(200).json({
             msg: "Visit ended successfully!",
-            end_date: visitEnd // Return the new end_date time
         });
 
     } catch (err) {
@@ -224,7 +223,7 @@ class ExpertLogController {
             await withTransaction(async (query) => {
                 // 1) LOCK expert row to prevent race conditions
                 const [expert] = await query(
-                    "SELECT in_unit FROM experts WHERE nationalID = ? FOR UPDATE",
+                    "SELECT in_unit FROM experts WHERE id = ? FOR UPDATE",
                     [expertObject.getExpertID()]
                 );
       
@@ -245,7 +244,7 @@ class ExpertLogController {
 
 
                     
-                await query("update experts set in_unit = 1 where nationalID = ?", [expertObject.getExpertID()]);
+                await query("update experts set in_unit = 1 where id = ?", [expertObject.getExpertID()]);
 
 
             });
@@ -291,7 +290,7 @@ class ExpertLogController {
             await withTransaction(async (query) => {
                 // 1) LOCK expert row
                 const [expert] = await query(
-                    "SELECT in_unit FROM experts WHERE nationalID = ? FOR UPDATE",
+                    "SELECT in_unit FROM experts WHERE id = ? FOR UPDATE",
                     [expertObject.getExpertID()]
                 );
       
@@ -309,7 +308,7 @@ class ExpertLogController {
 
                 const expertRecordId = expertRecordResult.insertId;
 
-                await query("update experts set in_unit = 0 where nationalID = ?", [expertObject.getExpertID()]);
+                await query("update experts set in_unit = 0 where id = ?", [expertObject.getExpertID()]);
             });
 
 

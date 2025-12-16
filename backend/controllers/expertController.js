@@ -452,15 +452,33 @@ class ExpertController {
   }
 }
 
-    
 
+static async getAbsentExperts(req, res) {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+        }
 
+        const query = util.promisify(connection.query).bind(connection);
+        const sql = `SELECT * FROM experts WHERE in_unit = 0
+        `;
 
+        const absentExperts = await query(sql);
 
+        if (absentExperts.length === 0) {
+            return res.status(404).json({
+                errors: [{ msg: "No absent experts found" }],
+            });
+        }
 
-    
+        return res.status(200).json(absentExperts);
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ err: err.message });
     }
-
+}
+}
 
 
 module.exports = ExpertController;

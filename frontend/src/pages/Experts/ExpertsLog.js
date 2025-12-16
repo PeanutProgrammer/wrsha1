@@ -168,6 +168,7 @@ const ExpertsLog = () => {
       <Table striped bordered hover>
         <thead>
           <tr>
+            <th>م</th>
             <th>رقم تحقيق الشخصية</th>
             <th>الإسم</th>
             <th>رقم التصديق الأمني</th>
@@ -181,8 +182,9 @@ const ExpertsLog = () => {
           </tr>
         </thead>
         <tbody>
-          {experts.results.map((expert) => (
+          {experts.results.map((expert, index) => (
             <tr key={expert.nationalID}>
+              <td>{index + 1}</td>
               <td>{expert.nationalID}</td>
               <td>{expert.name}</td>
               <td>{expert.security_clearance_number}</td>

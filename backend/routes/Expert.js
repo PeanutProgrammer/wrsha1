@@ -159,8 +159,9 @@ router.get("/filter",  authorized,(req, res) => {
     ExpertController.filterExperts(req, res);
 });  
 
-
-
+router.get("/absent", allowAny(gate,securityHead),(req, res) => {
+    ExpertController.getAbsentExperts(req, res);
+});
 
 router.get("/", allowAny(gate,securityHead),(req, res) => {
     ExpertController.getExperts(req, res);

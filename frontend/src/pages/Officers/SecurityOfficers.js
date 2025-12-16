@@ -360,6 +360,7 @@ const exportToWord = () => {
         <Table id="officer-table" striped bordered hover>
           <thead>
             <tr>
+              <th>م</th>
               <th>الرقم العسكري</th>
               <th>الرتبة</th>
               <th>الاسم</th>
@@ -371,8 +372,9 @@ const exportToWord = () => {
             </tr>
           </thead>
           <tbody>
-            {currentRecords.map((officer) => (
+            {currentRecords.map((officer,index) => (
               <tr key={officer.mil_id}>
+                <td>{index+1}</td>
                 <td>{officer.mil_id}</td>
                 <td>{officer.rank}</td>
                 <td>{officer.name}</td>

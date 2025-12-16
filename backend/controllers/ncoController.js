@@ -298,6 +298,15 @@ SELECT
         LIMIT 1
     ) AS latest_arrival,
 
+        -- Latest leave ID
+    (
+        SELECT id
+        FROM nco_leave_details old
+        WHERE old.ncoID = o.id
+        ORDER BY old.id DESC
+        LIMIT 1
+    ) AS latest_leave_id,
+
     lt.name AS tmam
 FROM ncos o
 LEFT JOIN nco_leave_details old
@@ -310,7 +319,7 @@ LEFT JOIN nco_leave_details old
     )
 LEFT JOIN leave_type lt
     ON lt.id = old.leaveTypeID
-ORDER BY o.mil_id;
+ORDER BY o.id;
 `);
       console.log(ncos[0]);
       console.log("hello");
@@ -361,7 +370,7 @@ ORDER BY o.mil_id;
         nco[0].attached
       );
       const officerTmam = await query(
-        `SELECT ncos.mil_id ,ncos.rank,ncos.name, ncos.department, ncos.join_date, leave_type.name AS 'tmam', nco_leave_details.start_date, nco_leave_details.end_date, nco_leave_details.destination, nco_log.notes, nco_log.event_type
+        `SELECT ncos.mil_id ,ncos.rank,ncos.name, ncos.department, ncos.in_unit, ncos.join_date, leave_type.name AS 'tmam', nco_leave_details.start_date, nco_leave_details.end_date, nco_leave_details.destination, nco_log.notes, nco_log.event_type, nco_log.event_time
                                           FROM ncos
                                           LEFT JOIN nco_leave_details
                                           ON ncos.id = nco_leave_details.ncoID
@@ -376,6 +385,8 @@ ORDER BY o.mil_id;
         [officerObject.getMilID()]
       );
 
+      console.log(officerTmam[0]);
+      
       return res.status(200).json(officerTmam);
     } catch (err) {
       return res.status(500).json({ err: err });

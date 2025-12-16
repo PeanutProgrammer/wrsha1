@@ -72,7 +72,7 @@ body {
 table {
   width: 100%;          /* Full width */
   border-collapse: collapse;
-  table-layout: fixed;  /* Fix column widths */
+  table-layout: auto;  /* Fix column widths */
   word-wrap: break-word;
   margin: 0;
 }
@@ -92,3 +92,12 @@ th, td {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch; /* Smooth scroll on mobile */
 }
+
+.action-col {
+  width: 140px;
+  min-width: 140px;
+  max-width: 140px;
+  white-space: nowrap;
+  text-align: center !important;
+}
+

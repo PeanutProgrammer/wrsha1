@@ -20,7 +20,7 @@ router.post("/", shuoonOfficers,
         .isString().withMessage("من فضلك أدخل ورشة / فرع صحيح "),
     // Validate 'nationalID'
     body("nationalID")
-        .isNumeric().withMessage("من فضلك أدخل رقم الهوية الوطنية صحيح"),
+        .isString().withMessage("من فضلك أدخل رقم الهوية الوطنية صحيح"),
 
     body("telephone_number")
         .isMobilePhone('ar-EG').withMessage("من فضلك أدخل رقم هاتف صحيح"),

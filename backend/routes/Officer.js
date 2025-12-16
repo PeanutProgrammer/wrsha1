@@ -18,7 +18,7 @@ router.post("/", shuoonOfficers,
     body("department")
         .isString().withMessage("يرجى إدخال اسم الفرع أو الورشة"),
     body("mil_id")
-        .isNumeric().withMessage("يرجى إدخال رقم عسكري صحيح"),
+        .isString().withMessage("يرجى إدخال رقم عسكري صحيح"),
     body("rank")
         .isString().withMessage("يرجى إدخال رتبة صحيحة"),
     body("department")

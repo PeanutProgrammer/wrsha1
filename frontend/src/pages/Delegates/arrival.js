@@ -101,13 +101,18 @@ const DelegateArrival = () => {
   };
 
   const notesOptions = [
-    { value: "اصلاح سلاح", label: "اصلاح سلاح" },
-    { value: "اصلاح معدات", label: "اصلاح معدات" },
-    { value: "اصلاح مدافع", label: "اصلاح مدافع" },
+    { value: "دخول سلاح", label: "دخول سلاح" },
+    { value: "دخول معدات", label: "دخول معدات" },
+    { value: "دخول مدافع", label: "دخول مدافع" },
     { value: "قرار حالة سلاح", label: "قرار حالة سلاح" },
     { value: "قرار حالة معدات", label: "قرار حالة معدات" },
     { value: "قرار حالة مدافع", label: "قرار حالة مدافع" },
-    { value: "صرف", label: "صرف" },
+    { value: "إستكمال إجراءات", label: "إستكمال إجراءات" },
+    { value: "إستلام قرار حالة", label: "إستلام قرار حالة" },
+    { value: "إستلام تعذر", label: "إستلام تعذر" },
+    { value: "خروج سلاح", label: "خروج سلاح" },
+    { value: "خروج معدات", label: "خروج معدات" },
+    { value: "خروج مدافع", label: "خروج مدافع" },
   ];
 
   const rankOptions = [
@@ -235,26 +240,30 @@ const DelegateArrival = () => {
           )}
         </Form.Group>
 
-        <Form.Group controlId="notes" className="form-group">
-          <Form.Label>سبب الزيارة</Form.Label>
-          <Select
-            options={notesOptions}
-            placeholder="اختر سبب الزيارة"
-            isSearchable
-            styles={{
-              ...rankSelectStyles,
-              menuPortal: (base) => ({ ...base, zIndex: 9999 }), // ensure on top
-            }}
-            menuPortalTarget={document.body} // render dropdown on body
-            onChange={(selectedOption) =>
-              setValue("notes", selectedOption ? selectedOption.value : "")
-            }
-          />
-          {errors.notes && (
-            <div className="invalid-feedback">{errors.notes.message}</div>
-          )}
-        </Form.Group>
-
+       <Form.Group controlId="notes" className="form-group">
+  <Form.Label>سبب الزيارة</Form.Label>
+  <Select
+    options={notesOptions}
+    placeholder="اختر سبب الزيارة"
+    isSearchable
+    isMulti  // Enable multiple selection
+    styles={{
+      ...rankSelectStyles,
+      menuPortal: (base) => ({ ...base, zIndex: 9999 }), // ensure on top
+    }}
+    menuPortalTarget={document.body} // render dropdown on body
+    onChange={(selectedOptions) => {
+      // Join selected options values with '+' and set them in the form
+      const selectedValues = selectedOptions
+        ? selectedOptions.map((option) => option.value).join("+")
+        : "";
+      setValue("notes", selectedValues);  // Update the notes value
+    }}
+  />
+  {errors.notes && (
+    <div className="invalid-feedback">{errors.notes.message}</div>
+  )}
+</Form.Group>
         <Button
           variant="primary"
           type="submit"

@@ -9,7 +9,7 @@ try {
 
 // Use a pool instead of a single connection. Pools are safer and more resilient.
 const pool = mysql.createPool({
-    connectionLimit: parseInt(process.env.DB_CONNECTION_LIMIT, 10) || 10,
+    connectionLimit: parseInt(process.env.DB_CONNECTION_LIMIT, 50) || 50,
     host: process.env.DB_HOST || "localhost",
     user: process.env.DB_USER || "root",
     password: process.env.DB_PASSWORD || "", 

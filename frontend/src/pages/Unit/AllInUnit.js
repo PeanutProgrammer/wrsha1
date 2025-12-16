@@ -312,21 +312,23 @@ const exportToWord = () => {
         <Table id="officer-table" striped bordered hover>
           <thead>
             <tr>
+              <th>م</th>
               <th>الرقم العسكري</th>
               <th>الرتبة / الدرجة</th>
               <th>الاسم</th>
               <th>الورشة / الفرع</th>
-              <th>تاريخ الضم</th>
+              <th>اخر دخول</th>
             </tr>
           </thead>
           <tbody>
-            {currentRecords.map((unit) => (
+            {currentRecords.map((unit,index) => (
               <tr key={unit.mil_id}>
+                <td>{index+1}</td>
                 <td>{unit.mil_id}</td>
                 <td>{unit.rank}</td>
                 <td>{unit.name}</td>
                 <td>{unit.department}</td>
-                <td>{moment(unit.join_date).format('YYYY-MM-DD')}</td>
+                <td>{ unit.event_time ? moment(unit.event_time).format('YYYY-MM-DD HH:mm') : "لا يوجد"}</td>
 
                 {/* <td>
                   <div className="action-buttons">

@@ -75,6 +75,7 @@ const NCOsTmam = () => {
       <Table striped bordered hover>
         <thead>
           <tr>
+            <th>م</th>
             <th>الرقم العسكري</th>
             <th>الدرجة</th>
             <th>الإسم</th>
@@ -84,8 +85,9 @@ const NCOsTmam = () => {
           </tr>
         </thead>
         <tbody>
-          {ncos.results.map((officer) => (
+          {ncos.results.map((officer, index) => (
             <tr key={officer.mil_id}>
+              <td>{index + 1}</td> {/* Arabic numbering, starting from 1 */}
               <td>{officer.mil_id}</td>
               <td>{officer.rank}</td>
               <td>{officer.name}</td>

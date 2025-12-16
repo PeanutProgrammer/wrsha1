@@ -166,6 +166,7 @@ useEffect(() => {
       <Table striped bordered hover>
         <thead>
           <tr>
+            <th>م</th>
             <th>الرقم العسكري</th>
             <th>الدرجة</th>
             <th>الإسم</th>
@@ -180,8 +181,9 @@ useEffect(() => {
         <tbody>
           {Array.isArray(ncos.results) &&
           ncos.results.length > 0 ? (
-            ncos.results.map((nco) => (
+            ncos.results.map((nco, index) => (
             <tr key={nco.mil_id}>
+            <td>{index + 1}</td> {/* Arabic numbering, starting from 1 */}
             <td>{nco.mil_id}</td>    
             <td>{nco.rank}</td>
             <td>{nco.name}</td>
@@ -200,8 +202,9 @@ useEffect(() => {
     : "لا يوجد"}
 </td>
 
-            <td>{(nco.event_type? (nco.event_type == "دخول"? "دخول" : nco.reason): "لا يوجد")}</td>
-            <td>{nco.notes? nco.notes: "لا يوجد"}</td>
+            <td>{(nco.event_type ? (nco.event_type == "دخول" ?
+              `عودة ${nco.reason || ""}`
+              : nco.reason) : "لا يوجد")}</td>            <td>{nco.notes? nco.notes: "لا يوجد"}</td>
  
               </tr>
             ))          ) : (

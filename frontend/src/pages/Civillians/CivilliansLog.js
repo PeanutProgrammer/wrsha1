@@ -155,6 +155,7 @@ const CivilliansLog = () => {
       <Table striped bordered hover size="sm">
         <thead>
           <tr>
+            <th>م</th>
             <th>الرقم القومي</th>
             <th>الإسم</th>
             <th>الورشة / الفرع</th>
@@ -166,8 +167,9 @@ const CivilliansLog = () => {
         <tbody>
           {Array.isArray(civillians.results) &&
           civillians.results.length > 0 ? (
-            civillians.results.map((civillian) => (
+            civillians.results.map((civillian, index) => (
               <tr key={civillian.nationalID}>
+                <td>{index + 1}</td> {/* Arabic numbering, starting from 1 */}
                 <td>{civillian.nationalID}</td>
                 <td>{civillian.name}</td>
                 <td>{civillian.department}</td>

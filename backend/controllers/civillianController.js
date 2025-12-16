@@ -266,6 +266,15 @@ SELECT
         LIMIT 1
     ) AS latest_arrival,
 
+        -- Latest leave ID
+    (
+        SELECT id
+        FROM civillian_leave_details old
+        WHERE old.civillianID = o.id
+        ORDER BY old.id DESC
+        LIMIT 1
+    ) AS latest_leave_id,
+
     lt.name AS tmam
 FROM civillians o
 LEFT JOIN civillian_leave_details old
@@ -278,7 +287,7 @@ LEFT JOIN civillian_leave_details old
     )
 LEFT JOIN leave_type lt
     ON lt.id = old.leaveTypeID
-ORDER BY o.nationalID;
+ORDER BY o.id;
 `);
 
       console.log(civillians[0]);
@@ -329,7 +338,7 @@ ORDER BY o.nationalID;
         civillian[0].dob,
       );
       const civillianTmam = await query(
-        `SELECT civillians.nationalID,civillians.name, civillians.department, civillians.join_date, leave_type.name AS 'tmam', civillian_leave_details.start_date, civillian_leave_details.end_date, civillian_leave_details.destination, civillian_log.notes, civillian_log.event_type
+        `SELECT civillians.nationalID,civillians.name, civillians.department, civillians.join_date, leave_type.name AS 'tmam', civillian_leave_details.start_date, civillian_leave_details.end_date, civillian_leave_details.destination, civillian_log.notes, civillian_log.event_type, civillian_log.event_time
                                           FROM civillians
                                           LEFT JOIN civillian_leave_details
                                           ON civillians.id = civillian_leave_details.civillianID

@@ -135,6 +135,7 @@ const Civillians = () => {
         <Table striped bordered hover>
           <thead>
             <tr>
+              <th>م</th>
               <th>الرقم القومي</th>
               <th>الإسم</th>
               <th>الورشة / الفرع</th>
@@ -144,8 +145,9 @@ const Civillians = () => {
             </tr>
           </thead>
           <tbody>
-            {currentRecords.map((civillian) => (
+            {currentRecords.map((civillian, index) => (
               <tr key={civillian.nationalID}>
+                <td>{index + 1}</td> {/* Arabic numbering, starting from 1 */}
                 <td>{civillian.nationalID}</td>
                 <td>{civillian.name}</td>
                 <td>{civillian.department}</td>
