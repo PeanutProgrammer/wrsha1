@@ -114,7 +114,7 @@ const ExpertArrival = () => {
     }
   };
 
-  const officerOptions = officer.map((officer) => ({
+  const officerOptions = officer.data?.map((officer) => ({
     value: officer.id,
     label: `${officer.rank} / ${officer.name}`,
     leaveTypeID: officer.leaveTypeID, // attach latest leave type

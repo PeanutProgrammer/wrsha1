@@ -84,15 +84,15 @@ const OfficersTmamDetails = () => {
       )}
 
       <h5 className="mb-3">سجل التمام:</h5>
-      <Table striped bordered hover>
-        <thead>
+      <Table id="officer-table" striped bordered hover className="mb-0">
+        <thead className='table-dark'>
           <tr>
             <th>م</th>
             <th>نوع التمام</th>
             <th>إلى</th>
             <th>الفترة من</th>
             <th>الفترة إلى</th>
-                        <th>وقت الدخول/الخروج</th> {/* New column header */}
+            <th>وقت الدخول/الخروج</th> {/* New column header */}
             <th>ملاحظات</th>
           </tr>
         </thead>
@@ -102,14 +102,15 @@ const OfficersTmamDetails = () => {
               <tr key={index}>
                 <td>{index + 1}</td>
                 <td>
-        {rec.event_type 
-          ? rec.event_type === "دخول"
-            ? `عودة ${rec.tmam || ""}` // If "دخول", show "عودة" with leave type
-            : `خروج ${rec.tmam || ""}` // If "خروج", show "خروج" with leave type
-          : rec.tmam
-          ? `خروج ${rec.tmam}` // If event_type is null, check in_unit
-          : rec.in_unit ? "متواجد" : "غير متواجد"} 
-
+                  {rec.event_type
+                    ? rec.event_type === "دخول"
+                      ? `عودة ${rec.tmam || ""}` // If "دخول", show "عودة" with leave type
+                      : `خروج ${rec.tmam || ""}` // If "خروج", show "خروج" with leave type
+                    : rec.tmam
+                    ? `خروج ${rec.tmam}` // If event_type is null, check in_unit
+                    : rec.in_unit
+                    ? "متواجد"
+                    : "غير متواجد"}
                 </td>
                 <td>{rec.destination || "—"}</td>
                 <td>
@@ -122,14 +123,13 @@ const OfficersTmamDetails = () => {
                     ? moment(rec.end_date).format("YYYY-MM-DD")
                     : "—"}
                 </td>
-                                <td>
+                <td>
                   {/* Time and Event Type */}
                   {rec.event_type && rec.event_time
                     ? ` ${moment(rec.event_time).format("YYYY-MM-DD HH:mm ")}`
                     : "—"}
                 </td>
                 <td>{rec.notes || "—"}</td>
-
               </tr>
             ))
           ) : (

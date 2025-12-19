@@ -7,6 +7,7 @@ import {
   Form,
   Dropdown,
   DropdownButton,
+  InputGroup,
 } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import axios from "axios";
@@ -18,31 +19,29 @@ import "jspdf-autotable"; // This imports the autoTable plugin
 import htmlDocx from "html-docx-js/dist/html-docx";
 import { FaPrint } from "react-icons/fa"; // Import the printer icon from react-icons
 
-// Import react-pdf components
-// import pdfMake from 'pdfmake/build/pdfmake';
-// import pdfFonts from 'pdfmake/build/vfs_fonts';
-// import amiriFont from '..';
-// pdfMake.vfs = pdfFonts.pdfMake.vfs;  // Import font definitions for pdfMake
-// pdfMake.fonts = {
-//   Amiri: {
-//     normal: amiriFont, // Arabic font
-//     bold: amiriFont,
-//     italics: amiriFont,
-//     bolditalics: amiriFont,
-//   },
-//   // You can add more fonts here
-// };
+
+// Helper: Convert Arabic-Indic digits to Western digits
+const toWesternDigits = (str) => {
+  return str.replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
+};
 
 const ManageOfficers = () => {
   const auth = getAuthUser();
+  const [sortConfig, setSortConfig] = useState({ key: "", direction: "asc" });
   const [officers, setOfficers] = useState({
     loading: true,
     err: null,
     results: [],
     reload: 0,
+    page: 1,
+    totalPages: 1,
+    search: "",
+    limit: 0,
+    tempSearch: "",
   });
-  const [currentPage, setCurrentPage] = useState(1); // Current page number
-  const [recordsPerPage] = useState(10); // Number of records per page
+
+
+
 
 
   useEffect(() => {
@@ -50,14 +49,21 @@ const ManageOfficers = () => {
 
     // 🔁 Initial fetch
     const fetchData = () => {
-      axios
-        .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/officer/`, {
-          headers: { token: auth.token },
-        })
+      const searchValue = toWesternDigits(officers.search.trim());
+      const limit = 10;
+      const resp = axios
+        .get(
+          `${process.env.REACT_APP_BACKEND_BASE_URL}/officer?page=${officers.page}&limit=${limit}&search=${searchValue}`,
+          {
+            headers: { token: auth.token },
+          }
+        )
         .then((resp) => {
           setOfficers({
             ...officers,
-            results: resp.data,
+            results: resp.data.data || [],
+            totalPages: resp.data.totalPages || 1,
+            limit: resp.data.limit || limit,
             loading: false,
             err: null,
           });
@@ -85,31 +91,84 @@ const ManageOfficers = () => {
     });
 
     return () => socket.disconnect();
-  }, []);
+  }, [officers.page, officers.search]);
 
 
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const normalized = toWesternDigits(officers.tempSearch.trim());
+    setOfficers((prev) => ({
+      ...prev,
+      search: normalized,
+      page: 1,
+      results: [],
+    }));
+  };
 
+  const handleClearSearch = () => {
+    setOfficers((prev) => ({
+      ...prev,
+      search: "",
+      tempSearch: "",
+      page: 1,
+      results: [],
+    }));
+  };
 
+  const handlePrevPage = () => {
+    if (officers.page > 1)
+      setOfficers((prev) => ({ ...prev, page: prev.page - 1 }));
+  };
 
-  // Get current records for the current page
-  const indexOfLastRecord = currentPage * recordsPerPage;
-  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = officers.results.slice(
-    indexOfFirstRecord,
-    indexOfLastRecord
-  );
+  const handleNextPage = () => {
+    if (officers.page < officers.totalPages)
+      setOfficers((prev) => ({ ...prev, page: prev.page + 1 }));
+  };
 
-  // Change page
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const handleJumpToPage = (number) => {
+    if (number >= 1 && number <= officers.totalPages) {
+      setOfficers((prev) => ({ ...prev, page: number }));
+    }
+  };
 
-  // Calculate total pages
-  const totalPages = Math.ceil(officers.results.length / recordsPerPage);
+  const handleSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
 
-  // Generate an array of page numbers to display
-  const pageNumbers = [];
-  for (let i = 1; i <= totalPages; i++) {
-    pageNumbers.push(i);
-  }
+  const renderPageButtons = () => {
+    const pages = [];
+    const maxButtons = 5;
+    let start = Math.max(officers.page - 2, 1);
+    let end = Math.min(start + maxButtons - 1, officers.totalPages);
+    start = Math.max(end - maxButtons + 1, 1);
+
+    for (let num = start; num <= end; num++) {
+      pages.push(
+        <Button
+          key={num}
+          onClick={() => handleJumpToPage(num)}
+          variant={num === officers.page ? "primary" : "outline-primary"}
+          className="mx-1 btn-sm"
+        >
+          {num}
+        </Button>
+      );
+    }
+    return pages;
+  };
+
+  const sortedOfficers = [...officers.results].sort((a, b) => {
+    if (!sortConfig.key) return 0; // no sorting yet
+    if (a[sortConfig.key] > b[sortConfig.key])
+      return sortConfig.direction === "asc" ? 1 : -1;
+    if (a[sortConfig.key] < b[sortConfig.key])
+      return sortConfig.direction === "asc" ? -1 : 1;
+    return 0;
+  });
 
   // Export to PDF using pdfmake
   // const exportToPDF = () => {
@@ -284,123 +343,187 @@ const ManageOfficers = () => {
   };
   return (
     <div className="Officers p-5">
-      <div className="header d-flex justify-content-between mb-3">
-        <h3 className="text-center mb-3">إدارة الضباط</h3>
+      {/* Header: Search + Add + Export */}
+      <div className=" header d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+        {/* Page Title */}
+        <h3>إدارة الضباط</h3>
+        {/* Search bar */}
+        <Form
+          className="d-flex align-items-center flex-grow-1"
+          onSubmit={handleSearchSubmit}
+        >
+          <InputGroup className="w-50  shadow-sm me-5">
+            <InputGroup.Text className="">🔍</InputGroup.Text>
+            <Form.Control
+              size="sm"
+              placeholder="بحث"
+              value={officers.tempSearch}
+              onChange={(e) =>
+                setOfficers((prev) => ({ ...prev, tempSearch: e.target.value }))
+              }
+            />
+            {officers.tempSearch && (
+              <Button
+                size="sm"
+                variant="outline-secondary"
+                onClick={handleClearSearch}
+              >
+                ×
+              </Button>
+            )}
+          </InputGroup>
+        </Form>
 
-        {/* Button container with d-flex */}
-        <div className="d-flex">
-          {/* Add New Officer Button */}
-          <Link to={"../add"} className="btn btn-success mb-4 mx-2">
+        {/* Buttons: Add Officer + Export */}
+        <div className="d-flex flex-wrap gap-2">
+          <Link to="../add" className="btn btn-success btn-sm">
             إنشاء ضابط جديد +
           </Link>
 
-          {/* Export Button with Dropdown */}
-          <Dropdown className="mb-4">
+          <Dropdown>
             <DropdownButton
               variant="secondary"
               id="export-dropdown"
               title={
                 <>
-                  <FaPrint className="mr-2 " /> طباعة{" "}
+                  <FaPrint className="me-1" /> طباعة
                 </>
               }
             >
-              {/* Use PDFDownloadLink for PDF export */}
-              {/* <Dropdown.Item onClick={exportToPDF}>PDF</Dropdown.Item> */}
               <Dropdown.Item onClick={exportToWord}>Word</Dropdown.Item>
+              {/* Add PDF option if needed */}
             </DropdownButton>
           </Dropdown>
         </div>
       </div>
 
-      {officers.err && (
-        <Alert variant="danger" className="p-2">
-          {officers.err}
-        </Alert>
-      )}
-      {officers.success && (
-        <Alert variant="success" className="p-2">
-          {officers.success}
-        </Alert>
-      )}
-
-      <div className="table-responsive">
-        <Table id="officer-table" striped bordered hover>
-          <thead>
+      {/* Table */}
+      <div className="table-responsive shadow-sm rounded bg-white">
+        <Table id="officer-table" striped bordered hover className="mb-0">
+          <thead className="table-dark">
             <tr>
-              <th>الرقم العسكري</th>
-              <th>الرتبة</th>
-              <th>الاسم</th>
-              <th>الورشة / الفرع</th>
-              <th>تاريخ الضم</th>
-              <th>التمام</th>
+              <th>م</th>
+              <th onClick={() => handleSort("mil_id")}>
+                {sortConfig.key === "mil_id"
+                  ? sortConfig.direction === "asc"
+                    ? "↑"
+                    : "↓"
+                  : ""}{" "}
+                الرقم العسكري
+              </th>
+              <th onClick={() => handleSort("rank")}>
+                الرتبة
+                {sortConfig.key === "rank"
+                  ? sortConfig.direction === "asc"
+                    ? "↑"
+                    : "↓"
+                  : ""}
+              </th>
+              <th onClick={() => handleSort("name")}>
+                الاسم{" "}
+                {sortConfig.key === "name"
+                  ? sortConfig.direction === "asc"
+                    ? "↑"
+                    : "↓"
+                  : ""}
+              </th>
+              <th onClick={() => handleSort("department")}>
+                {sortConfig.key === "department"
+                  ? sortConfig.direction === "asc"
+                    ? "↑"
+                    : "↓"
+                  : ""}
+                الورشة / الفرع
+              </th>
+              <th onClick={() => handleSort("join_date")}>
+                تاريخ الضم
+                {sortConfig.key === "join_date"
+                  ? sortConfig.direction === "asc"
+                    ? "↑"
+                    : "↓"
+                  : ""}
+              </th>
+              <th onClick={() => handleSort("attached")}>
+                ملحق
+                {sortConfig.key === "attached"
+                  ? sortConfig.direction === "asc"
+                    ? "↑"
+                    : "↓"
+                  : ""}
+              </th>
+              <th onClick={() => handleSort("in_unit")}>
+                التمام
+                {sortConfig.key === "in_unit"
+                  ? sortConfig.direction === "asc"
+                    ? "↑"
+                    : "↓"
+                  : ""}
+              </th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
-            {currentRecords.map((officer) => (
-              <tr key={officer.mil_id}>
-                <td>{officer.mil_id}</td>
-                <td>{officer.rank}</td>
-                <td>{officer.name}</td>
-                <td>{officer.department}</td>
-                <td>{moment(officer.join_date).format("YYYY-MM-DD")}</td>
-                <td>{officer.in_unit ? "متواجد" : "غير موجود"}</td>
-                <td>
-                  <div className="action-buttons">
+            {Array.isArray(officers.results) && officers.results.length > 0 ? (
+              sortedOfficers.map((officer, index) => (
+                <tr key={officer.mil_id}>
+                  <td>{(officers.page - 1) * officers.limit + index + 1}</td>
+                  <td>{officer.mil_id}</td>
+                  <td>{officer.rank}</td>
+                  <td>{officer.name}</td>
+                  <td>{officer.department}</td>
+                  <td>{moment(officer.join_date).format("YYYY-MM-DD")}</td>
+                  <td>{officer.attached ? "نعم" : "لا"}</td>
+                  <td>{officer.in_unit ? "متواجد" : "غير موجود"}</td>
+                  <td>
+
                     <Link
                       to={`../${officer.id}`}
-                      className="btn btn-sm btn-primary"
+                      className="btn btn-sm btn-primary mx-1 p-2"
                     >
                       تعديل
                     </Link>
                     <Link
                       to={`../details/${officer.id}`}
-                      className="btn btn-sm btn-primary"
+                      className="btn btn-sm btn-primary mx-1 p-2"
                     >
                       تفاصيل
                     </Link>
-                  </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="9" className="text-center">
+                  لا توجد بيانات
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </Table>
       </div>
 
       {/* Pagination Controls */}
-      <div className="pagination-container">
-        <button
-          className="btn btn-light"
-          onClick={() => paginate(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          Previous
-        </button>
 
-        {/* Page Numbers */}
-        {pageNumbers.map((number) => (
-          <button
-            key={number}
-            className={`btn btn-light page-btn ${
-              currentPage === number ? "active" : ""
-            }`}
-            onClick={() => paginate(number)}
-          >
-            {number}
-          </button>
-        ))}
 
-        <button
-          className="btn btn-light"
-          onClick={() => paginate(currentPage + 1)}
-          disabled={currentPage === totalPages}
+      <div className="d-flex justify-content-between align-items-center mt-3">
+        <Button
+          onClick={handlePrevPage}
+          disabled={officers.page === 1}
+          variant="secondary"
+          size="sm"
         >
-          Next
-        </button>
+          السابق
+        </Button>
+        <div>{renderPageButtons()}</div>
+        <Button
+          onClick={handleNextPage}
+          disabled={officers.page === officers.totalPages}
+          variant="secondary"
+          size="sm"
+        >
+          التالي
+        </Button>
       </div>
-
-     
     </div>
   );
 };

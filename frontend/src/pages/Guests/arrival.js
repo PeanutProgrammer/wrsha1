@@ -13,7 +13,7 @@ import Select from 'react-select'; // Importing react-select
 const schema = yup.object().shape({
   name: yup.string().min(3, 'اسم الزائر يجب أن يكون أكثر من 3 حروف').max(30, 'اسم الزائر يجب ألا يتجاوز 30 حرف').required('اسم الزائر مطلوب'),
   reason: yup.string().optional('سبب الزيارة اختياري'),
-  visit_to: yup.number().required('المسؤول الذي تتم زيارته مطلوب'),
+  visit_to: yup.string().required('المسؤول الذي تتم زيارته مطلوب'),
 });
 
 const GuestArrival = () => {
@@ -21,7 +21,10 @@ const GuestArrival = () => {
   const [officer, setOfficer] = useState([]);
   const [guest, setGuest] = useState({
     loading: false,
-    err: null,  // Initially null, update with actual error message
+    visit_to: "",
+    name: "",
+    reason: "",
+    err: null, // Initially null, update with actual error message
     success: null,
   });
 
@@ -68,9 +71,12 @@ const createGuest = async (data) => {
         });
 
         setGuest({
-            loading: false,
-            err: null,
-            success: 'تمت الإضافة بنجاح!',
+          loading: false,
+          visit_to: "",
+          name: "",
+          reason: "",
+          err: null,
+          success: "تمت الإضافة بنجاح!",
         });
 
         reset(); // Reset form after successful submission
@@ -87,10 +93,13 @@ const createGuest = async (data) => {
             : 'Something went wrong. Please try again later.';
 
         setGuest({
-            ...guest,
-            loading: false,
-            err: errorMessage,
-            success: null,
+          ...guest,
+          visit_to: "",
+          name: "",
+          reason: "",
+          loading: false,
+          err: errorMessage,
+          success: null,
         });
     }
 };
@@ -98,6 +107,7 @@ const createGuest = async (data) => {
 
 
   useEffect(() => {
+  if (!auth?.token) return;
     axios
       .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/officer/`, {
         headers: {
@@ -106,10 +116,10 @@ const createGuest = async (data) => {
       })
       .then((resp) => setOfficer(resp.data))
       .catch((err) => console.log(err));
-  }, []);
+  }, [auth.token]);
 
 
-    const officerOptions = officer.map((officer) => ({
+    const officerOptions = officer.data?.map((officer) => ({
       value: officer.id,
       label: `${officer.rank} / ${officer.name}`,
       leaveTypeID: officer.leaveTypeID, // attach latest leave type
@@ -118,7 +128,7 @@ const createGuest = async (data) => {
     // Handle when an officer is selected
     const handleOfficerChange = (selectedOption) => {
       if (selectedOption) {
-        setValue("officerID", selectedOption.value); // Set the officerID field in react-hook-form
+        setValue("visit_to", selectedOption.value); // Set the visit_to field in react-hook-form
       }
     };
 
@@ -184,7 +194,7 @@ const createGuest = async (data) => {
         <Form.Group controlId="visit_to" className="form-group">
           <Form.Label>المسؤول الذي تتم زيارته</Form.Label>
           <Select
-            {...register("officerID")}
+            {...register("visit_to")}
             options={officerOptions}
             getOptionLabel={(e) => e.label}
             getOptionValue={(e) => e.value}

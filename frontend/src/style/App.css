@@ -9,6 +9,19 @@
   70% { opacity: 1; }
   100% { opacity: 0; }
 }
+:root {
+  --table-border: #dee2e6;
+  --table-header-bg: #f1f3f5;
+  --table-row-hover: #f8f9fa;
+  --table-text: #212529;
+  --table-muted: #6c757d;
+
+  --status-green-bg: #e6f4ea;
+  --status-green-text: #137333;
+
+  --status-red-bg: #fdecea;
+  --status-red-text: #b3261e;
+}
 
 /* Page Layout */
 html, body, #root {
@@ -68,36 +81,198 @@ body {
   width: 100%;
 }
 
-/* Table styling */
-table {
-  width: 100%;          /* Full width */
-  border-collapse: collapse;
-  table-layout: auto;  /* Fix column widths */
-  word-wrap: break-word;
-  margin: 0;
-}
+/* =========================
+   GLOBAL PROFESSIONAL TABLE
+   ========================= */
 
-th, td {
-  padding: 8px;
-  text-align: center !important;
-  word-wrap: break-word;
-  white-space: normal;
-    vertical-align: middle !important;  /* vertical center */
-
-}
-
-/* Optional: Add horizontal scroll for tables */
+/* Wrapper */
 .table-responsive {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  overflow: auto;
+}
+
+/* Base table */
+table {
   width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch; /* Smooth scroll on mobile */
+  border-collapse: separate;
+  border-spacing: 0;
+  background-color: #fff;
+  font-size: 0.9rem;
 }
 
-.action-col {
-  width: 140px;
-  min-width: 140px;
-  max-width: 140px;
-  white-space: nowrap;
+/* Header */
+thead th {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: linear-gradient(180deg, #212529, #343a40);
+  color: #ffffff;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  border-bottom: 2px solid #495057;
+  padding: 12px 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Cells */
+th,
+td {
+  padding: 10px 12px;
+  border: 1px solid var(--table-border);
   text-align: center !important;
+  vertical-align: middle !important;
+  white-space: nowrap;
 }
 
+/* Remove pointer on non-sortable headers */
+thead th:last-child {
+  cursor: default;
+}
+
+/* Header hover (sortable only) */
+thead th:not(:last-child):hover {
+  background: linear-gradient(180deg, #2c3034, #3b4147);
+}
+
+/* Body cells */
+tbody td {
+  padding: 10px;
+  border-bottom: 1px solid #dee2e6;
+  background-color: #ffffff;
+  transition: background-color 0.15s ease;
+}
+
+/* Zebra rows */
+tbody tr:nth-child(even) td {
+  background-color: #f8f9fa;
+}
+
+/* Hover row */
+tbody tr:hover td {
+  background-color: #eef3f7;
+}
+
+/* Empty state */
+tbody tr td[colspan] {
+  padding: 30px;
+  color: #6c757d;
+  font-size: 0.95rem;
+}
+
+/* Serial number column
+thead th:first-child,
+tbody td:first-child {
+  width: 60px;
+  font-weight: 600;
+  color: #000000;
+} */
+
+/* Action column */
+thead th:last-child,
+tbody td:last-child {
+  min-width: 100px;
+  white-space: nowrap;
+}
+
+/* Action buttons group */
+td .btn {
+  padding: 4px 10px;
+  font-size: 0.8rem;
+}
+
+td .btn + .btn {
+  margin-inline-start: 4px;
+}
+
+/* Improve danger button */
+.btn-danger {
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+/* Improve primary button */
+.btn-primary {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+/* Pagination container */
+.pagination,
+.d-flex.justify-content-between {
+  margin-top: 16px;
+}
+
+/* Page buttons */
+button.btn-outline-primary {
+  border-radius: 6px;
+}
+
+/* Active page */
+button.btn-primary {
+  font-weight: 600;
+}
+
+/* Sorting arrows alignment */
+thead th span.sort-icon {
+  margin-inline-start: 6px;
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+/* =========================
+   STATUS BADGES (in_unit)
+   ========================= */
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.status-in {
+  background-color: var(--status-green-bg);
+  color: var(--status-green-text);
+}
+
+.status-out {
+  background-color: var(--status-red-bg);
+  color: var(--status-red-text);
+}
+
+/* =========================
+   EXPORT / PRINT FRIENDLY
+   ========================= */
+
+@media print {
+  body {
+    background: white !important;
+  }
+
+  table {
+    font-size: 11pt;
+  }
+
+  thead th {
+    background-color: #f2f2f2 !important;
+    color: black !important;
+  }
+
+  /* Hide buttons, dropdowns, actions */
+  .btn,
+  .dropdown,
+  .action-col,
+  th:last-child,
+  td:last-child {
+    display: none !important;
+  }
+
+  /* Avoid row splitting */
+  tr {
+    page-break-inside: avoid;
+  }
+}

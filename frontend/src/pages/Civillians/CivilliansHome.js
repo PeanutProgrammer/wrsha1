@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import "./CivilliansHome.css";
 import { Link } from "react-router-dom";
 import { getAuthUser } from "../../helper/Storage";
-import axios from "axios";
 import { FaUsers, FaClipboardCheck, FaHistory, FaSearch } from "react-icons/fa";
 
 const CivilliansHome = () => {

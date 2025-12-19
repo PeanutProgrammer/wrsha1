@@ -132,8 +132,8 @@ const Civillians = () => {
       )}
 
       <div className="table-responsive">
-        <Table striped bordered hover>
-          <thead>
+        <Table id="civillian-table" striped bordered hover className="mb-0">
+          <thead className="table-dark">
             <tr>
               <th>م</th>
               <th>الرقم القومي</th>
@@ -152,7 +152,15 @@ const Civillians = () => {
                 <td>{civillian.name}</td>
                 <td>{civillian.department}</td>
                 <td>{moment(civillian.join_date).format('YYYY-MM-DD')}</td>
-                <td>{civillian.in_unit ? 'متواجد' : 'غير موجود'}</td>
+                <td>
+                  <span
+                    className={`status-badge ${
+                      civillian.in_unit ? "status-in" : "status-out"
+                    }`}
+                  >
+                    {civillian.in_unit ? "متواجد" : "غير موجود"}
+                  </span>
+                </td>
                 <td>
                   <div className="action-buttons">
                     <button
@@ -169,7 +177,7 @@ const Civillians = () => {
                     </Link>
                     <Link
                       to={`../details/${civillian.id}`}
-                      className="btn btn-sm btn-primary"
+                      className="btn btn-sm btn-secondary"
                     >
                       تفاصيل
                     </Link>

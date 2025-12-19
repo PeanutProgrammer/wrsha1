@@ -59,7 +59,7 @@ router.post("/",
     ,
 
     body("visit_to")
-        .isNumeric().withMessage("من فضلك أدخل اسم ضابط صحيح"),
+        .isString().withMessage("من فضلك أدخل اسم ضابط صحيح"),
 
     body("reason")
         .isString().withMessage("من فضلك أدخل سبب الزيارة صحيح"),

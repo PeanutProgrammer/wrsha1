@@ -151,7 +151,7 @@ const createGuest = async (data) => {
             defaultValue=""
           >
             <option value="">اختر المسؤول</option>
-            {officer.map((officer) => (
+            {officer.data?.map((officer) => (
               <option key={officer.id} value={officer.id}>
                 {officer.rank + " / " + officer.name}
               </option>

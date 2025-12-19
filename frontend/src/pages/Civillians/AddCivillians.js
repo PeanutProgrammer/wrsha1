@@ -3,9 +3,7 @@ import { Form, Button, Alert, } from 'react-bootstrap';
 import "../../style/style.css";
 import axios from 'axios';
 import { getAuthUser } from '../../helper/Storage';
-import DatePicker from 'react-datepicker';
 import "react-datetime/css/react-datetime.css";
-import { ar } from 'date-fns/locale';  // Import Arabic locale from date-fns
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';

@@ -7,7 +7,7 @@ const util = require("util");
 class LeaveTypeController {
 
 
-
+ 
 
 
     static async getLeaveTypes(req, res) {

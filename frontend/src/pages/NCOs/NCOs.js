@@ -134,7 +134,7 @@ const NCOs = () => {
     <div className="Officers p-5">
       <div className="header d-flex justify-content-between mb-3">
         <h3 className="text-center mb-3">إدارة ضباط الصف</h3>
-        <Link to={'../add'} className="btn btn-success mb-4">
+        <Link to={"../add"} className="btn btn-success mb-4">
           إنشاء ضابط صف جديد +
         </Link>
       </div>
@@ -152,13 +152,13 @@ const NCOs = () => {
       )}
 
       <div className="table-responsive">
-        <Table striped bordered hover>
-          <thead>
+        <Table id="officer-table" striped bordered hover className="mb-0">
+          <thead className="table-dark">
             <tr>
               <th>م</th>
               <th>الرقم العسكري</th>
               <th>الدرجة</th>
-              <th>الإسم</th>
+              <th>الاسم</th>
               <th>الورشة / الفرع</th>
               <th>تاريخ الضم</th>
               <th>ملحق؟</th>
@@ -174,9 +174,17 @@ const NCOs = () => {
                 <td>{nco.rank}</td>
                 <td>{nco.name}</td>
                 <td>{nco.department}</td>
-                <td>{moment(nco.join_date).format('YYYY-MM-DD')}</td>
-                <td>{nco.attached ? 'نعم' : 'لا'}</td>
-                <td>{nco.in_unit ? 'متواجد' : 'غير موجود'}</td>
+                <td>{moment(nco.join_date).format("YYYY-MM-DD")}</td>
+                <td>{nco.attached ? "نعم" : "لا"}</td>
+                <td>
+                  <span
+                    className={`status-badge ${
+                      nco.in_unit ? "status-in" : "status-out"
+                    }`}
+                  >
+                    {nco.in_unit ? "متواجد" : "غير موجود"}
+                  </span>
+                </td>
                 <td>
                   <div className="action-buttons">
                     <button
@@ -193,7 +201,7 @@ const NCOs = () => {
                     </Link>
                     <Link
                       to={`../details/${nco.id}`}
-                      className="btn btn-sm btn-primary"
+                      className="btn btn-sm btn-secondary"
                     >
                       تفاصيل
                     </Link>
@@ -219,7 +227,7 @@ const NCOs = () => {
           <button
             key={number}
             className={`btn btn-light page-btn ${
-              currentPage === number ? 'active' : ''
+              currentPage === number ? "active" : ""
             }`}
             onClick={() => paginate(number)}
           >
@@ -242,10 +250,8 @@ const NCOs = () => {
           <Modal.Title>تأكيد الحذف</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          هل أنت متأكد أنك تريد حذف ضابط الصف{' '}
-          <strong>{selectedNCO?.name}</strong>؟
-
-          {/* Additional Fields */}
+          هل أنت متأكد أنك تريد حذف ضابط الصف{" "}
+          <strong>{selectedNCO?.name}</strong>؟{/* Additional Fields */}
           <Form>
             <Form.Group controlId="endDate">
               <Form.Label>تاريخ النقل</Form.Label>

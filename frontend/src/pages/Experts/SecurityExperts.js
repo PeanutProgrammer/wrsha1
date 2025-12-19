@@ -1,12 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { Table, Alert, Modal, Button } from "react-bootstrap";
+import { Table, Alert, Modal, Button, InputGroup, Form } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { getAuthUser } from "../../helper/Storage";
 import moment from "moment";
+import { io } from "socket.io-client";
+
+// Helper: Convert Arabic-Indic digits to Western digits
+const toWesternDigits = (str) => {
+  return str.replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
+};
 
 const SecurityExperts = () => {
   const auth = getAuthUser();
+  const [sortConfig, setSortConfig] = useState({
+    key: "",
+    direction: "asc",
+  });
   const now = moment().format("YYYY-MM-DD HH:mm:ss");
   const [experts, setExperts] = useState({
     loading: true,
@@ -14,66 +24,218 @@ const SecurityExperts = () => {
     success: null, // ✅ Added success message
     results: [],
     reload: 0,
+    page: 1,
+    totalPages: 1,
+    search: "",
+    limit: 0,
+    tempSearch: "",
   });
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [recordsPerPage] = useState(8);
-
-
+    // ✅ Modal state
+    const [showConfirm, setShowConfirm] = useState(false);
+    const [selectedExpert, setSelectedExpert] = useState(null);
   useEffect(() => {
-    setExperts({ ...experts, loading: true });
+    const socket = io(`${process.env.REACT_APP_BACKEND_BASE_URL}`); //  backend port
+
+    const fetchData = () => {
+      const searchValue = toWesternDigits(experts.search.trim());
+      const limit = 10;
+      const resp = axios
+        .get(
+          `${process.env.REACT_APP_BACKEND_BASE_URL}/expert?page=${experts.page}&limit=${limit}&search=${searchValue}`,
+          {
+            headers: { token: auth.token },
+          }
+        )
+        .then((resp) => {
+          setExperts({
+            ...experts,
+            results: resp.data.data || [],
+            totalPages: resp.data.totalPages || 1,
+            limit: resp.data.limit || limit,
+            loading: false,
+            err: null,
+          });
+        })
+        .catch((err) => {
+          setExperts({
+            ...experts,
+            loading: false,
+            err: err.response
+              ? JSON.stringify(err.response.data.errors)
+              : "Something went wrong while fetching data.",
+          });
+        });
+    };
+
+    fetchData(); // ✅ Initial fetch on component mount
+
+    socket.on("connect", () => {
+      console.log("🟢 Connected to WebSocket:", socket.id);
+    });
+
+    socket.on("expertsUpdated", () => {
+      console.log("📢 Experts updated — refetching data...");
+      fetchData(); // ✅ Re-fetch on update
+    });
+
+    return () => socket.disconnect();
+  }, [experts.page, experts.search]);
+
+  // ✅ Show confirmation modal before deleting
+  const handleDeleteClick = (expert) => {
+    setSelectedExpert(expert);
+    setShowConfirm(true);
+  };
+
+  // ✅ Delete confirmation
+  const confirmDelete = () => {
+    if (!selectedExpert) return;
+
     axios
-      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/expert/`, {
-        headers: {
-          token: auth.token,
-        },
-      })
-      .then((resp) => {
+      .delete(
+        `${process.env.REACT_APP_BACKEND_BASE_URL}/expert/` +
+          selectedExpert.nationalID,
+        {
+          headers: {
+            token: auth.token,
+          },
+        }
+      )
+      .then(() => {
+        setShowConfirm(false);
+        setSelectedExpert(null);
+
+        // ✅ Show success message
         setExperts({
           ...experts,
-          results: resp.data,
-          loading: false,
+          reload: experts.reload + 1,
+          success: "تم حذف الخبير بنجاح ✅",
           err: null,
         });
+
+        // ✅ Hide message after 3 seconds
+        setTimeout(() => {
+          setExperts((prev) => ({ ...prev, success: null }));
+        }, 3000);
       })
       .catch((err) => {
         setExperts({
           ...experts,
-          loading: false,
-          err: err.response
-            ? JSON.stringify(err.response.data.errors)
-            : "حدث خطأ أثناء تحميل البيانات.",
+          err: err.response?.data?.errors || "حدث خطأ أثناء محاولة حذف الخبير.",
         });
+        setShowConfirm(false);
       });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [experts.reload]);
+  };
 
-  // ✅ Show confirmation modal before deleting
- 
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const normalized = toWesternDigits(experts.tempSearch.trim());
+    setExperts((prev) => ({
+      ...prev,
+      search: normalized,
+      page: 1,
+      results: [],
+    }));
+  };
 
-  // ✅ Delete confirmation
- 
+  const handleClearSearch = () => {
+    setExperts((prev) => ({
+      ...prev,
+      search: "",
+      tempSearch: "",
+      page: 1,
+      results: [],
+    }));
+  };
 
-  // ✅ Pagination logic
-  const indexOfLastRecord = currentPage * recordsPerPage;
-  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = experts.results.slice(
-    indexOfFirstRecord,
-    indexOfLastRecord
-  );
+  const handlePrevPage = () => {
+    if (experts.page > 1)
+      setExperts((prev) => ({ ...prev, page: prev.page - 1 }));
+  };
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-  const totalPages = Math.ceil(experts.results.length / recordsPerPage);
-  const pageNumbers = [];
-  for (let i = 1; i <= totalPages; i++) {
-    pageNumbers.push(i);
-  }
+  const handleNextPage = () => {
+    if (experts.page < experts.totalPages)
+      setExperts((prev) => ({ ...prev, page: prev.page + 1 }));
+  };
+
+  const handleJumpToPage = (number) => {
+    if (number >= 1 && number <= experts.totalPages) {
+      setExperts((prev) => ({ ...prev, page: number }));
+    }
+  };
+
+  const handleSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const renderPageButtons = () => {
+    const pages = [];
+    const maxButtons = 5;
+    let start = Math.max(experts.page - 2, 1);
+    let end = Math.min(start + maxButtons - 1, experts.totalPages);
+    start = Math.max(end - maxButtons + 1, 1);
+
+    for (let num = start; num <= end; num++) {
+      pages.push(
+        <Button
+          key={num}
+          onClick={() => handleJumpToPage(num)}
+          variant={num === experts.page ? "primary" : "outline-primary"}
+          className="mx-1 btn-sm"
+        >
+          {num}
+        </Button>
+      );
+    }
+    return pages;
+  };
+
+  const sortedExperts = [...experts.results].sort((a, b) => {
+    if (!sortConfig.key) return 0; // no sorting yet
+    if (a[sortConfig.key] > b[sortConfig.key])
+      return sortConfig.direction === "asc" ? 1 : -1;
+    if (a[sortConfig.key] < b[sortConfig.key])
+      return sortConfig.direction === "asc" ? -1 : 1;
+    return 0;
+  });
 
   return (
     <div className="Officers p-5">
       <div className="header d-flex justify-content-between mb-3">
         <h3 className="text-center mb-3">إدارة الخبراء</h3>
-
+        {/* Search bar */}
+        <Form
+          className="d-flex align-items-center flex-grow-1"
+          onSubmit={handleSearchSubmit}
+        >
+          <InputGroup className="w-50  shadow-sm me-5">
+            <Form.Control
+              size="sm"
+              placeholder="بحث 🔍"
+              value={experts.tempSearch}
+              onChange={(e) =>
+                setExperts((prev) => ({ ...prev, tempSearch: e.target.value }))
+              }
+            />
+            {experts.tempSearch && (
+              <Button
+                size="sm"
+                variant="outline-secondary"
+                onClick={handleClearSearch}
+              >
+                ×
+              </Button>
+            )}
+          </InputGroup>
+        </Form>
+        <Link to={"../experts/add"} className="btn btn-success mb-4">
+          إنشاء خبير جديد +
+        </Link>
       </div>
 
       {/* ✅ Success Message */}
@@ -91,117 +253,194 @@ const SecurityExperts = () => {
       )}
 
       <div className="table-responsive">
-        <Table striped bordered hover>
-          <thead>
+        <Table striped bordered hover className="mb-0">
+          <thead className="table-dark">
             <tr>
               <th>م</th>
-              <th>رقم تحقيق الشخصية</th>
-              <th>الاسم</th>
-              <th>رقم التصديق الأمني</th>
-              <th>الفترة من</th>
-              <th>الفترة إلى</th>
-              <th>الفرع / الورشة</th>
-              <th>حالة التصديق</th>
+              <th onClick={() => handleSort("nationalID")}>
+                {sortConfig.key === "nationalID"
+                  ? sortConfig.direction === "asc"
+                    ? "↑"
+                    : "↓"
+                  : ""}{" "}
+                رقم تحقيق الشخصية
+              </th>
+              <th onClick={() => handleSort("name")}>
+                الاسم{" "}
+                {sortConfig.key === "name"
+                  ? sortConfig.direction === "asc"
+                    ? "↑"
+                    : "↓"
+                  : ""}
+              </th>
+              <th onClick={() => handleSort("security_clearance_number")}>
+                رقم التصديق الأمني{" "}
+                {sortConfig.key === "security_clearance_number"
+                  ? sortConfig.direction === "asc"
+                    ? "↑"
+                    : "↓"
+                  : ""}
+              </th>
+              {/* <th onClick={() => handleSort("valid_from")}>
+                الفترة من
+                {sortConfig.key === "valid_from"
+                  ? sortConfig.direction === "asc"
+                    ? "↑"
+                    : "↓"
+                  : ""}
+              </th>
+              <th onClick={() => handleSort("valid_through")}>
+                الفترة إلى
+                {sortConfig.key === "valid_through"
+                  ? sortConfig.direction === "asc"
+                    ? "↑"
+                    : "↓"
+                  : ""}
+              </th> */}
+              <th onClick={() => handleSort("department")}>
+                الورشة / الفرع
+                {sortConfig.key === "department"
+                  ? sortConfig.direction === "asc"
+                    ? "↑"
+                    : "↓"
+                  : ""}
+              </th>
+              <th>حالة التصديق الأمني</th>
               <th>التمام</th>
-              <th>اسم الشركة</th>
+              <th onClick={() => handleSort("company_name")}>
+                اسم الشركة
+                {sortConfig.key === "company_name"
+                  ? sortConfig.direction === "asc"
+                    ? "↑"
+                    : "↓"
+                  : ""}
+              </th>
+
               <th>الإجراءات</th>
             </tr>
           </thead>
           <tbody>
-            {currentRecords.map((expert, index) => (
-              <tr key={expert.nationalID}>
-                <td>{index+1}</td>
-                <td>{expert.nationalID}</td>
-                <td>{expert.name}</td>
-                <td>{expert.security_clearance_number}</td>
-                <td>{moment(expert.valid_from).format("YYYY-MM-DD")}</td>
-                <td>{moment(expert.valid_through).format("YYYY-MM-DD")}</td>
-                <td>{expert.department}</td>
+            {Array.isArray(experts.results) && experts.results.length > 0 ? (
+              sortedExperts.map((expert, index) => (
+                <tr key={expert.nationalID}>
+                  <td>{(experts.page - 1) * experts.limit + index + 1}</td>
+                  <td>{expert.nationalID}</td>
+                  <td>{expert.name}</td>
+                  <td>{expert.security_clearance_number}</td>
+                  {/* <td>{moment(expert.valid_from).format("YYYY-MM-DD")}</td>
+                <td>{moment(expert.valid_through).format("YYYY-MM-DD")}</td> */}
+                  <td>{expert.department}</td>
 
-                <td
-                  className={
-                    moment(expert.valid_from).isBefore(now) &&
-                    moment(expert.valid_through).isAfter(now)
-                      ? "bg-success text-white" // Valid: green
-                      : moment(expert.valid_through).isBefore(now)
-                      ? "bg-danger text-white" // Expired: red
-                      : moment(expert.valid_from).isAfter(now)
-                      ? "bg-warning text-dark" // Not started yet: yellow
-                      : "bg-danger text-white" // fallback
-                  }
-                >
-                  {" "}
-                  {
-                    moment(expert.valid_from).isBefore(now) &&
-                    moment(expert.valid_through).isAfter(now)
-                      ? "ساري"
-                      : moment(expert.valid_through).isBefore(now)
-                      ? "منتهي"
-                      : moment(expert.valid_from).isAfter(now)
-                      ? "لم يبدأ بعد" // Optional, if you want to display something for experts who haven't started yet
-                      : "منتهي" // fallback for invalid state
-                  }
-                </td>
-                <td
-                  className={
-                    expert.in_unit
-                      ? "bg-success text-white"
-                      : "bg-danger text-white"
-                  }
-                >
-                  {expert.in_unit ? "متواجد" : "غير موجود"}
-                </td>
-                                <td>{expert.company_name}</td>
+                  <td
+                    className={
+                      moment(expert.valid_from).isBefore(now) &&
+                      moment(expert.valid_through).isAfter(now)
+                        ? "bg-success text-white" // Valid: green
+                        : moment(expert.valid_through).isBefore(now)
+                        ? "bg-danger text-white" // Expired: red
+                        : moment(expert.valid_from).isAfter(now)
+                        ? "bg-warning text-dark" // Not started yet: yellow
+                        : "bg-danger text-white" // fallback
+                    }
+                  >
+                    {" "}
+                    {
+                      moment(expert.valid_from).isBefore(now) &&
+                      moment(expert.valid_through).isAfter(now)
+                        ? "ساري"
+                        : moment(expert.valid_through).isBefore(now)
+                        ? "منتهي"
+                        : moment(expert.valid_from).isAfter(now)
+                        ? "لم يبدأ بعد" // Optional, if you want to display something for experts who haven't started yet
+                        : "منتهي" // fallback for invalid state
+                    }
+                  </td>
+                  <td
+                    className={
+                      expert.in_unit
+                        ? "bg-success text-white"
+                        : "bg-danger text-white"
+                    }
+                  >
+                    {expert.in_unit ? "متواجد" : "غير موجود"}
+                  </td>
+                  <td>{expert.company_name}</td>
 
-                                <td>
-                                  <div className="action-buttons">
-                                   
-                                    <Link
-                                      to={`../experts/details/${expert.nationalID}`}
-                                      className="btn btn-sm btn-primary"
-                                    >
-                                      تفاصيل
-                                    </Link>
-                                  </div>
-                                </td>
+                  <td className="text-center">
+                    <div className="d-inline-flex gap-1">
+                      <button
+                        className="btn btn-sm btn-danger"
+                        onClick={() => handleDeleteClick(expert)}
+                      >
+                        حذف
+                      </button>
+                      <Link
+                        to={`../experts/${expert.nationalID}`}
+                        className="btn btn-sm btn-primary"
+                      >
+                        تعديل
+                      </Link>
+                      <Link
+                        to={`../experts/details/${expert.nationalID}`}
+                        className="btn btn-sm btn-secondary"
+                      >
+                        تفاصيل
+                      </Link>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="9" className="text-center">
+                  لا توجد بيانات
+                </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </Table>
       </div>
 
       {/* Pagination Controls */}
-      <div className="pagination-container">
-        <button
-          className="btn btn-light"
-          onClick={() => paginate(currentPage - 1)}
-          disabled={currentPage === 1}
+
+      <div className="d-flex justify-content-between align-items-center mt-3">
+        <Button
+          onClick={handlePrevPage}
+          disabled={experts.page === 1}
+          variant="secondary"
+          size="sm"
         >
           السابق
-        </button>
-
-        {pageNumbers.map((number) => (
-          <button
-            key={number}
-            className={`btn btn-light page-btn ${
-              currentPage === number ? "active" : ""
-            }`}
-            onClick={() => paginate(number)}
-          >
-            {number}
-          </button>
-        ))}
-
-        <button
-          className="btn btn-light"
-          onClick={() => paginate(currentPage + 1)}
-          disabled={currentPage === totalPages}
+        </Button>
+        <div>{renderPageButtons()}</div>
+        <Button
+          onClick={handleNextPage}
+          disabled={experts.page === experts.totalPages}
+          variant="secondary"
+          size="sm"
         >
           التالي
-        </button>
+        </Button>
       </div>
 
-     
+      {/* ✅ Confirmation Modal */}
+      <Modal show={showConfirm} onHide={() => setShowConfirm(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>تأكيد الحذف</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          هل أنت متأكد أنك تريد حذف الخبير{" "}
+          <strong>{selectedExpert?.name}</strong>؟
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowConfirm(false)}>
+            إلغاء
+          </Button>
+          <Button variant="danger" onClick={confirmDelete}>
+            حذف
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

@@ -10,7 +10,7 @@ const securityHead = require("../middleware/securityHead");
 
 router.post("/", 
     // Add custom validation middleware for logical checks
-    admin,
+    securityHead,
     body("name")
         .isString().withMessage("من فضلك أدخل اسم صحيح")
         .isLength({ min: 3, max: 30 }).withMessage("الاسم يجب أن يكون بين 3 و 30 حرفًا"),
@@ -72,7 +72,7 @@ router.post("/",
 
 router.put(
   "/:id",
-  admin,
+  securityHead,
 
   // Validate 'nationalID'
   body("nationalID")
@@ -149,7 +149,7 @@ router.put(
 
 
 
-router.delete("/:nationalID", admin,  (req, res) => {
+router.delete("/:nationalID", securityHead,  (req, res) => {
     ExpertController.deleteExpert(req, res);
 });
 

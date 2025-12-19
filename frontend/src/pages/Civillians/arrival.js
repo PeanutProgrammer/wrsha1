@@ -9,7 +9,6 @@ import * as yup from 'yup';
 import "react-datetime/css/react-datetime.css";
 import moment from 'moment';
 import Select from 'react-select'; // Importing react-select
-import { se } from 'date-fns/locale';
 
 // Validation schema using yup
 const schema = yup.object().shape({

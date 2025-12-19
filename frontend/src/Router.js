@@ -430,12 +430,12 @@ export const router = createBrowserRouter([
           },
           {
             path: "add",
-            element: <ProtectedRoute allowedTypes={"admin"} />,
+            element: <ProtectedRoute allowedTypes={["admin", "قائد الامن"]} />,
             children: [{ path: "", element: <AddExperts /> }],
           },
           {
             path: ":id",
-            element: <ProtectedRoute allowedTypes={"admin"} />,
+            element: <ProtectedRoute allowedTypes={["admin", "قائد الامن"]} />,
             children: [{ path: "", element: <UpdateExperts /> }],
           },
           {

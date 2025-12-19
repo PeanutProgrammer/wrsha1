@@ -309,8 +309,8 @@ const exportToWord = () => {
       )}
 
       <div className="table-responsive">
-        <Table id="officer-table" striped bordered hover>
-          <thead>
+        <Table id="officer-table" striped bordered hover className="mb-0">
+          <thead className="table-dark">
             <tr>
               <th>م</th>
               <th>الرقم العسكري</th>

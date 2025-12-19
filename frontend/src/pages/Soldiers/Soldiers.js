@@ -134,8 +134,8 @@ const Soldiers = () => {
       )}
 
       <div className="table-responsive">
-        <Table striped bordered hover>
-          <thead>
+        <Table id="soldier-table" striped bordered hover className="mb-0">
+          <thead className="table-dark">
             <tr>
               <th>م</th>
               <th>الرقم العسكري</th>
@@ -160,7 +160,15 @@ const Soldiers = () => {
                 <td>{moment(soldier.join_date).format("YYYY-MM-DD")}</td>
                 <td>{moment(soldier.end_date).format("YYYY-MM-DD")}</td>
                 <td>{soldier.attached ? "نعم" : "لا"}</td>
-                <td>{soldier.in_unit ? "متواجد" : "غير موجود"}</td>
+                <td>
+                  <span
+                    className={`status-badge ${
+                      soldier.in_unit ? "status-in" : "status-out"
+                    }`}
+                  >
+                    {soldier.in_unit ? "متواجد" : "غير موجود"}
+                  </span>
+                </td>
                 <td>
                   <div className="action-buttons">
                     <button
@@ -177,7 +185,7 @@ const Soldiers = () => {
                     </Link>
                     <Link
                       to={`../details/${soldier.id}`}
-                      className="btn btn-sm btn-primary"
+                      className="btn btn-sm btn-secondary"
                     >
                       تفاصيل
                     </Link>

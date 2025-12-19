@@ -171,8 +171,8 @@ const Delegates = () => {
       )}
 
       <div className="table-responsive">
-        <Table striped bordered hover>
-          <thead>
+        <Table id="delegate-table" striped bordered hover className="mb-0">
+          <thead className="table-dark">
             <tr>
               <th>م</th>
               <th>الرتبة / الدرجة</th>

@@ -222,21 +222,50 @@ class OfficerController {
       }
 
       const query = util.promisify(connection.query).bind(connection);
-      let search = "";
+      // --- Pagination params ---
+
+      const page = parseInt(req.query.page) || 1; // default to page 1
+      const limit = parseInt(req.query.limit) || 20; // default 20 rows per page
+      const offset = (page - 1) * limit;
+
+      // --- Search params ---
+      let searchClause = "";
+      const params = [];
       if (req.query.search) {
-        search = `where name LIKE '%${req.query.search}%'`;
-      }
-      const officers = await query(`select * from officers ${search}`);
-
-      if (officers.length == 0) {
-        return res.status(404).json({
-          msg: "no officers found hey",
-        });
+        searchClause =
+          "WHERE officers.name LIKE ? OR officers.department LIKE ? OR officers.mil_id LIKE ? OR officers.rank LIKE ?";
+        const searchValue = `%${req.query.search}%`;
+        params.push(searchValue, searchValue, searchValue, searchValue);
       }
 
-      return res.status(200).json(officers);
+      // --- Total count for pagination ---
+      const countQuery = `SELECT COUNT(*) AS total FROM officers ${searchClause}`;
+      const countResult = await query(countQuery, params);
+      const total = countResult[0].total;
+      const totalPages = Math.ceil(total / limit);
+
+      const officers = await query(
+        `select * from officers ${searchClause} LIMIT ? OFFSET ?`,
+        [...params, limit, offset]
+      );
+
+      if (!officers.length) {
+        return res.status(404).json({ msg: "No officers found" });
+      }
+
+      return res.status(200).json({
+        page,
+        limit,
+        total,
+        totalPages,
+        data: officers,
+      });
     } catch (err) {
-      return res.status(500).json({ err: err.message || err });
+      console.error(err);
+      return res.status(500).json({
+        message: "An unexpected error occurred",
+        error: err.message,
+      });
     }
   }
 
@@ -293,14 +322,28 @@ class OfficerController {
       }
 
       const query = util.promisify(connection.query).bind(connection);
-      // let search = ""
-      // if (req.query.search) {
-      //     search =  `where name LIKE '%${req.query.search}%'`
-      // }
+      // --- Pagination params ---
+      const page = parseInt(req.query.page) || 1; // default to page 1
+      const limit = parseInt(req.query.limit) || 20; // default 20 rows per page
+      const offset = (page - 1) * limit;
+      // --- Search params ---
+      let searchClause = "";
+      const params = [];
+      if (req.query.search) {
+        searchClause =
+          "WHERE o.name LIKE ? OR o.department LIKE ? OR o.mil_id LIKE ? OR o.rank LIKE ?";
+        const searchValue = `%${req.query.search}%`;
+        params.push(searchValue, searchValue, searchValue, searchValue);
+      }
 
-      console.log("hey");
+      // --- Total count for pagination ---
+      const countQuery = `SELECT COUNT(*) AS total FROM officers o ${searchClause}`;
+      const countResult = await query(countQuery, params);
+      const total = countResult[0].total;
+      const totalPages = Math.ceil(total / limit);
 
-const officers = await query(`
+      const officers = await query(
+        `
 SELECT 
     o.mil_id,
     o.rank,
@@ -347,27 +390,37 @@ LEFT JOIN officer_leave_details old
     )
 LEFT JOIN leave_type lt
     ON lt.id = old.leaveTypeID
-ORDER BY o.id;
+${searchClause}
+ORDER BY o.id
+LIMIT ? OFFSET ?
 
 
 
-`);
 
-
-
+`,
+        [...params, limit, offset]
+      );
 
       console.log(officers[0]);
       console.log("hello");
 
-      if (officers.length == 0) {
-        return res.status(404).json({
-          msg: "no officers found now",
-        });
+      if (!officers.length) {
+        return res.status(404).json({ msg: "No officers found" });
       }
 
-      return res.status(200).json(officers);
+      return res.status(200).json({
+        page,
+        limit,
+        total,
+        totalPages,
+        data: officers,
+      });
     } catch (err) {
-      return res.status(500).json({ err: err });
+      console.error(err);
+      return res.status(500).json({
+        message: "An unexpected error occurred",
+        error: err.message,
+      });
     }
   }
 

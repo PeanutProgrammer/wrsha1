@@ -7,6 +7,8 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import "react-datetime/css/react-datetime.css";
+import Select from 'react-select'; // Importing react-select
+
 
 // Validation schema using yup
 const schema = yup.object().shape({
@@ -93,6 +95,83 @@ const createdelegate = async (data) => {
         });
     }
 };
+  
+    const notesOptions = [
+      { value: "دخول سلاح", label: "دخول سلاح" },
+      { value: "دخول معدات", label: "دخول معدات" },
+      { value: "دخول مدافع", label: "دخول مدافع" },
+      { value: "قرار حالة سلاح", label: "قرار حالة سلاح" },
+      { value: "قرار حالة معدات", label: "قرار حالة معدات" },
+      { value: "قرار حالة مدافع", label: "قرار حالة مدافع" },
+      { value: "إستكمال إجراءات", label: "إستكمال إجراءات" },
+      { value: "إستلام قرار حالة", label: "إستلام قرار حالة" },
+      { value: "إستلام تعذر", label: "إستلام تعذر" },
+      { value: "خروج سلاح", label: "خروج سلاح" },
+      { value: "خروج معدات", label: "خروج معدات" },
+      { value: "خروج مدافع", label: "خروج مدافع" },
+    ];
+
+    const rankOptions = [
+      "جندي",
+      "عريف مجند",
+      "عريف",
+      "رقيب",
+      "رقيب أول",
+      "مساعد",
+      "مساعد أول",
+      "صانع ماهر",
+      "صانع دقيق",
+      "صانع ممتاز",
+      "ملاحظ",
+      "ملاحظ فني",
+      "ملازم",
+      "ملازم أول",
+      "نقيب",
+      "نقيب أ ح",
+      "رائد",
+      "رائد أ ح",
+      "مقدم",
+      "مقدم أ ح",
+      "عقيد",
+      "عقيد أ ح",
+      "عميد",
+      "عميد أ ح",
+      "لواء",
+      "لواء أ ح",
+      "فريق",
+      "فريق أول",
+      "مشير",
+    ].map((rank) => ({ value: rank, label: rank }));
+  
+    const rankSelectStyles = {
+      control: (provided, state) => ({
+        ...provided,
+        borderRadius: "0.375rem",
+        borderColor: state.isFocused ? "#86b7fe" : "#ced4da",
+        boxShadow: state.isFocused
+          ? "0 0 0 0.25rem rgba(13,110,253,.25)"
+          : null,
+        minHeight: "38px",
+        direction: "rtl", // Arabic friendly
+      }),
+      menu: (provided) => ({
+        ...provided,
+        direction: "rtl",
+        textAlign: "right",
+      }),
+      option: (provided, state) => ({
+        ...provided,
+        backgroundColor: state.isFocused ? "#f8f9fa" : "white",
+        color: "black",
+        cursor: "pointer",
+        textAlign: "right",
+      }),
+      singleValue: (provided) => ({
+        ...provided,
+        textAlign: "right",
+        direction: "rtl",
+      }),
+    };
 
 
 
@@ -120,43 +199,20 @@ const createdelegate = async (data) => {
       <Form onSubmit={handleSubmit(createdelegate)} className="form">
         <Form.Group controlId="rank" className="form-group">
           <Form.Label>الرتبة / الدرجة</Form.Label>
-          <Form.Control
-            as="select"
-            {...register("rank")}
-            className={`form-control ${errors.rank ? "is-invalid" : ""}`}
-          >
-            <option value="">إختر رتبة / درجة المندوب</option>
-            <option value="جندي">جندي</option>
-            <option value="عريف مجند">عريف مجند</option>
-            <option value="عريف">عريف</option>
-            <option value="رقيب">رقيب</option>
-            <option value="رقيب أول">رقيب أول</option>
-            <option value="مساعد">مساعد</option>
-            <option value="مساعد أول">مساعد أول</option>
-            <option value="صانع ماهر">صانع ماهر</option>
-            <option value="صانع دقيق">صانع دقيق</option>
-            <option value="ملاحظ">ملاحظ</option>
-            <option value="ملاحظ فني">ملاحظ فني</option>
-            <option value="ملازم">ملازم</option>
-            <option value="ملازم أول">ملازم أول</option>
-            <option value="نقيب">نقيب</option>
-            <option value="نقيب أ ح">نقيب أ ح</option>
-            <option value="رائد">رائد</option>
-            <option value="رائد أ ح">رائد أ ح</option>
-            <option value="مقدم">مقدم</option>
-            <option value="مقدم أ ح">مقدم أ ح</option>
-            <option value="عقيد">عقيد</option>
-            <option value="عقيد أ ح">عقيد أ ح</option>
-            <option value="عميد">عميد</option>
-            <option value="عميد أ ح">عميد أ ح</option>
-            <option value="لواء">لواء</option>
-            <option value="لواء أ ح">لواء أ ح</option>
-            <option value="فريق">فريق</option>
-            <option value="فريق أول">فريق أول</option>
-            <option value="مشير">مشير</option>
-          </Form.Control>
+
+          <Select
+            options={rankOptions}
+            placeholder="إختر رتبة / درجة المندوب"
+            isSearchable
+            styles={rankSelectStyles}
+            classNamePrefix="react-select"
+            onChange={(selected) => setValue("rank", selected.value)}
+          />
+
           {errors.rank && (
-            <div className="invalid-feedback">{errors.rank.message}</div>
+            <div className="invalid-feedback d-block">
+              {errors.rank.message}
+            </div>
           )}
         </Form.Group>
         <Form.Group controlId="name" className="form-group">
@@ -186,14 +242,26 @@ const createdelegate = async (data) => {
 
         <Form.Group controlId="notes" className="form-group">
           <Form.Label>سبب الزيارة</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="أدخل سبب الزيارة"
-            {...register("reason")}
-            className={`form-control ${errors.reason ? "is-invalid" : ""}`}
+          <Select
+            options={notesOptions}
+            placeholder="اختر سبب الزيارة"
+            isSearchable
+            isMulti // Enable multiple selection
+            styles={{
+              ...rankSelectStyles,
+              menuPortal: (base) => ({ ...base, zIndex: 9999 }), // ensure on top
+            }}
+            menuPortalTarget={document.body} // render dropdown on body
+            onChange={(selectedOptions) => {
+              // Join selected options values with '+' and set them in the form
+              const selectedValues = selectedOptions
+                ? selectedOptions.map((option) => option.value).join("+")
+                : "";
+              setValue("notes", selectedValues); // Update the notes value
+            }}
           />
-          {errors.reason && (
-            <div className="invalid-feedback">{errors.reason.message}</div>
+          {errors.notes && (
+            <div className="invalid-feedback">{errors.notes.message}</div>
           )}
         </Form.Group>
 

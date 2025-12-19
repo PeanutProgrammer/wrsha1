@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Table, Alert, Modal, Button } from "react-bootstrap";
-import { Link } from "react-router-dom";
 import axios from "axios";
 import { getAuthUser } from "../../helper/Storage";
 import moment from "moment";
@@ -91,8 +90,8 @@ const SecurityDelegates = () => {
       )}
 
       <div className="table-responsive">
-        <Table striped bordered hover>
-          <thead>
+        <Table striped bordered hover className="mb-0">
+          <thead className="table-dark">
             <tr>
               <th>م</th>
               <th>الرتبة / الدرجة</th>
