@@ -85,7 +85,7 @@ class ExpertLogController {
 
             // SQL query to fetch experts with null end_date in expert_record
             const experts = await query(`
-                SELECT experts.id ,experts.nationalID, experts.name, experts.security_clearance_number, 
+                SELECT experts.id ,experts.nationalID, experts.name, experts.security_clearance_number, experts.department,
                        experts.company_name, experts.valid_from, experts.valid_through, expert_record.id, 
                        officers.rank, officers.name as officerName, expert_record.start_date, expert_record.end_date
                 FROM experts

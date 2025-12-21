@@ -85,7 +85,7 @@ const NCOsTmam = () => {
           </tr>
         </thead>
         <tbody>
-          {ncos.results.map((officer, index) => (
+          {ncos?.data?.map((officer, index) => (
             <tr key={officer.mil_id}>
               <td>{index + 1}</td> {/* Arabic numbering, starting from 1 */}
               <td>{officer.mil_id}</td>

@@ -210,8 +210,8 @@ const SecurityCivillians = () => {
               <th onClick={() => handleSort("nationalID")}>
                 {sortConfig.key === "nationalID"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}{" "}
                 الرقم القومي
               </th>
@@ -219,40 +219,40 @@ const SecurityCivillians = () => {
                 الاسم{" "}
                 {sortConfig.key === "name"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th onClick={() => handleSort("department")}>
                 الورشة / الفرع
                 {sortConfig.key === "department"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th onClick={() => handleSort("in_unit")}>
                 التمام
                 {sortConfig.key === "in_unit"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th onClick={() => handleSort("latest_arrival")}>
                 اخر دخول
                 {sortConfig.key === "latest_arrival"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th onClick={() => handleSort("latest_departure")}>
                 اخر خروج
                 {sortConfig.key === "latest_departure"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th>ملاحظات</th>
@@ -269,21 +269,7 @@ const SecurityCivillians = () => {
                   <td>{civillian.nationalID}</td>
                   <td>{civillian.name}</td>
                   <td>{civillian.department}</td>
-                  <td>
-                    {civillian.latest_arrival
-                      ? moment(civillian.latest_arrival).format(
-                          "YYYY-MM-DD HH:mm:ss"
-                        )
-                      : "لا يوجد"}
-                  </td>
-                  <td>
-                    {civillian.latest_departure
-                      ? moment(civillian.latest_departure).format(
-                          "YYYY-MM-DD HH:mm:ss"
-                        )
-                      : "لا يوجد"}
-                  </td>{" "}
-                  <td
+                                    <td
                     className={
                       civillian.in_unit
                         ? "bg-success text-white"
@@ -292,6 +278,38 @@ const SecurityCivillians = () => {
                   >
                     {civillian.in_unit ? "متواجد" : "غير موجود"}
                   </td>
+                 <td>
+  {civillian.latest_arrival ? (
+    <>
+      <div>{moment(civillian.latest_arrival).format("YYYY-MM-DD")}</div>
+      <div>
+        {moment(civillian.latest_arrival).format("hh:mm")}
+        <span>
+          {moment(civillian.latest_arrival).format("a") === "am" ? " ص" : " م"}
+        </span>
+      </div>
+    </>
+  ) : (
+    "لا يوجد"
+  )}
+</td>
+
+<td>
+  {civillian.latest_departure ? (
+    <>
+      <div>{moment(civillian.latest_departure).format("YYYY-MM-DD")}</div>
+      <div>
+        {moment(civillian.latest_departure).format("hh:mm")}
+        <span>
+          {moment(civillian.latest_departure).format("a") === "am" ? " ص" : " م"}
+        </span>
+      </div>
+    </>
+  ) : (
+    "لا يوجد"
+  )}
+</td>
+
                   <td>{civillian.in_unit ? "لا يوجد" : civillian.tmam}</td>
                   {/* <td>
                   <div className="action-buttons">

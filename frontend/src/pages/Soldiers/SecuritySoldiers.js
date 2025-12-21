@@ -157,7 +157,7 @@ const SecuritySoldiers = () => {
   return (
     <div className="Officers p-5">
       <div className="header d-flex justify-content-between mb-3">
-        <h3 className="text-center mb-3">إدارة الضباط</h3>
+        <h3 className="text-center mb-3">إدارة الجنود</h3>
         {/* Search bar */}
         <Form
           className="d-flex align-items-center flex-grow-1"
@@ -204,8 +204,8 @@ const SecuritySoldiers = () => {
               <th onClick={() => handleSort("mil_id")}>
                 {sortConfig.key === "mil_id"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}{" "}
                 الرقم العسكري
               </th>
@@ -213,56 +213,56 @@ const SecuritySoldiers = () => {
                 الرتبة
                 {sortConfig.key === "rank"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th onClick={() => handleSort("name")}>
                 الاسم{" "}
                 {sortConfig.key === "name"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th onClick={() => handleSort("department")}>
                 الورشة / الفرع
                 {sortConfig.key === "department"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th onClick={() => handleSort("end_date")}>
                 تاريخ التسريح
                 {sortConfig.key === "end_date"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th onClick={() => handleSort("in_unit")}>
                 التمام
                 {sortConfig.key === "in_unit"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th onClick={() => handleSort("latest_arrival")}>
                 اخر دخول
                 {sortConfig.key === "latest_arrival"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th onClick={() => handleSort("latest_departure")}>
                 اخر خروج
                 {sortConfig.key === "latest_departure"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th>ملاحظات</th>
@@ -278,6 +278,16 @@ const SecuritySoldiers = () => {
                   <td>{soldier.name}</td>
                   <td>{soldier.department}</td>
                   <td>{moment(soldier.end_date).format("YYYY-MM-DD")}</td>
+                                    <td
+                    className={
+                      soldier.in_unit
+                        ? "bg-success text-white"
+                        : "bg-danger text-white"
+                    }
+                  >
+                    {soldier.in_unit ? "متواجد" : "غير موجود"}
+                  </td>
+                  
                   <td>
                     {soldier.latest_arrival
                       ? moment(soldier.latest_arrival).format(
@@ -292,15 +302,7 @@ const SecuritySoldiers = () => {
                         )
                       : "لا يوجد"}
                   </td>
-                  <td
-                    className={
-                      soldier.in_unit
-                        ? "bg-success text-white"
-                        : "bg-danger text-white"
-                    }
-                  >
-                    {soldier.in_unit ? "متواجد" : "غير موجود"}
-                  </td>
+
                   <td>{soldier.in_unit ? "لا يوجد" : soldier.tmam}</td>
                   {/* <td>
                   <div className="action-buttons">

@@ -69,7 +69,7 @@ const SecurityNCOs = () => {
         console.log("🟢 Connected to WebSocket:", socket.id);
       });
 
-      socket.on("ncosUpdated", () => {
+      socket.on("officersUpdated", () => {
         console.log("📢 ncos updated — refetching data...");
         fetchData(); // ✅ Re-fetch on update
       });
@@ -155,7 +155,7 @@ const SecurityNCOs = () => {
   return (
     <div className="Officers p-5">
             <div className="header d-flex justify-content-between mb-3">
-        <h3 className="text-center mb-3">إدارة الضباط</h3>
+        <h3 className="text-center mb-3">إدارة ضباط الصف</h3>
          {/* Search bar */}
                 <Form
                   className="d-flex align-items-center flex-grow-1"
@@ -202,8 +202,7 @@ const SecurityNCOs = () => {
               <th onClick={() => handleSort("mil_id")}>
                 {sortConfig.key === "mil_id"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼" : " 🔽"
                   : ""}{" "}
                 الرقم العسكري
               </th>
@@ -211,48 +210,48 @@ const SecurityNCOs = () => {
                 الرتبة
                 {sortConfig.key === "rank"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th onClick={() => handleSort("name")}>
                 الاسم{" "}
                 {sortConfig.key === "name"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th onClick={() => handleSort("department")}>
                 الورشة / الفرع
                 {sortConfig.key === "department"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th onClick={() => handleSort("in_unit")}>
                 التمام
                 {sortConfig.key === "in_unit"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th onClick={() => handleSort("latest_arrival")}>
                 اخر دخول
                 {sortConfig.key === "latest_arrival"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th onClick={() => handleSort("latest_departure")}>
                 اخر خروج
                 {sortConfig.key === "latest_departure"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th>ملاحظات</th>
@@ -276,20 +275,37 @@ const SecurityNCOs = () => {
                           >
                               {nco.in_unit ? "متواجد" : "غير موجود"}
                               </td>
-                            <td>
-                              {nco.latest_arrival
-                                ? moment(nco.latest_arrival).format(
-                                    "YYYY-MM-DD HH:mm:ss"
-                                  )
-                                : "لا يوجد"}
-                            </td>
-                            <td>
-                              {nco.latest_departure
-                                ? moment(nco.latest_departure).format(
-                                    "YYYY-MM-DD HH:mm:ss"
-                                  )
-                                : "لا يوجد"}
-                            </td>
+<td>
+  {nco.latest_arrival ? (
+    <>
+      <div>{moment(nco.latest_arrival).format("YYYY-MM-DD")}</div>
+      <div>
+        {moment(nco.latest_arrival).format("hh:mm")}
+        <span>
+          {moment(nco.latest_arrival).format("a") === "am" ? " ص" : " م"}
+        </span>
+      </div>
+    </>
+  ) : (
+    "لا يوجد"
+  )}
+</td>
+
+<td>
+  {nco.latest_departure ? (
+    <>
+      <div>{moment(nco.latest_departure).format("YYYY-MM-DD")}</div>
+      <div>
+        {moment(nco.latest_departure).format("hh:mm")}
+        <span>
+          {moment(nco.latest_departure).format("a") === "am" ? " ص" : " م"}
+        </span>
+      </div>
+    </>
+  ) : (
+    "لا يوجد"
+  )}
+</td>
                             <td>{nco.in_unit ? "لا يوجد" : nco.tmam}</td>
           
                           </tr>

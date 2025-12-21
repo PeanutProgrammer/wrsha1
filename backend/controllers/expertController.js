@@ -188,11 +188,11 @@ class ExpertController {
     }
 
 
-    static async getExperts(req, res) {
-      try {
+   static async getExperts(req, res) {
+    try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-          return res.status(400).json({ errors: errors.array() });
+            return res.status(400).json({ errors: errors.array() });
         }
 
         const query = util.promisify(connection.query).bind(connection);
@@ -201,46 +201,71 @@ class ExpertController {
         const page = parseInt(req.query.page) || 1; // default to page 1
         const limit = parseInt(req.query.limit) || 20; // default 20 rows per page
         const offset = (page - 1) * limit;
+
         // --- Search params ---
         let searchClause = "";
         const params = [];
         if (req.query.search) {
-          searchClause =
-            "WHERE o.name LIKE ? OR o.department LIKE ? OR o.nationalID LIKE ? OR o.company_name LIKE ?";
-          const searchValue = `%${req.query.search}%`;
-          params.push(searchValue, searchValue, searchValue, searchValue);
+            searchClause =
+                "WHERE o.name LIKE ? OR o.department LIKE ? OR o.nationalID LIKE ? OR o.company_name LIKE ?";
+            const searchValue = `%${req.query.search}%`;
+            params.push(searchValue, searchValue, searchValue, searchValue);
         }
 
         // --- Total count for pagination ---
-        const countQuery = `SELECT COUNT(*) AS total FROM experts o ${searchClause}`;
+        const countQuery = `
+            SELECT COUNT(*) AS total
+            FROM experts o
+            LEFT JOIN expert_record er ON o.id = er.expertID
+            ${searchClause}
+        `;
         const countResult = await query(countQuery, params);
         const total = countResult[0].total;
         const totalPages = Math.ceil(total / limit);
 
+        // --- Main query to get experts with latest arrival and departure ---
         const experts = await query(
-          `select * from experts ${searchClause} LIMIT ? OFFSET ?`,
-          [...params, limit, offset]
+            `
+            SELECT 
+                o.id, 
+                o.name, 
+                o.department, 
+                o.nationalID, 
+                o.security_clearance_number,
+                o.valid_from,
+                o.valid_through,
+                o.company_name,
+                o.in_unit,
+                MAX(er.start_date) AS latest_arrival,
+                MAX(er.end_date) AS latest_departure
+            FROM experts o
+            LEFT JOIN expert_record er ON o.id = er.expertID
+            ${searchClause}
+            GROUP BY o.id
+            LIMIT ? OFFSET ?
+            `,
+            [...params, limit, offset]
         );
 
         if (!experts.length) {
-          return res.status(404).json({ msg: "No experts found" });
+            return res.status(404).json({ msg: "No experts found" });
         }
 
         return res.status(200).json({
-          page,
-          limit,
-          total,
-          totalPages,
-          data: experts,
+            page,
+            limit,
+            total,
+            totalPages,
+            data: experts,
         });
-      } catch (err) {
+    } catch (err) {
         console.error(err);
         return res.status(500).json({
-          message: "An unexpected error occurred",
-          error: err.message,
+            message: "An unexpected error occurred",
+            error: err.message,
         });
-      }
     }
+}
 
     static async getExpert(req, res) {
         try {
@@ -409,14 +434,14 @@ class ExpertController {
 
     // Handle search by name or military ID
     if (req.query.nationalID) {
-      filters.push(`(nationalID = ?)`);
-      params.push(`${req.query.nationalID}`);
+      filters.push(`(nationalID LIKE ?)`);
+      params.push(`%${req.query.nationalID}%`);
 
     }
 
     if (req.query.name) {
-      filters.push(`(name = ?)`);
-      params.push(`${req.query.name}`);
+      filters.push(`(name LIKE ?)`);
+      params.push(`%${req.query.name}%`);
 
     }
 
@@ -429,8 +454,8 @@ class ExpertController {
 
     // Filter by rank
     if (req.query.security_clearance_number) {
-      filters.push(`security_clearance_number = ?`);
-      params.push(req.query.security_clearance_number);
+      filters.push(`security_clearance_number LIKE ?`);
+      params.push(`%${req.query.security_clearance_number}%`);
     }
 
     // // Filter by join date range

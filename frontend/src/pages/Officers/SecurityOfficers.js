@@ -206,8 +206,7 @@ const SecurityOfficers = () => {
               <th onClick={() => handleSort("mil_id")}>
                 {sortConfig.key === "mil_id"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼" : " 🔽"
                   : ""}{" "}
                 الرقم العسكري
               </th>
@@ -215,46 +214,46 @@ const SecurityOfficers = () => {
                 الرتبة
                 {sortConfig.key === "rank"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th onClick={() => handleSort("name")}>
                 الاسم{" "}
                 {sortConfig.key === "name"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th onClick={() => handleSort("department")}>
                 الورشة / الفرع
                 {sortConfig.key === "department"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th onClick={() => handleSort("in_unit")}>
                 التمام
                 {sortConfig.key === "in_unit"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th onClick={() => handleSort("latest_arrival")}>اخر دخول
                 {sortConfig.key === "latest_arrival"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th onClick={() => handleSort("latest_departure")}>اخر خروج
                 {sortConfig.key === "latest_departure"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th>ملاحظات</th>
@@ -278,20 +277,37 @@ const SecurityOfficers = () => {
                 >
                     {officer.in_unit ? "متواجد" : "غير موجود"}
                     </td>
-                  <td>
-                    {officer.latest_arrival
-                      ? moment(officer.latest_arrival).format(
-                          "YYYY-MM-DD HH:mm:ss"
-                        )
-                      : "لا يوجد"}
-                  </td>
-                  <td>
-                    {officer.latest_departure
-                      ? moment(officer.latest_departure).format(
-                          "YYYY-MM-DD HH:mm:ss"
-                        )
-                      : "لا يوجد"}
-                  </td>
+<td>
+  {officer.latest_arrival ? (
+    <>
+      <div>{moment(officer.latest_arrival).format("YYYY-MM-DD")}</div>
+      <div>
+        {moment(officer.latest_arrival).format("hh:mm")}
+        <span>
+          {moment(officer.latest_arrival).format("a") === "am" ? " ص" : " م"}
+        </span>
+      </div>
+    </>
+  ) : (
+    "لا يوجد"
+  )}
+</td>
+
+<td>
+  {officer.latest_departure ? (
+    <>
+      <div>{moment(officer.latest_departure).format("YYYY-MM-DD")}</div>
+      <div>
+        {moment(officer.latest_departure).format("hh:mm")}
+        <span>
+          {moment(officer.latest_departure).format("a") === "am" ? " ص" : " م"}
+        </span>
+      </div>
+    </>
+  ) : (
+    "لا يوجد"
+  )}
+</td>
                   <td>{officer.in_unit ? "لا يوجد" : officer.tmam}</td>
 
                 </tr>

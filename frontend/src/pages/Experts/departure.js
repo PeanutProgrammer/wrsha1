@@ -84,6 +84,8 @@ const ExpertDeparture = () => {
             results: prev.results.filter((expert) => expert.id !== expertId),
           }));
         }, 5000);
+
+        
       })
       .catch((err) => {
         setExperts({
@@ -129,14 +131,14 @@ const ExpertDeparture = () => {
       )}
 
       <div className="table-responsive">
-        <Table striped bordered hover>
-          <thead>
+        <Table striped bordered hover className="mb-0">
+          <thead className="table-dark">
             <tr>
               <th>الرقم القومي</th>
               <th>الإسم</th>
               <th>رقم التصريح الأمني</th>
               <th>اسم الشركة</th>
-              <th>الورشة / الفرع</th>
+              <th>مكان التواجد</th>
               <th>وقت الدخول</th>
               <th>وقت الخروج</th>
               <th>الإجراءات</th>
@@ -149,7 +151,7 @@ const ExpertDeparture = () => {
                 <td>{expert.name}</td>
                 <td>{expert.security_clearance_number}</td>
                 <td>{expert.company_name}</td>
-                <td>{expert.department_visited}</td>
+                <td>{expert.department}</td>
                 <td>{moment(expert.start_date).format('YYYY-MM-DD HH:mm')}</td>
                 <td>{expert.end_date ? moment(expert.end_date).format('YYYY-MM-DD HH:mm') : 'لا يوجد'}</td>
 

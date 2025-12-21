@@ -31,9 +31,9 @@ const SecurityExperts = () => {
     tempSearch: "",
   });
 
-    // ✅ Modal state
-    const [showConfirm, setShowConfirm] = useState(false);
-    const [selectedExpert, setSelectedExpert] = useState(null);
+  // ✅ Modal state
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [selectedExpert, setSelectedExpert] = useState(null);
   useEffect(() => {
     const socket = io(`${process.env.REACT_APP_BACKEND_BASE_URL}`); //  backend port
 
@@ -260,61 +260,77 @@ const SecurityExperts = () => {
               <th onClick={() => handleSort("nationalID")}>
                 {sortConfig.key === "nationalID"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}{" "}
-                رقم تحقيق الشخصية
+                تحقيق الشخصية
               </th>
               <th onClick={() => handleSort("name")}>
                 الاسم{" "}
                 {sortConfig.key === "name"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th onClick={() => handleSort("security_clearance_number")}>
-                رقم التصديق الأمني{" "}
+                رقم التصديق{" "}
                 {sortConfig.key === "security_clearance_number"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               {/* <th onClick={() => handleSort("valid_from")}>
                 الفترة من
                 {sortConfig.key === "valid_from"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th onClick={() => handleSort("valid_through")}>
                 الفترة إلى
                 {sortConfig.key === "valid_through"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th> */}
               <th onClick={() => handleSort("department")}>
-                الورشة / الفرع
+                مكان التواجد
                 {sortConfig.key === "department"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
-              <th>حالة التصديق الأمني</th>
+              <th>حالة التصديق</th>
               <th>التمام</th>
-              <th onClick={() => handleSort("company_name")}>
+              <th onClick={() => handleSort("latest_arrival")}>
+                اخر دخول
+                {sortConfig.key === "latest_arrival"
+                  ? sortConfig.direction === "asc"
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}
+              </th>
+              <th onClick={() => handleSort("latest_departure")}>
+                اخر خروج
+                {sortConfig.key === "latest_departure"
+                  ? sortConfig.direction === "asc"
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}
+              </th>
+              {/* <th onClick={() => handleSort("company_name")}>
                 اسم الشركة
                 {sortConfig.key === "company_name"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
-              </th>
+              </th> */}
 
               <th>الإجراءات</th>
             </tr>
@@ -364,7 +380,49 @@ const SecurityExperts = () => {
                   >
                     {expert.in_unit ? "متواجد" : "غير موجود"}
                   </td>
-                  <td>{expert.company_name}</td>
+
+                  <td>
+                    {expert.latest_arrival ? (
+                      <>
+                        <div>
+                          {moment(expert.latest_arrival).format("YYYY-MM-DD")}
+                        </div>
+                        <div>
+                          {moment(expert.latest_arrival).format("hh:mm")}
+                          <span>
+                            {moment(expert.latest_arrival).format("a") === "am"
+                              ? " ص"
+                              : " م"}
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      "لا يوجد"
+                    )}
+                  </td>
+
+                  <td>
+                    {expert.latest_departure ? (
+                      <>
+                        <div>
+                          {moment(expert.latest_departure).format("YYYY-MM-DD")}
+                        </div>
+                        <div>
+                          {moment(expert.latest_departure).format("hh:mm")}
+                          <span>
+                            {moment(expert.latest_departure).format("a") ===
+                            "am"
+                              ? " ص"
+                              : " م"}
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      "لا يوجد"
+                    )}
+                  </td>
+
+                  {/* <td>{expert.company_name}</td> */}
 
                   <td className="text-center">
                     <div className="d-inline-flex gap-1">

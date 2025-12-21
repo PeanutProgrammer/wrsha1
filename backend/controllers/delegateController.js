@@ -187,30 +187,49 @@ class DelegateController {
 
       const query = util.promisify(connection.query).bind(connection);
 
+       // --- Pagination params ---
+        const page = parseInt(req.query.page) || 1; // default to page 1
+        const limit = parseInt(req.query.limit) || 20; // default 20 rows per page
+        const offset = (page - 1) * limit;
+        // --- Search params ---
+        let searchClause = "";
+        const params = [];
+        if (req.query.search) {
+          searchClause =
+            "WHERE delegates.name LIKE ? OR delegates.unit LIKE ? OR delegates.rank LIKE ? OR delegates.notes LIKE ?";
+          const searchValue = `%${req.query.search}%`;
+          params.push(searchValue, searchValue, searchValue, searchValue);
+        }
+
+        // --- Total count for pagination ---
+        const countQuery = `SELECT COUNT(*) AS total FROM delegates  ${searchClause}`;
+        const countResult = await query(countQuery, params);
+        const total = countResult[0].total;
+        const totalPages = Math.ceil(total / limit);
+
       const delegates =
         await query(`select  delegates.id, delegates.rank, delegates.name, delegates.unit, delegates.visit_start, delegates.visit_end, delegates.notes 
-                from delegates`);
+                from delegates ${searchClause} LIMIT ? OFFSET ?`, [...params, limit, offset]);
 
-      if (delegates.length == 0) {
-        return res.status(404).json({
-          msg: "no delegates found hey",
+      if (!delegates.length) {
+          return res.status(404).json({ msg: "No delegates found" });
+        }
+
+        return res.status(200).json({
+          page,
+          limit,
+          total,
+          totalPages,
+          data: delegates,
+        });
+      } catch (err) {
+        console.error(err);
+        return res.status(500).json({
+          message: "An unexpected error occurred",
+          error: err.message,
         });
       }
-
-      // // Map delegates to Delegate objects
-      // const guestObjects = delegates.map(delegate => new Delegate(
-      //     delegate.name,
-      //     delegate.visit_start,
-      //     delegate.visit_end,
-      //     delegate.visit_to,
-      //     delegate.reason
-      // ));
-
-      return res.status(200).json(delegates);
-    } catch (err) {
-      return res.status(500).json({ err: err });
     }
-  }
 
   static async getDelegate(req, res) {
     try {

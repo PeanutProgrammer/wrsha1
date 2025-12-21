@@ -212,32 +212,51 @@ class GuestController {
             }
 
             const query = util.promisify(connection.query).bind(connection);
-
-            const guests = await query(`select  guests.id, guests.name, guests.visit_start, guests.visit_end, guests.visit_to, guests.reason, officers.rank, officers.name as officer_name 
-                from guests
-                left join officers on guests.visit_to = officers.id`)
-
-            if (guests.length == 0) {
-                return res.status(404).json({
-                    msg: "no guests found hey"
-                })
-            }
-
-            // // Map guests to Guest objects
-            // const guestObjects = guests.map(guest => new Guest(
-            //     guest.name,
-            //     guest.visit_start,
-            //     guest.visit_end,
-            //     guest.visit_to,
-            //     guest.reason
-            // ));
-
-            return res.status(200).json(guests);
-
-        } catch (err) {
-            return res.status(500).json({ err: err });
-            
+             // --- Pagination params ---
+        const page = parseInt(req.query.page) || 1; // default to page 1
+        const limit = parseInt(req.query.limit) || 20; // default 20 rows per page
+        const offset = (page - 1) * limit;
+        // --- Search params ---
+        let searchClause = "";
+        const params = [];
+        if (req.query.search) {
+          searchClause =
+            "WHERE guests.name LIKE ? OR guests.visit_to LIKE ? OR guests.reason LIKE ?";
+          const searchValue = `%${req.query.search}%`;
+          params.push(searchValue, searchValue, searchValue);
         }
+
+        // --- Total count for pagination ---
+        const countQuery = `SELECT COUNT(*) AS total FROM guests ${searchClause}`;
+        const countResult = await query(countQuery, params);
+        const total = countResult[0].total;
+        const totalPages = Math.ceil(total / limit);
+
+
+            const guests = await query(`select guests.id, guests.name, guests.visit_start, guests.visit_end, guests.visit_to, guests.reason, officers.rank, officers.name as officer_name 
+                from guests
+                left join officers on guests.visit_to = officers.id
+                ${searchClause}
+                LIMIT ? OFFSET ?`, [...params, limit, offset]);
+
+           if (!guests.length) {
+          return res.status(404).json({ msg: "No guests found" });
+        }
+
+        return res.status(200).json({
+          page,
+          limit,
+          total,
+          totalPages,
+          data: guests,
+        });
+      } catch (err) {
+        console.error(err);
+        return res.status(500).json({
+          message: "An unexpected error occurred",
+          error: err.message,
+        });
+      }
     }
 
     static async getGuest(req, res) {

@@ -1,91 +1,203 @@
 import React, { useState, useEffect } from "react";
-import { Table, Alert, Modal, Button } from "react-bootstrap";
+import { Table, Alert, Modal, Button, Form, InputGroup } from "react-bootstrap";
 import axios from "axios";
 import { getAuthUser } from "../../helper/Storage";
 import moment from "moment";
+import { io } from "socket.io-client";
+
+// Helper: Convert Arabic-Indic digits to Western digits
+const toWesternDigits = (str) => {
+  return str.replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
+};
 
 const SecurityDelegates = () => {
   const auth = getAuthUser();
-  const [Delegates, setDelegates] = useState({
+  const [sortConfig, setSortConfig] = useState({
+    key: "",
+    direction: "asc",
+  });
+  const [delegates, setDelegates] = useState({
     loading: true,
     err: null,
     success: null, // ✅ Added success message
     results: [],
     reload: 0,
+    page: 1,
+    totalPages: 1,
+    search: "",
+    limit: 0,
+    tempSearch: "",
   });
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [recordsPerPage] = useState(8);
-
-
-
   useEffect(() => {
-    setDelegates({ ...Delegates, loading: true });
-    axios
-      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/delegate/`, {
-        headers: {
-          token: auth.token,
-        },
-      })
-      .then((resp) => {
-        setDelegates({
-          ...Delegates,
-          results: resp.data,
-          loading: false,
-          err: null,
+    const socket = io(`${process.env.REACT_APP_BACKEND_BASE_URL}`); //  backend port
+
+    const fetchData = () => {
+      const searchValue = toWesternDigits(delegates.search.trim());
+      const limit = 10;
+      const resp = axios
+        .get(
+          `${process.env.REACT_APP_BACKEND_BASE_URL}/delegate?page=${delegates.page}&limit=${limit}&search=${searchValue}`,
+          {
+            headers: { token: auth.token },
+          }
+        )
+        .then((resp) => {
+          setDelegates({
+            ...delegates,
+            results: resp.data.data || [],
+            totalPages: resp.data.totalPages || 1,
+            limit: resp.data.limit || limit,
+            loading: false,
+            err: null,
+          });
+        })
+        .catch((err) => {
+          setDelegates({
+            ...delegates,
+            loading: false,
+            err: err.response
+              ? JSON.stringify(err.response.data.errors)
+              : "Something went wrong while fetching data.",
+          });
         });
-      })
-      .catch((err) => {
-        setDelegates({
-          ...Delegates,
-          loading: false,
-          err: err.response
-            ? JSON.stringify(err.response.data.errors)
-            : "حدث خطأ أثناء تحميل البيانات.",
-        });
-      });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [Delegates.reload]);
+    };
 
+    fetchData(); // ✅ Initial fetch on component mount
 
+    socket.on("connect", () => {
+      console.log("🟢 Connected to WebSocket:", socket.id);
+    });
 
- 
+    socket.on("delegatesUpdated", () => {
+      console.log("📢 Delegates updated — refetching data...");
+      fetchData(); // ✅ Re-fetch on update
+    });
 
- 
+    return () => socket.disconnect();
+  }, [delegates.page, delegates.search]);
 
-  // ✅ Pagination logic
-  const indexOfLastRecord = currentPage * recordsPerPage;
-  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = Delegates.results.slice(
-    indexOfFirstRecord,
-    indexOfLastRecord
-  );
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const normalized = toWesternDigits(delegates.tempSearch.trim());
+    setDelegates((prev) => ({
+      ...prev,
+      search: normalized,
+      page: 1,
+      results: [],
+    }));
+  };
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-  const totalPages = Math.ceil(Delegates.results.length / recordsPerPage);
-  const pageNumbers = [];
-  for (let i = 1; i <= totalPages; i++) {
-    pageNumbers.push(i);
-  }
+  const handleClearSearch = () => {
+    setDelegates((prev) => ({
+      ...prev,
+      search: "",
+      tempSearch: "",
+      page: 1,
+      results: [],
+    }));
+  };
+
+  const handlePrevPage = () => {
+    if (delegates.page > 1)
+      setDelegates((prev) => ({ ...prev, page: prev.page - 1 }));
+  };
+
+  const handleNextPage = () => {
+    if (delegates.page < delegates.totalPages)
+      setDelegates((prev) => ({ ...prev, page: prev.page + 1 }));
+  };
+
+  const handleJumpToPage = (number) => {
+    if (number >= 1 && number <= delegates.totalPages) {
+      setDelegates((prev) => ({ ...prev, page: number }));
+    }
+  };
+
+  const handleSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const renderPageButtons = () => {
+    const pages = [];
+    const maxButtons = 5;
+    let start = Math.max(delegates.page - 2, 1);
+    let end = Math.min(start + maxButtons - 1, delegates.totalPages);
+    start = Math.max(end - maxButtons + 1, 1);
+
+    for (let num = start; num <= end; num++) {
+      pages.push(
+        <Button
+          key={num}
+          onClick={() => handleJumpToPage(num)}
+          variant={num === delegates.page ? "primary" : "outline-primary"}
+          className="mx-1 btn-sm"
+        >
+          {num}
+        </Button>
+      );
+    }
+    return pages;
+  };
+
+  const sortedDelegates = [...delegates.results].sort((a, b) => {
+    if (!sortConfig.key) return 0; // no sorting yet
+    if (a[sortConfig.key] > b[sortConfig.key])
+      return sortConfig.direction === "asc" ? 1 : -1;
+    if (a[sortConfig.key] < b[sortConfig.key])
+      return sortConfig.direction === "asc" ? -1 : 1;
+    return 0;
+  });
 
   return (
     <div className="Officers p-5">
       <div className="header d-flex justify-content-between mb-3">
         <h3 className="text-center mb-3">إدارة المناديب</h3>
-
+        {/* Search bar */}
+        <Form
+          className="d-flex align-items-center flex-grow-1"
+          onSubmit={handleSearchSubmit}
+        >
+          <InputGroup className="w-50  shadow-sm me-5">
+            <Form.Control
+              size="sm"
+              placeholder="بحث 🔍"
+              value={delegates.tempSearch}
+              onChange={(e) =>
+                setDelegates((prev) => ({
+                  ...prev,
+                  tempSearch: e.target.value,
+                }))
+              }
+            />
+            {delegates.tempSearch && (
+              <Button
+                size="sm"
+                variant="outline-secondary"
+                onClick={handleClearSearch}
+              >
+                ×
+              </Button>
+            )}
+          </InputGroup>
+        </Form>
       </div>
 
       {/* ✅ Success Message */}
-      {Delegates.success && (
+      {delegates.success && (
         <Alert variant="success" className="p-2 text-center">
-          {Delegates.success}
+          {delegates.success}
         </Alert>
       )}
 
       {/* ❌ Error Message */}
-      {Delegates.err && (
+      {delegates.err && (
         <Alert variant="danger" className="p-2 text-center">
-          {Delegates.err}
+          {delegates.err}
         </Alert>
       )}
 
@@ -94,69 +206,97 @@ const SecurityDelegates = () => {
           <thead className="table-dark">
             <tr>
               <th>م</th>
-              <th>الرتبة / الدرجة</th>
-              <th>الاسم</th>
-              <th>اسم الوحدة</th>
-              <th>وقت الدخول</th>
-              <th>وقت الخروج</th>
-              <th>سبب الزيارة</th>
+              <th onClick={() => handleSort("rank")}>
+                الرتبة / الدرجة
+                {sortConfig.key === "rank" && (
+                  <span>{sortConfig.direction === "asc" ? " 🔼" : " 🔽"}</span>
+                )}
+              </th>
+              <th onClick={() => handleSort("name")}>
+                الاسم
+                {sortConfig.key === "name" && (
+                  <span>{sortConfig.direction === "asc" ? " 🔼" : " 🔽"}</span>
+                )}
+              </th>
+              <th onClick={() => handleSort("unit")}>
+                اسم الوحدة
+                {sortConfig.key === "unit" && (
+                  <span>{sortConfig.direction === "asc" ? " 🔼" : " 🔽"}</span>
+                )}
+              </th>
+              <th onClick={() => handleSort("visit_start")}>
+                وقت الدخول
+                {sortConfig.key === "visit_start" && (
+                  <span>{sortConfig.direction === "asc" ? " 🔼" : " 🔽"}</span>
+                )}
+              </th>
+              <th onClick={() => handleSort("visit_end")}>
+                وقت الخروج
+                {sortConfig.key === "visit_end" && (
+                  <span>{sortConfig.direction === "asc" ? " 🔼" : " 🔽"}</span>
+                )}
+              </th>
+              <th onClick={() => handleSort("notes")}>
+                سبب الزيارة
+                {sortConfig.key === "notes" && (
+                  <span>{sortConfig.direction === "asc" ? " 🔼" : " 🔽"}</span>
+                )}
+              </th>
             </tr>
           </thead>
           <tbody>
-            {currentRecords.map((delegate, index) => (
-              <tr key={delegate.id}>
-                <td>{index+1}</td>
-                <td>{delegate.rank}</td>
-                <td>{delegate.name}</td>
-                <td>{delegate.unit}</td>
-                <td>{moment(delegate.visit_start).format("YYYY-MM-DD HH:mm")}</td>
-                {/* Conditionally show visit_end */}
-                <td>
-                  {delegate.visit_end
-                    ? moment(delegate.visit_end).format("YYYY-MM-DD HH:mm")
-                    : "لا يوجد"}
+            {Array.isArray(delegates.results) &&
+            delegates.results.length > 0 ? (
+              sortedDelegates.map((delegate, index) => (
+                <tr key={delegate.id}>
+                  <td> {(delegates.page - 1) * delegates.limit + index + 1}</td>
+                  <td>{delegate.rank}</td>
+                  <td>{delegate.name}</td>
+                  <td>{delegate.unit}</td>
+                  <td>
+                    {moment(delegate.visit_start).format("YYYY-MM-DD HH:mm")}
+                  </td>
+                  {/* Conditionally show visit_end */}
+                  <td>
+                    {delegate.visit_end
+                      ? moment(delegate.visit_end).format("YYYY-MM-DD HH:mm")
+                      : "لا يوجد"}
+                  </td>
+                  <td>{delegate.notes ? delegate.notes : "لا يوجد"}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="9" className="text-center">
+                  لا توجد بيانات
                 </td>
-                <td>{delegate.notes ? delegate.notes : "لا يوجد"}</td>
-
-                
               </tr>
-            ))}
+            )}
           </tbody>
         </Table>
       </div>
 
       {/* Pagination Controls */}
-      <div className="pagination-container">
-        <button
-          className="btn btn-light"
-          onClick={() => paginate(currentPage - 1)}
-          disabled={currentPage === 1}
+
+      <div className="d-flex justify-content-between align-items-center mt-3">
+        <Button
+          onClick={handlePrevPage}
+          disabled={delegates.page === 1}
+          variant="secondary"
+          size="sm"
         >
           السابق
-        </button>
-
-        {pageNumbers.map((number) => (
-          <button
-            key={number}
-            className={`btn btn-light page-btn ${
-              currentPage === number ? "active" : ""
-            }`}
-            onClick={() => paginate(number)}
-          >
-            {number}
-          </button>
-        ))}
-
-        <button
-          className="btn btn-light"
-          onClick={() => paginate(currentPage + 1)}
-          disabled={currentPage === totalPages}
+        </Button>
+        <div>{renderPageButtons()}</div>
+        <Button
+          onClick={handleNextPage}
+          disabled={delegates.page === delegates.totalPages}
+          variant="secondary"
+          size="sm"
         >
           التالي
-        </button>
+        </Button>
       </div>
-
-      
     </div>
   );
 };
