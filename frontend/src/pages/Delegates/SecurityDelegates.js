@@ -34,7 +34,7 @@ const SecurityDelegates = () => {
 
     const fetchData = () => {
       const searchValue = toWesternDigits(delegates.search.trim());
-      const limit = 10;
+      const limit = 15;
       const resp = axios
         .get(
           `${process.env.REACT_APP_BACKEND_BASE_URL}/delegate?page=${delegates.page}&limit=${limit}&search=${searchValue}`,

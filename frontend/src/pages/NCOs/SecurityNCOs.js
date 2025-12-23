@@ -34,7 +34,7 @@ const SecurityNCOs = () => {
 
       const fetchData = () => {
         const searchValue = toWesternDigits(ncos.search.trim());
-        const limit = 10;
+        const limit = 15;
         const resp = axios
           .get(
             `${process.env.REACT_APP_BACKEND_BASE_URL}/nco/tmam?page=${ncos.page}&limit=${limit}&search=${searchValue}`,

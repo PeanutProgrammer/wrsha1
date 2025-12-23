@@ -145,8 +145,8 @@ const Users = () => {
       )}
 
       <div className="table-responsive">
-        <Table striped bordered hover>
-          <thead>
+        <Table striped bordered hover responsive className="mb-0">
+          <thead className='table-dark'>
             <tr>
               <th>ID</th>
               <th>الاسم</th>

@@ -163,13 +163,13 @@ useEffect(() => {
       )}
 
 
-      <Table striped bordered hover>
-        <thead>
+      <Table striped bordered hover responsive className="mb-0">
+        <thead className='table-dark'>
           <tr>
             <th>م</th>
             <th>الرقم العسكري</th>
             <th>الدرجة</th>
-            <th>الإسم</th>
+            <th>الاسم</th>
             <th>الورشة / الفرع</th>
             <th>دخول / خروج</th>
             <th>الوقت</th>

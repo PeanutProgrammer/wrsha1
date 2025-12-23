@@ -37,7 +37,7 @@ const AllInUnit = () => {
 
     const fetchData = () => {
       const searchValue = toWesternDigits(units.search.trim());
-      const limit = 10;
+      const limit = 15;
       const resp = axios
         .get(
           `${process.env.REACT_APP_BACKEND_BASE_URL}/unit?page=${units.page}&limit=${limit}&search=${searchValue}`,

@@ -163,8 +163,8 @@ const SoldiersLog = () => {
       )}
 
 
-      <Table striped bordered hover>
-        <thead>
+      <Table striped bordered hover responsive className="mb-0" >
+        <thead className="table-dark">
           <tr>
             <th>م</th>
             <th>الرقم العسكري</th>

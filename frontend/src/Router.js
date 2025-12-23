@@ -19,8 +19,6 @@ import GuestsHome from "./pages/Guests/GuestsHome";
 import DelegatesHome from "./pages/Delegates/DelegatesHome";
 import PastWorkersHome from "./pages/Past_Workers/PastWorkersHome";
 
-
-
 // Officers
 import Officers from "./pages/Officers/Officers";
 import AddOfficers from "./pages/Officers/AddOfficers";
@@ -36,6 +34,9 @@ import ManageOfficers from "./pages/Officers/ManageOfficers";
 import ManageTmam from "./pages/Officers/ManageTmam";
 import UpdateTmam from "./pages/Officers/UpdateTmam";
 import AddTmam from "./pages/Officers/AddTmam";
+import ManageVacation from "./pages/Officers/ManageVacation";
+import ManageMission from "./pages/Officers/ManageMission";
+import ManageCourse from "./pages/Officers/ManageCourse";
 // NCOs
 import NCOs from "./pages/NCOs/NCOs";
 import AddNCOs from "./pages/NCOs/AddNCOs";
@@ -113,10 +114,9 @@ import SecurityNCOs from "./pages/NCOs/SecurityNCOs";
 import SecuritySoldiers from "./pages/Soldiers/SecuritySoldiers";
 import SecurityCivillians from "./pages/Civillians/SecurityCivillians";
 import SecurityExperts from "./pages/Experts/SecurityExperts";
-import SecurityGuests from "./pages/Guests/SecurityGuests"; 
+import SecurityGuests from "./pages/Guests/SecurityGuests";
 import SecurityDelegates from "./pages/Delegates/SecurityDelegates";
 import AllInUnit from "./pages/Unit/AllInUnit";
-
 
 export const router = createBrowserRouter([
   {
@@ -242,6 +242,21 @@ export const router = createBrowserRouter([
             path: "manage-tmam",
             element: <ProtectedRoute allowedTypes={"شؤون ضباط"} />,
             children: [{ path: "", element: <ManageTmam /> }],
+          },
+          {
+            path: "manage-vacation",
+            element: <ProtectedRoute allowedTypes={"شؤون ضباط"} />,
+            children: [{ path: "", element: <ManageVacation/> }],
+          },
+                    {
+            path: "manage-mission",
+            element: <ProtectedRoute allowedTypes={"شؤون ضباط"} />,
+            children: [{ path: "", element: <ManageMission /> }],
+          },
+                             {
+            path: "manage-course",
+            element: <ProtectedRoute allowedTypes={"شؤون ضباط"} />,
+            children: [{ path: "", element: <ManageCourse /> }],
           },
           {
             path: "tmam/:id",

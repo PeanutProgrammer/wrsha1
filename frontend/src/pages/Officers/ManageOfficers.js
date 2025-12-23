@@ -50,7 +50,7 @@ const ManageOfficers = () => {
     // 🔁 Initial fetch
     const fetchData = () => {
       const searchValue = toWesternDigits(officers.search.trim());
-      const limit = 10;
+      const limit = 15;
       const resp = axios
         .get(
           `${process.env.REACT_APP_BACKEND_BASE_URL}/officer?page=${officers.page}&limit=${limit}&search=${searchValue}`,
@@ -353,10 +353,9 @@ const ManageOfficers = () => {
           onSubmit={handleSearchSubmit}
         >
           <InputGroup className="w-50  shadow-sm me-5">
-            <InputGroup.Text className="">🔍</InputGroup.Text>
             <Form.Control
               size="sm"
-              placeholder="بحث"
+              placeholder=" بحث 🔍" 
               value={officers.tempSearch}
               onChange={(e) =>
                 setOfficers((prev) => ({ ...prev, tempSearch: e.target.value }))
@@ -406,32 +405,31 @@ const ManageOfficers = () => {
               <th onClick={() => handleSort("mil_id")}>
                 {sortConfig.key === "mil_id"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
-                  : ""}{" "}
+                    ? " 🔼" : " 🔽"
+                  : ""}
                 الرقم العسكري
               </th>
               <th onClick={() => handleSort("rank")}>
                 الرتبة
                 {sortConfig.key === "rank"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th onClick={() => handleSort("name")}>
                 الاسم{" "}
                 {sortConfig.key === "name"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th onClick={() => handleSort("department")}>
                 {sortConfig.key === "department"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
                 الورشة / الفرع
               </th>
@@ -439,24 +437,24 @@ const ManageOfficers = () => {
                 تاريخ الضم
                 {sortConfig.key === "join_date"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th onClick={() => handleSort("attached")}>
                 ملحق
                 {sortConfig.key === "attached"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th onClick={() => handleSort("in_unit")}>
                 التمام
                 {sortConfig.key === "in_unit"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th>Action</th>
@@ -473,8 +471,15 @@ const ManageOfficers = () => {
                   <td>{officer.department}</td>
                   <td>{moment(officer.join_date).format("YYYY-MM-DD")}</td>
                   <td>{officer.attached ? "نعم" : "لا"}</td>
-                  <td>{officer.in_unit ? "متواجد" : "غير موجود"}</td>
                   <td>
+                    <span
+                      className={`status-badge ${
+                        officer.in_unit ? "status-in" : "status-out"
+                      }`}
+                    >
+                      {officer.in_unit ? "متواجد" : "غير موجود"}
+                    </span>
+                  </td>{" "}                  <td>
 
                     <Link
                       to={`../${officer.id}`}

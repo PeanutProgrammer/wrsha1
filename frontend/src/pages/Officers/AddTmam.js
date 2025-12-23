@@ -138,8 +138,15 @@ const AddTmam = () => {
       .catch((err) => console.log(err));
   }, []);
 
+      const filteredLeaveTypes = leaveType.filter(
+      (type) => ![16, 17, 18].includes(type.id)
+    );
+  const leaveTypeOptions = filteredLeaveTypes.map((type) => ({
+    value: type.id,
+    label: type.name,
+  }));
   // Transform officers into format required by react-select
-  const officerOptions = officer.map((officer) => ({
+  const officerOptions = officer.data?.map((officer) => ({
     value: officer.id,
     label: `${officer.rank} / ${officer.name}`,
   }));
@@ -207,20 +214,26 @@ const AddTmam = () => {
         </Form.Group>
 
         {/* Leave Type Dropdown */}
-        <Form.Group controlId="leaveTypeID" className="form-group">
-          <Form.Label>سبب الخروج</Form.Label>
-          <Form.Control
-            as="select"
-            {...register("leaveTypeID")}
-            className={`form-control ${errors.leaveTypeID ? 'is-invalid' : ''}`}
-          >
-            <option value="">إختر سبب الخروج</option>
-            {leaveType.map((type) => (
-              <option key={type.id} value={type.id}>{type.name}</option>
-            ))}
-          </Form.Control>
-          {errors.leaveTypeID && <div className="invalid-feedback">{errors.leaveTypeID.message}</div>}
-        </Form.Group>
+               <Form.Group controlId="leaveTypeID" className="form-group">
+                 <Form.Label>سبب الخروج</Form.Label>
+                 <Select
+                   options={leaveTypeOptions}
+                   placeholder="اختر سبب الخروج"
+                   onChange={(selectedOption) => {
+                     setValue("leaveTypeID", selectedOption.value);
+                   }}
+                   styles={customStyles}
+                   className="react-select"
+                 />
+                 {errors.leaveTypeID && (
+                   <div className="invalid-feedback d-block">
+                     {errors.leaveTypeID.message}
+                   </div>
+                 )}
+                 {errors.leaveTypeID && (
+                   <div className="invalid-feedback">{errors.leaveTypeID.message}</div>
+                 )}
+               </Form.Group>
 
                 <Form.Group controlId="destination" className="form-group">
           <Form.Label>إلى</Form.Label>

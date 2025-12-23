@@ -48,7 +48,7 @@ class CivillianLogController {
             LEFT JOIN civillian_leave_details ON civillian_leave_details.movementID = civillian_log.id
             LEFT JOIN leave_type ON civillian_leave_details.leaveTypeID = leave_type.id
             ${searchClause}
-            ORDER BY civillians.name ASC
+            ORDER BY civillian_log.event_time desc
             LIMIT ? OFFSET ?
         `;
       params.push(limit, offset);

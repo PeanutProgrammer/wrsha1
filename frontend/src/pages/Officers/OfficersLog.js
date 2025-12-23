@@ -27,7 +27,7 @@ const OfficersLog = () => {
     try {
       const searchValue = toWesternDigits(officers.search.trim());
       const resp = await axios.get(
-        `${process.env.REACT_APP_BACKEND_BASE_URL}/OfficerLog?page=${officers.page}&limit=10&search=${searchValue}`,
+        `${process.env.REACT_APP_BACKEND_BASE_URL}/OfficerLog?page=${officers.page}&limit=15&search=${searchValue}`,
         { headers: { token: auth.token } }
       );
       setOfficers((prev) => ({

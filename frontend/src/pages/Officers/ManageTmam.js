@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import "../../style/style.css";
 import { Table, Alert, Form, InputGroup, Button, Dropdown, DropdownButton} from "react-bootstrap";
 import { Link, useParams } from "react-router-dom";
@@ -23,7 +23,7 @@ const ManageTmam = () => {
     page: 1,
     totalPages: 1,
     search: "",
-    limit: 0,
+    limit: 15,
     tempSearch: "",
   });
 
@@ -32,20 +32,19 @@ const ManageTmam = () => {
 
     const fetchData = () => {
       const searchValue = toWesternDigits(officers.search.trim());
-      const limit = 10;
       const resp = axios
         .get(
-          `${process.env.REACT_APP_BACKEND_BASE_URL}/officer/tmam?page=${officers.page}&limit=${limit}&search=${searchValue}`,
+          `${process.env.REACT_APP_BACKEND_BASE_URL}/officer/tmam?page=${officers.page}&limit=${officers.limit}&search=${searchValue}`,
           {
             headers: { token: auth.token },
-          }
+          } 
         )
         .then((resp) => {
           setOfficers({
             ...officers,
             results: resp.data.data || [],
             totalPages: resp.data.totalPages || 1,
-            limit: resp.data.limit || limit,
+            limit: resp.data.limit || officers.limit,
             loading: false,
             err: null,
           });
@@ -142,14 +141,15 @@ const renderPageButtons = () => {
   return pages;
 };
 
-const sortedOfficers = [...officers.results].sort((a, b) => {
-  if (!sortConfig.key) return 0; // no sorting yet
-  if (a[sortConfig.key] > b[sortConfig.key])
-    return sortConfig.direction === "asc" ? 1 : -1;
-  if (a[sortConfig.key] < b[sortConfig.key])
-    return sortConfig.direction === "asc" ? -1 : 1;
-  return 0;
-});
+const sortedOfficers = useMemo(() => {
+  return [...officers.results].sort((a, b) => {
+    if (!sortConfig.key) return 0;
+    if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === "asc" ? 1 : -1;
+    if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === "asc" ? -1 : 1;
+    return 0;
+  });
+}, [officers.results, sortConfig]);
+
 
 
   return (
@@ -164,10 +164,9 @@ const sortedOfficers = [...officers.results].sort((a, b) => {
           onSubmit={handleSearchSubmit}
         >
           <InputGroup className="w-50  shadow-sm me-5">
-            <InputGroup.Text className="">🔍</InputGroup.Text>
             <Form.Control
               size="sm"
-              placeholder="بحث"
+              placeholder="بحث 🔍 " 
               value={officers.tempSearch}
               onChange={(e) =>
                 setOfficers((prev) => ({ ...prev, tempSearch: e.target.value }))
@@ -185,7 +184,7 @@ const sortedOfficers = [...officers.results].sort((a, b) => {
           </InputGroup>
         </Form>
         {/* Buttons: Add Officer + Export */}
-        <Link to="../add" className="btn btn-success btn-sm mb-0 p-2">
+        <Link to="../tmam/add" className="btn btn-success btn-sm mb-0 p-2">
           إنشاء تمام جديد +
         </Link>
       </div>
@@ -212,8 +211,7 @@ const sortedOfficers = [...officers.results].sort((a, b) => {
               <th onClick={() => handleSort("mil_id")}>
                 {sortConfig.key === "mil_id"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼" : " 🔽"
                   : ""}{" "}
                 الرقم العسكري
               </th>
@@ -221,22 +219,50 @@ const sortedOfficers = [...officers.results].sort((a, b) => {
                 الرتبة
                 {sortConfig.key === "rank"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th onClick={() => handleSort("name")}>
                 الاسم{" "}
                 {sortConfig.key === "name"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
-              <th>الورشة / الفرع</th>
-              <th>التمام</th>
-              <th>اخر دخول</th>
-              <th>اخر خروج</th> 
+              <th onClick={() => handleSort("department")}>
+                {sortConfig.key === "department"
+                  ? sortConfig.direction === "asc"
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}
+                الورشة / الفرع
+              </th>
+              <th onClick={() => handleSort("tmam")}>
+                {sortConfig.key === "tmam"
+                  ? sortConfig.direction === "asc"
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}
+                التمام
+              </th>
+              <th onClick={() => handleSort("latest_arrival")}>
+                {sortConfig.key === "latest_arrival"
+                  ? sortConfig.direction === "asc"
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}
+                اخر دخول
+              </th>
+              <th onClick={() => handleSort("latest_departure")}>
+                {sortConfig.key === "latest_departure"
+                  ? sortConfig.direction === "asc"
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}
+                اخر خروج
+              </th>
               <th>Action</th>
             </tr>
           </thead>
@@ -249,15 +275,49 @@ const sortedOfficers = [...officers.results].sort((a, b) => {
                   <td>{officer.rank}</td>
                   <td>{officer.name}</td>
                   <td>{officer.department}</td>
-                  <td>
-                    {officer.in_unit
+                    <td>
+                    <span
+                      className={`status-badge ${
+                        officer.in_unit ? "status-in" : "status-out"
+                      }`}
+                    >
+                                          {officer.in_unit
                       ? "متواجد"
                       : officer.tmam
                       ? officer.tmam
                       : "غير متواجد"}
-                  </td>
-                                  <td>{officer.latest_arrival ? moment(officer.latest_arrival).format('YYYY-MM-DD HH:mm:ss') : 'لا يوجد'}</td>
-                                  <td>{officer.latest_departure ? moment(officer.latest_departure).format('YYYY-MM-DD HH:mm:ss') : 'لا يوجد'}</td>
+                    </span>
+                  </td>{" "}
+<td>
+  {officer.latest_arrival ? (
+    <>
+      <div>{moment(officer.latest_arrival).format("YYYY-MM-DD")}</div>
+      <div>
+        {moment(officer.latest_arrival).format("hh:mm")}
+        <span>
+          {moment(officer.latest_arrival).format("a") === "am" ? " ص" : " م"}
+        </span>
+      </div>
+    </>
+  ) : (
+    "لا يوجد"
+  )}
+</td>
+<td>
+  {officer.latest_departure ? (
+    <>
+      <div>{moment(officer.latest_departure).format("YYYY-MM-DD")}</div>
+      <div>
+        {moment(officer.latest_departure).format("hh:mm")}
+        <span>
+          {moment(officer.latest_departure).format("a") === "am" ? " ص" : " م"}
+        </span>
+      </div>
+    </>
+  ) : (
+    "لا يوجد"
+  )}
+</td>
                   <td className="d-flex gap-1 p-3"> 
                     {/* <button className="btn btn-sm btn-danger mx-1 p-2" onClick ={(e) =>  {deleteOfficer(officer.mil_id)}}>حذف</button> */}
                     <Link

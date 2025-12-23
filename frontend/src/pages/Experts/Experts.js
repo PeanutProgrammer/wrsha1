@@ -38,7 +38,7 @@ const Experts = () => {
 
     const fetchData = () => {
       const searchValue = toWesternDigits(experts.search.trim());
-      const limit = 10;
+      const limit = 15;
       const resp = axios
         .get(
           `${process.env.REACT_APP_BACKEND_BASE_URL}/expert?page=${experts.page}&limit=${limit}&search=${searchValue}`,
@@ -247,7 +247,7 @@ const Experts = () => {
             {Array.isArray(experts.results) && experts.results.length > 0 ? (
               sortedExperts.map((expert, index) => (
                 <tr key={expert.nationalID}>
-                  <td>{index + 1}</td>
+                  <td>{(experts.page - 1) * experts.limit + index + 1}</td>
                   <td>{expert.nationalID}</td>
                   <td>{expert.name}</td>
                   <td>{expert.security_clearance_number}</td>

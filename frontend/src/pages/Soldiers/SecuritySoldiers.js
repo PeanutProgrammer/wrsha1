@@ -35,7 +35,7 @@ const SecuritySoldiers = () => {
 
     const fetchData = () => {
       const searchValue = toWesternDigits(soldiers.search.trim());
-      const limit = 10;
+      const limit = 15;
       const resp = axios
         .get(
           `${process.env.REACT_APP_BACKEND_BASE_URL}/soldier/tmam?page=${soldiers.page}&limit=${limit}&search=${searchValue}`,

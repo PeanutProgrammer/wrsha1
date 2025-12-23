@@ -4,15 +4,29 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { getAuthUser } from '../../helper/Storage';
 import moment from 'moment';
+import { io } from "socket.io-client";
 
+// Helper: Convert Arabic-Indic digits to Western digits
+const toWesternDigits = (str) => {
+  return str.replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
+};
 const Guests = () => {
   const auth = getAuthUser();
-  const [Guests, setGuests] = useState({
+  const [sortConfig, setSortConfig] = useState({
+    key: "",
+    direction: "asc",
+  });
+  const [guests, setGuests] = useState({
     loading: true,
     err: null,
     success: null, // ✅ Added success message
     results: [],
     reload: 0,
+    page: 1,
+    totalPages: 1,
+    limit: 15,
+    search: "",
+    tempSearch: "",
   });
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -23,33 +37,52 @@ const Guests = () => {
   const [selectedGuest, setSelectedGuest] = useState(null);
 
   useEffect(() => {
-    setGuests({ ...Guests, loading: true });
-    axios
-      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/guest/`, {
-        headers: {
-          token: auth.token,
-        },
-      })
-      .then((resp) => {
-        setGuests({
-          ...Guests,
-          results: resp.data,
-          loading: false,
-          err: null,
-        });
-      })
-      .catch((err) => {
-        setGuests({
-          ...Guests,
-          loading: false,
-          err:
-            err.response
+    const socket = io(`${process.env.REACT_APP_BACKEND_BASE_URL}`); //  backend port
+
+    const fetchData = () => {
+      const searchValue = toWesternDigits(guests.search.trim());
+      const limit = 15;
+      const resp = axios
+        .get(
+          `${process.env.REACT_APP_BACKEND_BASE_URL}/guest?page=${guests.page}&limit=${limit}&search=${searchValue}`,
+          {
+            headers: { token: auth.token },
+          }
+        )
+        .then((resp) => {
+          setGuests({
+            ...guests,
+            results: resp.data.data || [],
+            totalPages: resp.data.totalPages || 1,
+            limit: resp.data.limit || limit,
+            loading: false,
+            err: null,
+          });
+        })
+        .catch((err) => {
+          setGuests({
+            ...guests,
+            loading: false,
+            err: err.response
               ? JSON.stringify(err.response.data.errors)
-              : 'حدث خطأ أثناء تحميل البيانات.',
+              : "Something went wrong while fetching data.",
+          });
         });
-      });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [Guests.reload]);
+    };
+
+    fetchData(); // ✅ Initial fetch on component mount
+
+    socket.on("connect", () => {
+      console.log("🟢 Connected to WebSocket:", socket.id);
+    });
+
+    socket.on("expertsUpdated", () => {
+      console.log("📢 Guests updated — refetching data...");
+      fetchData(); // ✅ Re-fetch on update
+    });
+
+    return () => socket.disconnect();
+  }, [guests.page, guests.search]);
 
   // ✅ Show confirmation modal before deleting
   const handleDeleteClick = (guest) => {
@@ -62,20 +95,24 @@ const Guests = () => {
     if (!selectedGuest) return;
 
     axios
-      .delete(`${process.env.REACT_APP_BACKEND_BASE_URL}/guest/` + selectedGuest.id, {
-        headers: {
-          token: auth.token,
-        },
-      })
+      .delete(
+        `${process.env.REACT_APP_BACKEND_BASE_URL}/guest/` +
+          selectedGuest.nationalID,
+        {
+          headers: {
+            token: auth.token,
+          },
+        }
+      )
       .then(() => {
         setShowConfirm(false);
         setSelectedGuest(null);
 
         // ✅ Show success message
         setGuests({
-          ...Guests,
-          reload: Guests.reload + 1,
-          success: 'تم حذف الزائر بنجاح ✅',
+          ...guests,
+          reload: guests.reload + 1,
+          success: "تم حذف الخبير بنجاح ✅",
           err: null,
         });
 
@@ -86,16 +123,14 @@ const Guests = () => {
       })
       .catch((err) => {
         setGuests({
-          ...Guests,
-          err:
-            err.response?.data?.errors ||
-            'حدث خطأ أثناء محاولة حذف الزائر.',
+          ...guests,
+          err: err.response?.data?.errors || "حدث خطأ أثناء محاولة حذف الخبير.",
         });
         setShowConfirm(false);
       });
   };
 
-  // ✅ Function to end the visit (update visit_end)
+    // ✅ Function to end the visit (update visit_end)
   const endVisit = (guestId) => {
     const visitEnd = moment().format("YYYY-MM-DD HH:mm:ss");  // Current time
 
@@ -131,21 +166,81 @@ const Guests = () => {
         });
       });
   };
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const normalized = toWesternDigits(guests.tempSearch.trim());
+    setGuests((prev) => ({
+      ...prev,
+      search: normalized,
+      page: 1,
+      results: [],
+    }));
+  };
 
-  // ✅ Pagination logic
-  const indexOfLastRecord = currentPage * recordsPerPage;
-  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = Guests.results.slice(
-    indexOfFirstRecord,
-    indexOfLastRecord
-  );
+  const handleClearSearch = () => {
+    setGuests((prev) => ({
+      ...prev,
+      search: "",
+      tempSearch: "",
+      page: 1,
+      results: [],
+    }));
+  };
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-  const totalPages = Math.ceil(Guests.results.length / recordsPerPage);
-  const pageNumbers = [];
-  for (let i = 1; i <= totalPages; i++) {
-    pageNumbers.push(i);
-  }
+  const handlePrevPage = () => {
+    if (guests.page > 1)
+      setGuests((prev) => ({ ...prev, page: prev.page - 1 }));
+  };
+
+  const handleNextPage = () => {
+    if (guests.page < guests.totalPages)
+      setGuests((prev) => ({ ...prev, page: prev.page + 1 }));
+  };
+
+  const handleJumpToPage = (number) => {
+    if (number >= 1 && number <= guests.totalPages) {
+      setGuests((prev) => ({ ...prev, page: number }));
+    }
+  };
+
+  const handleSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const renderPageButtons = () => {
+    const pages = [];
+    const maxButtons = 5;
+    let start = Math.max(guests.page - 2, 1);
+    let end = Math.min(start + maxButtons - 1, guests.totalPages);
+    start = Math.max(end - maxButtons + 1, 1);
+
+    for (let num = start; num <= end; num++) {
+      pages.push(
+        <Button
+          key={num}
+          onClick={() => handleJumpToPage(num)}
+          variant={num === guests.page ? "primary" : "outline-primary"}
+          className="mx-1 btn-sm"
+        >
+          {num}
+        </Button>
+      );
+    }
+    return pages;
+  };
+
+  const sortedGuests = [...guests.results].sort((a, b) => {
+    if (!sortConfig.key) return 0; // no sorting yet
+    if (a[sortConfig.key] > b[sortConfig.key])
+      return sortConfig.direction === "asc" ? 1 : -1;
+    if (a[sortConfig.key] < b[sortConfig.key])
+      return sortConfig.direction === "asc" ? -1 : 1;
+    return 0;
+  });
 
   return (
     <div className="Officers p-5">
@@ -154,25 +249,26 @@ const Guests = () => {
         <Link to={'../add'} className="btn btn-success mb-4">
           إنشاء زائر جديد +
         </Link>
+
       </div>
 
       {/* ✅ Success Message */}
-      {Guests.success && (
+      {guests.success && (
         <Alert variant="success" className="p-2 text-center">
-          {Guests.success}
+          {guests.success}
         </Alert>
       )}
 
       {/* ❌ Error Message */}
-      {Guests.err && (
+      {guests.err && (
         <Alert variant="danger" className="p-2 text-center">
-          {Guests.err}
+          {guests.err}
         </Alert>
       )}
 
       <div className="table-responsive">
-        <Table striped bordered hover>
-          <thead>
+        <Table striped bordered hover responsive className="mb-0">
+          <thead className='table-dark'>
             <tr>
               <th>م</th>
               <th>الإسم</th>
@@ -184,9 +280,10 @@ const Guests = () => {
             </tr>
           </thead>
           <tbody>
-            {currentRecords.map((guest, index) => (
+            {Array.isArray(guests.results) && guests.results.length > 0 ? (
+              sortedGuests.map((guest, index) => (
               <tr key={guest.id}>
-                <td>{index + 1}</td>
+                  <td>{(guests.page - 1) * guests.limit + index + 1}</td>
                 <td>{guest.name}</td>
                 <td>{guest.rank + " " + guest.officer_name}</td>
                 <td>{moment(guest.visit_start).format('YYYY-MM-DD HH:mm')}</td>
@@ -216,41 +313,59 @@ const Guests = () => {
                   </div>
                 </td>
               </tr>
-            ))}
+            ))
+          ) : (
+              <tr>
+                <td colSpan="7" className="text-center">
+                  لا توجد بيانات
+                </td>
+              </tr>
+            )}
           </tbody>
         </Table>
       </div>
 
-      {/* Pagination Controls */}
-      <div className="pagination-container">
-        <button
-          className="btn btn-light"
-          onClick={() => paginate(currentPage - 1)}
-          disabled={currentPage === 1}
+     {/* Pagination Controls */}
+
+      <div className="d-flex justify-content-between align-items-center mt-3">
+        <Button
+          onClick={handlePrevPage}
+          disabled={guests.page === 1}
+          variant="secondary"
+          size="sm"
         >
           السابق
-        </button>
-
-        {pageNumbers.map((number) => (
-          <button
-            key={number}
-            className={`btn btn-light page-btn ${
-              currentPage === number ? 'active' : ''
-            }`}
-            onClick={() => paginate(number)}
-          >
-            {number}
-          </button>
-        ))}
-
-        <button
-          className="btn btn-light"
-          onClick={() => paginate(currentPage + 1)}
-          disabled={currentPage === totalPages}
+        </Button>
+        <div>{renderPageButtons()}</div>
+        <Button
+          onClick={handleNextPage}
+          disabled={guests.page === guests.totalPages}
+          variant="secondary"
+          size="sm"
         >
           التالي
-        </button>
+        </Button>
       </div>
+
+      {/* ✅ Confirmation Modal */}
+      <Modal show={showConfirm} onHide={() => setShowConfirm(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>تأكيد الحذف</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          هل أنت متأكد أنك تريد حذف الخبير{" "}
+          <strong>{selectedGuest?.name}</strong>؟
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowConfirm(false)}>
+            إلغاء
+          </Button>
+          <Button variant="danger" onClick={confirmDelete}>
+            حذف
+          </Button>
+        </Modal.Footer>
+      </Modal>
+ 
 
       {/* ✅ Confirmation Modal */}
       <Modal show={showConfirm} onHide={() => setShowConfirm(false)} centered>

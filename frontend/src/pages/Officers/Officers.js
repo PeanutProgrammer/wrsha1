@@ -1,16 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { Table, Alert, Modal, Button, Form,  Dropdown, DropdownButton, InputGroup } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
-import { getAuthUser } from '../../helper/Storage';
-import moment from 'moment';
+import React, { useState, useEffect } from "react";
+import {
+  Table,
+  Alert,
+  Modal,
+  Button,
+  Form,
+  Dropdown,
+  DropdownButton,
+  InputGroup,
+} from "react-bootstrap";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import { getAuthUser } from "../../helper/Storage";
+import moment from "moment";
 import { io } from "socket.io-client";
-import htmlDocx from 'html-docx-js/dist/html-docx';
-import { FaPrint } from 'react-icons/fa';  // Import the printer icon from react-icons
+import htmlDocx from "html-docx-js/dist/html-docx";
+import { FaPrint } from "react-icons/fa"; // Import the printer icon from react-icons
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import AmiriFont from "../../assets/fonts/Amiri/Amiri-Regular.ttf";
-
 
 // Helper: Convert Arabic-Indic digits to Western digits
 const toWesternDigits = (str) => {
@@ -40,12 +48,12 @@ const Officers = () => {
     tempSearch: "",
   });
 
-  const [showConfirm, setShowConfirm] = useState(false);  // Modal state
-  const [selectedOfficer, setSelectedOfficer] = useState(null);  // Selected officer for deletion
+  const [showConfirm, setShowConfirm] = useState(false); // Modal state
+  const [selectedOfficer, setSelectedOfficer] = useState(null); // Selected officer for deletion
 
-  const [endDate, setEndDate] = useState('');
-  const [transferID, setTransferID] = useState('');
-  const [transferredTo, setTransferredTo] = useState('');
+  const [endDate, setEndDate] = useState("");
+  const [transferID, setTransferID] = useState("");
+  const [transferredTo, setTransferredTo] = useState("");
 
   useEffect(() => {
     const socket = io(`${process.env.REACT_APP_BACKEND_BASE_URL}`); //  backend port
@@ -53,8 +61,8 @@ const Officers = () => {
     // 🔁 Initial fetch
     const fetchData = () => {
       const searchValue = toWesternDigits(officers.search.trim());
-      const limit = 10;
-     const resp = axios
+      const limit = 15;
+      const resp = axios
         .get(
           `${process.env.REACT_APP_BACKEND_BASE_URL}/officer?page=${officers.page}&limit=${limit}&search=${searchValue}`,
           {
@@ -81,7 +89,6 @@ const Officers = () => {
           });
         });
     };
-    
 
     fetchData(); // ✅ Initial fetch on component mount
 
@@ -96,7 +103,6 @@ const Officers = () => {
 
     return () => socket.disconnect();
   }, [officers.page, officers.search]);
-
 
   // Show confirmation modal before deleting
   const handleDeleteClick = (officer) => {
@@ -122,68 +128,75 @@ const Officers = () => {
 
     // Change the API method to DELETE as per the new backend implementation
     axios
-      .delete(`${process.env.REACT_APP_BACKEND_BASE_URL}/officer/` + selectedOfficer.mil_id, {
-        headers: { token: auth.token },
-        data: data,  // Send additional fields in the body of the DELETE request
-      })
+      .delete(
+        `${process.env.REACT_APP_BACKEND_BASE_URL}/officer/` +
+          selectedOfficer.mil_id,
+        {
+          headers: { token: auth.token },
+          data: data, // Send additional fields in the body of the DELETE request
+        }
+      )
       .then(() => {
         setShowConfirm(false);
         setSelectedOfficer(null);
-        setEndDate('');
-        setTransferID('');
-        setTransferredTo('');
-        setOfficers({ ...officers, reload: officers.reload + 1, success: 'تم حذف الضابط  بنجاح ✅',
-          err: null, });
+        setEndDate("");
+        setTransferID("");
+        setTransferredTo("");
+        setOfficers({
+          ...officers,
+          reload: officers.reload + 1,
+          success: "تم حذف الضابط  بنجاح ✅",
+          err: null,
+        });
       })
       .catch((err) => {
         setOfficers({
           ...officers,
-          err:
-            err.response
-              ? JSON.stringify(err.response.data.errors)
-              : "Something went wrong. Please try again later.",
+          err: err.response
+            ? JSON.stringify(err.response.data.errors)
+            : "Something went wrong. Please try again later.",
         });
         setShowConfirm(false);
       });
   };
 
-    const handleSearchSubmit = (e) => {
-      e.preventDefault();
-      const normalized = toWesternDigits(officers.tempSearch.trim());
-      setOfficers((prev) => ({
-        ...prev,
-        search: normalized,
-        page: 1,
-        results: [],
-      }));
-    };
-  
-    const handleClearSearch = () => {
-      setOfficers((prev) => ({
-        ...prev,
-        search: "",
-        tempSearch: "",
-        page: 1,
-        results: [],
-      }));
-    };
-  
-    const handlePrevPage = () => {
-      if (officers.page > 1)
-        setOfficers((prev) => ({ ...prev, page: prev.page - 1 }));
-    };
-  
-    const handleNextPage = () => {
-      if (officers.page < officers.totalPages)
-        setOfficers((prev) => ({ ...prev, page: prev.page + 1 }));
-    };
-  
-    const handleJumpToPage = (number) => {
-      if (number >= 1 && number <= officers.totalPages) {
-        setOfficers((prev) => ({ ...prev, page: number }));
-      }
-    };
-  
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const normalized = toWesternDigits(officers.tempSearch.trim());
+    setOfficers((prev) => ({
+      ...prev,
+      search: normalized,
+      page: 1,
+      results: [],
+    }));
+  };
+
+  const handleClearSearch = () => {
+    setOfficers((prev) => ({
+      ...prev,
+      search: "",
+      tempSearch: "",
+      page: 1,
+      results: [],
+    }));
+  };
+
+  const handlePrevPage = () => {
+    if (officers.page > 1)
+      setOfficers((prev) => ({ ...prev, page: prev.page - 1 }));
+  };
+
+  const handleNextPage = () => {
+    if (officers.page < officers.totalPages)
+      setOfficers((prev) => ({ ...prev, page: prev.page + 1 }));
+  };
+
+  const handleJumpToPage = (number) => {
+    if (number >= 1 && number <= officers.totalPages) {
+      setOfficers((prev) => ({ ...prev, page: number }));
+    }
+  };
+
   const handleSort = (key) => {
     let direction = "asc";
     if (sortConfig.key === key && sortConfig.direction === "asc") {
@@ -191,29 +204,29 @@ const Officers = () => {
     }
     setSortConfig({ key, direction });
   };
-  
-    const renderPageButtons = () => {
-      const pages = [];
-      const maxButtons = 5;
-      let start = Math.max(officers.page - 2, 1);
-      let end = Math.min(start + maxButtons - 1, officers.totalPages);
-      start = Math.max(end - maxButtons + 1, 1);
-  
-      for (let num = start; num <= end; num++) {
-        pages.push(
-          <Button
-            key={num}
-            onClick={() => handleJumpToPage(num)}
-            variant={num === officers.page ? "primary" : "outline-primary"}
-            className="mx-1 btn-sm"
-          >
-            {num}
-          </Button>
-        );
-      }
-      return pages;
-    };
-  
+
+  const renderPageButtons = () => {
+    const pages = [];
+    const maxButtons = 5;
+    let start = Math.max(officers.page - 2, 1);
+    let end = Math.min(start + maxButtons - 1, officers.totalPages);
+    start = Math.max(end - maxButtons + 1, 1);
+
+    for (let num = start; num <= end; num++) {
+      pages.push(
+        <Button
+          key={num}
+          onClick={() => handleJumpToPage(num)}
+          variant={num === officers.page ? "primary" : "outline-primary"}
+          className="mx-1 btn-sm"
+        >
+          {num}
+        </Button>
+      );
+    }
+    return pages;
+  };
+
   const sortedOfficers = [...officers.results].sort((a, b) => {
     if (!sortConfig.key) return 0; // no sorting yet
     if (a[sortConfig.key] > b[sortConfig.key])
@@ -308,56 +321,54 @@ const Officers = () => {
     doc.save("officers.pdf");
   };
 
-
-
-// Function to get current date and time in Arabic format
-const getFormattedDate = () => {
-  const date = new Date();
-  const options = {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: false,
+  // Function to get current date and time in Arabic format
+  const getFormattedDate = () => {
+    const date = new Date();
+    const options = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    };
+    return date.toLocaleString("ar-EG", options); // Arabic (Egypt) locale for Arabic format
   };
-  return date.toLocaleString('ar-EG', options); // Arabic (Egypt) locale for Arabic format
-};
 
-// Export to Word
-const exportToWord = () => {
-  const table = document.getElementById('officer-table');
-  if (table) {
-    // Clone the table to modify it before export
-    const tableClone = table.cloneNode(true);
+  // Export to Word
+  const exportToWord = () => {
+    const table = document.getElementById("officer-table");
+    if (table) {
+      // Clone the table to modify it before export
+      const tableClone = table.cloneNode(true);
 
-    // Remove the "Actions" column (last column)
-    const rows = tableClone.querySelectorAll('tr');
-    rows.forEach(row => {
-      const cells = row.querySelectorAll('td, th'); // Include both headers and data cells
-      if (cells.length > 0) {
-        row.deleteCell(cells.length - 1); // Remove the last cell (Actions column)
-      }
-    });
+      // Remove the "Actions" column (last column)
+      const rows = tableClone.querySelectorAll("tr");
+      rows.forEach((row) => {
+        const cells = row.querySelectorAll("td, th"); // Include both headers and data cells
+        if (cells.length > 0) {
+          row.deleteCell(cells.length - 1); // Remove the last cell (Actions column)
+        }
+      });
 
-    // Get current date in Arabic format
-    const currentDate = getFormattedDate();
+      // Get current date in Arabic format
+      const currentDate = getFormattedDate();
 
-    // Create header and footer content
-    const header = `
+      // Create header and footer content
+      const header = `
       <div style="text-align: center; font-size: 16pt; font-weight: bold; font-family: 'Arial', sans-serif;">
         <p>إدارة الضباط</p>
       </div>
     `;
-    const footer = `
+      const footer = `
       <div style="text-align: center; font-size: 10pt; font-family: 'Arial', sans-serif; color: #888;">
         <p>تم طباعة هذا المستند في: ${currentDate}</p>
       </div>
     `;
 
-    // Set the direction to RTL for the Word document and include header, footer, and the table
-    const tableHTML = `
+      // Set the direction to RTL for the Word document and include header, footer, and the table
+      const tableHTML = `
       <div style="direction: rtl; font-family: 'Arial', sans-serif; font-size: 12pt;">
         <!-- Header -->
         ${header}
@@ -377,17 +388,23 @@ const exportToWord = () => {
           <tbody>
             ${Array.from(rows)
               .map((row, index) => {
-                const cells = row.querySelectorAll('td');
-                const rowStyle = index % 2 === 0 ? 'background-color: #ffffff;' : 'background-color: #f9f9f9;';
+                const cells = row.querySelectorAll("td");
+                const rowStyle =
+                  index % 2 === 0
+                    ? "background-color: #ffffff;"
+                    : "background-color: #f9f9f9;";
                 return `
                   <tr style="${rowStyle}">
                     ${Array.from(cells)
-                      .map(cell => `<td style="border: 1px solid black; padding: 5px;">${cell.innerHTML}</td>`)
-                      .join('')}
+                      .map(
+                        (cell) =>
+                          `<td style="border: 1px solid black; padding: 5px;">${cell.innerHTML}</td>`
+                      )
+                      .join("")}
                   </tr>
                 `;
               })
-              .join('')}
+              .join("")}
           </tbody>
         </table>
         <!-- Footer -->
@@ -395,16 +412,16 @@ const exportToWord = () => {
       </div>
     `;
 
-    // Convert HTML to Word format
-    const converted = htmlDocx.asBlob(tableHTML);
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(converted);
-    link.download = 'officers_table.docx';
-    link.click();
-  } else {
-    alert('Table not found!');
-  }
-};
+      // Convert HTML to Word format
+      const converted = htmlDocx.asBlob(tableHTML);
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(converted);
+      link.download = "officers_table.docx";
+      link.click();
+    } else {
+      alert("Table not found!");
+    }
+  };
   return (
     <div className="Officers p-5">
       {/* Header: Search + Add + Export */}
@@ -470,8 +487,8 @@ const exportToWord = () => {
               <th onClick={() => handleSort("mil_id")}>
                 {sortConfig.key === "mil_id"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
                 الرقم العسكري
               </th>
@@ -479,23 +496,23 @@ const exportToWord = () => {
                 الرتبة
                 {sortConfig.key === "rank"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th onClick={() => handleSort("name")}>
                 الاسم{" "}
                 {sortConfig.key === "name"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th onClick={() => handleSort("department")}>
                 {sortConfig.key === "department"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
                 الورشة / الفرع
               </th>
@@ -503,24 +520,24 @@ const exportToWord = () => {
                 تاريخ الضم
                 {sortConfig.key === "join_date"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th onClick={() => handleSort("attached")}>
                 ملحق
                 {sortConfig.key === "attached"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th onClick={() => handleSort("in_unit")}>
                 التمام
                 {sortConfig.key === "in_unit"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th>Action</th>
@@ -657,6 +674,6 @@ const exportToWord = () => {
       </div>
     </div>
   );
-      };
+};
 
 export default Officers;

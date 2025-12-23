@@ -71,10 +71,6 @@ const CivilliansTmamDetails = () => {
             <strong>الاسم:</strong> {basicInfo.name}
           </p>
           <p>
-            <strong>رقم التصريح الأمني:</strong>{" "}
-            {basicInfo.security_clearance_number}
-          </p>
-          <p>
             <strong>الرقم القومي:</strong> {basicInfo.nationalID}
           </p>
           <p>
@@ -85,7 +81,7 @@ const CivilliansTmamDetails = () => {
 
       <h5 className="mb-3">سجل التمام:</h5>
       <Table striped bordered hover>
-        <thead>
+        <thead className='table-dark'>
                  <tr>
                    <th>م</th>
                    <th>نوع التمام</th>

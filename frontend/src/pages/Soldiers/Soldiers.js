@@ -7,6 +7,8 @@ import moment from 'moment';
 
 const Soldiers = () => {
   const auth = getAuthUser();
+    const [sortConfig, setSortConfig] = useState({ key: "", direction: "asc" });
+  
   const [soldiers, setSoldiers] = useState({
     loading: true,
     err: null,
@@ -94,7 +96,13 @@ const Soldiers = () => {
         setShowConfirm(false);
       });
   };
-
+  const handleSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
   // ✅ Pagination logic
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
@@ -109,6 +117,15 @@ const Soldiers = () => {
   for (let i = 1; i <= totalPages; i++) {
     pageNumbers.push(i);
   }
+
+    const sortedSoldiers = [...soldiers.results].sort((a, b) => {
+    if (!sortConfig.key) return 0; // no sorting yet
+    if (a[sortConfig.key] > b[sortConfig.key])
+      return sortConfig.direction === "asc" ? 1 : -1;
+    if (a[sortConfig.key] < b[sortConfig.key])
+      return sortConfig.direction === "asc" ? -1 : 1;
+    return 0;
+  });
 
   return (
     <div className="Officers p-5">
@@ -138,19 +155,76 @@ const Soldiers = () => {
           <thead className="table-dark">
             <tr>
               <th>م</th>
-              <th>الرقم العسكري</th>
-              <th>الدرجة</th>
-              <th>الاسم</th>
-              <th>الورشة / الفرع</th>
-              <th>تاريخ الضم</th>
-              <th>تاريخ التسريح</th>
-              <th>ملحق؟</th>
-              <th>التمام</th>
+              <th onClick={() => handleSort("mil_id")}>
+                الرقم العسكري
+                {sortConfig.key === "mil_id"
+                  ? sortConfig.direction === "asc"
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}
+              </th>
+              <th onClick={() => handleSort("rank")}>
+                الدرجة
+                {sortConfig.key === "rank"
+                  ? sortConfig.direction === "asc"
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}
+              </th>
+              <th onClick={() => handleSort("name")}>
+                الاسم
+                {sortConfig.key === "name"
+                  ? sortConfig.direction === "asc"
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}
+              </th>
+              <th onClick={() => handleSort("department")}>
+                الورشة / الفرع
+                {sortConfig.key === "department"
+                  ? sortConfig.direction === "asc"
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}
+              </th>
+              <th onClick={() => handleSort("join_date")}>
+                تاريخ الضم
+                {sortConfig.key === "join_date"
+                  ? sortConfig.direction === "asc"
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}
+              </th>
+              <th onClick={() => handleSort("end_date")}>
+                تاريخ التسريح
+                {sortConfig.key === "end_date"
+                  ? sortConfig.direction === "asc"
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}
+              </th>
+              <th onClick={() => handleSort("attached")}>
+                ملحق؟
+                {sortConfig.key === "attached"
+                  ? sortConfig.direction === "asc"
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}
+              </th>
+              <th onClick={() => handleSort("in_unit")}>
+                التمام
+                {sortConfig.key === "in_unit"
+                  ? sortConfig.direction === "asc"
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}
+              </th>
               <th>الإجراءات</th>
             </tr>
           </thead>
           <tbody>
-            {currentRecords.map((soldier, index) => (
+            {Array.isArray(soldiers.results) && soldiers.results.length > 0 ? (
+            sortedSoldiers.map((soldier, index) => (
               <tr key={soldier.mil_id}>
                 <td>{index + 1}</td> {/* Arabic numbering, starting from 1 */}
                 <td>{soldier.mil_id}</td>
@@ -192,7 +266,14 @@ const Soldiers = () => {
                   </div>
                 </td>
               </tr>
-            ))}
+            ))
+          ) : (
+              <tr>
+                <td colSpan="10" className="text-center">
+                  لا توجد بيانات
+                </td>
+              </tr>
+            )}
           </tbody>
         </Table>
       </div>

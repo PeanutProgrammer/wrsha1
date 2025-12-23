@@ -118,8 +118,8 @@ class ExpertController {
              
 
 
-            await query(`update experts set  name =?, security_clearance_number = ?, valid_from = ?, valid_through = ?, company_name = ?, department = ? where nationalID = ?`,
-                [expertObject.getName(), expertObject.getSecurityClearanceNumber(), expertObject.getValidFrom(), expertObject.getValidThrough(), expertObject.getCompanyName(), expertObject.getDepartment(), req.params.id]);
+            await query(`update experts set nationalID =?,  name =?, security_clearance_number = ?, valid_from = ?, valid_through = ?, company_name = ?, department = ? where nationalID = ?`,
+                [expertObject.getNationalID(), expertObject.getName(), expertObject.getSecurityClearanceNumber(), expertObject.getValidFrom(), expertObject.getValidThrough(), expertObject.getCompanyName(), expertObject.getDepartment(), req.params.id]);
 
 
 

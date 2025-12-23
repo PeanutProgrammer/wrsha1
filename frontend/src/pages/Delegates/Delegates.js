@@ -4,17 +4,31 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { getAuthUser } from '../../helper/Storage';
 import moment from 'moment';
+import { io } from 'socket.io-client';
 
+// Helper: Convert Arabic-Indic digits to Western digits
+const toWesternDigits = (str) => {
+  return str.replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
+};
 const Delegates = () => {
   const auth = getAuthUser();
-  const [Delegates, setDelegates] = useState({
+  const [delegates, setDelegates] = useState({
     loading: true,
     err: null,
     success: null, // ✅ Added success message
     results: [],
     reload: 0,
+        page: 1,
+    totalPages: 1,
+    search: "",
+    limit: 0,
+    tempSearch: "",
   });
 
+  const [sortConfig, setSortConfig] = useState({
+      key: "",
+      direction: "asc",
+    });
   const [currentPage, setCurrentPage] = useState(1);
   const [recordsPerPage] = useState(8);
 
@@ -22,34 +36,53 @@ const Delegates = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [selectedDelegate, setSelectedDelegate] = useState(null);
 
-  useEffect(() => {
-    setDelegates({ ...Delegates, loading: true });
-    axios
-      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/delegate/`, {
-        headers: {
-          token: auth.token,
-        },
-      })
-      .then((resp) => {
-        setDelegates({
-          ...Delegates,
-          results: resp.data,
-          loading: false,
-          err: null,
-        });
-      })
-      .catch((err) => {
-        setDelegates({
-          ...Delegates,
-          loading: false,
-          err:
-            err.response
+ useEffect(() => {
+    const socket = io(`${process.env.REACT_APP_BACKEND_BASE_URL}`); //  backend port
+
+    const fetchData = () => {
+      const searchValue = toWesternDigits(delegates.search.trim());
+      const limit = 15;
+      const resp = axios
+        .get(
+          `${process.env.REACT_APP_BACKEND_BASE_URL}/delegate?page=${delegates.page}&limit=${limit}&search=${searchValue}`,
+          {
+            headers: { token: auth.token },
+          }
+        )
+        .then((resp) => {
+          setDelegates({
+            ...delegates,
+            results: resp.data.data || [],
+            totalPages: resp.data.totalPages || 1,
+            limit: resp.data.limit || limit,
+            loading: false,
+            err: null,
+          });
+        })
+        .catch((err) => {
+          setDelegates({
+            ...delegates,
+            loading: false,
+            err: err.response
               ? JSON.stringify(err.response.data.errors)
-              : 'حدث خطأ أثناء تحميل البيانات.',
+              : "Something went wrong while fetching data.",
+          });
         });
-      });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [Delegates.reload]);
+    };
+
+    fetchData(); // ✅ Initial fetch on component mount
+
+    socket.on("connect", () => {
+      console.log("🟢 Connected to WebSocket:", socket.id);
+    });
+
+    socket.on("expertsUpdated", () => {
+      console.log("📢 Experts updated — refetching data...");
+      fetchData(); // ✅ Re-fetch on update
+    });
+
+    return () => socket.disconnect();
+  }, [delegates.page, delegates.search]);
 
   // ✅ Show confirmation modal before deleting
   const handleDeleteClick = (delegate) => {
@@ -62,59 +95,24 @@ const Delegates = () => {
     if (!selectedDelegate) return;
 
     axios
-      .delete(`${process.env.REACT_APP_BACKEND_BASE_URL}/delegate/` + selectedDelegate.id, {
-        headers: {
-          token: auth.token,
-        },
-      })
-      .then(() => {
-        setShowConfirm(false);
-        setSelectedDelegate(null);
-
-        // ✅ Show success message
-        setDelegates({
-          ...Delegates,
-          reload: Delegates.reload + 1,
-          success: 'تم حذف المندوب بنجاح ✅',
-          err: null,
-        });
-
-        // ✅ Hide message after 3 seconds
-        setTimeout(() => {
-          setDelegates((prev) => ({ ...prev, success: null }));
-        }, 3000);
-      })
-      .catch((err) => {
-        setDelegates({
-          ...Delegates,
-          err:
-            err.response?.data?.errors ||
-            'حدث خطأ أثناء محاولة حذف المندوب.',
-        });
-        setShowConfirm(false);
-      });
-  };
-
-  // ✅ Function to end the visit (update visit_end)
-  const endVisit = (delegateId) => {
-    const visitEnd = moment().format("YYYY-MM-DD HH:mm:ss");  // Current time
-
-    axios
-      .put(
-        `${process.env.REACT_APP_BACKEND_BASE_URL}/delegate/end-visit/${delegateId}`,
-        { visit_end: visitEnd },
+      .delete(
+        `${process.env.REACT_APP_BACKEND_BASE_URL}/delegate/` +
+          selectedDelegate.nationalID,
         {
           headers: {
             token: auth.token,
           },
         }
       )
-      .then((response) => {
-        // Refresh the delegate data after updating
+      .then(() => {
+        setShowConfirm(false);
+        setSelectedDelegate(null);
+
+        // ✅ Show success message
         setDelegates({
-          ...Delegates,
-          reload: Delegates.reload + 1,
-          success: "تم إنهاء الزيارة بنجاح ✅",
+          ...delegates,
+          reload: delegates.reload + 1,
+          success: "تم حذف الخبير بنجاح ✅",
           err: null,
         });
 
@@ -125,27 +123,88 @@ const Delegates = () => {
       })
       .catch((err) => {
         setDelegates({
-          ...Delegates,
-          err:
-            err.response?.data?.errors || "حدث خطأ أثناء محاولة إنهاء الزيارة.",
+          ...delegates,
+          err: err.response?.data?.errors || "حدث خطأ أثناء محاولة حذف الخبير.",
         });
+        setShowConfirm(false);
       });
   };
 
-  // ✅ Pagination logic
-  const indexOfLastRecord = currentPage * recordsPerPage;
-  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = Delegates.results.slice(
-    indexOfFirstRecord,
-    indexOfLastRecord
-  );
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const normalized = toWesternDigits(delegates.tempSearch.trim());
+    setDelegates((prev) => ({
+      ...prev,
+      search: normalized,
+      page: 1,
+      results: [],
+    }));
+  };
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-  const totalPages = Math.ceil(Delegates.results.length / recordsPerPage);
-  const pageNumbers = [];
-  for (let i = 1; i <= totalPages; i++) {
-    pageNumbers.push(i);
-  }
+  const handleClearSearch = () => {
+    setDelegates((prev) => ({
+      ...prev,
+      search: "",
+      tempSearch: "",
+      page: 1,
+      results: [],
+    }));
+  };
+
+  const handlePrevPage = () => {
+    if (delegates.page > 1)
+      setDelegates((prev) => ({ ...prev, page: prev.page - 1 }));
+  };
+
+  const handleNextPage = () => {
+    if (delegates.page < delegates.totalPages)
+      setDelegates((prev) => ({ ...prev, page: prev.page + 1 }));
+  };
+
+  const handleJumpToPage = (number) => {
+    if (number >= 1 && number <= delegates.totalPages) {
+      setDelegates((prev) => ({ ...prev, page: number }));
+    }
+  };
+
+  const handleSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const renderPageButtons = () => {
+    const pages = [];
+    const maxButtons = 5;
+    let start = Math.max(delegates.page - 2, 1);
+    let end = Math.min(start + maxButtons - 1, delegates.totalPages);
+    start = Math.max(end - maxButtons + 1, 1);
+
+    for (let num = start; num <= end; num++) {
+      pages.push(
+        <Button
+          key={num}
+          onClick={() => handleJumpToPage(num)}
+          variant={num === delegates.page ? "primary" : "outline-primary"}
+          className="mx-1 btn-sm"
+        >
+          {num}
+        </Button>
+      );
+    }
+    return pages;
+  };
+
+  const sortedDelegates = [...delegates.results].sort((a, b) => {
+    if (!sortConfig.key) return 0; // no sorting yet
+    if (a[sortConfig.key] > b[sortConfig.key])
+      return sortConfig.direction === "asc" ? 1 : -1;
+    if (a[sortConfig.key] < b[sortConfig.key])
+      return sortConfig.direction === "asc" ? -1 : 1;
+    return 0;
+  });
 
   return (
     <div className="Officers p-5">
@@ -157,16 +216,16 @@ const Delegates = () => {
       </div>
 
       {/* ✅ Success Message */}
-      {Delegates.success && (
+      {delegates.success && (
         <Alert variant="success" className="p-2 text-center">
-          {Delegates.success}
+          {delegates.success}
         </Alert>
       )}
 
       {/* ❌ Error Message */}
-      {Delegates.err && (
+      {delegates.err && (
         <Alert variant="danger" className="p-2 text-center">
-          {Delegates.err}
+          {delegates.err}
         </Alert>
       )}
 
@@ -185,9 +244,10 @@ const Delegates = () => {
             </tr>
           </thead>
           <tbody>
-            {currentRecords.map((delegate, index) => (
+            {Array.isArray(delegates.results) && delegates.results.length > 0 ? (
+              sortedDelegates.map((delegate, index) => (
               <tr key={delegate.id}>
-                <td>{index + 1}</td>
+                  <td>{(delegates.page - 1) * delegates.limit + index + 1}</td>
                 <td>{delegate.rank}</td>
                 <td>{delegate.name}</td>
                 <td>{delegate.unit}</td>
@@ -207,52 +267,70 @@ const Delegates = () => {
 
 
                     {/* Add End Visit button */}
-                    {!delegate.visit_end && (
+                    {/* {!delegate.visit_end && (
                       <button
                         className="btn btn-sm btn-success"
                         onClick={() => endVisit(delegate.id)}
                       >
                         إنهاء الزيارة
                       </button>
-                    )}
+                    )} */}
                   </div>
                 </td>
               </tr>
-            ))}
+            ))
+          ) : (
+              <tr>
+                <td colSpan="8" className="text-center">
+                  لا توجد بيانات
+                </td>
+              </tr>
+            )}
           </tbody>
         </Table>
       </div>
 
-      {/* Pagination Controls */}
-      <div className="pagination-container">
-        <button
-          className="btn btn-light"
-          onClick={() => paginate(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          السابق
-        </button>
+     {/* Pagination Controls */}
+     
+           <div className="d-flex justify-content-between align-items-center mt-3">
+             <Button
+               onClick={handlePrevPage}
+               disabled={delegates.page === 1}
+               variant="secondary"
+               size="sm"
+             >
+               السابق
+             </Button>
+             <div>{renderPageButtons()}</div>
+             <Button
+               onClick={handleNextPage}
+               disabled={delegates.page === delegates.totalPages}
+               variant="secondary"
+               size="sm"
+             >
+               التالي
+             </Button>
+           </div>
+     
+           {/* ✅ Confirmation Modal */}
+           <Modal show={showConfirm} onHide={() => setShowConfirm(false)} centered>
+             <Modal.Header closeButton>
+               <Modal.Title>تأكيد الحذف</Modal.Title>
+             </Modal.Header>
+             <Modal.Body>
+               هل أنت متأكد أنك تريد حذف الخبير{" "}
+               <strong>{selectedDelegate?.name}</strong>؟
+             </Modal.Body>
+             <Modal.Footer>
+               <Button variant="secondary" onClick={() => setShowConfirm(false)}>
+                 إلغاء
+               </Button>
+               <Button variant="danger" onClick={confirmDelete}>
+                 حذف
+               </Button>
+             </Modal.Footer>
+            </Modal>
 
-        {pageNumbers.map((number) => (
-          <button
-            key={number}
-            className={`btn btn-light page-btn ${
-              currentPage === number ? 'active' : ''
-            }`}
-            onClick={() => paginate(number)}
-          >
-            {number}
-          </button>
-        ))}
-
-        <button
-          className="btn btn-light"
-          onClick={() => paginate(currentPage + 1)}
-          disabled={currentPage === totalPages}
-        >
-          التالي
-        </button>
-      </div>
 
       {/* ✅ Confirmation Modal */}
       <Modal show={showConfirm} onHide={() => setShowConfirm(false)} centered>

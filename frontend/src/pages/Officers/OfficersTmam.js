@@ -40,7 +40,7 @@ const OfficersTmam = () => {
 
     const fetchData = () => {
       const searchValue = toWesternDigits(officers.search.trim());
-      const limit = 10;
+      const limit = 15;
       const resp = axios
         .get(
           `${process.env.REACT_APP_BACKEND_BASE_URL}/officer/tmam?page=${officers.page}&limit=${limit}&search=${searchValue}`,
@@ -214,8 +214,8 @@ const OfficersTmam = () => {
               <th onClick={() => handleSort("mil_id")}>
                 {sortConfig.key === "mil_id"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}{" "}
                 الرقم العسكري
               </th>
@@ -223,22 +223,43 @@ const OfficersTmam = () => {
                 الرتبة
                 {sortConfig.key === "rank"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
               <th onClick={() => handleSort("name")}>
                 الاسم{" "}
                 {sortConfig.key === "name"
                   ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}
               </th>
-              <th>الورشة / الفرع</th>
+              <th onClick={() => handleSort("department")}>
+                الورشة / الفرع{" "}
+                {sortConfig.key === "department"
+                  ? sortConfig.direction === "asc"
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}
+              </th>
               <th>التمام</th>
-              <th>اخر دخول</th>
-              <th>اخر خروج</th>
+              <th onClick={() => handleSort("latest_arrival")}>
+                اخر دخول
+                {sortConfig.key === "latest_arrival"
+                  ? sortConfig.direction === "asc"
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}
+              </th>
+              <th onClick={() => handleSort("latest_departure")}>
+                اخر خروج
+                {sortConfig.key === "latest_departure"
+                  ? sortConfig.direction === "asc"
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}
+              </th>
               <th>Action</th>
             </tr>
           </thead>

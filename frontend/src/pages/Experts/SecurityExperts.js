@@ -39,7 +39,7 @@ const SecurityExperts = () => {
 
     const fetchData = () => {
       const searchValue = toWesternDigits(experts.search.trim());
-      const limit = 10;
+      const limit = 15;
       const resp = axios
         .get(
           `${process.env.REACT_APP_BACKEND_BASE_URL}/expert?page=${experts.page}&limit=${limit}&search=${searchValue}`,
@@ -450,7 +450,7 @@ const SecurityExperts = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="9" className="text-center">
+                <td colSpan="10" className="text-center">
                   لا توجد بيانات
                 </td>
               </tr>

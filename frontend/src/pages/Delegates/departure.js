@@ -142,8 +142,8 @@ const DelegateDeparture = () => {
       )}
 
       <div className="table-responsive">
-        <Table striped bordered hover>
-          <thead>
+        <Table striped bordered hover responsive className="mb-0">
+          <thead className='table-dark'>
             <tr>
               {/* <th>#</th> */}
               <th>الرتبة / الدرجة</th>

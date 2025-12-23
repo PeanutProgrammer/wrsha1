@@ -139,9 +139,9 @@ const GuestDeparture = () => {
         </Alert>
       )}
 
-      <div className="table-responsive">
-        <Table striped bordered hover>
-          <thead>
+      <div className="table-responsive ">
+        <Table striped bordered hover className="mb-0">
+          <thead className='table-dark'>
             <tr>
               {/* <th>#</th> */}
               <th>الإسم</th>

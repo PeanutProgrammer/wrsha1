@@ -76,8 +76,8 @@ const SoldiersTmamDetails = () => {
 
 
       <h5 className="mb-3">سجل التمام:</h5>
-      <Table striped bordered hover>
-         <thead>
+      <Table striped bordered hover responsive className="mb-0" >
+         <thead className="table-dark">
                   <tr>
                     <th>م</th>
                     <th>نوع التمام</th>

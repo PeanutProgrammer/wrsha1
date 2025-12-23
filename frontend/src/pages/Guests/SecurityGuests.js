@@ -34,7 +34,7 @@ const SecurityGuests = () => {
 
     const fetchData = () => {
       const searchValue = toWesternDigits(guests.search.trim());
-      const limit = 10;
+      const limit = 15;
       const resp = axios
         .get(
           `${process.env.REACT_APP_BACKEND_BASE_URL}/guest?page=${guests.page}&limit=${limit}&search=${searchValue}`,

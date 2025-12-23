@@ -13,7 +13,7 @@ router.post("/",
     securityHead,
     body("name")
         .isString().withMessage("من فضلك أدخل اسم صحيح")
-        .isLength({ min: 3, max: 30 }).withMessage("الاسم يجب أن يكون بين 3 و 30 حرفًا"),
+        .isLength({ min: 3, max: 40 }).withMessage("الاسم يجب أن يكون بين 3 و 40 حرفًا"),
 
     // Validate 'valid_from' and 'valid_through' dates
     body("valid_from")

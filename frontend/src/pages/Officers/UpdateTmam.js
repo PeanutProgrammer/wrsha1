@@ -7,6 +7,7 @@ import { getAuthUser } from "../../helper/Storage";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import Select from "react-select"; // Importing react-select
 
 // Validation schema using yup
 const schema = yup.object().shape({
@@ -44,7 +45,7 @@ const UpdateTmam = () => {
     success: null,
   });
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm({
+  const { register, handleSubmit, formState: { errors }, setValue, reset, watch } = useForm({
     resolver: yupResolver(schema),
   });
 
@@ -92,12 +93,18 @@ const UpdateTmam = () => {
           ...log,
           start_date: log.start_date ? formatDateToInput(log.start_date) : "",
           end_date: log.end_date ? formatDateToInput(log.end_date) : "",
-          // ensure leaveTypeID is number or empty string so select works
-          leaveTypeID: log.leaveTypeID ?? "",
+          leaveTypeID: log.leaveTypeID ?? "", // set initial leaveTypeID
         };
 
         // reset the form with the fetched record AFTER leaveType options are loaded
         reset(prepared);
+
+        // Pre-select the leaveTypeID in the select field
+        if (log.leaveTypeID) {
+          const selectedLeaveType = ltData.find((type) => type.id === log.leaveTypeID);
+          // If we find the matching leaveType, set the value
+          setValue("leaveTypeID", selectedLeaveType ? selectedLeaveType.id : "");
+        }
 
         setOfficerLog(prev => ({ ...prev, loading: false }));
       } catch (err) {
@@ -113,7 +120,7 @@ const UpdateTmam = () => {
     fetchAll();
 
     return () => { cancelled = true; };
-  }, [id, auth.token, reset]);
+  }, [id, auth.token, reset, setValue]);
 
   // Submit (use async/await so we always handle errors and clear loading)
   const updateTmam = async (data) => {
@@ -153,14 +160,42 @@ const UpdateTmam = () => {
     }
   };
 
+  const filteredLeaveTypes = leaveType.filter(
+    (type) => ![16, 17, 18].includes(type.id)
+  );
+  const leaveTypeOptions = filteredLeaveTypes.map((type) => ({
+    value: type.id,
+    label: type.name,
+  }));
+
+  // Custom styles for react-select to prevent conflict with Bootstrap's form-control
+  const customStyles = {
+    control: (provided) => ({
+      ...provided,
+      width: '100%',
+      padding: '0.375rem 0.75rem',
+      borderRadius: '0.25rem',
+      border: '1px solid #ced4da',
+    }),
+    menu: (provided) => ({
+      ...provided,
+      zIndex: 1050, // Make sure the dropdown appears above other elements
+    }),
+    option: (provided, state) => ({
+      ...provided,
+      backgroundColor: state.isSelected ? '#007bff' : state.isFocused ? '#f8f9fa' : null,
+      color: state.isSelected ? '#fff' : '#495057',
+    }),
+  };
+
   return (
-    <div className="Update">
+    <div className="add-officer-form">
       <h1 className="text-center p-2">تعديل تمام الضابط</h1>
 
       {officerLog.err && <Alert variant="danger" className="p-2">{officerLog.err}</Alert>}
       {officerLog.success && <Alert variant="success" className="p-2">{officerLog.success}</Alert>}
 
-      <Form onSubmit={handleSubmit(updateTmam)}>
+      <Form onSubmit={handleSubmit(updateTmam)} className="form">
         <Form.Group controlId="officerLabel" className="form-group">
           <Form.Label>الضابط</Form.Label>
           <Form.Control
@@ -172,22 +207,24 @@ const UpdateTmam = () => {
           />
         </Form.Group>
 
+        {/* Leave Type Dropdown */}
         <Form.Group controlId="leaveTypeID" className="form-group">
           <Form.Label>سبب الخروج</Form.Label>
-          <Form.Control
-            as="select"
-            {...register("leaveTypeID")}
-            className={`form-control ${errors.leaveTypeID ? "is-invalid" : ""}`}
-            // keep uncontrolled; react-hook-form will set value via reset()
-          >
-            <option value="">إختر سبب الخروج</option>
-            {leaveType.map((type) => (
-              <option key={type.id} value={type.id}>
-                {type.name}
-              </option>
-            ))}
-          </Form.Control>
-          {errors.leaveTypeID && <div className="invalid-feedback">{errors.leaveTypeID.message}</div>}
+          <Select
+            options={leaveTypeOptions}
+            value={leaveTypeOptions.find(option => option.value === watch("leaveTypeID"))} // Ensure selected option is highlighted
+            placeholder="اختر سبب الخروج"
+            onChange={(selectedOption) => {
+              setValue("leaveTypeID", selectedOption ? selectedOption.value : ""); // set the selected value
+            }}
+            styles={customStyles}
+            className="react-select"
+          />
+          {errors.leaveTypeID && (
+            <div className="invalid-feedback d-block">
+              {errors.leaveTypeID.message}
+            </div>
+          )}
         </Form.Group>
 
         <Form.Group controlId="destination" className="form-group">

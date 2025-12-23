@@ -165,14 +165,12 @@ const ExpertsLog = () => {
         </Alert>
       )}
 
-      <Table striped bordered hover>
-        <thead>
+      <Table striped bordered hover responsive className="mb-0">
+        <thead className='table-dark'>
           <tr>
             <th>م</th>
-            <th>رقم تحقيق الشخصية</th>
-            <th>الإسم</th>
-            <th>رقم التصديق الأمني</th>
-            <th>اسم الشركة</th>
+            <th>تحقيق الشخصية</th>
+            <th>الاسم</th>
             <th>حالة التصديق</th>
             <th>وقت الدخول</th>
             <th>وقت الخروج</th>
@@ -187,8 +185,6 @@ const ExpertsLog = () => {
               <td>{index + 1}</td>
               <td>{expert.nationalID}</td>
               <td>{expert.name}</td>
-              <td>{expert.security_clearance_number}</td>
-              <td>{expert.company_name}</td>
               <td
                 className={
                   moment(expert.valid_from).isBefore(now) &&
@@ -214,31 +210,47 @@ const ExpertsLog = () => {
                 }
               </td>
 
-              <td>
-                {expert.start_date
-                  ? new Date(expert.start_date).toLocaleString("ar-EG", {
-                      year: "numeric",
-                      month: "2-digit",
-                      day: "2-digit",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      hour12: true,
-                    })
-                  : "لا يوجد"}
-              </td>
 
-              <td>
-                {expert.end_date
-                  ? new Date(expert.end_date).toLocaleString("ar-EG", {
-                      year: "numeric",
-                      month: "2-digit",
-                      day: "2-digit",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      hour12: true,
-                    })
-                  : "لا يوجد"}
-              </td>
+                  <td>
+                    {expert.start_date ? (
+                      <>
+                        <div>
+                          {moment(expert.start_date).format("YYYY-MM-DD")}
+                        </div>
+                        <div>
+                          {moment(expert.start_date).format("hh:mm")}
+                          <span>
+                            {moment(expert.start_date).format("a") === "am"
+                              ? " ص"
+                              : " م"}
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      "لا يوجد"
+                    )}
+                  </td>
+
+                  <td>
+                    {expert.end_date ? (
+                      <>
+                        <div>
+                          {moment(expert.end_date).format("YYYY-MM-DD")}
+                        </div>
+                        <div>
+                          {moment(expert.end_date).format("hh:mm")}
+                          <span>
+                            {moment(expert.end_date).format("a") ===
+                            "am"
+                              ? " ص"
+                              : " م"}
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      "لا يوجد"
+                    )}
+                  </td>
 
               <td>{expert.department ? expert.department : "لا يوجد"}</td>
 

@@ -11,8 +11,8 @@ import * as yup from 'yup';
 
 // Validation schema using yup
 const schema = yup.object().shape({
-  nationalID: yup.string().matches(/^\d+$/, 'رقم تحقيق الشخصية يجب أن يحتوي على أرقام فقط').required('رقم تحقيق الشخصية مطلوب'),
-  name: yup.string().min(3, 'اسم الخبير يجب أن يكون أكثر من 3 حروف').max(30, 'اسم الخبير يجب ألا يتجاوز 30 حرف').required('اسم الخبير مطلوب'),
+  nationalID: yup.string().required('رقم تحقيق الشخصية مطلوب').optional().nullable(),
+  name: yup.string().min(3, 'اسم الخبير يجب أن يكون أكثر من 3 حروف').max(40, 'اسم الخبير يجب ألا يتجاوز 40 حرف').required('اسم الخبير مطلوب'),
   security_clearance_number: yup.string().required('رقم التصديق الأمني مطلوب'),
   valid_from: yup.date().required('تاريخ بداية التصديق الأمني مطلوب').typeError('يرجى إدخال تاريخ صحيح'),
   valid_through: yup.date().required('تاريخ انتهاء التصديق الأمني مطلوب').min(yup.ref('valid_from'), 'تاريخ الانتهاء يجب أن يكون بعد تاريخ البداية').typeError('يرجى إدخال تاريخ صحيح'),
@@ -179,8 +179,7 @@ const UpdateExperts = () => {
     type="text"
     placeholder="أدخل رقم تحقيق الشخصية"
     {...register('nationalID')}
-    className={`form-control ${errors.nationalID ? 'is-invalid' : ''}`}
-    disabled // Make it uneditable
+    className={`form-control ${errors.nationalID ? 'is-invalid' : ''}`} // Make it uneditable
   />
   {errors.nationalID && <div className="invalid-feedback">{errors.nationalID.message}</div>}
 </Form.Group>

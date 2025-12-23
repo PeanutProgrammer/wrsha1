@@ -152,8 +152,8 @@ const CivilliansLog = () => {
 
       {civillians.err && <Alert variant="danger">{civillians.err}</Alert>}
 
-      <Table striped bordered hover size="sm">
-        <thead>
+      <Table striped bordered hover responsive className="mb-0">
+        <thead className='table-dark'>
           <tr>
             <th>م</th>
             <th>الرقم القومي</th>
