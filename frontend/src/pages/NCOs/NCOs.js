@@ -1,134 +1,409 @@
-import React, { useState, useEffect } from 'react';
-import { Table, Alert, Modal, Button, Form } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
-import { getAuthUser } from '../../helper/Storage';
-import moment from 'moment';
+import React, { useState, useEffect } from "react";
+import { Table, Alert, Modal, Button, Form } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import { getAuthUser } from "../../helper/Storage";
+import moment from "moment";
+import { io } from "socket.io-client";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import htmlDocx from "html-docx-js/dist/html-docx";
+// Helper: Convert Arabic-Indic digits to Western digits
+const toWesternDigits = (str) => {
+  return str.replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
+};
 
 const NCOs = () => {
   const auth = getAuthUser();
-  const [ncos, setNCOs] = useState({
+  const [sortConfig, setSortConfig] = useState({ key: "", direction: "asc" });
+
+  const [officers, setOfficers] = useState({
     loading: true,
     err: null,
     success: null,
     results: [],
     reload: 0,
+    page: 1,
+    totalPages: 1,
+    search: "",
+    limit: 0,
+    tempSearch: "",
   });
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [recordsPerPage] = useState(8);
+  const [showConfirm, setShowConfirm] = useState(false); // Modal state
+  const [selectedOfficer, setSelectedOfficer] = useState(null); // Selected officer for deletion
 
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [selectedNCO, setSelectedNCO] = useState(null);
-
-  // Additional fields for the delete operation
-  const [endDate, setEndDate] = useState('');
-  const [transferID, setTransferID] = useState('');
-  const [transferredTo, setTransferredTo] = useState('');
+  const [endDate, setEndDate] = useState("");
+  const [transferID, setTransferID] = useState("");
+  const [transferredTo, setTransferredTo] = useState("");
 
   useEffect(() => {
-    setNCOs({ ...ncos, loading: true });
-    axios
-      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/nco/`, {
-        headers: {
-          token: auth.token,
-        },
-      })
-      .then((resp) => {
-        setNCOs({
-          ...ncos,
-          results: resp.data,
-          loading: false,
-          err: null,
-        });
-      })
-      .catch((err) => {
-        setNCOs({
-          ...ncos,
-          loading: false,
-          err:
-            err.response
+    const socket = io(`${process.env.REACT_APP_BACKEND_BASE_URL}`); //  backend port
+
+    // 🔁 Initial fetch
+    const fetchData = () => {
+      const searchValue = toWesternDigits(officers.search.trim());
+      const limit = 15;
+      const resp = axios
+        .get(
+          `${process.env.REACT_APP_BACKEND_BASE_URL}/nco?page=${officers.page}&limit=${limit}&search=${searchValue}`,
+          {
+            headers: { token: auth.token },
+          }
+        )
+        .then((resp) => {
+          setOfficers({
+            ...officers,
+            results: resp.data.data || [],
+            totalPages: resp.data.totalPages || 1,
+            limit: resp.data.limit || limit,
+            loading: false,
+            err: null,
+          });
+        })
+        .catch((err) => {
+          setOfficers({
+            ...officers,
+            loading: false,
+            err: err.response
               ? JSON.stringify(err.response.data.errors)
-              : 'حدث خطأ أثناء تحميل البيانات.',
+              : "Something went wrong while fetching data.",
+          });
         });
-      });
-  }, [ncos.reload]);
+    };
+
+    fetchData(); // ✅ Initial fetch on component mount
+
+    socket.on("connect", () => {
+      console.log("🟢 Connected to WebSocket:", socket.id);
+    });
+
+    socket.on("officersUpdated", () => {
+      console.log("📢 Officers updated — refetching data...");
+      fetchData(); // ✅ Re-fetch on update
+    });
+
+    return () => socket.disconnect();
+  }, [officers.page, officers.search]);
 
   // Show confirmation modal before deleting
-  const handleDeleteClick = (nco) => {
-    setSelectedNCO(nco);
+  const handleDeleteClick = (officer) => {
+    setSelectedOfficer(officer);
     setShowConfirm(true);
   };
 
-  // Handle form data changes for delete modal
+  // Handle form data changes
   const handleEndDateChange = (e) => setEndDate(e.target.value);
   const handleTransferIDChange = (e) => setTransferID(e.target.value);
   const handleTransferredToChange = (e) => setTransferredTo(e.target.value);
 
-  // Delete confirmation with additional fields
+  // Confirm deletion
   const confirmDelete = () => {
-    if (!selectedNCO) return;
+    if (!selectedOfficer) return;
 
-    // Prepare data to be sent for archiving the NCO
+    // Prepare data to be sent for archiving the officer
     const data = {
       end_date: endDate,
       transferID: transferID,
       transferred_to: transferredTo,
     };
 
-    // Send DELETE request with additional fields
+    // Change the API method to DELETE as per the new backend implementation
     axios
-      .delete(`${process.env.REACT_APP_BACKEND_BASE_URL}/nco/` + selectedNCO.mil_id, {
-        headers: {
-          token: auth.token,
-        },
-        data: data, // Send additional fields in the body of the DELETE request
-      })
+      .delete(
+        `${process.env.REACT_APP_BACKEND_BASE_URL}/nco/` +
+          selectedOfficer.mil_id,
+        {
+          headers: { token: auth.token },
+          data: data, // Send additional fields in the body of the DELETE request
+        }
+      )
       .then(() => {
         setShowConfirm(false);
-        setSelectedNCO(null);
-        setEndDate('');
-        setTransferID('');
-        setTransferredTo('');
-
-        // Show success message
-        setNCOs({
-          ...ncos,
-          reload: ncos.reload + 1,
-          success: 'تم حذف ضابط الصف بنجاح ✅',
+        setSelectedOfficer(null);
+        setEndDate("");
+        setTransferID("");
+        setTransferredTo("");
+        setOfficers({
+          ...officers,
+          reload: officers.reload + 1,
+          success: "تم حذف ضابط الصف  بنجاح ✅",
           err: null,
         });
-
-        // Hide success message after 3 seconds
-        setTimeout(() => {
-          setNCOs((prev) => ({ ...prev, success: null }));
-        }, 3000);
       })
       .catch((err) => {
-        setNCOs({
-          ...ncos,
-          err:
-            err.response?.data?.errors ||
-            'حدث خطأ أثناء محاولة حذف ضابط الصف.',
+        setOfficers({
+          ...officers,
+          err: err.response
+            ? JSON.stringify(err.response.data.errors)
+            : "Something went wrong. Please try again later.",
         });
         setShowConfirm(false);
       });
   };
 
-  // Pagination logic
-  const indexOfLastRecord = currentPage * recordsPerPage;
-  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = ncos.results.slice(
-    indexOfFirstRecord,
-    indexOfLastRecord
-  );
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const normalized = toWesternDigits(officers.tempSearch.trim());
+    setOfficers((prev) => ({
+      ...prev,
+      search: normalized,
+      page: 1,
+      results: [],
+    }));
+  };
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-  const totalPages = Math.ceil(ncos.results.length / recordsPerPage);
-  const pageNumbers = [];
-  for (let i = 1; i <= totalPages; i++) {
-    pageNumbers.push(i);
-  }
+  const handleClearSearch = () => {
+    setOfficers((prev) => ({
+      ...prev,
+      search: "",
+      tempSearch: "",
+      page: 1,
+      results: [],
+    }));
+  };
+
+  const handlePrevPage = () => {
+    if (officers.page > 1)
+      setOfficers((prev) => ({ ...prev, page: prev.page - 1 }));
+  };
+
+  const handleNextPage = () => {
+    if (officers.page < officers.totalPages)
+      setOfficers((prev) => ({ ...prev, page: prev.page + 1 }));
+  };
+
+  const handleJumpToPage = (number) => {
+    if (number >= 1 && number <= officers.totalPages) {
+      setOfficers((prev) => ({ ...prev, page: number }));
+    }
+  };
+
+  const handleSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const renderPageButtons = () => {
+    const pages = [];
+    const maxButtons = 5;
+    let start = Math.max(officers.page - 2, 1);
+    let end = Math.min(start + maxButtons - 1, officers.totalPages);
+    start = Math.max(end - maxButtons + 1, 1);
+
+    for (let num = start; num <= end; num++) {
+      pages.push(
+        <Button
+          key={num}
+          onClick={() => handleJumpToPage(num)}
+          variant={num === officers.page ? "primary" : "outline-primary"}
+          className="mx-1 btn-sm"
+        >
+          {num}
+        </Button>
+      );
+    }
+    return pages;
+  };
+
+  const sortedOfficers = [...officers.results].sort((a, b) => {
+    if (!sortConfig.key) return 0; // no sorting yet
+    if (a[sortConfig.key] > b[sortConfig.key])
+      return sortConfig.direction === "asc" ? 1 : -1;
+    if (a[sortConfig.key] < b[sortConfig.key])
+      return sortConfig.direction === "asc" ? -1 : 1;
+    return 0;
+  });
+
+  const exportToPDF = () => {
+    const doc = new jsPDF({
+      orientation: "landscape",
+      unit: "pt",
+      format: "A4",
+    });
+
+    doc.setFont("Amiri");
+
+    /* ===== Header ===== */
+    doc.setFontSize(18);
+    doc.text("إدارة الضباط", doc.internal.pageSize.width / 2, 40, {
+      align: "center",
+    });
+
+    doc.setFontSize(11);
+    doc.text(
+      `تم طباعة هذا المستند في: ${getFormattedDate()}`,
+      doc.internal.pageSize.width / 2,
+      65,
+      { align: "center" }
+    );
+
+    /* ===== Table Data ===== */
+    const tableColumn = [
+      "م",
+      "الرقم العسكري",
+      "الرتبة",
+      "الاسم",
+      "الورشة / الفرع",
+      "تاريخ الضم",
+      "ملحق",
+      "التمام",
+    ];
+
+    const tableRows = [];
+
+    sortedOfficers.forEach((officer, index) => {
+      tableRows.push([
+        (officers.page - 1) * officers.limit + index + 1,
+        officer.mil_id,
+        officer.rank,
+        officer.name,
+        officer.department,
+        moment(officer.join_date).format("YYYY-MM-DD"),
+        officer.attached ? "نعم" : "لا",
+        officer.in_unit ? "متواجد" : "غير موجود",
+      ]);
+    });
+
+    /* ===== AutoTable ===== */
+    doc.autoTable({
+      startY: 90,
+      head: [tableColumn],
+      body: tableRows,
+      styles: {
+        font: "Amiri",
+        fontSize: 10,
+        halign: "center",
+        valign: "middle",
+        cellPadding: 6,
+      },
+      headStyles: {
+        fillColor: [240, 240, 240],
+        textColor: 0,
+        fontStyle: "bold",
+      },
+      alternateRowStyles: {
+        fillColor: [250, 250, 250],
+      },
+      margin: { left: 30, right: 30 },
+      didDrawPage: () => {
+        doc.setFontSize(9);
+        doc.text(
+          `صفحة ${doc.internal.getNumberOfPages()}`,
+          doc.internal.pageSize.width / 2,
+          doc.internal.pageSize.height - 20,
+          { align: "center" }
+        );
+      },
+    });
+
+    doc.save("officers.pdf");
+  };
+
+  // Function to get current date and time in Arabic format
+  const getFormattedDate = () => {
+    const date = new Date();
+    const options = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    };
+    return date.toLocaleString("ar-EG", options); // Arabic (Egypt) locale for Arabic format
+  };
+
+  // Export to Word
+  const exportToWord = () => {
+    const table = document.getElementById("officer-table");
+    if (table) {
+      // Clone the table to modify it before export
+      const tableClone = table.cloneNode(true);
+
+      // Remove the "Actions" column (last column)
+      const rows = tableClone.querySelectorAll("tr");
+      rows.forEach((row) => {
+        const cells = row.querySelectorAll("td, th"); // Include both headers and data cells
+        if (cells.length > 0) {
+          row.deleteCell(cells.length - 1); // Remove the last cell (Actions column)
+        }
+      });
+
+      // Get current date in Arabic format
+      const currentDate = getFormattedDate();
+
+      // Create header and footer content
+      const header = `
+      <div style="text-align: center; font-size: 16pt; font-weight: bold; font-family: 'Arial', sans-serif;">
+        <p>إدارة الضباط</p>
+      </div>
+    `;
+      const footer = `
+      <div style="text-align: center; font-size: 10pt; font-family: 'Arial', sans-serif; color: #888;">
+        <p>تم طباعة هذا المستند في: ${currentDate}</p>
+      </div>
+    `;
+
+      // Set the direction to RTL for the Word document and include header, footer, and the table
+      const tableHTML = `
+      <div style="direction: rtl; font-family: 'Arial', sans-serif; font-size: 12pt;">
+        <!-- Header -->
+        ${header}
+        <!-- Table -->
+        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+          <thead>
+            <tr style="background-color: #f2f2f2;">
+              <th style="border: 1px solid black; padding: 5px;">الرقم العسكري</th>
+              <th style="border: 1px solid black; padding: 5px;">الرتبة</th>
+              <th style="border: 1px solid black; padding: 5px;">الإسم</th>
+              <th style="border: 1px solid black; padding: 5px;">الورشة / الفرع</th>
+              <th style="border: 1px solid black; padding: 5px;">تاريخ الضم</th>
+              <th style="border: 1px solid black; padding: 5px;">ملحق</th>
+              <th style="border: 1px solid black; padding: 5px;">التمام</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${Array.from(rows)
+              .map((row, index) => {
+                const cells = row.querySelectorAll("td");
+                const rowStyle =
+                  index % 2 === 0
+                    ? "background-color: #ffffff;"
+                    : "background-color: #f9f9f9;";
+                return `
+                  <tr style="${rowStyle}">
+                    ${Array.from(cells)
+                      .map(
+                        (cell) =>
+                          `<td style="border: 1px solid black; padding: 5px;">${cell.innerHTML}</td>`
+                      )
+                      .join("")}
+                  </tr>
+                `;
+              })
+              .join("")}
+          </tbody>
+        </table>
+        <!-- Footer -->
+        ${footer}
+      </div>
+    `;
+
+      // Convert HTML to Word format
+      const converted = htmlDocx.asBlob(tableHTML);
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(converted);
+      link.download = "officers_table.docx";
+      link.click();
+    } else {
+      alert("Table not found!");
+    }
+  };
 
   return (
     <div className="Officers p-5">
@@ -139,15 +414,15 @@ const NCOs = () => {
         </Link>
       </div>
 
-      {ncos.success && (
+      {officers.success && (
         <Alert variant="success" className="p-2 text-center">
-          {ncos.success}
+          {officers.success}
         </Alert>
       )}
 
-      {ncos.err && (
+      {officers.err && (
         <Alert variant="danger" className="p-2 text-center">
-          {ncos.err}
+          {officers.err}
         </Alert>
       )}
 
@@ -156,130 +431,163 @@ const NCOs = () => {
           <thead className="table-dark">
             <tr>
               <th>م</th>
-              <th>الرقم العسكري</th>
-              <th>الدرجة</th>
-              <th>الاسم</th>
-              <th>الورشة / الفرع</th>
-              <th>تاريخ الضم</th>
-              <th>ملحق؟</th>
-              <th>التمام</th>
-              <th>الإجراءات</th>
+              <th onClick={() => handleSort("mil_id")}>
+                {sortConfig.key === "mil_id"
+                  ? sortConfig.direction === "asc"
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}
+                الرقم العسكري
+              </th>
+              <th onClick={() => handleSort("rank")}>
+                الدرجة
+                {sortConfig.key === "rank"
+                  ? sortConfig.direction === "asc"
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}
+              </th>
+              <th onClick={() => handleSort("name")}>
+                الاسم{" "}
+                {sortConfig.key === "name"
+                  ? sortConfig.direction === "asc"
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}
+              </th>
+              <th onClick={() => handleSort("department")}>
+                {sortConfig.key === "department"
+                  ? sortConfig.direction === "asc"
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}
+                الورشة / الفرع
+              </th>
+              <th onClick={() => handleSort("join_date")}>
+                تاريخ الضم
+                {sortConfig.key === "join_date"
+                  ? sortConfig.direction === "asc"
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}
+              </th>
+              <th onClick={() => handleSort("attached")}>
+                ملحق
+                {sortConfig.key === "attached"
+                  ? sortConfig.direction === "asc"
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}
+              </th>
+              <th onClick={() => handleSort("in_unit")}>
+                التمام
+                {sortConfig.key === "in_unit"
+                  ? sortConfig.direction === "asc"
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}
+              </th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
-            {currentRecords.map((nco, index) => (
-              <tr key={nco.mil_id}>
-                <td>{index + 1}</td> {/* Arabic numbering, starting from 1 */}
-                <td>{nco.mil_id}</td>
-                <td>{nco.rank}</td>
-                <td>{nco.name}</td>
-                <td>{nco.department}</td>
-                <td>{moment(nco.join_date).format("YYYY-MM-DD")}</td>
-                <td>{nco.attached ? "نعم" : "لا"}</td>
-                <td>
-                  <span
-                    className={`status-badge ${
-                      nco.in_unit ? "status-in" : "status-out"
-                    }`}
-                  >
-                    {nco.in_unit ? "متواجد" : "غير موجود"}
-                  </span>
-                </td>
-                <td>
-                  <div className="action-buttons">
-                    <button
-                      className="btn btn-sm btn-danger"
-                      onClick={() => handleDeleteClick(nco)}
+            {Array.isArray(officers.results) && officers.results.length > 0 ? (
+              sortedOfficers.map((officer, index) => (
+                <tr key={officer.mil_id}>
+                  <td>{(officers.page - 1) * officers.limit + index + 1}</td>{" "}
+                  <td>{officer.mil_id}</td>
+                  <td>{officer.rank}</td>
+                  <td>{officer.name}</td>
+                  <td>{officer.department}</td>
+                  <td>{moment(officer.join_date).format("YYYY-MM-DD")}</td>
+                  <td>{officer.attached ? "نعم" : "لا"}</td>
+                  <td>
+                    <span
+                      className={`status-badge ${
+                        officer.in_unit ? "status-in" : "status-out"
+                      }`}
                     >
-                      حذف
-                    </button>
-                    <Link
-                      to={`../${nco.id}`}
-                      className="btn btn-sm btn-primary"
-                    >
-                      تعديل
-                    </Link>
-                    <Link
-                      to={`../details/${nco.id}`}
-                      className="btn btn-sm btn-secondary"
-                    >
-                      تفاصيل
-                    </Link>
-                  </div>
+                      {officer.in_unit ? "متواجد" : "غير موجود"}
+                    </span>
+                  </td>{" "}
+                  <td className="text-center">
+                    <div className="d-inline-flex gap-1">
+                      <button
+                        className="btn btn-sm btn-danger"
+                        onClick={() => handleDeleteClick(officer)}
+                      >
+                        حذف
+                      </button>
+                      <Link
+                        to={`../${officer.id}`}
+                        className="btn btn-sm btn-primary"
+                      >
+                        تعديل
+                      </Link>
+                      <Link
+                        to={`../details/${officer.id}`}
+                        className="btn btn-sm btn-secondary"
+                      >
+                        تفاصيل
+                      </Link>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="9" className="text-center">
+                  لا توجد بيانات
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </Table>
       </div>
-
       {/* Pagination Controls */}
-      <div className="pagination-container">
-        <button
-          className="btn btn-light"
-          onClick={() => paginate(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          السابق
-        </button>
 
-        {pageNumbers.map((number) => (
-          <button
-            key={number}
-            className={`btn btn-light page-btn ${
-              currentPage === number ? "active" : ""
-            }`}
-            onClick={() => paginate(number)}
-          >
-            {number}
-          </button>
-        ))}
-
-        <button
-          className="btn btn-light"
-          onClick={() => paginate(currentPage + 1)}
-          disabled={currentPage === totalPages}
-        >
-          التالي
-        </button>
-      </div>
-
-      {/* Confirmation Modal */}
+      {/* Confirmation Modal for Deleting Officer */}
       <Modal show={showConfirm} onHide={() => setShowConfirm(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>تأكيد الحذف</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          هل أنت متأكد أنك تريد حذف ضابط الصف{" "}
-          <strong>{selectedNCO?.name}</strong>؟{/* Additional Fields */}
-          <Form>
-            <Form.Group controlId="endDate">
-              <Form.Label>تاريخ النقل</Form.Label>
-              <Form.Control
-                type="date"
-                value={endDate}
-                onChange={handleEndDateChange}
-              />
-            </Form.Group>
+          <div>
+            <p>
+              هل أنت متأكد أنك تريد حذف ضابط الصف{" "}
+              <strong>{selectedOfficer?.name}</strong>؟
+            </p>
 
-            <Form.Group controlId="transferID">
-              <Form.Label>رقم بند أوامر النقل</Form.Label>
-              <Form.Control
-                type="text"
-                value={transferID}
-                onChange={handleTransferIDChange}
-              />
-            </Form.Group>
+            {/* Additional Fields */}
+            <Form>
+              <Form.Group controlId="endDate">
+                <Form.Label>تاريخ النقل</Form.Label>
+                <Form.Control
+                  type="date"
+                  value={endDate}
+                  onChange={handleEndDateChange}
+                />
+              </Form.Group>
 
-            <Form.Group controlId="transferredTo">
-              <Form.Label>تم النقل إلى</Form.Label>
-              <Form.Control
-                type="text"
-                value={transferredTo}
-                onChange={handleTransferredToChange}
-              />
-            </Form.Group>
-          </Form>
+              <Form.Group controlId="transferID">
+                <Form.Label>رقم بند أوامر النقل</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={transferID}
+                  onChange={handleTransferIDChange}
+                />
+              </Form.Group>
+
+              <Form.Group controlId="transferredTo">
+                <Form.Label>تم النقل إلى</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={transferredTo}
+                  onChange={handleTransferredToChange}
+                />
+              </Form.Group>
+            </Form>
+          </div>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowConfirm(false)}>
@@ -290,6 +598,26 @@ const NCOs = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      <div className="d-flex justify-content-between align-items-center mt-3">
+        <Button
+          onClick={handlePrevPage}
+          disabled={officers.page === 1}
+          variant="secondary"
+          size="sm"
+        >
+          السابق
+        </Button>
+        <div>{renderPageButtons()}</div>
+        <Button
+          onClick={handleNextPage}
+          disabled={officers.page === officers.totalPages}
+          variant="secondary"
+          size="sm"
+        >
+          التالي
+        </Button>
+      </div>
     </div>
   );
 };

@@ -221,6 +221,100 @@ class SoldierLogController {
       return res.status(500).json({ error: err.message });
     }
   }
+
+
+    static async createTmam(req,res) {
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                console.log(errors.array()); // Log errors
+                return res.status(400).json({ errors: errors.array() });
+            }
+            const { soldierID, leaveTypeID, start_date, end_date, destination } = req.body;
+
+            const query = util.promisify(connection.query).bind(connection);
+
+            const result = await query(
+                `INSERT INTO soldier_leave_details (soldierID, leaveTypeID, start_date, end_date, destination)
+                 VALUES (?, ?, ?, ?, ?)`,
+                [soldierID, leaveTypeID, start_date, end_date, destination]
+            );
+
+            return res.status(201).json({ msg: "تمت الإضافة بنجاح", id: result.insertId });
+        } catch (err) {
+            return res.status(500).json({ err });
+        }
+    }
+
+      static async updateTmam(req, res) {
+    try {
+      const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+        console.log(errors.array()); // Log errors
+        return res.status(400).json({ errors: errors.array() });
+    }
+    const {  leaveTypeID, start_date, end_date, destination } = req.body;
+    const leaveID = req.params.id;
+
+        const query = util.promisify(connection.query).bind(connection);
+
+        const existing = await query(
+            `SELECT * FROM soldier_leave_details WHERE id = ?`,
+            [leaveID]
+        );
+
+        if (existing.length === 0) {
+            return res.status(404).json({ msg: "Record not found" });
+        }
+
+        await query(
+            `UPDATE soldier_leave_details
+             SET leaveTypeID = ?, start_date = ?, end_date = ?, destination = ?
+             WHERE id = ?`,
+            [leaveTypeID || null, start_date || null, end_date || null, destination || null, leaveID]
+        );
+
+        return res.status(200).json({ msg: "تم التحديث بنجاح" });
+
+    } catch (err) {
+        return res.status(500).json({ err });
+    }
+}
+
+
+    static async getOneTmam(req, res) {
+    try {
+        const leaveID = req.params.id;
+        const query = util.promisify(connection.query).bind(connection);
+
+        const result = await query(
+            `SELECT 
+                old.id AS leaveID,
+                old.leaveTypeID,
+                old.start_date,
+                old.end_date,
+                old.destination,
+                soldier.name AS soldierName,
+                soldier.rank AS soldierRank,
+                soldier.id AS soldierID
+            FROM soldier_leave_details old
+            LEFT JOIN soldiers AS soldier
+                ON soldier.id = old.soldierID
+            WHERE old.id = ?`,
+            [leaveID]
+        );
+
+        if (result.length === 0) {
+            return res.status(404).json({ msg: "Record not found" });
+        }
+
+        return res.status(200).json(result[0]);
+
+    } catch (err) {
+        return res.status(500).json({ err });
+    }
+}
+
 }
 
 module.exports = SoldierLogController;

@@ -133,9 +133,12 @@ class NCOController {
       }
 
       const query = util.promisify(connection.query).bind(connection);
+
+      
       const checkOfficer = await query("SELECT * from ncos where mil_id = ?", [
         req.params.mil_id,
       ]);
+      
 
       if (checkOfficer.length == 0) {
         return res.status(400).json({
@@ -198,24 +201,52 @@ class NCOController {
       }
 
       const query = util.promisify(connection.query).bind(connection);
-      let search = "";
+      // --- Pagination params ---
+
+      const page = parseInt(req.query.page) || 1; // default to page 1
+      const limit = parseInt(req.query.limit) || 20; // default 20 rows per page
+      const offset = (page - 1) * limit;
+
+      // --- Search params ---
+      let searchClause = "";
+      const params = [];
       if (req.query.search) {
-        search = `where name LIKE '%${req.query.search}%'`;
-      }
-      const ncos = await query(`select * from ncos ${search}`);
-
-      if (ncos.length == 0) {
-        return res.status(404).json({
-          msg: "no ncos found hey",
-        });
+        searchClause =
+          "WHERE ncos.name LIKE ? OR ncos.department LIKE ? OR ncos.mil_id LIKE ? OR ncos.rank LIKE ?";
+        const searchValue = `%${req.query.search}%`;
+        params.push(searchValue, searchValue, searchValue, searchValue);
       }
 
-      return res.status(200).json(ncos);
+      // --- Total count for pagination ---
+      const countQuery = `SELECT COUNT(*) AS total FROM ncos ${searchClause}`;
+      const countResult = await query(countQuery, params);
+      const total = countResult[0].total;
+      const totalPages = Math.ceil(total / limit);
+
+      const ncos = await query(
+        `select * from ncos ${searchClause} LIMIT ? OFFSET ?`,
+        [...params, limit, offset]
+      );
+
+      if (!ncos.length) {
+        return res.status(404).json({ msg: "No ncos found" });
+      }
+
+      return res.status(200).json({
+        page,
+        limit,
+        total,
+        totalPages,
+        data: ncos,
+      });
     } catch (err) {
-      return res.status(500).json({ err: err });
+      console.error(err);
+      return res.status(500).json({
+        message: "An unexpected error occurred",
+        error: err.message,
+      });
     }
   }
-
   static async getOfficer(req, res) {
     try {
       const errors = validationResult(req);

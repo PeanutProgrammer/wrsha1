@@ -26,7 +26,7 @@ const SearchNCOs = () => {
 
   // ✅ Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const [recordsPerPage] = useState(6);
+  const [recordsPerPage] = useState(8);
 
   useEffect(() => {
     setNCOs({ ...ncos, loading: true });

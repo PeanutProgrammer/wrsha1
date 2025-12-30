@@ -147,7 +147,36 @@ const Aside = ({ setCollapsed, collapsed }) => {
           </>
         )}
 
-        {["مبنى القيادة", "شؤون ادارية"].includes(auth?.type) && (
+                {auth?.type === "شؤون ادارية" && (
+          <>
+            <li className="tabs">
+              <Link to={"Home"}>الصفحة الرئيسية</Link>
+            </li>
+            <li className="tabs">
+              <Link to={"ncos/manage"}>بيانات ضباط الصف</Link>
+            </li>
+                        <li className="tabs">
+              <Link to={"soldiers/manage"}>بيانات الجنود</Link>
+            </li>
+            <li className="tabs">
+              <Link to={"ncos/manage-tmam"}>تمام ضباط الصف</Link>
+            </li>
+            <li className="tabs">
+              <Link to={"soldiers/manage-tmam"}>تمام الجنود</Link>
+            </li>
+            <li className="tabs">
+              <Link to={"shuoon/manage-vacation"}>الاجازات</Link>
+            </li>
+            <li className="tabs">
+              <Link to={"shuoon/manage-mission"}>المأموريات</Link>
+            </li>
+            <li className="tabs">
+              <Link to={"shuoon/manage-course"}>الفرق</Link>
+            </li>
+          </>
+        )}
+
+        {["مبنى القيادة"].includes(auth?.type) && (
           <li className="tabs">
             <Link to={"Home"}>Home</Link>
           </li>

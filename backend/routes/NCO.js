@@ -6,6 +6,7 @@ const admin = require("../middleware/admin");
 const shuoonSarya = require("../middleware/shuoonSarya");
 const gate = require("../middleware/gate");
 const security = require("../middleware/securityHead");
+const allowAny = require("../middleware/allowAny");
 
 
 router.post("/", shuoonSarya,
@@ -34,7 +35,7 @@ router.post("/", shuoonSarya,
 
 router.put(
   "/:id",
-  admin,
+  shuoonSarya,
 
   body("rank").isString().withMessage("يرجى إدخال رتبة صحيحة"),
   body("name").isString().withMessage("يرجى إدخال اسم الضابط"),
@@ -64,22 +65,22 @@ router.get("/filter",  authorized,(req, res) => {
 
 
 
-router.get("/", gate,(req, res) => {
+router.get("/", allowAny(gate,shuoonSarya),(req, res) => {
     NCOController.getOfficers(req, res);
 });
 
-router.get("/tmam/:id", admin, (req,res) => {
+router.get("/tmam/:id", shuoonSarya, (req,res) => {
     NCOController.getOfficerTmamDetails(req,res);
 });
 
-router.get("/tmam", (security || admin), (req,res) => {
+router.get("/tmam", allowAny(security,shuoonSarya), (req,res) => {
     NCOController.getOfficersTmam(req,res);
 });
 
 
 
 
-router.get("/log", admin, (req,res) => {
+router.get("/log", shuoonSarya, (req,res) => {
     NCOController.getOfficersTmam(req,res);
 });
 
@@ -91,7 +92,7 @@ router.get("/absent", gate, (req, res) => {
     NCOController.getAbsentOfficers(req, res);
 });
 
-router.get("/:id", admin, (req, res) => {
+router.get("/:id", shuoonSarya, (req, res) => {
     NCOController.getOfficer(req, res);
 });
 

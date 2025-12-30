@@ -42,7 +42,7 @@ router.post("/",
 
     // Validate 'nationalID'
     body("nationalID")
-        .isString().withMessage("من فضلك أدخل رقم تحقيق شخصي  صحيح"),
+        .isString().withMessage("من فضلك أدخل رقم تحقيق شخصي  صحيح").optional(),
 
     // Validate 'company_name'
     body("company_name")
@@ -77,7 +77,7 @@ router.put(
   // Validate 'nationalID'
   body("nationalID")
     .isString()
-    .withMessage("من فضلك أدخل رقم تحقيق شخصي  صحيح"),
+    .withMessage("من فضلك أدخل رقم تحقيق شخصي  صحيح").optional(),
 
   // Validate valid_from and valid_through dates with custom validation
   body("valid_from")

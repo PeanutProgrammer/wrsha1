@@ -11,7 +11,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000", // your React app
+    origin: "http://localhost", // your React app
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   },
@@ -68,13 +68,7 @@ const pastNCO = require("./routes/PastNCO");
 const leaveType = require("./routes/LeaveType");
 const unit = require("./routes/Unit");
 const delegate = require("./routes/Delegate");
-
-
-
-// const busses = require("./routes/Busses");
-// const appointments = require("./routes/Appointments");
-// const destinations = require("./routes/Destinations");
-// const requests = require("./routes/Requests");
+const shuoon = require("./routes/Shuoon");
 
 
 
@@ -99,6 +93,7 @@ app.use("/pastNCO", pastNCO);
 app.use("/leaveType", leaveType);
 app.use("/unit", unit);
 app.use("/delegate", delegate);
+app.use("/shuoon", shuoon);
 
 
 // app.use("/busses", busses);
@@ -108,7 +103,7 @@ app.use("/delegate", delegate);
 
 const PORT = 4001;
 
-server.listen(PORT, "0.0.0.0", () => {
+server.listen(PORT, "192.168.1.3", () => {
     console.log(`Server is running on port ${PORT}`);
 })
 

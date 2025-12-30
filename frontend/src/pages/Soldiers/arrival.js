@@ -63,7 +63,7 @@ const SoldierArrival = () => {
   }, []);
 
     const filteredLeaveTypes = leaveType.filter(
-      (type) => ![1,6,7,8,9,17,18].includes(type.id)
+      (type) => ![1,6,7,8,9,17,18,22].includes(type.id)
     );
   const leaveTypeOptions = filteredLeaveTypes.map((type) => ({
     value: type.id,

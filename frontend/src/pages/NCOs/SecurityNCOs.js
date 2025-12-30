@@ -207,7 +207,7 @@ const SecurityNCOs = () => {
                 الرقم العسكري
               </th>
               <th onClick={() => handleSort("rank")}>
-                الرتبة
+                الدرجة
                 {sortConfig.key === "rank"
                   ? sortConfig.direction === "asc"
                     ? " 🔼"

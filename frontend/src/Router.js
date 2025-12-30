@@ -48,7 +48,10 @@ import SearchNCOs from "./pages/NCOs/SearchNCOs";
 import NCOsTmamDetails from "./pages/NCOs/NCOTmamDetails";
 import NCOArrival from "./pages/NCOs/arrival";
 import NCODeparture from "./pages/NCOs/departure";
-
+import ManageNCOs from "./pages/NCOs/ManageNCOs";
+import ManageNCOTmam from "./pages/NCOs/ManageTmam";
+import AddNCOTmam from "./pages/NCOs/AddTmam";
+import UpdateNCOTmam from "./pages/NCOs/UpdateTmam";
 // Soldiers
 import Soldiers from "./pages/Soldiers/Soldiers";
 import AddSoldiers from "./pages/Soldiers/AddSoldiers";
@@ -60,6 +63,10 @@ import SearchSoldiers from "./pages/Soldiers/SearchSoldiers";
 import SoldiersTmamDetails from "./pages/Soldiers/SoldierTmamDetails";
 import SoldierArrival from "./pages/Soldiers/arrival";
 import SoldierDeparture from "./pages/Soldiers/departure";
+import ManageSoldiers from "./pages/Soldiers/ManageSoldiers";
+import ManageSoldierTmam from "./pages/Soldiers/ManageTmam";
+import AddSoldierTmam from "./pages/Soldiers/AddTmam";
+import UpdateSoldierTmam from "./pages/Soldiers/UpdateTmam";
 // import RealTimeMonitor from "./pages/Soldiers/RealTimeMonitor";
 
 // Civillians
@@ -117,6 +124,10 @@ import SecurityExperts from "./pages/Experts/SecurityExperts";
 import SecurityGuests from "./pages/Guests/SecurityGuests";
 import SecurityDelegates from "./pages/Delegates/SecurityDelegates";
 import AllInUnit from "./pages/Unit/AllInUnit";
+
+import ManageShuoonVacation from "./pages/Shuoon/ManageVacation";
+import ManageShuoonMission from "./pages/Shuoon/ManageMission";
+import ManageShuoonCourse from "./pages/Shuoon/ManageCourse";
 
 export const router = createBrowserRouter([
   {
@@ -246,14 +257,14 @@ export const router = createBrowserRouter([
           {
             path: "manage-vacation",
             element: <ProtectedRoute allowedTypes={"شؤون ضباط"} />,
-            children: [{ path: "", element: <ManageVacation/> }],
+            children: [{ path: "", element: <ManageVacation /> }],
           },
-                    {
+          {
             path: "manage-mission",
             element: <ProtectedRoute allowedTypes={"شؤون ضباط"} />,
             children: [{ path: "", element: <ManageMission /> }],
           },
-                             {
+          {
             path: "manage-course",
             element: <ProtectedRoute allowedTypes={"شؤون ضباط"} />,
             children: [{ path: "", element: <ManageCourse /> }],
@@ -271,10 +282,29 @@ export const router = createBrowserRouter([
         ],
       },
 
+      // Shuoon Routes 
+                {
+            path: "shuoon/manage-vacation",
+            element: <ProtectedRoute allowedTypes={"شؤون ادارية"} />,
+            children: [{ path: "", element: <ManageShuoonVacation /> }],
+          },
+          {
+            path: "shuoon/manage-mission",
+            element: <ProtectedRoute allowedTypes={"شؤون ادارية"} />,
+            children: [{ path: "", element: <ManageShuoonMission /> }],
+          },
+          {
+            path: "shuoon/manage-course",
+            element: <ProtectedRoute allowedTypes={"شؤون ادارية"} />,
+            children: [{ path: "", element: <ManageShuoonCourse /> }],
+          },
+
       // NCOs Routes
       {
         path: "ncos",
-        element: <ProtectedRoute allowedTypes={["admin", "بوابة"]} />,
+        element: (
+          <ProtectedRoute allowedTypes={["admin", "بوابة", "شؤون ادارية"]} />
+        ),
         children: [
           { path: "", element: <NCOsHome /> },
           {
@@ -284,28 +314,38 @@ export const router = createBrowserRouter([
           },
           {
             path: "add",
-            element: <ProtectedRoute allowedTypes={"admin"} />,
+            element: <ProtectedRoute allowedTypes={["admin", "شؤون ادارية"]} />,
             children: [{ path: "", element: <AddNCOs /> }],
           },
           {
             path: ":id",
-            element: <ProtectedRoute allowedTypes={"admin"} />,
+            element: <ProtectedRoute allowedTypes={["admin", "شؤون ادارية"]} />,
             children: [{ path: "", element: <UpdateNCOs /> }],
           },
           {
             path: "details/:id",
-            element: <ProtectedRoute allowedTypes={"admin"} />,
+            element: <ProtectedRoute allowedTypes={["admin", "شؤون ادارية"]} />,
             children: [{ path: "", element: <NCODetails /> }],
           },
           {
             path: "tmam",
-            element: <ProtectedRoute allowedTypes={"admin"} />,
+            element: <ProtectedRoute allowedTypes={["admin", "شؤون ادارية"]} />,
             children: [{ path: "", element: <NCOsTmam /> }],
+          },
+                    {
+            path: "tmam/add",
+            element: <ProtectedRoute allowedTypes={"شؤون ادارية"} />,
+            children: [{ path: "", element: <AddNCOTmam /> }],
           },
           {
             path: "tmam/details/:id",
-            element: <ProtectedRoute allowedTypes={"admin"} />,
+            element: <ProtectedRoute allowedTypes={["admin", "شؤون ادارية"]} />,
             children: [{ path: "", element: <NCOsTmamDetails /> }],
+          },
+                    {
+            path: "tmam/:id",
+            element: <ProtectedRoute allowedTypes={["شؤون ادارية"]} />,
+            children: [{ path: "", element: <UpdateNCOTmam /> }],
           },
           {
             path: "log",
@@ -319,13 +359,25 @@ export const router = createBrowserRouter([
           },
           { path: "arrival", element: <NCOArrival /> },
           { path: "departure", element: <NCODeparture /> },
+          {
+            path: "manage",
+            element: <ProtectedRoute allowedTypes={"شؤون ادارية"} />,
+            children: [{ path: "", element: <ManageNCOs /> }],
+          },
+          {
+            path: "manage-tmam",
+            element: <ProtectedRoute allowedTypes={"شؤون ادارية"} />,
+            children: [{ path: "", element: <ManageNCOTmam /> }],
+          },
         ],
       },
 
       // Soldiers Routes
       {
         path: "soldiers",
-        element: <ProtectedRoute allowedTypes={["admin", "بوابة"]} />,
+        element: (
+          <ProtectedRoute allowedTypes={["admin", "بوابة", "شؤون ادارية"]} />
+        ),
         children: [
           { path: "", element: <SoldiersHome /> },
           {
@@ -335,28 +387,39 @@ export const router = createBrowserRouter([
           },
           {
             path: "add",
-            element: <ProtectedRoute allowedTypes={"admin"} />,
+            element: <ProtectedRoute allowedTypes={["admin", "شؤون ادارية"]} />,
             children: [{ path: "", element: <AddSoldiers /> }],
           },
           {
             path: ":id",
-            element: <ProtectedRoute allowedTypes={"admin"} />,
+            element: <ProtectedRoute allowedTypes={["admin", "شؤون ادارية"]} />,
             children: [{ path: "", element: <UpdateSoldiers /> }],
           },
           {
             path: "details/:id",
-            element: <ProtectedRoute allowedTypes={"admin"} />,
+            element: <ProtectedRoute allowedTypes={["admin", "شؤون ادارية"]} />,
             children: [{ path: "", element: <SoldierDetails /> }],
           },
           {
             path: "tmam",
-            element: <ProtectedRoute allowedTypes={"admin"} />,
+            element: <ProtectedRoute allowedTypes={["admin", "شؤون ادارية"]} />,
             children: [{ path: "", element: <SoldiersTmam /> }],
           },
           {
+            path: "tmam/add",
+            element: <ProtectedRoute allowedTypes={"شؤون ادارية"} />,
+            children: [{ path: "", element: <AddSoldierTmam /> }],
+          },
+
+          {
             path: "tmam/details/:id",
-            element: <ProtectedRoute allowedTypes={"admin"} />,
+            element: <ProtectedRoute allowedTypes={["admin", "شؤون ادارية"]} />,
             children: [{ path: "", element: <SoldiersTmamDetails /> }],
+          },
+          {
+            path: "tmam/:id",
+            element: <ProtectedRoute allowedTypes={["شؤون ادارية"]} />,
+            children: [{ path: "", element: <UpdateSoldierTmam /> }],
           },
           {
             path: "log",
@@ -376,6 +439,16 @@ export const router = createBrowserRouter([
           // },
           { path: "arrival", element: <SoldierArrival /> },
           { path: "departure", element: <SoldierDeparture /> },
+          {
+            path: "manage",
+            element: <ProtectedRoute allowedTypes={"شؤون ادارية"} />,
+            children: [{ path: "", element: <ManageSoldiers /> }],
+          },
+          {
+            path: "manage-tmam",
+            element: <ProtectedRoute allowedTypes={"شؤون ادارية"} />,
+            children: [{ path: "", element: <ManageSoldierTmam /> }],
+          },
         ],
       },
 

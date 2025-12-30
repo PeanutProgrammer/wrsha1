@@ -27,6 +27,88 @@
 
 }
 
+/* Custom Dropdown Button */
+.custom-dropdown-button .btn-outline-secondary {
+  background-color: #343a40 !important; /* Slightly lighter button background */
+  color: #ffffff !important; /* Text color */
+  border-color: #201f19 !important; /* Border color */
+  transition: all 0.3s ease; /* Smooth transition */
+}
+
+/* Button hover effect */
+.custom-dropdown-button .btn-outline-secondary:hover {
+  background-color: #3a4149 !important; /* Slightly lighter background on hover */
+  border-color: #3a4149 !important; /* Border color on hover */
+  color: #fff !important; /* Keep text color white on hover */
+}
+
+/* Dropdown Menu Customization */
+.custom-dropdown-button .dropdown-menu {
+  background-color: #343a40 !important; /* Slightly lighter menu background color */
+  border: 1px solid #201f19 !important; /* Border around the menu */
+  border-radius: 5px !important; /* Rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  padding: 10px 0 !important; /* Space between items */
+}
+
+/* Hover effect on the dropdown items */
+.custom-dropdown-button .dropdown-item {
+  color: #fff !important; /* Default text color */
+  background-color: transparent !important; /* Transparent background */
+  padding: 8px 20px !important; /* Spacing within items */
+  transition: all 0.2s ease-in-out; /* Smooth hover effect */
+}
+
+/* Hover effect on items */
+.custom-dropdown-button .dropdown-item:hover {
+  background-color: #75746e !important; /* Item background on hover */
+  color: #fff !important; /* Keep text white */
+}
+
+/* Active/Selected Item Effect */
+.custom-dropdown-button .dropdown-item.active, 
+.custom-dropdown-button .dropdown-item:active {
+  background-color: #75746e !important; /* Same as hover for active state */
+  color: #fff !important; /* Text color on active */
+}
+
+/* Focus effect on button */
+.custom-dropdown-button .btn-outline-secondary:focus {
+  outline: none !important; /* Remove default outline */
+  box-shadow: 0 0 0 0.25rem rgba(82, 168, 236, 0.5); /* Custom focus outline */
+}
+
+/* Focus effect on dropdown items */
+.custom-dropdown-button .dropdown-item:focus {
+  background-color: #75746e !important; /* Highlight on focus */
+  color: #fff !important; /* Keep text white */
+}
+
+/* Final polish */
+.custom-dropdown-button .dropdown-item {
+  padding: 10px 15px !important; /* Increase padding for better click area */
+  font-size: 16px; /* Slightly larger text */
+  border-radius: 4px; /* Rounded corners for items */
+}
+
+/* Improve alignment and spacing for the dropdown toggle button */
+.custom-dropdown-button .dropdown-toggle {
+  padding: 8px 20px !important; /* Adjust button padding */
+  font-size: 16px; /* Adjust font size for readability */
+  border-radius: 4px; /* Rounded corners for button */
+}
+
+/* Remove border on hover for better visual appeal */
+.custom-dropdown-button .dropdown-toggle:hover {
+  border: 1px solid #201f19 !important; /* Keep a consistent border */
+}
+
+
+
+
+
+
+
 .action-buttons {
   display: flex;
   gap: 6px;

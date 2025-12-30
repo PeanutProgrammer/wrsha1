@@ -10,7 +10,7 @@ import "react-datetime/css/react-datetime.css";
 
 // Validation schema using yup
 const schema = yup.object().shape({
-  nationalID: yup.string().required('رقم تحقيق الشخصية مطلوب').optional().nullable(),
+  nationalID: yup.string().optional().nullable(),
   name: yup.string().min(3, 'اسم الخبير يجب أن يكون أكثر من 3 حروف').max(40, 'اسم الخبير يجب ألا يتجاوز 40 حرف').required('اسم الخبير مطلوب'),
   security_clearance_number: yup.string().required('رقم التصديق الأمني مطلوب'),
   valid_from: yup.date().required('تاريخ بداية التصديق الأمني مطلوب').typeError('يرجى إدخال تاريخ صحيح'),

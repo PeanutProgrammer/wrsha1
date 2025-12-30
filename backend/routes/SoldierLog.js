@@ -6,6 +6,7 @@ const shuoonSarya = require("../middleware/shuoonSarya");
 const gate = require("../middleware/gate");
 const SoldierLogController = require("../controllers/soldierLogController");
 const moment = require("moment");
+const allowAny = require("../middleware/allowAny");
 
 // Arrival route (already exists)
 router.post("/", gate,
@@ -87,8 +88,75 @@ router.post("/departure", gate,
     }
 );
 
+router.post("/tmam", shuoonSarya,
+        body("soldierID")
+        .isNumeric().withMessage("من فضلك أدخل اسم جندي صحيح"),
+      body("leaveTypeID")
+        .isNumeric().withMessage("من فضلك أدخل نوع عودة صحيح"),
+    body("start_date")
+        .custom((value, { req }) => {
+            if (!moment(value, "YYYY-MM-DD", true).isValid()) {
+                throw new Error("تاريخ البدء يجب أن يكون بالتنسيق الصحيح (YYYY-MM-DD).");
+            }
+            if (moment(value).isAfter(req.body.end_date)) {
+                throw new Error("تاريخ البدء يجب أن يكون قبل تاريخ الانتهاء.");
+            }
+            return true;
+        }),
+    body("end_date")
+        .custom((value, { req }) => {
+            if (!moment(value, "YYYY-MM-DD", true).isValid()) {
+                throw new Error("تاريخ الانتهاء يجب أن يكون بالتنسيق الصحيح (YYYY-MM-DD).");
+            }
+            if (moment(value).isBefore(req.body.start_date)) {
+                throw new Error("تاريخ الانتهاء يجب أن يكون بعد تاريخ البدء.");
+            }
+            return true;
+        }),
+    body("destination")
+        .isString().withMessage("من فضلك أدخل الوجهة."),
+    (req, res) => {
+        SoldierLogController.createTmam(req, res);
+    }
+);
 
-router.get("/", admin,(req, res) => {
+router.put("/:id", allowAny(shuoonSarya),
+    body("leaveTypeID")
+        .isNumeric().withMessage("من فضلك أدخل نوع عودة صحيح"),
+    body("start_date")
+        .custom((value, { req }) => {
+            if (!moment(value, "YYYY-MM-DD", true).isValid()) {
+                throw new Error("تاريخ البدء يجب أن يكون بالتنسيق الصحيح (YYYY-MM-DD).");
+            }
+            if (moment(value).isAfter(req.body.end_date)) {
+                throw new Error("تاريخ البدء يجب أن يكون قبل تاريخ الانتهاء.");
+            }
+            return true;
+        }),
+    body("end_date")
+        .custom((value, { req }) => {
+            if (!moment(value, "YYYY-MM-DD", true).isValid()) {
+                throw new Error("تاريخ الانتهاء يجب أن يكون بالتنسيق الصحيح (YYYY-MM-DD).");
+            }
+            if (moment(value).isBefore(req.body.start_date)) {
+                throw new Error("تاريخ الانتهاء يجب أن يكون بعد تاريخ البدء.");
+            }
+            return true;
+        }),
+    body("destination")
+        .isString().withMessage("من فضلك أدخل الوجهة."),
+
+    (req, res) => {
+        SoldierLogController.updateTmam(req, res);
+    }
+);
+
+router.get("/:id", shuoonSarya, (req, res) => {
+    SoldierLogController.getOneTmam(req, res);
+});
+
+
+router.get("/", shuoonSarya,(req, res) => {
     SoldierLogController.getSoldiersLog(req, res);
 });
 

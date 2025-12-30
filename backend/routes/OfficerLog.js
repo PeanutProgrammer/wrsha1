@@ -107,12 +107,39 @@ router.post("/departure", gate,
     }
 );
 
-router.post("/tmam", shuoonOfficers, (req, res) => {
-    OfficerLogController.createTmam(req, res);
-});
+router.post("/tmam", shuoonOfficers,
+        body("officerID")
+        .isNumeric().withMessage("من فضلك أدخل اسم ضابط صحيح"),
+        body("leaveTypeID")
+        .isNumeric().withMessage("من فضلك أدخل نوع عودة صحيح"),
+    body("start_date")
+        .custom((value, { req }) => {
+            if (!moment(value, "YYYY-MM-DD", true).isValid()) {
+                throw new Error("تاريخ البدء يجب أن يكون بالتنسيق الصحيح (YYYY-MM-DD).");
+            }
+            if (moment(value).isAfter(req.body.end_date)) {
+                throw new Error("تاريخ البدء يجب أن يكون قبل تاريخ الانتهاء.");
+            }
+            return true;
+        }),
+    body("end_date")
+        .custom((value, { req }) => {
+            if (!moment(value, "YYYY-MM-DD", true).isValid()) {
+                throw new Error("تاريخ الانتهاء يجب أن يكون بالتنسيق الصحيح (YYYY-MM-DD).");
+            }
+            if (moment(value).isBefore(req.body.start_date)) {
+                throw new Error("تاريخ الانتهاء يجب أن يكون بعد تاريخ البدء.");
+            }
+            return true;
+        }),
+    body("destination")
+        .isString().withMessage("من فضلك أدخل الوجهة."),
+    (req, res) => {
+        OfficerLogController.createTmam(req, res);
+    }
+);
 
-
-router.put("/:id", allowAny(gate,shuoonOfficers),
+router.put("/:id", allowAny(shuoonOfficers),
     body("leaveTypeID")
         .isNumeric().withMessage("من فضلك أدخل نوع عودة صحيح"),
     body("start_date")

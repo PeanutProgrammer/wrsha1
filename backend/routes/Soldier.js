@@ -6,6 +6,7 @@ const admin = require("../middleware/admin");
 const shuoonSarya = require("../middleware/shuoonSarya");
 const gate = require("../middleware/gate");
 const securityHead = require("../middleware/securityHead");
+const allowAny = require("../middleware/allowAny");
 
 
 router.post(
@@ -47,7 +48,7 @@ router.post(
 
 router.put(
   "/:id",
-  admin,
+  shuoonSarya,
   body("name")
     .isString()
     .withMessage("يرجى إدخال اسم صحيح")
@@ -98,23 +99,23 @@ router.get("/filter",  authorized,(req, res) => {
 
 
 
-router.get("/", gate,(req, res) => {
+router.get("/", allowAny(gate,shuoonSarya),(req, res) => {
     SoldierController.getSoldiers(req, res);
 });
 
-router.get("/tmam/:id", admin, (req,res) => {
+router.get("/tmam/:id", shuoonSarya, (req,res) => {
     SoldierController.getSoldierTmamDetails(req,res);
 });
 
-router.get("/tmam", (securityHead), (req,res) => {
+router.get("/tmam", allowAny(securityHead,shuoonSarya), (req,res) => {
     SoldierController.getSoldiersTmam(req,res);
 });
 
 
 
 
-router.get("/log", admin, (req,res) => {
-    SoldierController.getSoldiersTmam(req,res);
+router.get("/log", shuoonSarya, (req,res) => {
+    SoldierController.getSoldiersLog(req,res);
 });
 
 router.get("/absent", gate, (req, res) => {
@@ -125,7 +126,7 @@ router.get("/current", gate, (req, res) => {
     SoldierController.getCurrentSoldiers(req, res);
 });
 
-router.get("/:id", admin, (req, res) => {
+router.get("/:id", shuoonSarya, (req, res) => {
     SoldierController.getSoldier(req, res);
 });
 
