@@ -99,6 +99,28 @@ table {
   border-spacing: 0;
   background-color: #fff;
   font-size: 0.9rem;
+    border-radius: 8px; /* Rounded corners for the table */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+/* Highlight the headers for each section */
+.table-summary-header {
+  background-color: #007bff; /* Blue background for summary section */
+  color: white;
+  font-size: 16px;
+}
+.table-summary-subheader th {
+  border-color: rgb(255, 255, 255);
+
+}
+/* Highlighting important columns */
+.percentage-column {
+  background-color: #dff0d8; /* Light green for percentage */
+  font-weight: bold;
+}
+.table-summary-header th {
+  border: none; /* Remove borders for summary header */
+  padding: 12px 15px;
 }
 
 /* Header */
@@ -116,14 +138,20 @@ thead th {
   user-select: none;
 }
 
+th {
+    border-color: white !important;
+
+}
+
 /* Cells */
 th,
 td {
   padding: 10px 12px;
-  border: 1px solid var(--table-border);
+  border: 1px solid var(--table-border) #ddd;
   text-align: center !important;
   vertical-align: middle !important;
   white-space: nowrap;
+  
 }
 
 /* Remove pointer on non-sortable headers */
@@ -175,6 +203,7 @@ tbody td:last-child {
   min-width: 100px;
   white-space: nowrap;
 }
+
 
 /* Action buttons group */
 td .btn {

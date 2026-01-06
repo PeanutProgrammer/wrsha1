@@ -1,10 +1,8 @@
 const router = require("express").Router();
-const { body } = require('express-validator');
 const PastNCOController = require("../controllers/pastNCOController"); 
-const authorized = require("../middleware/authorized");
 const admin = require("../middleware/admin");
-const shuoonOfficers = require("../middleware/shuoonOfficers");
-
+const allowAny = require("../middleware/allowAny");
+const leader = require("../middleware/leader");
 
 
 
@@ -20,7 +18,7 @@ const shuoonOfficers = require("../middleware/shuoonOfficers");
 
 
 
-router.get("/", admin,(req, res) => {
+router.get("/", allowAny(admin,leader),(req, res) => {
     console.log("Getting Officers");
     
     PastNCOController.getNCOs(req, res);
@@ -28,7 +26,7 @@ router.get("/", admin,(req, res) => {
 
 
 
-router.get("/:id", admin, (req, res) => {
+router.get("/:id", allowAny(admin,leader), (req, res) => {
     PastNCOController.getNCO(req, res);
 });
 

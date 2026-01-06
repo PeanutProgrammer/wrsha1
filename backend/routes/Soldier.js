@@ -7,6 +7,7 @@ const shuoonSarya = require("../middleware/shuoonSarya");
 const gate = require("../middleware/gate");
 const securityHead = require("../middleware/securityHead");
 const allowAny = require("../middleware/allowAny");
+const leader = require("../middleware/leader")
 
 
 router.post(
@@ -95,6 +96,11 @@ router.delete("/:mil_id", admin,  (req, res) => {
 router.get("/filter",  authorized,(req, res) => {
     SoldierController.filterSoldiers(req, res);
 });  
+
+
+router.get("/daily-summary", allowAny(leader,shuoonSarya), (req, res) => {
+    SoldierController.getDailySummary(req, res);
+});
 
 
 

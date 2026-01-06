@@ -11,7 +11,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost", // your React app
+    origin: "http://localhost:3000", // your React app
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   },
@@ -103,7 +103,7 @@ app.use("/shuoon", shuoon);
 
 const PORT = 4001;
 
-server.listen(PORT, "192.168.1.3", () => {
+server.listen(PORT, "0.0.0.0", () => {
     console.log(`Server is running on port ${PORT}`);
 })
 

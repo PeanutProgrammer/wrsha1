@@ -6,6 +6,8 @@ const gate = require("../middleware/gate");
 // const shuoonSarya = require("../middleware/shuoonSarya");
 const ExpertLogController = require("../controllers/expertLogController");
 const moment = require("moment");
+const allowAny = require("../middleware/allowAny");
+const leader = require("../middleware/leader");
 
 // Arrival route (already exists)
 router.post("/", gate,
@@ -113,7 +115,7 @@ router.get("/current", gate,(req, res) => {
     ExpertLogController.getExpertsWithNullEndDate(req, res);
 });
 
-router.get("/", admin,(req, res) => {
+router.get("/", allowAny(admin,leader),(req, res) => {
     ExpertLogController.getExpertsLog(req, res);
 });
 

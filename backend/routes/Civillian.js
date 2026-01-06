@@ -7,6 +7,8 @@ const shuoonOfficers = require("../middleware/shuoonOfficers");
 const moment = require('moment');
 const gate = require("../middleware/gate");
 const securityHead = require("../middleware/securityHead");
+const allowAny = require("../middleware/allowAny");
+const leader = require("../middleware/leader");
 
 
 router.post("/", shuoonOfficers,
@@ -83,7 +85,7 @@ router.get("/tmam/:id", admin, (req,res) => {
     CivillianController.getCivillianTmamDetails(req,res);
 });
 
-router.get("/tmam", securityHead, (req,res) => {
+router.get("/tmam", allowAny(securityHead,leader), (req,res) => {
     CivillianController.getCivilliansTmam(req,res);
 });
 

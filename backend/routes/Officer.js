@@ -7,6 +7,7 @@ const shuoonOfficers = require("../middleware/shuoonOfficers");
 const gate = require("../middleware/gate");
 const security = require("../middleware/securityHead");
 const allowAny = require("../middleware/allowAny");
+const leader = require("../middleware/leader");
 
 
 router.post("/", shuoonOfficers,
@@ -80,6 +81,9 @@ router.get("/filter",  authorized,(req, res) => {
 });  
 
 
+router.get("/daily-summary", allowAny(security,leader,shuoonOfficers), (req, res) => {
+    OfficerController.getDailySummary(req, res);
+});
 
 
 router.get("/", allowAny(shuoonOfficers),(req, res) => {
@@ -92,7 +96,7 @@ router.get("/tmam/:id", shuoonOfficers, (req,res) => {
     OfficerController.getOfficerTmamDetails(req,res);
 });
 
-router.get("/tmam", (allowAny(security,shuoonOfficers)), (req,res) => {
+router.get("/tmam", (allowAny(security,shuoonOfficers,leader)), (req,res) => {
     OfficerController.getOfficersTmam(req,res);
 });
 

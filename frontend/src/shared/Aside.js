@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FaBars } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { getAuthUser } from "../helper/Storage";
-import '../style/Aside.css';
+import "../style/Aside.css";
 
 const Aside = ({ setCollapsed, collapsed }) => {
   const auth = getAuthUser();
@@ -147,7 +147,7 @@ const Aside = ({ setCollapsed, collapsed }) => {
           </>
         )}
 
-                {auth?.type === "شؤون ادارية" && (
+        {auth?.type === "شؤون ادارية" && (
           <>
             <li className="tabs">
               <Link to={"Home"}>الصفحة الرئيسية</Link>
@@ -155,7 +155,7 @@ const Aside = ({ setCollapsed, collapsed }) => {
             <li className="tabs">
               <Link to={"ncos/manage"}>بيانات ضباط الصف</Link>
             </li>
-                        <li className="tabs">
+            <li className="tabs">
               <Link to={"soldiers/manage"}>بيانات الجنود</Link>
             </li>
             <li className="tabs">
@@ -176,10 +176,39 @@ const Aside = ({ setCollapsed, collapsed }) => {
           </>
         )}
 
-        {["مبنى القيادة"].includes(auth?.type) && (
-          <li className="tabs">
-            <Link to={"Home"}>Home</Link>
-          </li>
+        {auth?.type === "مبنى القيادة" && (
+          <>
+            <li className="tabs">
+              <Link to={"Home"}>الصفحة الرئيسية</Link>
+            </li>
+            <li className="tabs">
+              <Link to={"leader-officers"}>تمام الوحدة</Link>
+            </li>
+            <li className="tabs">
+              <Link to={"leader-officers"}>تمام الضباط</Link>
+            </li>
+            <li className="tabs">
+              <Link to={"leader-ncos"}>تمام ضباط الصف</Link>
+            </li>
+            <li className="tabs">
+              <Link to={"leader-soldiers"}>تمام الجنود</Link>
+            </li>
+            <li className="tabs">
+              <Link to={"leader-civillians"}>تمام المدنيين</Link>
+            </li>
+            <li className="tabs">
+              <Link to={"soldiers/manage-tmam"}>سجل الخبراء</Link>
+            </li>
+            <li className="tabs">
+              <Link to={"soldiers/manage-tmam"}>سجل المناديب</Link>
+            </li>
+            <li className="tabs">
+              <Link to={"shuoon/manage-vacation"}>سجل الزوار</Link>
+            </li>
+            <li className="tabs">
+              <Link to={"past-workers"}>العاملين السابقين</Link>
+            </li>
+          </>
         )}
       </ul>
     </div>

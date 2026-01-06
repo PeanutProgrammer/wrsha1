@@ -603,6 +603,105 @@ WHERE o.in_unit = 0;`);
       return res.status(500).json({ err: err });
     }
   }
+
+    static async getDailySummary(req, res)  {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const query = util.promisify(connection.query).bind(connection);
+
+    // Query all soldiers' data for the summary calculation
+    const soldiers = await query(`
+SELECT 
+    o.mil_id,
+    o.rank,
+    o.name,
+    o.department,
+    o.in_unit,
+    o.attached,
+
+
+    -- Latest leave ID
+    (
+        SELECT id
+        FROM soldier_leave_details old
+        WHERE old.soldierID = o.id
+        ORDER BY old.id DESC
+        LIMIT 1
+    ) AS latest_leave_id,
+
+    lt.name AS tmam
+FROM soldiers o
+LEFT JOIN soldier_leave_details old
+    ON old.id = (
+        SELECT id
+        FROM soldier_leave_details
+        WHERE soldierID = o.id
+        ORDER BY id DESC
+        LIMIT 1
+    )
+LEFT JOIN leave_type lt
+    ON lt.id = old.leaveTypeID;
+    `);
+
+    if (!soldiers.length) {
+      return res.status(404).json({ msg: "No soldiers found" });
+    }
+
+    // Calculate the summary
+    const totalSoldiers = soldiers.length;
+    const totalAttached = soldiers.filter((soldier) => soldier.attached).length;
+    const available = soldiers.filter((soldier) => soldier.in_unit).length;
+    const missing = totalSoldiers - available;
+    const fixedMission = soldiers.filter((soldier) => soldier.tmam === "مأمورية ثابتة" && !soldier.in_unit).length;
+
+    // Breakdown for اجازة types
+    const normalLeave = soldiers.filter((soldier) => soldier.tmam === "راحة"  && !soldier.in_unit).length;
+    const fieldLeave = soldiers.filter((soldier) => soldier.tmam === "اجازة ميدانية" && !soldier.in_unit).length;
+    const grantLeave = soldiers.filter((soldier) => soldier.tmam === "منحة" && !soldier.in_unit).length;
+
+    // Other categories
+    const sickLeave = soldiers.filter((soldier) => soldier.tmam === "اجازة مرضية" && !soldier.in_unit).length;
+    const mission = soldiers.filter((soldier) => (soldier.tmam === "مأمورية" || soldier.tmam === "مأمورية جهاز الخدمات العامة") && !soldier.in_unit).length;
+    const hospital = soldiers.filter((soldier) => soldier.tmam === "عيادة" && !soldier.in_unit).length;
+
+    // Calculating total exits (اجمالي الخوارج)
+    const totalExits = fixedMission + normalLeave + fieldLeave + grantLeave + sickLeave + mission + hospital;
+
+    // Calculate the percentage of available soldiers
+    const percentageAvailable = totalSoldiers ? ((missing / totalSoldiers) * 100).toFixed(2) : 0;
+
+    // Return the daily summary response
+    return res.status(200).json({
+      total: totalSoldiers,
+      available: available,
+      attached: totalAttached,
+      missing: missing,
+      تمام_الخوارج: {
+        ثابتة: fixedMission,
+        راحة: normalLeave,
+        اجازة_ميدانية: fieldLeave,
+        منحة: grantLeave,
+        اجازة_مرضية: sickLeave,
+        مأمورية: mission,
+        مستشفى: hospital,
+      },
+      اجمالي_الخوارج: totalExits,
+      percentageAvailable: percentageAvailable,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      message: "An unexpected error occurred",
+      error: err.message,
+    });
+  }
+};
+
+  
 }
 
 

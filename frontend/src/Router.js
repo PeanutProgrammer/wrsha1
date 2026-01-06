@@ -37,6 +37,7 @@ import AddTmam from "./pages/Officers/AddTmam";
 import ManageVacation from "./pages/Officers/ManageVacation";
 import ManageMission from "./pages/Officers/ManageMission";
 import ManageCourse from "./pages/Officers/ManageCourse";
+import LeaderOfficers from "./pages/Officers/LeaderOfficers";
 // NCOs
 import NCOs from "./pages/NCOs/NCOs";
 import AddNCOs from "./pages/NCOs/AddNCOs";
@@ -52,6 +53,7 @@ import ManageNCOs from "./pages/NCOs/ManageNCOs";
 import ManageNCOTmam from "./pages/NCOs/ManageTmam";
 import AddNCOTmam from "./pages/NCOs/AddTmam";
 import UpdateNCOTmam from "./pages/NCOs/UpdateTmam";
+import LeaderNCOs from "./pages/NCOs/LeaderNCOs";
 // Soldiers
 import Soldiers from "./pages/Soldiers/Soldiers";
 import AddSoldiers from "./pages/Soldiers/AddSoldiers";
@@ -67,6 +69,7 @@ import ManageSoldiers from "./pages/Soldiers/ManageSoldiers";
 import ManageSoldierTmam from "./pages/Soldiers/ManageTmam";
 import AddSoldierTmam from "./pages/Soldiers/AddTmam";
 import UpdateSoldierTmam from "./pages/Soldiers/UpdateTmam";
+import LeaderSoldiers from "./pages/Soldiers/LeaderSoldiers";
 // import RealTimeMonitor from "./pages/Soldiers/RealTimeMonitor";
 
 // Civillians
@@ -80,6 +83,7 @@ import SearchCivillians from "./pages/Civillians/SearchCivillians";
 import CivilliansTmamDetails from "./pages/Civillians/CivilliansTmamDetails";
 import CivillianArrival from "./pages/Civillians/arrival";
 import CivillianDeparture from "./pages/Civillians/departure";
+import LeaderCivillians from "./pages/Civillians/LeaderCivillians";
 
 // Experts
 import Experts from "./pages/Experts/Experts";
@@ -90,6 +94,7 @@ import ExpertsLog from "./pages/Experts/ExpertsLog";
 import SearchExperts from "./pages/Experts/SearchExperts";
 import ExpertArrival from "./pages/Experts/arrival";
 import ExpertDeparture from "./pages/Experts/departure";
+import LeaderExperts from "./pages/Experts/LeaderExperts";
 
 // Guests
 import Guests from "./pages/Guests/Guests";
@@ -143,6 +148,30 @@ export const router = createBrowserRouter([
     element: <App />,
     children: [
       { path: "home", element: <Home /> },
+
+      // Leader Routes
+      {
+        path: "leader-officers",
+        element: <ProtectedRoute allowedTypes={["مبنى القيادة"]} />,
+        children: [{ path: "", element: <LeaderOfficers /> }],
+      },
+            {
+        path: "leader-ncos",
+        element: <ProtectedRoute allowedTypes={["مبنى القيادة"]} />,
+        children: [{ path: "", element: <LeaderNCOs /> }],
+      },
+      {
+        path: "leader-soldiers",
+        element: <ProtectedRoute allowedTypes={["مبنى القيادة"]} />,
+        children: [{ path: "", element: <LeaderSoldiers /> }],
+      },
+      {
+        path: "leader-civillians",
+        element: <ProtectedRoute allowedTypes={["مبنى القيادة"]} />,
+        children: [{ path: "", element: <LeaderCivillians /> }],
+      },
+
+      
 
       // Security Routes
       {
@@ -602,32 +631,32 @@ export const router = createBrowserRouter([
       // Past Workers
       {
         path: "past-workers",
-        element: <Admin />,
+        element: <ProtectedRoute allowedTypes={["admin", "مبنى القيادة"]} />,
         children: [
           { path: "", element: <PastWorkersHome /> },
           {
             path: "officers",
-            element: <ProtectedRoute allowedTypes={"admin"} />,
+            element: <ProtectedRoute allowedTypes={["admin", "مبنى القيادة"]} />,
             children: [{ path: "", element: <PastOfficers /> }],
           },
           {
             path: "officers/:id",
-            element: <ProtectedRoute allowedTypes={"admin"} />,
+            element: <ProtectedRoute allowedTypes={["admin", "مبنى القيادة"]} />,
             children: [{ path: "", element: <PastOfficerDetails /> }],
           },
           {
             path: "ncos",
-            element: <ProtectedRoute allowedTypes={"admin"} />,
+            element: <ProtectedRoute allowedTypes={["admin", "مبنى القيادة"]} />,
             children: [{ path: "", element: <PastNCOs /> }],
           },
           {
             path: "ncos/:id",
-            element: <ProtectedRoute allowedTypes={"admin"} />,
+            element: <ProtectedRoute allowedTypes={["admin", "مبنى القيادة"]} />,
             children: [{ path: "", element: <PastNCODetails /> }],
           },
           {
             path: "search",
-            element: <ProtectedRoute allowedTypes={"admin"} />,
+            element: <ProtectedRoute allowedTypes={["admin", "مبنى القيادة"]} />,
             children: [{ path: "", element: <SearchPastWorkers /> }],
           },
         ],

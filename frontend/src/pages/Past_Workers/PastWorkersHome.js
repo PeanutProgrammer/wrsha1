@@ -7,23 +7,8 @@ import { FaUsers, FaClipboardCheck, FaHistory, FaSearch } from "react-icons/fa";
 
 const PastWorkersHome = () => {
   const auth = getAuthUser();
-    const [officers, setOfficers] = useState([]);
-  
+  const [officers, setOfficers] = useState([]);
 
-
-
-    
-
-   
-
-
-   
-  
-  
-  
-  
-
-  
   console.log(auth.token);
 
   console.log(officers[0]);
@@ -35,9 +20,9 @@ const PastWorkersHome = () => {
           <FaUsers className="card-icon" />
           <h2>بيانات الضباط السابقين</h2>
         </div>
-        {auth && auth.type === "admin" && (
-          <Link to={"officers"} className="button">Go</Link>
-        )}
+        <Link to={"officers"} className="button">
+          Go
+        </Link>
       </div>
 
       <div className="card">
@@ -45,30 +30,20 @@ const PastWorkersHome = () => {
           <FaClipboardCheck className="card-icon" />
           <h2>بيانات ضباط الصف السابقين</h2>
         </div>
-        {auth && auth.type === "admin" && (
-          <Link to={"ncos"} className="button">Go</Link>
-        )}
+        <Link to={"ncos"} className="button">
+          Go
+        </Link>
       </div>
 
-      {/* <div className="card">
+      <div className="card">
         <div className="card-header">
-          <FaHistory className="card-icon" />
-          <h2>سجل دخول / خروج الضباط</h2>
+          <FaSearch className="card-icon" />
+          <h2>بحث</h2>
         </div>
-        {auth && auth.type === "admin" && (
-          <Link to={"Officers/log"} className="button">Go</Link>
-        )}
-      </div> */}
-
-      {auth && auth.type === "admin" && (
-        <div className="card">
-          <div className="card-header">
-            <FaSearch className="card-icon" />
-            <h2>بحث</h2>
-          </div>
-          <Link to="search" className="button">Go</Link>
-        </div>
-      )}
+        <Link to="search" className="button">
+          Go
+        </Link>
+      </div>
     </div>
   );
 };

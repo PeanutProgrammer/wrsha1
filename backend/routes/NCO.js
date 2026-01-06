@@ -7,6 +7,7 @@ const shuoonSarya = require("../middleware/shuoonSarya");
 const gate = require("../middleware/gate");
 const security = require("../middleware/securityHead");
 const allowAny = require("../middleware/allowAny");
+const leader = require("../middleware/leader")
 
 
 router.post("/", shuoonSarya,
@@ -61,6 +62,10 @@ router.delete("/:mil_id", admin,  (req, res) => {
 router.get("/filter",  authorized,(req, res) => {
     NCOController.filterOfficers(req, res);
 });  
+
+router.get("/daily-summary", allowAny(security,leader,shuoonSarya), (req, res) => {
+    NCOController.getDailySummary(req, res);
+});
 
 
 

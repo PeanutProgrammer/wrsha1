@@ -898,6 +898,114 @@ WHERE
       });
     }
   }
+
+
+  static async getDailySummary(req, res)  {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const query = util.promisify(connection.query).bind(connection);
+
+    // Query all officers' data for the summary calculation
+    const officers = await query(`
+SELECT 
+    o.mil_id,
+    o.rank,
+    o.name,
+    o.department,
+    o.in_unit,
+    o.attached,
+
+
+    -- Latest leave ID
+    (
+        SELECT id
+        FROM officer_leave_details old
+        WHERE old.officerID = o.id
+        ORDER BY old.id DESC
+        LIMIT 1
+    ) AS latest_leave_id,
+
+    lt.name AS tmam
+FROM officers o
+LEFT JOIN officer_leave_details old
+    ON old.id = (
+        SELECT id
+        FROM officer_leave_details
+        WHERE officerID = o.id
+        ORDER BY id DESC
+        LIMIT 1
+    )
+LEFT JOIN leave_type lt
+    ON lt.id = old.leaveTypeID;
+    `);
+
+    if (!officers.length) {
+      return res.status(404).json({ msg: "No officers found" });
+    }
+
+    // Calculate the summary
+    const totalOfficers = officers.length;
+    const totalAttached = officers.filter((officer) => officer.attached).length;
+    const available = officers.filter((officer) => officer.in_unit).length;
+    const missing = totalOfficers - available;
+    const fixedMission = officers.filter((officer) => officer.tmam === "مأمورية ثابتة" && !officer.in_unit).length;
+    const course = officers.filter((officer) => officer.tmam === "فرقة / دورة"  && !officer.in_unit).length;
+
+    // Breakdown for اجازة types
+    const normalLeave = officers.filter((officer) => officer.tmam === "راحة"  && !officer.in_unit).length;
+    const compensatoryLeave = officers.filter((officer) => officer.tmam === "بدل راحة"  && !officer.in_unit).length;
+    const casualLeave = officers.filter((officer) => officer.tmam === "عارضة" && !officer.in_unit).length;
+    const fieldLeave = officers.filter((officer) => officer.tmam === "اجازة ميدانية" && !officer.in_unit).length;
+    const grantLeave = officers.filter((officer) => officer.tmam === "منحة" && !officer.in_unit).length;
+
+    // Other categories
+    const annualLeave = officers.filter((officer) => officer.tmam === "اجازة سنوية"  && !officer.in_unit).length;
+    const sickLeave = officers.filter((officer) => officer.tmam === "اجازة مرضية" && !officer.in_unit).length;
+    const travel = officers.filter((officer) => officer.tmam === "سفر" && !officer.in_unit).length;
+    const mission = officers.filter((officer) => (officer.tmam === "مأمورية" || officer.tmam === "مأمورية جهاز الخدمات العامة") && !officer.in_unit).length;
+    const hospital = officers.filter((officer) => officer.tmam === "عيادة" && !officer.in_unit).length;
+
+    // Calculating total exits (اجمالي الخوارج)
+    const totalExits = fixedMission + course + normalLeave + compensatoryLeave + casualLeave + fieldLeave + grantLeave + annualLeave + sickLeave + travel + mission + hospital;
+
+    // Calculate the percentage of available officers
+    const percentageAvailable = totalOfficers ? ((missing / totalOfficers) * 100).toFixed(2) : 0;
+
+    // Return the daily summary response
+    return res.status(200).json({
+      total: totalOfficers,
+      available: available,
+      attached: totalAttached,
+      missing: missing,
+      تمام_الخوارج: {
+        ثابتة: fixedMission,
+        فرقة_دورة: course,
+        راحة: normalLeave,
+        بدل_راحة: compensatoryLeave,
+        عارضة: casualLeave,
+        اجازة_ميدانية: fieldLeave,
+        منحة: grantLeave,
+        اجازة_سنوية: annualLeave,
+        اجازة_مرضية: sickLeave,
+        سفر: travel,
+        مأمورية: mission,
+        مستشفى: hospital,
+      },
+      اجمالي_الخوارج: totalExits,
+      percentageAvailable: percentageAvailable,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      message: "An unexpected error occurred",
+      error: err.message,
+    });
+  }
+};
 }
 
 module.exports = OfficerController;
