@@ -294,6 +294,7 @@ LEFT JOIN leave_type lt
       const normalLeave = units.filter(
         (unit) => unit.tmam === "راحة" && !unit.in_unit
       ).length;
+      
       const fieldLeave = units.filter(
         (unit) => unit.tmam === "اجازة ميدانية" && !unit.in_unit
       ).length;
@@ -308,8 +309,8 @@ LEFT JOIN leave_type lt
       ).length;
 
       // Other categories
-      const annualLeave = officers.filter(
-        (officer) => officer.tmam === "اجازة سنوية" && !officer.in_unit
+      const annualLeave = units.filter(
+        (unit) => unit.tmam === "اجازة سنوية" && !unit.in_unit
       ).length;
 
       const sickLeave = units.filter(
@@ -358,6 +359,10 @@ LEFT JOIN leave_type lt
           اجازة_مرضية: sickLeave,
           مأمورية: mission,
           مستشفى: hospital,
+          اجازة_سنوية: annualLeave,
+          عارضة: casualLeave,
+          بدل_راحة: compensatoryLeave,
+          فرقة_دورة: course,
         },
         اجمالي_الخوارج: totalExits,
         percentageAvailable: percentageAvailable,

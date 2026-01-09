@@ -182,7 +182,7 @@ const Aside = ({ setCollapsed, collapsed }) => {
               <Link to={"Home"}>الصفحة الرئيسية</Link>
             </li>
             <li className="tabs">
-              <Link to={"leader-officers"}>تمام الوحدة</Link>
+              <Link to={"leader-units"}>تمام الوحدة</Link>
             </li>
             <li className="tabs">
               <Link to={"leader-officers"}>تمام الضباط</Link>

@@ -129,6 +129,7 @@ import SecurityExperts from "./pages/Experts/SecurityExperts";
 import SecurityGuests from "./pages/Guests/SecurityGuests";
 import SecurityDelegates from "./pages/Delegates/SecurityDelegates";
 import AllInUnit from "./pages/Unit/AllInUnit";
+import LeaderUnits from "./pages/Unit/LeaderUnits";
 
 import ManageShuoonVacation from "./pages/Shuoon/ManageVacation";
 import ManageShuoonMission from "./pages/Shuoon/ManageMission";
@@ -169,6 +170,11 @@ export const router = createBrowserRouter([
         path: "leader-civillians",
         element: <ProtectedRoute allowedTypes={["مبنى القيادة"]} />,
         children: [{ path: "", element: <LeaderCivillians /> }],
+      },
+      {
+        path: "leader-units",
+        element: <ProtectedRoute allowedTypes={["مبنى القيادة"]} />,
+        children: [{ path: "", element: <LeaderUnits /> }],
       },
 
       
