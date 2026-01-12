@@ -26,6 +26,27 @@ const ManageTmam = () => {
     limit: 15,
     tempSearch: "",
   });
+  const [dailySummary, setDailySummary] = useState({
+      total: 0,
+      available: 0,
+      missing: 0,
+      تمام_الخوارج: {
+        ثابتة: 0,
+        فرقة_دورة: 0,
+        راحة: 0,
+        بدل_راحة: 0,
+        عارضة: 0,
+        اجازة_ميدانية: 0,
+        منحة: 0,
+        اجازة_سنوية: 0,
+        اجازة_مرضية: 0,
+        سفر: 0,
+        مأمورية: 0,
+        مستشفى: 0,
+      },
+      اجمالي_الخوارج: 0,
+      percentageAvailable: 0,
+    });
 
   useEffect(() => {
     const socket = io(`${process.env.REACT_APP_BACKEND_BASE_URL}`); //  backend port
@@ -58,7 +79,21 @@ const ManageTmam = () => {
               : "Something went wrong while fetching data.",
           });
         });
+
+         // Fetch daily summary
+      axios
+        .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/officer/daily-summary`, {
+          headers: { token: auth.token },
+        })
+        .then((response) => {
+          setDailySummary(response.data);
+        })
+        .catch((err) => {
+          console.error("Error fetching daily summary", err);
+        });
+    
     };
+    
 
     fetchData(); // ✅ Initial fetch on component mount
 
@@ -188,6 +223,51 @@ const sortedOfficers = useMemo(() => {
           إنشاء تمام جديد +
         </Link>
       </div>
+
+
+      <div className="daily-summary mt-4">
+              <Table striped bordered hover size="sm">
+                <thead className="table-dark">
+                  <tr className='table-summary-subheader'>
+                    <th colSpan="2">الإجمالي</th>
+                    <th colSpan="8" className="table-summary-header">تمام الخوارج</th>
+                    <th rowSpan={2}>اجمالي الخوارج</th>
+                    <th rowSpan={2}>موجود</th>
+                    <th rowSpan={2}>نسبة الخوارج</th>
+                  </tr>
+                  <tr className='table-summary-subheader'>
+                    <th>القوة</th>
+                    <th>الملاحق</th>
+                    <th>مأمورية ثابتة</th>
+                    <th>فرقة / دورة</th>
+                    <th>اجازة عادية</th>
+                    <th>اجازة سنوية</th>
+                    <th>اجازة مرضية</th>
+                    <th>سفر</th>
+                    <th>مأمورية</th>
+                    <th>مستشفى</th>
+      
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{dailySummary.total}</td>
+                    <td>{dailySummary.attached}</td>
+                    <td>{dailySummary?.تمام_الخوارج?.ثابتة || 0}</td>
+                    <td>{dailySummary?.تمام_الخوارج?.فرقة_دورة || 0}</td>
+                    <td>{dailySummary?.تمام_الخوارج?.راحة + dailySummary?.تمام_الخوارج?.بدل_راحة + dailySummary?.تمام_الخوارج?.عارضة + dailySummary?.تمام_الخوارج?.اجازة_ميدانية + dailySummary?.تمام_الخوارج?.منحة || 0}</td>
+                    <td>{dailySummary?.تمام_الخوارج?.اجازة_سنوية || 0}</td>
+                    <td>{dailySummary?.تمام_الخوارج?.اجازة_مرضية || 0}</td>
+                    <td>{dailySummary?.تمام_الخوارج?.سفر || 0}</td>
+                    <td>{dailySummary?.تمام_الخوارج?.مأمورية || 0}</td>
+                    <td>{dailySummary?.تمام_الخوارج?.مستشفى || 0}</td>
+                    <td>{dailySummary.missing}</td>
+                    <td>{dailySummary.available}</td>
+                    <td className="percentage-column">{dailySummary.percentageAvailable} %</td>
+                  </tr>
+                </tbody>
+              </Table>
+            </div>
 
       {/* Loading Indicator */}
       {officers.loading && (

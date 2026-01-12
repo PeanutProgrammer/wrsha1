@@ -666,7 +666,19 @@ WHERE o.in_unit = 0;
       }
 
       // --- Total count for pagination ---
-      const countQuery = `SELECT COUNT(*) AS total FROM officers o WHERE 1 ${searchClause}`;
+      const countQuery = `SELECT COUNT(*) AS total FROM officers o JOIN 
+    officer_leave_details old ON o.id = old.officerID
+JOIN 
+    leave_type lt ON old.leaveTypeID = lt.id
+WHERE 
+    old.leaveTypeID IN (1, 2, 3, 5, 6, 7, 11, 12, 13)  -- filter by leave types
+    AND o.in_unit = 0  -- filter for officers not in unit
+    AND old.id = (
+        -- Subquery to get the latest leave record for each officer
+        SELECT MAX(id) 
+        FROM officer_leave_details 
+        WHERE officerID = o.id
+    )  ${searchClause}`;
       const countResult = await query(countQuery, params);
       const total = countResult[0].total;
       const totalPages = Math.ceil(total / limit);
@@ -846,7 +858,14 @@ WHERE
       }
 
       // --- Total count for pagination ---
-      const countQuery = `SELECT COUNT(*) AS total FROM officers o WHERE 1 ${searchClause}`;
+      const countQuery = `SELECT COUNT(*) AS total FROM officers o JOIN 
+        officer_leave_details old ON o.id = old.officerID
+      JOIN 
+        leave_type lt ON old.leaveTypeID = lt.id
+      WHERE 
+        old.leaveTypeID IN (8)
+        AND o.in_unit = 0
+        AND CURDATE() BETWEEN old.start_date AND old.end_date ${searchClause}`;
       const countResult = await query(countQuery, params);
       const total = countResult[0].total;
       const totalPages = Math.ceil(total / limit);
