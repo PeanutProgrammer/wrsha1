@@ -101,12 +101,14 @@ import Guests from "./pages/Guests/Guests";
 import AddGuests from "./pages/Guests/AddGuests";
 import GuestArrival from "./pages/Guests/arrival";
 import GuestDeparture from "./pages/Guests/departure";
+import LeaderGuests from "./pages/Guests/LeaderGuests";
 
 //Delegates
 import Delegates from "./pages/Delegates/Delegates";
 import AddDelegates from "./pages/Delegates/AddDelegates";
 import DelegateArrival from "./pages/Delegates/arrival";
 import DelegateDeparture from "./pages/Delegates/departure";
+import LeaderDelegates from "./pages/Delegates/LeaderDelegates";
 
 // Past Workers
 import PastOfficers from "./pages/Past_Workers/PastOfficers";
@@ -176,8 +178,21 @@ export const router = createBrowserRouter([
         element: <ProtectedRoute allowedTypes={["مبنى القيادة"]} />,
         children: [{ path: "", element: <LeaderUnits /> }],
       },
-
-      
+            {
+        path: "leader-delegates",
+        element: <ProtectedRoute allowedTypes={["مبنى القيادة"]} />,
+        children: [{ path: "", element: <LeaderDelegates /> }],
+      },
+      {
+        path: "leader-guests",
+        element: <ProtectedRoute allowedTypes={["مبنى القيادة"]} />,
+        children: [{ path: "", element: <LeaderGuests /> }],
+      },
+      {
+        path: "leader-experts",
+        element: <ProtectedRoute allowedTypes={["مبنى القيادة"]} />,
+        children: [{ path: "", element: <LeaderExperts /> }],
+      },
 
       // Security Routes
       {

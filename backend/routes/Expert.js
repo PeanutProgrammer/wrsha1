@@ -7,6 +7,7 @@ const admin = require("../middleware/admin");
 const gate = require("../middleware/gate");
 const allowAny = require("../middleware/allowAny");
 const securityHead = require("../middleware/securityHead");
+const leader = require("../middleware/leader");
 
 router.post("/", 
     // Add custom validation middleware for logical checks
@@ -163,7 +164,7 @@ router.get("/absent", allowAny(gate,securityHead),(req, res) => {
     ExpertController.getAbsentExperts(req, res);
 });
 
-router.get("/", allowAny(gate,securityHead),(req, res) => {
+router.get("/", allowAny(gate,securityHead,leader),(req, res) => {
     ExpertController.getExperts(req, res);
 });
 

@@ -197,13 +197,13 @@ const Aside = ({ setCollapsed, collapsed }) => {
               <Link to={"leader-civillians"}>تمام المدنيين</Link>
             </li>
             <li className="tabs">
-              <Link to={"soldiers/manage-tmam"}>سجل الخبراء</Link>
+              <Link to={"leader-experts"}>سجل الخبراء</Link>
             </li>
             <li className="tabs">
-              <Link to={"soldiers/manage-tmam"}>سجل المناديب</Link>
+              <Link to={"leader-delegates"}>سجل المناديب</Link>
             </li>
             <li className="tabs">
-              <Link to={"shuoon/manage-vacation"}>سجل الزوار</Link>
+              <Link to={"leader-guests"}>سجل الزوار</Link>
             </li>
             <li className="tabs">
               <Link to={"past-workers"}>العاملين السابقين</Link>

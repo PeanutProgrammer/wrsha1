@@ -106,8 +106,8 @@ const PastOfficers = () => {
       )}
 
       <div className="table-responsive">
-        <Table striped bordered hover>
-          <thead>
+        <Table striped bordered hover className="mb-0">
+          <thead className="table-dark">
             <tr>
               <th>الرقم العسكري</th>
               <th>الرتبة</th>

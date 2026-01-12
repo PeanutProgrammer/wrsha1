@@ -8,6 +8,7 @@ const shuoonSarya = require("../middleware/shuoonSarya");
 const gate = require("../middleware/gate");
 const allowAny = require("../middleware/allowAny");
 const securityHead = require("../middleware/securityHead");
+const leader = require("../middleware/leader");
 
 router.post(
   "/",
@@ -157,12 +158,12 @@ router.delete("/:id", admin, (req, res) => {
 });
 
 // Get all current guests
-router.get("/current", allowAny(gate, securityHead), (req, res) => {
+router.get("/current", allowAny(gate, securityHead, leader), (req, res) => {
   DelegateController.getCurrentDelegates(req, res);
 });
 
 // Get all guests
-router.get("/", allowAny(gate, securityHead), (req, res) => {
+router.get("/", allowAny(gate, securityHead, leader), (req, res) => {
   DelegateController.getDelegates(req, res);
 });
 

@@ -375,6 +375,92 @@ LEFT JOIN leave_type lt
       });
     }
   }
+
+  static async getRankSummary(req, res) {
+  try {
+    const query = util.promisify(connection.query).bind(connection);
+
+    const results = await query(`
+      SELECT 
+          rank,
+          COUNT(*) AS total,
+          SUM(CASE WHEN in_unit = 1 THEN 1 ELSE 0 END) AS available,
+          SUM(CASE WHEN in_unit = 0 THEN 1 ELSE 0 END) AS missing,
+          SUM(CASE WHEN attached = 1 THEN 1 ELSE 0 END) AS attached
+      FROM (
+          SELECT rank, in_unit, attached FROM officers
+          UNION ALL
+          SELECT rank, in_unit, attached FROM ncos
+          UNION ALL
+          SELECT rank, in_unit, attached FROM soldiers
+      ) all_units
+      GROUP BY rank;
+    `);
+
+    if (!results.length) {
+      return res.status(404).json({ msg: "No data found" });
+    }
+    const RANK_ORDER = [
+  "عميد",
+  "عقيد",
+  "مقدم",
+    "مقدم أ ح",
+  "رائد",
+  "نقيب",
+  "ملازم أول",
+  "ملازم",
+    "مساعد أول",
+    "ملاحظ فني",
+  "مساعد",
+  "ملاحظ",
+    "رقيب أول",
+    "صانع ممتاز",
+    "صانع دقيق",
+  "رقيب",
+  "عريف",
+  "جندي"
+];
+
+
+    // ترتيب النتائج بداية من عميد
+    const sorted = RANK_ORDER.map(rank => {
+      const row = results.find(r => r.rank === rank);
+      return row || {
+        rank,
+        total: 0,
+        available: 0,
+        missing: 0,
+        attached: 0
+      };
+    });
+
+    // إجماليات عامة
+    const totals = sorted.reduce(
+      (acc, r) => {
+        acc.total += r.total;
+        acc.available += r.available;
+        acc.missing += r.missing;
+        acc.attached += r.attached;
+        return acc;
+      },
+      { total: 0, available: 0, missing: 0, attached: 0 }
+    );
+
+    return res.status(200).json({
+      starting_from: "عميد",
+      ranks: sorted,
+      totals
+    });
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      message: "An unexpected error occurred",
+      error: err.message,
+    });
+  }
+}
+
 }
 
 module.exports = UnitController;

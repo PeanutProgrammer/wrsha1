@@ -209,7 +209,7 @@ class DelegateController {
 
       const delegates =
         await query(`select  delegates.id, delegates.rank, delegates.name, delegates.unit, delegates.visit_start, delegates.visit_end, delegates.notes 
-                from delegates ${searchClause} LIMIT ? OFFSET ?`, [...params, limit, offset]);
+                from delegates ${searchClause} ORDER BY id desc LIMIT ? OFFSET ?`, [...params, limit, offset]);
 
       if (!delegates.length) {
           return res.status(404).json({ msg: "No delegates found" });

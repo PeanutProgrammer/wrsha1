@@ -22,13 +22,13 @@ const leader = require("../middleware/leader");
 
 
 
-router.get("/filter", allowAny(admin,leader),(req, res) => {
+router.get("/filter", allowAny(leader),(req, res) => {
     console.log("Getting Officers");
     
     PastOfficerController.filterOfficersAndNCOs(req, res);
 });
 
-router.get("/", allowAny(admin,leader),(req, res) => {
+router.get("/", allowAny(leader),(req, res) => {
     console.log("Getting Officers");
     
     PastOfficerController.getOfficers(req, res);
@@ -36,7 +36,7 @@ router.get("/", allowAny(admin,leader),(req, res) => {
 
 
 
-router.get("/:id", allowAny(admin,leader), (req, res) => {
+router.get("/:id", allowAny(leader), (req, res) => {
     PastOfficerController.getOfficer(req, res);
 });
 

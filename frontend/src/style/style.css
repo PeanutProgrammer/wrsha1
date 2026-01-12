@@ -27,6 +27,64 @@
 
 }
 
+/* Make tables compact */
+.table-compact th,
+.table-compact td {
+  padding: 0.25rem 0.4rem !important;
+  font-size: 0.8rem;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* Slightly smaller header text */
+.table-compact thead th {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Percentage column highlight */
+.table-compact .percentage-column {
+  font-weight: 600;
+  color: #0d6efd;
+}
+
+/* Totals row emphasis */
+.table-compact tfoot td {
+  background-color: #f1f3f5;
+  font-weight: 700;
+}
+
+/* Reduce table border thickness */
+.table-compact {
+  border-collapse: collapse;
+}
+
+/* Narrow numeric columns */
+.table-compact td,
+.table-compact th {
+  min-width: 55px;
+}
+
+/* Rank name column slightly wider */
+.table-compact td:first-child,
+.table-compact th:first-child {
+  min-width: 90px;
+}
+
+/* موجود */
+.table-compact td:nth-child(3) {
+  color: #198754;
+  font-weight: 600;
+}
+
+/* خارج */
+.table-compact td:nth-child(4) {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+
 /* Custom Dropdown Button */
 .custom-dropdown-button .btn-outline-secondary {
   background-color: #343a40 !important; /* Slightly lighter button background */

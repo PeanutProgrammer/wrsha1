@@ -118,6 +118,43 @@ table {
   background-color: #dff0d8; /* Light green for percentage */
   font-weight: bold;
 }
+
+.percentage-cell {
+  min-width: 80px;
+}
+.percentage-bar {
+  background: #e9ecef;
+  height: 6px;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.percentage-bar span {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background: linear-gradient(
+    270deg,
+    #198754,
+    #ffc107,
+    #dc3545
+  );
+}
+
+
+.percentage-bar span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    #198754,
+    #ffc107,
+    #dc3545
+  );
+}
+
 .table-summary-header th {
   border: none; /* Remove borders for summary header */
   padding: 12px 15px;

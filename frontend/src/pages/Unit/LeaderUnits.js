@@ -1,14 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { Table, Alert, Modal, Button, Form,  Dropdown, DropdownButton, InputGroup } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
-import { getAuthUser } from '../../helper/Storage';
-import moment from 'moment';
+import React, { useState, useEffect } from "react";
+import {
+  Table,
+  Alert,
+  Modal,
+  Button,
+  Form,
+  Dropdown,
+  DropdownButton,
+  InputGroup,
+} from "react-bootstrap";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import { getAuthUser } from "../../helper/Storage";
+import moment from "moment";
 import { io } from "socket.io-client";
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';  // This imports the autoTable plugin
-import htmlDocx from 'html-docx-js/dist/html-docx';
-import { FaPrint } from 'react-icons/fa';  // Import the printer icon from react-icons
+import jsPDF from "jspdf";
+import "jspdf-autotable"; // This imports the autoTable plugin
+import htmlDocx from "html-docx-js/dist/html-docx";
+import { FaPrint } from "react-icons/fa"; // Import the printer icon from react-icons
 
 // Helper: Convert Arabic-Indic digits to Western digits
 const toWesternDigits = (str) => {
@@ -17,7 +26,7 @@ const toWesternDigits = (str) => {
 
 const LeaderUnits = () => {
   const auth = getAuthUser();
-    const [sortConfig, setSortConfig] = useState({ key: "", direction: "asc" });
+  const [sortConfig, setSortConfig] = useState({ key: "", direction: "asc" });
   const [officers, setOfficers] = useState({
     loading: true,
     err: null,
@@ -29,7 +38,7 @@ const LeaderUnits = () => {
     limit: 0,
     tempSearch: "",
   });
-const [dailySummary, setDailySummary] = useState({
+  const [dailySummary, setDailySummary] = useState({
     total: 0,
     available: 0,
     missing: 0,
@@ -50,8 +59,16 @@ const [dailySummary, setDailySummary] = useState({
     اجمالي_الخوارج: 0,
     percentageAvailable: 0,
   });
-
-
+  const [rankSummary, setRankSummary] = useState({
+    ranks: [],
+    totals: {
+      total: 0,
+      available: 0,
+      missing: 0,
+      attached: 0,
+    },
+  });
+  const [showRankSummary, setShowRankSummary] = useState(true);
 
 
   // Fetch officers data and summary from the backend
@@ -60,8 +77,8 @@ const [dailySummary, setDailySummary] = useState({
 
     const fetchData = () => {
       const searchValue = officers.search.trim();
-      const limit = 15;
-      
+      const limit = 10;
+
       // Fetch officers with search filter and pagination
       axios
         .get(
@@ -73,7 +90,7 @@ const [dailySummary, setDailySummary] = useState({
         .then((resp) => {
           setOfficers({
             ...officers,
-            results: resp.data.data || [], 
+            results: resp.data.data || [],
             totalPages: resp.data.totalPages || 1,
             limit: resp.data.limit || limit,
             loading: false,
@@ -84,7 +101,9 @@ const [dailySummary, setDailySummary] = useState({
           setOfficers({
             ...officers,
             loading: false,
-            err: err.response ? JSON.stringify(err.response.data.errors) : "Something went wrong while fetching data.",
+            err: err.response
+              ? JSON.stringify(err.response.data.errors)
+              : "Something went wrong while fetching data.",
           });
         });
 
@@ -98,6 +117,18 @@ const [dailySummary, setDailySummary] = useState({
         })
         .catch((err) => {
           console.error("Error fetching daily summary", err);
+        });
+
+      // Fetch rank summary
+      axios
+        .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/unit/rank-summary`, {
+          headers: { token: auth.token },
+        })
+        .then((resp) => {
+          setRankSummary(resp.data);
+        })
+        .catch((err) => {
+          console.error("Error fetching rank summary", err);
         });
     };
 
@@ -114,9 +145,6 @@ const [dailySummary, setDailySummary] = useState({
 
     return () => socket.disconnect();
   }, [officers.page, officers.search]);
-
-
-
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -198,44 +226,22 @@ const [dailySummary, setDailySummary] = useState({
     <div className="Officers p-5">
       <div className="header d-flex justify-content-between mb-3">
         <h3 className="text-center mb-3">تمام الوحدة</h3>
-         {/* Search bar */}
-                <Form
-                  className="d-flex align-items-center flex-grow-1"
-                  onSubmit={handleSearchSubmit}
-                >
-                  <InputGroup className="w-50  shadow-sm me-5">
-                    <Form.Control
-                      size="sm"
-                      placeholder="بحث 🔍"
-                      value={officers.tempSearch}
-                      onChange={(e) =>
-                        setOfficers((prev) => ({ ...prev, tempSearch: e.target.value }))
-                      }
-                    />
-                    {officers.tempSearch && (
-                      <Button
-                        size="sm"
-                        variant="outline-secondary"
-                        onClick={handleClearSearch}
-                      >
-                        ×
-                      </Button>
-                    )}
-                  </InputGroup>
-                </Form>
+       
       </div>
 
-       <div className="daily-summary mt-4">
+      <div className="daily-summary mt-4">
         <Table striped bordered hover size="sm">
           <thead className="table-dark">
-            <tr className='table-summary-subheader'>
+            <tr className="table-summary-subheader">
               <th colSpan="2">الإجمالي</th>
-              <th colSpan="8" className="table-summary-header">تمام الخوارج</th>
+              <th colSpan="8" className="table-summary-header">
+                تمام الخوارج
+              </th>
               <th rowSpan={2}>اجمالي الخوارج</th>
               <th rowSpan={2}>موجود</th>
               <th rowSpan={2}>نسبة الخوارج</th>
             </tr>
-            <tr className='table-summary-subheader'>
+            <tr className="table-summary-subheader">
               <th>القوة</th>
               <th>الملاحق</th>
               <th>مأمورية ثابتة</th>
@@ -246,7 +252,6 @@ const [dailySummary, setDailySummary] = useState({
               <th>سفر</th>
               <th>مأمورية</th>
               <th>مستشفى</th>
-
             </tr>
           </thead>
           <tbody>
@@ -255,7 +260,13 @@ const [dailySummary, setDailySummary] = useState({
               <td>{dailySummary.attached}</td>
               <td>{dailySummary?.تمام_الخوارج?.ثابتة || 0}</td>
               <td>{dailySummary?.تمام_الخوارج?.فرقة_دورة || 0}</td>
-              <td>{dailySummary?.تمام_الخوارج?.راحة + dailySummary?.تمام_الخوارج?.بدل_راحة + dailySummary?.تمام_الخوارج?.عارضة + dailySummary?.تمام_الخوارج?.اجازة_ميدانية + dailySummary?.تمام_الخوارج?.منحة || 0}</td>
+              <td>
+                {dailySummary?.تمام_الخوارج?.راحة +
+                  dailySummary?.تمام_الخوارج?.بدل_راحة +
+                  dailySummary?.تمام_الخوارج?.عارضة +
+                  dailySummary?.تمام_الخوارج?.اجازة_ميدانية +
+                  dailySummary?.تمام_الخوارج?.منحة || 0}
+              </td>
               <td>{dailySummary?.تمام_الخوارج?.اجازة_سنوية || 0}</td>
               <td>{dailySummary?.تمام_الخوارج?.اجازة_مرضية || 0}</td>
               <td>{dailySummary?.تمام_الخوارج?.سفر || 0}</td>
@@ -263,11 +274,84 @@ const [dailySummary, setDailySummary] = useState({
               <td>{dailySummary?.تمام_الخوارج?.مستشفى || 0}</td>
               <td>{dailySummary.missing}</td>
               <td>{dailySummary.available}</td>
-              <td className="percentage-column">{dailySummary.percentageAvailable} %</td>
+              <td className="percentage-column">
+                {dailySummary.percentageAvailable} %
+              </td>
             </tr>
           </tbody>
         </Table>
       </div>
+
+      <div className="rank-summary mt-3">
+  <h5 className="mb-3"></h5>
+<div className="shadow-sm rounded bg-white p-2 mb-3">
+  <Table striped bordered hover size="sm" className="table-compact">
+    <thead className="table-dark">
+      <tr>
+        <th>الرتبة</th>
+        <th>الإجمالي</th>
+        <th>موجود</th>
+        <th>خارج</th>
+        <th>ملاحق</th>
+        <th>نسبة الخوارج</th>
+      </tr>
+    </thead>
+    <tbody>
+      {rankSummary.ranks.length > 0 ? (
+        rankSummary.ranks.map((r) => {
+          const percentage = r.total
+            ? ((r.missing / r.total) * 100).toFixed(1)
+            : 0;
+
+          return (
+            <tr key={r.rank}>
+              <td>{r.rank}</td>
+              <td>{r.total}</td>
+              <td>{r.available}</td>
+              <td>{r.missing}</td>
+              <td>{r.attached}</td>
+              <td className="percentage-cell">
+  <div className="percentage-bar">
+    <span style={{ width: `${percentage}%` }} />
+  </div>
+  <small>{percentage} %</small>
+</td>
+
+            </tr>
+          );
+        })
+      ) : (
+        <tr>
+          <td colSpan="6" className="text-center">
+            لا توجد بيانات
+          </td>
+        </tr>
+      )}
+    </tbody>
+
+    {/* Totals row */}
+    <tfoot className="table-secondary fw-bold">
+      <tr>
+        <td>الإجمالي</td>
+        <td>{rankSummary.totals.total}</td>
+        <td>{rankSummary.totals.available}</td>
+        <td>{rankSummary.totals.missing}</td>
+        <td>{rankSummary.totals.attached}</td>
+        <td>
+          {rankSummary.totals.total
+            ? (
+                (rankSummary.totals.missing /
+                  rankSummary.totals.total) *
+                100
+              ).toFixed(1)
+            : 0}{" "}
+          %
+        </td>
+      </tr>
+    </tfoot>
+  </Table>
+  </div>
+</div>
 
 
       {officers.err && (
@@ -281,6 +365,38 @@ const [dailySummary, setDailySummary] = useState({
         </Alert>
       )}
 
+      <div className="d-flex align-items-center justify-content-between
+                px-3 py-2 mb-2
+                bg-dark text-white rounded-top">
+
+  <span className="fw-bold">الموجودين بالوحدة</span>
+   {/* Search bar */}
+        <Form
+          className="d-flex align-items-center flex-grow-1"
+          onSubmit={handleSearchSubmit}
+        >
+          <InputGroup className="w-50  shadow-sm me-5">
+            <Form.Control
+              size="sm"
+              placeholder="بحث 🔍"
+              value={officers.tempSearch}
+              onChange={(e) =>
+                setOfficers((prev) => ({ ...prev, tempSearch: e.target.value }))
+              }
+            />
+            {officers.tempSearch && (
+              <Button
+                size="sm"
+                variant="outline-secondary"
+                onClick={handleClearSearch}
+              >
+                ×
+              </Button>
+            )}
+          </InputGroup>
+        </Form>
+</div>
+
       <div className="table-responsive shadow-sm rounded bg-white">
         <Table id="officer-table" striped bordered hover className="mb-0">
           <thead className="table-dark">
@@ -289,7 +405,8 @@ const [dailySummary, setDailySummary] = useState({
               <th onClick={() => handleSort("mil_id")}>
                 {sortConfig.key === "mil_id"
                   ? sortConfig.direction === "asc"
-                    ? " 🔼" : " 🔽"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}{" "}
                 الرقم العسكري
               </th>
@@ -317,23 +434,10 @@ const [dailySummary, setDailySummary] = useState({
                     : " 🔽"
                   : ""}
               </th>
-              <th onClick={() => handleSort("in_unit")}>
-                التمام
-                {sortConfig.key === "in_unit"
-                  ? sortConfig.direction === "asc"
-                    ? " 🔼"
-                    : " 🔽"
-                  : ""}
-              </th>
-              <th onClick={() => handleSort("latest_arrival")}>اخر دخول
-                {sortConfig.key === "latest_arrival"
-                  ? sortConfig.direction === "asc"
-                    ? " 🔼"
-                    : " 🔽"
-                  : ""}
-              </th>
-              <th onClick={() => handleSort("latest_departure")}>اخر خروج
-                {sortConfig.key === "latest_departure"
+
+              <th onClick={() => handleSort("event_time")}>
+                اخر دخول
+                {sortConfig.key === "event_time"
                   ? sortConfig.direction === "asc"
                     ? " 🔼"
                     : " 🔽"
@@ -351,48 +455,28 @@ const [dailySummary, setDailySummary] = useState({
                   <td>{officer.rank}</td>
                   <td>{officer.name}</td>
                   <td>{officer.department}</td>
-                  <td
-                  className={
-                    officer.in_unit
-                      ? "bg-success text-white"
-                      : "bg-danger text-white"
-                  }
-                >
-                    {officer.in_unit ? "متواجد" : "غير موجود"}
-                    </td>
-<td>
-  {officer.latest_arrival ? (
-    <>
-      <div>{moment(officer.latest_arrival).format("YYYY-MM-DD")}</div>
-      <div>
-        {moment(officer.latest_arrival).format("hh:mm")}
-        <span>
-          {moment(officer.latest_arrival).format("a") === "am" ? " ص" : " م"}
-        </span>
-      </div>
-    </>
-  ) : (
-    "لا يوجد"
-  )}
-</td>
 
-<td>
-  {officer.latest_departure ? (
-    <>
-      <div>{moment(officer.latest_departure).format("YYYY-MM-DD")}</div>
-      <div>
-        {moment(officer.latest_departure).format("hh:mm")}
-        <span>
-          {moment(officer.latest_departure).format("a") === "am" ? " ص" : " م"}
-        </span>
-      </div>
-    </>
-  ) : (
-    "لا يوجد"
-  )}
-</td>
+                  <td>
+                    {officer.event_time ? (
+                      <>
+                        <div>
+                          {moment(officer.event_time).format("YYYY-MM-DD")}
+                        </div>
+                        <div>
+                          {moment(officer.event_time).format("hh:mm")}
+                          <span>
+                            {moment(officer.event_time).format("a") === "am"
+                              ? " ص"
+                              : " م"}
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      "لا يوجد"
+                    )}
+                  </td>
+
                   <td>{officer.in_unit ? "لا يوجد" : officer.tmam}</td>
-
                 </tr>
               ))
             ) : (
@@ -429,6 +513,6 @@ const [dailySummary, setDailySummary] = useState({
       </div>
     </div>
   );
-    };
+};
 
 export default LeaderUnits;

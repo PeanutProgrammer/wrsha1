@@ -237,6 +237,7 @@ class GuestController {
                 from guests
                 left join officers on guests.visit_to = officers.id
                 ${searchClause}
+                order by guests.id DESC
                 LIMIT ? OFFSET ?`, [...params, limit, offset]);
 
            if (!guests.length) {

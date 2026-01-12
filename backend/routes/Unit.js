@@ -9,6 +9,11 @@ router.get("/daily-summary", allowAny(security,leader), (req, res) => {
     UnitController.getDailySummary(req, res);
 });
 
+router.get("/rank-summary", allowAny(security,leader), (req, res) => {
+    UnitController.getRankSummary(req, res);
+});
+
+
 router.get("/", allowAny(security,leader), (req,res) => {
     UnitController.getAllInUnit(req,res);
 })
