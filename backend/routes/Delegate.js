@@ -63,6 +63,11 @@ router.post(
       return true;
     }),
 
+  body("telephone_number")
+    .isString()
+    .withMessage("من فضلك أدخل رقم هاتف صحيح")
+    .optional(),
+
   body("notes").isString().withMessage("من فضلك أدخل سبب الزيارة صحيح"),
 
   // Handle validation results
@@ -129,7 +134,10 @@ router.put(
 
       return true;
     }),
-
+  body("telephone_number")
+    .isString()
+    .withMessage("من فضلك أدخل رقم هاتف صحيح")
+    .optional(),
   body("notes").isString().withMessage("من فضلك أدخل سبب الزيارة صحيح"),
 
   // Handle validation results

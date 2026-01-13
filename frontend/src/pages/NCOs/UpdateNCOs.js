@@ -11,7 +11,7 @@ import * as yup from 'yup';
 
 // Validation schema using yup
 const schema = yup.object().shape({
-  name: yup.string().min(3, 'اسم ضابط الصف يجب أن يكون أكثر من 3 حروف').max(30, 'اسم ضابط الصف يجب ألا يتجاوز 30 حرف').required('اسم ضابط الصف مطلوب'),
+  name: yup.string().min(3, 'اسم ضابط الصف يجب أن يكون أكثر من 3 حروف').max(50, 'اسم ضابط الصف يجب ألا يتجاوز 50 حرف').required('اسم ضابط الصف مطلوب'),
   rank: yup.string().required('الدرجة مطلوبة'),
   mil_id: yup.string().matches(/^\d+$/, 'الرقم العسكري يجب أن يحتوي على أرقام فقط').required('الرقم العسكري مطلوب'),
   department: yup.string().required('الفرع / الورشة مطلوب'),

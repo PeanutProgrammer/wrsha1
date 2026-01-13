@@ -10,7 +10,7 @@ import "react-datetime/css/react-datetime.css";
 
 // Validation schema using yup
 const schema = yup.object().shape({
-  name: yup.string().min(3, 'اسم ضابط صف الصف يجب أن يكون أكثر من 3 حروف').max(30, 'اسم ضابط صف الصف يجب ألا يتجاوز 30 حرف').required('اسم ضابط صف الصف مطلوب'),
+  name: yup.string().min(3, 'اسم ضابط صف الصف يجب أن يكون أكثر من 3 حروف').max(50, 'اسم ضابط صف الصف يجب ألا يتجاوز 50 حرف').required('اسم ضابط صف الصف مطلوب'),
   rank: yup.string().required('الدرجة مطلوبة'),
   mil_id: yup.string().matches(/^\d+$/, 'الرقم العسكري يجب أن يحتوي على أرقام فقط').required('الرقم العسكري مطلوب'),
   department: yup.string().required('الفرع / الورشة مطلوب'),

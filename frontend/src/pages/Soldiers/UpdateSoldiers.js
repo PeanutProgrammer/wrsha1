@@ -12,7 +12,7 @@ import autoTable from 'jspdf-autotable';
 
 // Validation schema using yup
 const schema = yup.object().shape({
-  name: yup.string().min(3, 'اسم الجندي  يجب أن يكون أكثر من 3 حروف').max(30, 'اسم الجندي  يجب ألا يتجاوز 30 حرف').required('اسم الجندي  مطلوب'),
+  name: yup.string().min(3, 'اسم الجندي  يجب أن يكون أكثر من 3 حروف').max(50, 'اسم الجندي  يجب ألا يتجاوز 50 حرف').required('اسم الجندي  مطلوب'),
   rank: yup.string().required('الدرجة مطلوبة'),
   mil_id: yup.string().matches(/^\d+$/, 'الرقم العسكري يجب أن يحتوي على أرقام فقط').required('الرقم العسكري مطلوب'),
   department: yup.string().required('الفرع / الورشة مطلوب'),

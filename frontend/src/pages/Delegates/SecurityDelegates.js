@@ -224,6 +224,13 @@ const SecurityDelegates = () => {
                   <span>{sortConfig.direction === "asc" ? " 🔼" : " 🔽"}</span>
                 )}
               </th>
+
+              <th onClick={() => handleSort("telephone_number")}>
+                رقم الهاتف
+                {sortConfig.key === "telephone_number" && (
+                  <span>{sortConfig.direction === "asc" ? " 🔼" : " 🔽"}</span>
+                )}
+              </th>
               <th onClick={() => handleSort("visit_start")}>
                 وقت الدخول
                 {sortConfig.key === "visit_start" && (
@@ -253,6 +260,12 @@ const SecurityDelegates = () => {
                   <td>{delegate.rank}</td>
                   <td>{delegate.name}</td>
                   <td>{delegate.unit}</td>
+                  <td>
+                    {delegate.telephone_number
+                      ? delegate.telephone_number
+                      : "لا يوجد"}
+                  </td>
+
                   <td>
                     {moment(delegate.visit_start).format("YYYY-MM-DD HH:mm")}
                   </td>

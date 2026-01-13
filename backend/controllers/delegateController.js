@@ -38,6 +38,7 @@ class DelegateController {
         req.body.unit,
         visitStart,
         visitEnd,
+        req.body.telephone_number,
         req.body.notes
       );
 
@@ -48,11 +49,12 @@ class DelegateController {
         delegateObject.getVisitEnd(),
         delegateObject.getUnit(),
         delegateObject.getNotes(),
+        delegateObject.getTelephoneNumber(),
       ]);
 
       // Now insert the delegate into the database
       await query(
-        "INSERT INTO delegates SET `rank` = ?, name = ?, unit = ?, visit_start = ?, visit_end = ?, notes = ?",
+        "INSERT INTO delegates SET `rank` = ?, name = ?, unit = ?, visit_start = ?, visit_end = ?, notes = ?, telephone_number = ?",
         [
           delegateObject.getRank(),
           delegateObject.getName(),
@@ -60,6 +62,7 @@ class DelegateController {
           delegateObject.getVisitStart(),
           delegateObject.getVisitEnd(),
           delegateObject.getNotes(),
+          delegateObject.getTelephoneNumber(),
         ]
       );
 
@@ -111,6 +114,7 @@ class DelegateController {
         req.body.unit,
         req.body.visit_start,
         req.body.visit_end,
+        req.body.telephone_number,
         req.body.notes
       );
 
@@ -120,17 +124,19 @@ class DelegateController {
         delegateObject.getUnit(),
         delegateObject.getVisitStart(),
         delegateObject.getVisitEnd(),
+        delegateObject.getTelephoneNumber(),
         delegateObject.getNotes(),
       ]);
 
       await query(
-        "update delegates SET `rank` = ?, name = ?, unit = ?, visit_start = ?, visit_end = ?, notes = ? where id = ?",
+        "update delegates SET `rank` = ?, name = ?, unit = ?, visit_start = ?, visit_end = ?, telephone_number = ?, notes = ? where id = ?",
         [
           delegateObject.getRank(),
           delegateObject.getName(),
           delegateObject.getUnit(),
           delegateObject.getVisitStart(),
           delegateObject.getVisitEnd(),
+          delegateObject.getTelephoneNumber(),
           delegateObject.getNotes(),
           req.params.id,
         ]
@@ -208,7 +214,7 @@ class DelegateController {
         const totalPages = Math.ceil(total / limit);
 
       const delegates =
-        await query(`select  delegates.id, delegates.rank, delegates.name, delegates.unit, delegates.visit_start, delegates.visit_end, delegates.notes 
+        await query(`select  delegates.id, delegates.rank, delegates.name, delegates.unit, delegates.visit_start, delegates.visit_end, delegates.telephone_number, delegates.notes 
                 from delegates ${searchClause} ORDER BY id desc LIMIT ? OFFSET ?`, [...params, limit, offset]);
 
       if (!delegates.length) {
@@ -262,6 +268,7 @@ class DelegateController {
         delegate[0].unit,
         delegate[0].visit_start,
         delegate[0].visit_end,
+        delegate[0].telephone_number,
         delegate[0].notes
       );
       return res.status(200).json(delegateObject.toJSON());
@@ -329,7 +336,7 @@ class DelegateController {
 
       // SQL query to fetch delegates with null end_date in expert_record
       const delegates = await query(`
-                SELECT delegates.id , delegates.rank, delegates.name, delegates.unit, delegates.visit_start, delegates.visit_end, delegates.notes
+                SELECT delegates.id , delegates.rank, delegates.name, delegates.unit, delegates.visit_start, delegates.visit_end, delegates.telephone_number, delegates.notes
                 FROM delegates
                  WHERE delegates.visit_end IS NULL AND delegates.visit_start IS NOT NULL
             `);

@@ -237,6 +237,7 @@ const Delegates = () => {
               <th>الرتبة / الدرجة</th>
               <th>الاسم</th>
               <th>اسم الوحدة</th>
+              <th>رقم الهاتف</th>
               <th>وقت الدخول</th>
               <th>وقت الخروج</th>
               <th>سبب الزيارة</th>
@@ -251,6 +252,7 @@ const Delegates = () => {
                 <td>{delegate.rank}</td>
                 <td>{delegate.name}</td>
                 <td>{delegate.unit}</td>
+                <td>{delegate.telephone_number ? delegate.telephone_number : "لا يوجد"}</td>
                 <td>{moment(delegate.visit_start).format('YYYY-MM-DD HH:mm')}</td>
                 {/* Conditionally show visit_end */}
                 <td>{delegate.visit_end ? moment(delegate.visit_end).format('YYYY-MM-DD HH:mm') : 'لا يوجد'}</td>

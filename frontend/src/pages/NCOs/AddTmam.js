@@ -118,7 +118,7 @@ const AddNCOTmam = () => {
 
   useEffect(() => {
     axios
-      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/nco/`, {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/nco?limit=1000`, {
         headers: {
           token: auth.token,
         },

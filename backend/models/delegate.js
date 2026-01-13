@@ -1,11 +1,12 @@
 class Delegate {
-  constructor(id, rank, name, unit, visit_start, visit_end, notes) {
+  constructor(id, rank, name, unit, visit_start, visit_end, telephone_number, notes) {
       this._id = id; 
       this._rank = rank;
       this._name = name;
       this._unit = unit;
       this._visit_start = visit_start;
       this._visit_end = visit_end;
+      this._telephone_number = telephone_number;
       this._notes = notes;
   }
  
@@ -33,6 +34,10 @@ class Delegate {
     getUnit = () => {
     return this._unit;
   }
+
+  getTelephoneNumber = () => {
+    return this._telephone_number;
+  };
 
  getNotes = () => {
     return this._notes;
@@ -62,6 +67,10 @@ class Delegate {
     setUnit = (unit) => {
     this._unit = unit;
   }
+
+  setTelephoneNumber = (telephone_number) => {
+    this._telephone_number = telephone_number;
+  };
 
     setNotes = (notes) => {
     this._notes = notes;

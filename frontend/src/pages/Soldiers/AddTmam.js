@@ -118,7 +118,7 @@ const AddSoldierTmam = () => {
 
   useEffect(() => {
     axios
-      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/soldier/`, {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/soldier?limit=500`, {
         headers: {
           token: auth.token,
         },

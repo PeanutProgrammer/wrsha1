@@ -16,7 +16,7 @@ router.post(
   body("name")
     .isString()
     .withMessage("يرجى إدخال اسم صحيح")
-    .isLength({ min: 3, max: 30 })
+    .isLength({ min: 3, max: 50 })
     .withMessage("اسم الضابط يجب أن يكون أكثر من 3 حروف ولا يتجاوز 30 حرفًا"),
   body("join_date")
     .isDate()
@@ -32,11 +32,13 @@ router.post(
     .withMessage("يرجى إدخال رقم الفرع أو الورشة بشكل صحيح"),
   body("telephone_number")
     .isString()
-    .withMessage("يرجى إدخال رقم الهاتف بشكل صحيح"),
+    .withMessage("يرجى إدخال رقم الهاتف بشكل صحيح")
+    .optional(),
   body("guardian_name").isString().withMessage("يرجى إدخال اسم صحيح"),
   body("guardian_telephone_number")
     .isString()
-    .withMessage("يرجى إدخال رقم الهاتف بشكل صحيح"),
+    .withMessage("يرجى إدخال رقم الهاتف بشكل صحيح")
+    .optional(),
   body("attached")
     .optional()
     .isBoolean()
@@ -53,7 +55,7 @@ router.put(
   body("name")
     .isString()
     .withMessage("يرجى إدخال اسم صحيح")
-    .isLength({ min: 3, max: 30 })
+    .isLength({ min: 3, max: 50 })
     .withMessage("اسم الضابط يجب أن يكون أكثر من 3 حروف ولا يتجاوز 30 حرفًا"),
   body("join_date")
     .isDate()
@@ -69,11 +71,13 @@ router.put(
     .withMessage("يرجى إدخال رقم الفرع أو الورشة بشكل صحيح"),
   body("telephone_number")
     .isString()
-    .withMessage("يرجى إدخال رقم الهاتف بشكل صحيح"),
+    .withMessage("يرجى إدخال رقم الهاتف بشكل صحيح")
+    .optional(),
   body("guardian_name").isString().withMessage("يرجى إدخال اسم صحيح"),
   body("guardian_telephone_number")
     .isString()
-    .withMessage("يرجى إدخال رقم الهاتف بشكل صحيح"),
+    .withMessage("يرجى إدخال رقم الهاتف بشكل صحيح")
+    .optional(),
   body("attached")
     .optional()
     .isBoolean()

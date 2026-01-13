@@ -118,7 +118,7 @@ const AddTmam = () => {
 
   useEffect(() => {
     axios
-      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/officer/`, {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/officer?limit=1000`, {
         headers: {
           token: auth.token,
         },

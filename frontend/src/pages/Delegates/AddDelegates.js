@@ -16,6 +16,7 @@ const schema = yup.object().shape({
   name: yup.string().min(3, 'اسم المندوب يجب أن يكون أكثر من 3 حروف').max(30, 'اسم المندوب يجب ألا يتجاوز 30 حرف').required('اسم المندوب مطلوب'),
   notes: yup.string().required('سبب الزيارة مطلوب'),
   unit: yup.string().required('اسم الوحدة مطلوب'),
+  telephone_number: yup.string().optional().nullable(),
 });
 
 const AddDelegates = () => {
@@ -237,6 +238,19 @@ const createdelegate = async (data) => {
           />
           {errors.unit && (
             <div className="invalid-feedback">{errors.unit.message}</div>
+          )}
+        </Form.Group>
+
+        <Form.Group controlId="telephone_number" className="form-group">
+          <Form.Label>رقم الهاتف</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="أدخل رقم الهاتف"
+            {...register("telephone_number")}
+            className={`form-control ${errors.telephone_number ? "is-invalid" : ""}`}
+          />
+          {errors.telephone_number && (
+            <div className="invalid-feedback">{errors.telephone_number.message}</div>
           )}
         </Form.Group>
 

@@ -13,7 +13,7 @@ const leader = require("../middleware/leader");
 router.post("/", shuoonOfficers,
     body("name")
         .isString().withMessage("يرجى إدخال اسم صحيح")
-        .isLength({ min: 3, max: 30 }).withMessage("اسم الضابط يجب أن يكون أكثر من 3 حروف ولا يتجاوز 30 حرفًا"),
+        .isLength({ min: 3, max: 50 }).withMessage("اسم الضابط يجب أن يكون أكثر من 3 حروف ولا يتجاوز 50 حرفًا"),
     body("join_date")
         .isDate().withMessage("يرجى إدخال تاريخ ضم صحيح بصيغة yyyy-MM-DD"),
     body("department")
