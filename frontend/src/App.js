@@ -11,7 +11,8 @@ function App() {
 
   return (
     <>
-      <Header />
+      <Header collapsed={collapsed
+      }/>
       <div className={`app-container ${collapsed ? 'collapsed' : 'expanded'}`}>
         <Aside setCollapsed={setCollapsed} collapsed={collapsed} />
         <main className="main-content">

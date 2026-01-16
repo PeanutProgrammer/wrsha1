@@ -382,19 +382,19 @@ LEFT JOIN leave_type lt
 
     const results = await query(`
       SELECT 
-          rank,
+          \`rank\`,
           COUNT(*) AS total,
           SUM(CASE WHEN in_unit = 1 THEN 1 ELSE 0 END) AS available,
           SUM(CASE WHEN in_unit = 0 THEN 1 ELSE 0 END) AS missing,
           SUM(CASE WHEN attached = 1 THEN 1 ELSE 0 END) AS attached
       FROM (
-          SELECT rank, in_unit, attached FROM officers
+          SELECT \`rank\`, in_unit, attached FROM officers
           UNION ALL
-          SELECT rank, in_unit, attached FROM ncos
+          SELECT \`rank\`, in_unit, attached FROM ncos
           UNION ALL
-          SELECT rank, in_unit, attached FROM soldiers
+          SELECT \`rank\`, in_unit, attached FROM soldiers
       ) all_units
-      GROUP BY rank;
+      GROUP BY \`rank\`;
     `);
 
     if (!results.length) {

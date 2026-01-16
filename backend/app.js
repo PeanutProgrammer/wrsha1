@@ -69,6 +69,7 @@ const leaveType = require("./routes/LeaveType");
 const unit = require("./routes/Unit");
 const delegate = require("./routes/Delegate");
 const shuoon = require("./routes/Shuoon");
+const event = require("./routes/Event");
 
 
 
@@ -94,6 +95,7 @@ app.use("/leaveType", leaveType);
 app.use("/unit", unit);
 app.use("/delegate", delegate);
 app.use("/shuoon", shuoon);
+app.use("/event", event);
 
 
 // app.use("/busses", busses);

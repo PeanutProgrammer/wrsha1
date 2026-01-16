@@ -137,6 +137,8 @@ import ManageShuoonVacation from "./pages/Shuoon/ManageVacation";
 import ManageShuoonMission from "./pages/Shuoon/ManageMission";
 import ManageShuoonCourse from "./pages/Shuoon/ManageCourse";
 
+import Calendar from "./pages/Events/Calendar";
+
 export const router = createBrowserRouter([
   {
     element: <Guest />,
@@ -192,6 +194,11 @@ export const router = createBrowserRouter([
         path: "leader-experts",
         element: <ProtectedRoute allowedTypes={["مبنى القيادة"]} />,
         children: [{ path: "", element: <LeaderExperts /> }],
+      },
+      {
+        path: "calendar",
+        element: <ProtectedRoute allowedTypes={["admin", "مبنى القيادة"]} />,
+        children: [{ path: "", element: <Calendar /> }],
       },
 
       // Security Routes
