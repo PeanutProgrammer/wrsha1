@@ -4,6 +4,7 @@
   background: linear-gradient(135deg, #111418, #1b1f24);
   color: #f1f1f1;
     direction: rtl;
+    overflow: visible;
 }
 
 .calendar-title {
@@ -167,3 +168,5 @@
   opacity: 0.6;
   text-align: center;
   padding: 20px;}
+
+

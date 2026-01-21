@@ -288,7 +288,7 @@ const LeaderUnits = () => {
   <Table striped bordered hover size="sm" className="table-compact">
     <thead className="table-dark">
       <tr>
-        <th>الرتبة</th>
+        <th>الرتبة / الدرجة</th>
         <th>الإجمالي</th>
         <th>موجود</th>
         <th>خارج</th>

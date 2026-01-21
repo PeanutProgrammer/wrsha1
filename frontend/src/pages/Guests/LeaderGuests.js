@@ -153,6 +153,11 @@ const LeaderGuests = () => {
     return 0;
   });
 
+  const isToday = (date) => {
+    if (!date) return false;
+    return moment(date).isSame(moment(), "day");
+  };
+
   return (
     <div className="Officers p-5">
       <div className="header d-flex justify-content-between mb-3">
@@ -209,7 +214,8 @@ const LeaderGuests = () => {
               <th onClick={() => handleSort("name")}>
                 {sortConfig.key === "name"
                   ? sortConfig.direction === "asc"
-                    ? " 🔼" : " 🔽"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}{" "}
                 الاسم
               </th>
@@ -249,14 +255,27 @@ const LeaderGuests = () => {
           </thead>
           <tbody>
             {sortedGuests.map((guest, index) => (
-              <tr key={guest.id}>
+              <tr
+                key={guest.id}
+                className={isToday(guest.visit_start) ? "today-row" : ""}
+              >
                 <td> {(guests.page - 1) * guests.limit + index + 1}</td>
                 <td>{guest.name}</td>
                 <td>{guest.rank + " " + guest.officer_name}</td>
-<td>
+                <td>
   {guest.visit_start ? (
     <>
-      <div>{moment(guest.visit_start).format("YYYY-MM-DD")}</div>
+      <div className=" align-items-center ">
+                {isToday(guest.visit_start) && (
+          <span className="badge bg-warning text-dark today-badge ml-2">
+            اليوم
+          </span>
+        )}
+        <span>{moment(guest.visit_start).format("YYYY-MM-DD")}</span>
+
+
+      </div>
+
       <div>
         {moment(guest.visit_start).format("hh:mm")}
         <span>
@@ -269,21 +288,23 @@ const LeaderGuests = () => {
   )}
 </td>
 
-<td>
-  {guest.visit_end ? (
-    <>
-      <div>{moment(guest.visit_end).format("YYYY-MM-DD")}</div>
-      <div>
-        {moment(guest.visit_end).format("hh:mm")}
-        <span>
-          {moment(guest.visit_end).format("a") === "am" ? " ص" : " م"}
-        </span>
-      </div>
-    </>
-  ) : (
-    "لا يوجد"
-  )}
-</td>
+                <td>
+                  {guest.visit_end ? (
+                    <>
+                      <div>{moment(guest.visit_end).format("YYYY-MM-DD")}</div>
+                      <div>
+                        {moment(guest.visit_end).format("hh:mm")}
+                        <span>
+                          {moment(guest.visit_end).format("a") === "am"
+                            ? " ص"
+                            : " م"}
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    "لا يوجد"
+                  )}
+                </td>
                 <td>{guest.reason ? guest.reason : "لا يوجد"}</td>
               </tr>
             ))}

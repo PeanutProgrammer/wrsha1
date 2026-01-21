@@ -153,6 +153,11 @@ const LeaderDelegates = () => {
     return 0;
   });
 
+    const isToday = (date) => {
+      if (!date) return false;
+      return moment(date).isSame(moment(), "day");
+    };
+
   return (
     <div className="Officers p-5">
       <div className="header d-flex justify-content-between mb-3">
@@ -260,15 +265,40 @@ const LeaderDelegates = () => {
             {Array.isArray(delegates.results) &&
             delegates.results.length > 0 ? (
               sortedDelegates.map((delegate, index) => (
-                <tr key={delegate.id}>
+                <tr key={delegate.id}
+                                className={isToday(delegate.visit_start) ? "today-row" : ""}
+>
                   <td> {(delegates.page - 1) * delegates.limit + index + 1}</td>
                   <td>{delegate.rank}</td>
                   <td>{delegate.name}</td>
                   <td>{delegate.unit}</td>
                     <td>{delegate.telephone_number ? delegate.telephone_number : "لا يوجد"}</td>
-                  <td>
-                    {moment(delegate.visit_start).format("YYYY-MM-DD HH:mm")}
-                  </td>
+                 <td>
+                  {delegate.visit_start ? (
+                    <>
+                      <div className=" align-items-center ">
+                                {isToday(delegate.visit_start) && (
+                          <span className="badge bg-warning text-dark today-badge ml-2">
+                            اليوم
+                          </span>
+                        )}
+                        <span>{moment(delegate.visit_start).format("YYYY-MM-DD")}</span>
+                
+                
+                      </div>
+                
+                      <div>
+                        {moment(delegate.visit_start).format("hh:mm")}
+                        <span>
+                          {moment(delegate.visit_start).format("a") === "am" ? " ص" : " م"}
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    "لا يوجد"
+                  )}
+                </td>
+                
                   {/* Conditionally show visit_end */}
                   <td>
                     {delegate.visit_end

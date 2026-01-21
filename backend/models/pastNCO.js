@@ -1,14 +1,12 @@
 
 
 class PastNCO {
-    constructor(name, join_date, mil_id, rank, address, height, weight, dob, end_date, transferID, transferred_to) {
+    constructor(name, join_date, mil_id, rank, address, dob, end_date, transferID, transferred_to) {
         this._name = name;
         this._join_date = join_date;
         this._mil_id = mil_id;
         this._rank = rank;
         this._address = address;
-        this._height = height;
-        this._weight = weight;
         this._dob = dob;
         this._end_date = end_date;
         this._transferID = transferID;
@@ -36,14 +34,6 @@ class PastNCO {
         return this._address;
     }
 
-    getHeight = () => {
-        return this._height;
-    }
-
-
-    getWeight = () => {
-        return this._weight;
-    }
 
 
     getDOB = () => {
@@ -87,14 +77,6 @@ class PastNCO {
         this._address = address;
     }
 
-    setHeight = (height) => {
-        this._height = height;
-    }
-
-
-    setWeight = (weight) => {
-        this._weight = weight;
-    }
 
 
     setDOB = (dob) => {

@@ -13,6 +13,20 @@ router.get("/rank-summary", allowAny(security,leader), (req, res) => {
     UnitController.getRankSummary(req, res);
 });
 
+router.get("/unit-count", allowAny(security,leader), (req, res) => {
+    UnitController.getUnitCount(req, res);
+});
+
+router.get("/vacations", allowAny(security,leader), (req, res) => {
+    UnitController.getVacations(req, res);
+});
+
+router.get("/vacations-count", allowAny(security,leader), (req, res) => {
+    UnitController.getVacationsCount(req, res);
+});
+
+
+
 
 router.get("/", allowAny(security,leader), (req,res) => {
     UnitController.getAllInUnit(req,res);

@@ -242,6 +242,7 @@ class ExpertController {
             LEFT JOIN expert_record er ON o.id = er.expertID
             ${searchClause}
             GROUP BY o.id
+            ORDER BY latest_arrival DESC
             LIMIT ? OFFSET ?
             `,
             [...params, limit, offset]

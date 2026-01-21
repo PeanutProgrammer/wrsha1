@@ -11,5 +11,15 @@ router.get("/", allowAny(leader), (req, res) => {
 }); 
 
 
+router.post("/",allowAny(admin),
+    body("name")
+        .isString().withMessage("من فضلك أدخل اسم صحيح")
+        .isLength({ min: 3, max: 40 }).withMessage("الاسم يجب أن يكون بين 3 و 40 حرفًا"),
+
+
+(req,res) => {
+  EventController.createEvent(req,res);
+})
+
 
 module.exports = router;

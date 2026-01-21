@@ -294,7 +294,7 @@ LEFT JOIN leave_type lt
       const normalLeave = units.filter(
         (unit) => unit.tmam === "راحة" && !unit.in_unit
       ).length;
-      
+
       const fieldLeave = units.filter(
         (unit) => unit.tmam === "اجازة ميدانية" && !unit.in_unit
       ).length;
@@ -334,7 +334,7 @@ LEFT JOIN leave_type lt
         grantLeave +
         sickLeave +
         mission +
-        hospital + 
+        hospital +
         annualLeave +
         casualLeave +
         compensatoryLeave +
@@ -377,10 +377,10 @@ LEFT JOIN leave_type lt
   }
 
   static async getRankSummary(req, res) {
-  try {
-    const query = util.promisify(connection.query).bind(connection);
+    try {
+      const query = util.promisify(connection.query).bind(connection);
 
-    const results = await query(`
+      const results = await query(`
       SELECT 
           \`rank\`,
           COUNT(*) AS total,
@@ -397,70 +397,476 @@ LEFT JOIN leave_type lt
       GROUP BY \`rank\`;
     `);
 
-    if (!results.length) {
-      return res.status(404).json({ msg: "No data found" });
+      if (!results.length) {
+        return res.status(404).json({ msg: "No data found" });
+      }
+      const RANK_ORDER = [
+        "عميد",
+        "عقيد",
+        "مقدم",
+        "مقدم أ ح",
+        "رائد",
+        "نقيب",
+        "ملازم أول",
+        "ملازم",
+        "مساعد أول",
+        "ملاحظ فني",
+        "مساعد",
+        "ملاحظ",
+        "رقيب أول",
+        "صانع ممتاز",
+        "صانع دقيق",
+        "رقيب",
+        "عريف",
+        "جندي",
+      ];
+
+      // ترتيب النتائج بداية من عميد
+      const sorted = RANK_ORDER.map((rank) => {
+        const row = results.find((r) => r.rank === rank);
+        return (
+          row || {
+            rank,
+            total: 0,
+            available: 0,
+            missing: 0,
+            attached: 0,
+          }
+        );
+      });
+
+      // إجماليات عامة
+      const totals = sorted.reduce(
+        (acc, r) => {
+          acc.total += r.total;
+          acc.available += r.available;
+          acc.missing += r.missing;
+          acc.attached += r.attached;
+          return acc;
+        },
+        { total: 0, available: 0, missing: 0, attached: 0 }
+      );
+
+      return res.status(200).json({
+        starting_from: "عميد",
+        ranks: sorted,
+        totals,
+      });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({
+        message: "An unexpected error occurred",
+        error: err.message,
+      });
     }
-    const RANK_ORDER = [
-  "عميد",
-  "عقيد",
-  "مقدم",
-    "مقدم أ ح",
-  "رائد",
-  "نقيب",
-  "ملازم أول",
-  "ملازم",
-    "مساعد أول",
-    "ملاحظ فني",
-  "مساعد",
-  "ملاحظ",
-    "رقيب أول",
-    "صانع ممتاز",
-    "صانع دقيق",
-  "رقيب",
-  "عريف",
-  "جندي"
-];
-
-
-    // ترتيب النتائج بداية من عميد
-    const sorted = RANK_ORDER.map(rank => {
-      const row = results.find(r => r.rank === rank);
-      return row || {
-        rank,
-        total: 0,
-        available: 0,
-        missing: 0,
-        attached: 0
-      };
-    });
-
-    // إجماليات عامة
-    const totals = sorted.reduce(
-      (acc, r) => {
-        acc.total += r.total;
-        acc.available += r.available;
-        acc.missing += r.missing;
-        acc.attached += r.attached;
-        return acc;
-      },
-      { total: 0, available: 0, missing: 0, attached: 0 }
-    );
-
-    return res.status(200).json({
-      starting_from: "عميد",
-      ranks: sorted,
-      totals
-    });
-
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({
-      message: "An unexpected error occurred",
-      error: err.message,
-    });
   }
-}
 
+  static async getUnitCount(req, res) {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const query = util.promisify(connection.query).bind(connection);
+
+      const count = await query(`
+        SELECT
+    (SELECT COUNT(*) FROM officers) AS officers,
+    (SELECT COUNT(*) FROM officers WHERE in_unit=1) AS officers_in_unit,
+    (SELECT COUNT(*) FROM ncos) AS ncos,
+        (SELECT COUNT(*) FROM ncos WHERE in_unit=1) AS ncos_in_unit,
+    (SELECT COUNT(*) FROM soldiers) AS soldiers,
+        (SELECT COUNT(*) FROM soldiers WHERE in_unit=1) AS soldiers_in_unit,
+
+    (SELECT COUNT(*) FROM civillians) AS civillians,
+        (SELECT COUNT(*) FROM civillians WHERE in_unit=1) AS civillians_in_unit,
+    (SELECT COUNT(*) FROM delegates where Date(visit_start) = CURRENT_DATE) AS delegates,
+    (SELECT COUNT(*) FROM experts) AS experts,
+              (SELECT COUNT(*) FROM experts WHERE in_unit=1) AS experts_in_unit,
+    (SELECT COUNT(*) FROM guests where Date(visit_start) = CURRENT_DATE) AS guests;
+`);
+
+      const officers = count[0].officers;
+      const officers_in_unit = count[0].officers_in_unit;
+      const ncos = count[0].ncos;
+      const ncos_in_unit = count[0].ncos_in_unit;
+      const soldiers = count[0].soldiers;
+      const soldiers_in_unit = count[0].soldiers_in_unit;
+      const civillians = count[0].civillians;
+      const civillians_in_unit = count[0].civillians_in_unit;
+      const delegates = count[0].delegates;
+      const experts = count[0].experts;
+      const experts_in_unit = count[0].experts_in_unit;
+      const guests = count[0].guests;
+
+      const unit = officers + ncos + soldiers;
+      const unit_in_unit = officers_in_unit + ncos_in_unit + soldiers_in_unit;
+
+      return res.status(200).json({
+        unitCount: unit,
+        unitInUnit: unit_in_unit,
+        civillians: civillians,
+        civilliansInUnit: civillians_in_unit,
+        delegates: delegates,
+        experts: experts,
+        expertsInUnit: experts_in_unit,
+        guests: guests,
+      });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({
+        message: "An unexpected error occurred",
+        error: err.message,
+      });
+    }
+  }
+
+  static async getVacations(req, res) {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const query = util.promisify(connection.query).bind(connection);
+
+      // --- Pagination params ---
+      const page = parseInt(req.query.page) || 1; // default to page 1
+      const limit = parseInt(req.query.limit) || 20; // default 20 rows per page
+      const offset = (page - 1) * limit;
+
+      // --- Search params ---
+      let officerSearchClause = "";
+      let ncoSearchClause = "";
+      let soldierSearchClause = "";
+      const params = [];
+
+      if (req.query.search) {
+        const searchValue = `%${req.query.search}%`;
+        // Add the search condition for each table individually
+        officerSearchClause = `
+        AND (o.name LIKE ? OR o.department LIKE ? OR o.mil_id LIKE ? OR o.rank LIKE ?)
+      `;
+        ncoSearchClause = `
+        AND (n.name LIKE ? OR n.department LIKE ? OR n.mil_id LIKE ? OR n.rank LIKE ?)
+      `;
+        soldierSearchClause = `
+        AND (s.name LIKE ? OR s.department LIKE ? OR s.mil_id LIKE ? OR s.rank LIKE ?)
+      `;
+        // Push the search term into the params array for each table (4 times per table)
+        for (let i = 0; i < 12; i++) {
+          params.push(searchValue); // 4 params for each table
+        }
+      }
+
+      // --- Type filter (soldiers, ncos, both) ---
+      const type = req.query.type || "all"; // Default to 'all' if no type is provided
+
+      let typeCondition = "";
+      if (type === "soldiers") {
+        typeCondition = "AND s.mil_id IS NOT NULL"; // Filter for soldiers
+      } else if (type === "ncos") {
+        typeCondition = "AND n.mil_id IS NOT NULL"; // Filter for NCOs
+      } else if (type !== "officrs") {
+        typeCondition = "AND o.mil_id IS NOT NULL"; // Filter for Officers
+      }
+
+      // --- Filter for 'Returning Today' ---
+      const filterReturningToday = req.query.filterReturningToday === "true"; // Get the parameter from query string
+
+      let soldiersReturningTodayCondition = "";
+      let ncosReturningTodayCondition = "";
+      let officersReturningTodayCondition = "";
+      if (filterReturningToday) {
+        const today = moment().format("YYYY-MM-DD"); // Get today's date
+
+        // Separate returning today condition for soldiers and NCOs
+        soldiersReturningTodayCondition = `
+        AND sl.end_date = ?  -- Filter for soldiers' returning today
+      `;
+        ncosReturningTodayCondition = `
+        AND nl.end_date = ?  -- Filter for NCOs' returning today
+      `;
+        officersReturningTodayCondition = `
+        AND ol.end_date = ?  -- Filter for Officers' returning today
+      `;
+
+        // Add today's date to the params for filtering
+        params.push(today, today, today);
+      }
+
+      // --- Total count for pagination ---
+      const countQuery = `
+    SELECT COUNT(*) AS total FROM (   
+        SELECT 1 FROM officers o
+        JOIN 
+          officer_leave_details ol ON o.id = ol.officerID
+        JOIN 
+          leave_type lt ON ol.leaveTypeID = lt.id
+        WHERE 
+          ol.leaveTypeID IN (1, 2, 3, 5, 6, 7, 11, 12, 13)  -- filter by leave types
+          AND o.in_unit = 0  -- filter for Officers not in unit
+          AND ol.id = (
+            -- Subquery to get the latest leave record for each Officer
+            SELECT MAX(id) 
+            FROM officer_leave_details 
+            WHERE officerID = o.id
+          )
+          ${officerSearchClause}
+          ${
+            type === "soldiers" || type === "ncos" ? "AND 1=0" : ""
+          } -- If filtering for soldiers or NCOs, exclude Officers
+          ${officersReturningTodayCondition}  -- Apply the returning today filter for Officers if active
+
+        UNION ALL
+
+
+
+      SELECT COUNT(*) AS total FROM (   
+        SELECT 1 FROM ncos n
+        JOIN 
+          nco_leave_details nl ON n.id = nl.ncoID
+        JOIN 
+          leave_type lt ON nl.leaveTypeID = lt.id
+        WHERE 
+          nl.leaveTypeID IN (1, 2, 3, 5, 6, 7, 11, 12, 13)  -- filter by leave types
+          AND n.in_unit = 0  -- filter for NCOs not in unit
+          AND nl.id = (
+            -- Subquery to get the latest leave record for each NCO
+            SELECT MAX(id) 
+            FROM nco_leave_details 
+            WHERE ncoID = n.id
+          )
+          ${ncoSearchClause}
+          ${
+            type === "soldiers" || type === "officers" ? "AND 1=0" : ""
+          } -- If filtering for soldiers or officers, exclude NCOs
+          ${ncosReturningTodayCondition}  -- Apply the returning today filter for NCOs if active
+
+        UNION ALL
+
+        SELECT 1 FROM soldiers s
+        JOIN 
+          soldier_leave_details sl ON s.id = sl.soldierID
+        JOIN 
+          leave_type lt ON sl.leaveTypeID = lt.id
+        WHERE 
+          sl.leaveTypeID IN (1, 2, 3, 5, 6, 7, 11, 12, 13)  -- filter by leave types
+          AND s.in_unit = 0  -- filter for soldiers not in unit
+          AND sl.id = (
+            -- Subquery to get the latest leave record for each soldier
+            SELECT MAX(id) 
+            FROM soldier_leave_details 
+            WHERE soldierID = s.id
+          )
+          ${soldierSearchClause}
+          ${
+            type === "ncos" || type === "officers" ? "AND 1=0" : ""
+          } -- If filtering for NCOs or Officers, exclude soldiers
+          ${soldiersReturningTodayCondition}  -- Apply the returning today filter for soldiers if active
+      ) AS combined
+    `;
+
+      // Execute the count query
+      const countResult = await query(countQuery, params.length ? params : []);
+      const total = countResult[0].total;
+      const totalPages = Math.ceil(total / limit);
+
+      // --- Main query ---
+      const allQuery = `
+      SELECT 
+        s.mil_id, 
+        s.name, 
+        s.rank, 
+        s.department,
+        sl.leaveTypeID,
+        sl.start_date,
+        sl.end_date,
+        lt.name AS leave_type_name
+      FROM 
+        soldiers s
+      JOIN 
+        soldier_leave_details sl ON s.id = sl.soldierID
+      JOIN 
+        leave_type lt ON sl.leaveTypeID = lt.id
+      WHERE 
+        sl.leaveTypeID IN (1, 2, 3, 5, 6, 7, 11, 12, 13)  -- filter by leave types
+        AND s.in_unit = 0  -- filter for soldiers not in unit
+            AND CURDATE() BETWEEN sl.start_date AND sl.end_date  -- leave is ongoing today
+
+        AND sl.id = (
+          -- Subquery to get the latest leave record for each soldier
+          SELECT MAX(id) 
+          FROM soldier_leave_details 
+          WHERE soldierID = s.id
+        )
+        ${soldierSearchClause}
+        ${
+          type === "ncos" ? "AND 1=0" : ""
+        } -- If filtering for NCOs, exclude soldiers
+        ${soldiersReturningTodayCondition}  -- Apply the returning today filter for soldiers if active
+
+      UNION
+
+      SELECT 
+        n.mil_id, 
+        n.name, 
+        n.rank, 
+        n.department,
+        nl.leaveTypeID,
+        nl.start_date,
+        nl.end_date,
+        lt.name AS leave_type_name
+      FROM 
+        ncos n
+      JOIN 
+        nco_leave_details nl ON n.id = nl.ncoID
+      JOIN 
+        leave_type lt ON nl.leaveTypeID = lt.id
+      WHERE 
+        nl.leaveTypeID IN (1, 2, 3, 5, 6, 7, 11, 12, 13)  -- filter by leave types
+        AND n.in_unit = 0  -- filter for NCOs not in unit
+            AND CURDATE() BETWEEN nl.start_date AND nl.end_date  -- leave is ongoing today
+
+        AND nl.id = (
+          -- Subquery to get the latest leave record for each NCO
+          SELECT MAX(id) 
+          FROM nco_leave_details 
+          WHERE ncoID = n.id
+        )
+        ${ncoSearchClause}
+        ${
+          type === "soldiers" ? "AND 1=0" : ""
+        } -- If filtering for soldiers, exclude NCOs
+        ${ncosReturningTodayCondition}  -- Apply the returning today filter for NCOs if active
+
+         UNION
+
+      SELECT 
+        o.mil_id, 
+        o.name, 
+        o.rank, 
+        o.department,
+        ol.leaveTypeID,
+        ol.start_date,
+        ol.end_date,
+        lt.name AS leave_type_name
+      FROM 
+        officers o
+      JOIN 
+        officer_leave_details ol ON o.id = ol.officerID
+      JOIN 
+        leave_type lt ON ol.leaveTypeID = lt.id
+      WHERE 
+        ol.leaveTypeID IN (1, 2, 3, 5, 6, 7, 11, 12, 13)  -- filter by leave types
+        AND o.in_unit = 0  -- filter for Officers not in unit
+            AND CURDATE() BETWEEN ol.start_date AND ol.end_date  -- leave is ongoing today
+
+        AND ol.id = (
+          -- Subquery to get the latest leave record for each Officer
+          SELECT MAX(id) 
+          FROM officer_leave_details 
+          WHERE officerID = o.id
+        )
+        ${officerSearchClause}
+        ${
+          type === "soldiers" || type === "ncos" ? "AND 1=0" : ""
+        } -- If filtering for soldiers or NCOs, exclude Officers
+        ${officersReturningTodayCondition}  -- Apply the returning today filter for Officers if active
+
+      LIMIT ? OFFSET ?
+    `;
+
+      // Execute the main query with pagination and filtering
+      const result = await query(allQuery, [...params, limit, offset]);
+
+      if (!result.length) {
+        return res.status(404).json({ msg: "No one found" });
+      }
+
+      return res.status(200).json({
+        page,
+        limit,
+        total,
+        totalPages,
+        data: result,
+      });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({
+        message: "An unexpected error occurred",
+        error: err.message,
+      });
+    }
+  }
+
+  static async getVacationsCount(req, res) {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const query = util.promisify(connection.query).bind(connection);
+
+      const count = await query(`
+        SELECT
+  SUM(category = 'officer') AS officers,
+  SUM(category = 'nco') AS ncos,
+  SUM(category = 'soldier') AS soldiers
+FROM (
+  SELECT 'officer' AS category
+  FROM officers o
+  JOIN officer_leave_details ol ON o.id = ol.officerID
+  WHERE o.in_unit = 0
+    AND ol.leaveTypeID IN (1,2,3,5,6,7,11,12,13)
+    AND CURDATE() BETWEEN ol.start_date AND ol.end_date
+    AND ol.id = (SELECT MAX(id) FROM officer_leave_details WHERE officerID = o.id)
+  
+  UNION ALL
+
+  SELECT 'nco' AS category
+  FROM ncos n
+  JOIN nco_leave_details nl ON n.id = nl.ncoID
+  WHERE n.in_unit = 0
+    AND nl.leaveTypeID IN (1,2,3,5,6,7,11,12,13)
+    AND CURDATE() BETWEEN nl.start_date AND nl.end_date
+    AND nl.id = (SELECT MAX(id) FROM nco_leave_details WHERE ncoID = n.id)
+  
+  UNION ALL
+
+  SELECT 'soldier' AS category
+  FROM soldiers s
+  JOIN soldier_leave_details sl ON s.id = sl.soldierID
+  WHERE s.in_unit = 0
+    AND sl.leaveTypeID IN (1,2,3,5,6,7,11,12,13)
+    AND CURDATE() BETWEEN sl.start_date AND sl.end_date
+    AND sl.id = (SELECT MAX(id) FROM soldier_leave_details WHERE soldierID = s.id)
+) AS combined;
+
+`);
+
+      const officers = count[0].officers;
+      const ncos = count[0].ncos;
+      const soldiers = count[0].soldiers;
+     
+
+     
+
+      return res.status(200).json({
+        officersCount: officers,
+        ncosCount: ncos,
+        soldiersCount: soldiers,
+      });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({
+        message: "An unexpected error occurred",
+        error: err.message,
+      });
+    }
+  }
 }
 
 module.exports = UnitController;

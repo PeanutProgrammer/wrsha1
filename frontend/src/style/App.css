@@ -155,6 +155,8 @@ table {
   );
 }
 
+
+
 .table-summary-header th {
   border: none; /* Remove borders for summary header */
   padding: 12px 15px;

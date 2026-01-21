@@ -1,8 +1,9 @@
 const NCO = require("../models/nco");
-const { validationResult } = require('express-validator');
+const { validationResult, check } = require('express-validator');
 const connection = require("../db/dbConnection");
 const util = require("util");
 const moment = require("moment");
+const PastNCO = require("../models/pastNCO");
 
 
 class NCOController {
@@ -150,34 +151,40 @@ class NCOController {
         });
       }
 
-      // Create a PastOfficer object with the officer's data
-      const PastNCOObject = {
-        mil_id: checkOfficer[0].mil_id,
-        rank: checkOfficer[0].rank,
-        name: checkOfficer[0].name,
-        join_date: checkOfficer[0].join_date,
-        address: checkOfficer[0].address,
-        dob: checkOfficer[0].dob,
-        // If you have additional fields such as 'end_date', 'transferID', etc.
-        end_date: req.body.end_date || new Date().toISOString(),
-        transferID: req.body.transferID || null,
-        transferred_to: req.body.transferred_to || null,
-      };
+      console.log(checkOfficer[0].mil_id);
+      
 
+      // Create a PastOfficer object with the officer's data
+      const PastNCOObject = new PastNCO( 
+                 checkOfficer[0].name,
+          checkOfficer[0].join_date,
+
+        checkOfficer[0].mil_id,
+         checkOfficer[0].rank,
+         checkOfficer[0].address,
+        checkOfficer[0].dob,
+        // If you have additional fields such as 'end_date', 'transferID', etc.
+         req.body.end_date || new Date().toISOString(),
+         req.body.transferID || null,
+         req.body.transferred_to || null,
+      );
+
+      console.log(PastNCOObject.getMilID());
+      
       // Insert the officer data into the past_officers table
       await query(
-        "INSERT INTO past_ncos (mil_id, `rank`, name, join_date, address, dob, end_date, transferID, transferred_to) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO past_ncos set mil_id = ?, `rank` = ?, name = ?, join_date = ?, address = ?, dob = ?, end_date = ?, transferID = ?, transferred_to = ?",
         [
-          PastNCOObject.mil_id,
-          PastNCOObject.rank,
-          PastNCOObject.name,
-          PastNCOObject.join_date,
-          PastNCOObject.address,
+          PastNCOObject.getMilID(),
+          PastNCOObject.getRank(),
+          PastNCOObject.getName(),
+          PastNCOObject.getJoinDate(),
+          PastNCOObject.getAddress(),
 
-          PastNCOObject.dob,
-          PastNCOObject.end_date,
-          PastNCOObject.transferID,
-          PastNCOObject.transferred_to,
+          PastNCOObject.getDOB(),
+          PastNCOObject.getEndDate(),
+          PastNCOObject.getTransferID(),
+          PastNCOObject.getTransferredTo(),
         ]
       );
 
@@ -189,7 +196,8 @@ class NCOController {
         msg: "NCO deleted!",
       });
     } catch (err) {
-      return res.status(500).json({ err: err });
+      return res.status(500).json({         message: "An unexpected error occurred",
+        error: err.message, });
     }
   }
 

@@ -309,7 +309,7 @@
   font-size: 1.1rem;
   font-weight: 700;
   margin-bottom: 15px;
-  color: #000000;
+  color: #ffffff;
   border-bottom: 1px solid rgba(255,255,255,0.2);
   padding-bottom: 8px;
 }
@@ -394,6 +394,96 @@
   opacity: 0.8;
 }
 
+.mini-calendar.vacations {
+  border-left: 5px solid #ff4500; /* different accent color for vacations */
+}
+
+.mini-calendar.vacations::after {
+  content: "اجازات";
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: #ff4500;
+  color: #000;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
+/* Vacation sections container */
+.vacation-sections {
+  display: flex;
+  justify-content: space-around; /* spread sections evenly */
+  gap: 20px; /* space between sections */
+  margin-top: 20px;
+}
+
+/* Single vacation section */
+.vac-section {
+  flex: 1; /* allow each section to grow equally */
+  min-width: 100px; /* prevents wrapping for longer labels */
+  background: rgba(255, 255, 255, 0.05);
+  padding: 15px 10px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Label inside section */
+.vac-label {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #ffd700;
+  text-align: center;
+  white-space: nowrap; /* prevent breaking into two lines */
+}
+
+/* Count inside section */
+.vac-count {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #fff;
+  margin-top: 8px;
+}
+
+/* Make MiniVacationsCard behave like leader-card / mini-calendar on hover */
+.mini-calendar.vacations {
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* Hover effect */
+.mini-calendar.vacations:hover {
+  transform: translateY(-10px) scale(1.05);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  background: rgba(0,0,0,0.8);
+}
+
+/* Optional glowing particles effect like leader-card */
+.mini-calendar.vacations::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.2) 1%, transparent 2%);
+  background-size: 10px 10px;
+  animation: moveParticles 12s linear infinite;
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+
+
 /* Logo animation */
 .home-logo {
   width: 250px;
@@ -416,6 +506,60 @@
   0% { opacity: 0; transform: translateY(50px); }
   100% { opacity: 1; transform: translateY(0); }
 }
+
+@keyframes slowSpin {
+  from {
+    transform: rotate(0deg) scale(1);
+  }
+  to {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+.home-logo.spin {
+  animation:
+    fadeInLogo 2s ease forwards 0.5s,
+    slowSpin 40s linear infinite;
+}
+
+@keyframes glowPulse {
+  0% {
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 35px rgba(255, 215, 0, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+  }
+}
+
+.home-logo.glow {
+  animation:
+    fadeInLogo 2s ease forwards 0.5s,
+    glowPulse 4s ease-in-out infinite;
+}
+
+@keyframes floatRotate {
+  0% {
+    transform: translateY(0) rotate(-1deg) scale(1);
+  }
+  50% {
+    transform: translateY(-12px) rotate(1deg) scale(1.02);
+  }
+  100% {
+    transform: translateY(0) rotate(-1deg) scale(1);
+  }
+}
+
+.home-logo.epic {
+  animation:
+    fadeInLogo 2s ease forwards 0.5s,
+    floatRotate 6s ease-in-out infinite,
+    glowPulse 5s ease-in-out infinite;
+}
+
+
 
 /* Responsive adjustments */
 @media (max-width: 768px) {

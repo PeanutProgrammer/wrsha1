@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { getAuthUser } from "../../helper/Storage";
 import "./Calendar.css";
+import { Link, useParams } from "react-router-dom";
+import { Modal, Button, Form } from "react-bootstrap";
 
 const Calendar = () => {
   const auth = getAuthUser();
@@ -11,6 +13,13 @@ const Calendar = () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     return today;
+  });
+  const [showAddEvent, setShowAddEvent] = useState(false);
+
+  const [newEvent, setNewEvent] = useState({
+    name: "",
+    location: "",
+    description: "",
   });
 
   useEffect(() => {
@@ -139,6 +148,15 @@ const Calendar = () => {
       <div className="calendar-events-panel">
         <h3>إلتزامات {selectedDate.toLocaleDateString("ar-EG")}</h3>
 
+        {auth?.type === "admin" && (
+          <button
+            className="btn btn-success btn-sm mb-2"
+            onClick={() => setShowAddEvent(true)}
+          >
+            + إضافة حدث
+          </button>
+        )}
+
         {getEventsForDate(selectedDate).length > 0 ? (
           getEventsForDate(selectedDate).map((e) => (
             <div key={e.id} className="calendar-event-card">
@@ -150,6 +168,100 @@ const Calendar = () => {
           <div className="no-events">لا يوجد إلتزامات</div>
         )}
       </div>
+
+
+       <Modal
+  show={showAddEvent}
+  onHide={() => setShowAddEvent(false)}
+  centered
+>
+  <Modal.Header closeButton>
+    <Modal.Title>إضافة حدث جديد</Modal.Title>
+  </Modal.Header>
+
+  <Modal.Body>
+    <Form
+      onSubmit={(e) => {
+        e.preventDefault();
+
+        axios
+          .post(
+            `${process.env.REACT_APP_BACKEND_BASE_URL}/event`,
+            {
+              ...newEvent,
+              date: selectedDate,
+            },
+            {
+              headers: { token: auth.token },
+            }
+          )
+          .then((res) => {
+            setEvents([...events, res.data]);
+            setShowAddEvent(false);
+            setNewEvent({ name: "", location: "", description: "" });
+          })
+          .catch(console.error);
+      }}
+    >
+      <Form.Group className="mb-3">
+        <Form.Label>اسم الحدث *</Form.Label>
+        <Form.Control
+          type="text"
+          required
+          value={newEvent.name}
+          onChange={(e) =>
+            setNewEvent({ ...newEvent, name: e.target.value })
+          }
+        />
+      </Form.Group>
+
+      <Form.Group className="mb-3">
+        <Form.Label>المكان</Form.Label>
+        <Form.Control
+          type="text"
+          value={newEvent.location}
+          onChange={(e) =>
+            setNewEvent({ ...newEvent, location: e.target.value })
+          }
+        />
+      </Form.Group>
+
+      <Form.Group className="mb-3">
+        <Form.Label>التاريخ</Form.Label>
+        <Form.Control
+          type="text"
+          value={selectedDate.toLocaleDateString("ar-EG")}
+          disabled
+        />
+      </Form.Group>
+
+      <Form.Group className="mb-3">
+        <Form.Label>الوصف</Form.Label>
+        <Form.Control
+          as="textarea"
+          rows={3}
+          value={newEvent.description}
+          onChange={(e) =>
+            setNewEvent({ ...newEvent, description: e.target.value })
+          }
+        />
+      </Form.Group>
+
+      <div className="d-flex justify-content-end gap-2">
+        <Button
+          variant="secondary"
+          onClick={() => setShowAddEvent(false)}
+        >
+          إلغاء
+        </Button>
+        <Button type="submit" variant="success">
+          حفظ
+        </Button>
+      </div>
+    </Form>
+  </Modal.Body>
+</Modal>
+
     </div>
   );
 };
