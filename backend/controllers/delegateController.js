@@ -14,17 +14,7 @@ class DelegateController {
 
       const query = util.promisify(connection.query).bind(connection);
 
-    //   // Check if the delegate already exists by name (assuming 'name' is unique)
-    //   const checkDelegate = await query(
-    //     "SELECT * from delegates where id = ?",
-    //     [req.body.id]
-    //   );
 
-    //   if (checkDelegate.length > 0) {
-    //     return res.status(400).json({
-    //       errors: [{ msg: "Delegate with this name already exists" }],
-    //     });
-    //   }
 
       // Ensure visit_start is set to current date and time if not provided
       const visitStart = req.body.visit_start || new Date().toISOString(); // Use current time if missing
@@ -202,9 +192,9 @@ class DelegateController {
         const params = [];
         if (req.query.search) {
           searchClause =
-            "WHERE delegates.name LIKE ? OR delegates.unit LIKE ? OR delegates.rank LIKE ? OR delegates.notes LIKE ?";
+            "WHERE delegates.name LIKE ? OR delegates.unit LIKE ? OR delegates.rank LIKE ? OR delegates.notes LIKE ? OR delegates.telephone_number LIKE ?";
           const searchValue = `%${req.query.search}%`;
-          params.push(searchValue, searchValue, searchValue, searchValue);
+          params.push(searchValue, searchValue, searchValue, searchValue, searchValue);
         }
 
         // --- Total count for pagination ---
@@ -214,7 +204,7 @@ class DelegateController {
         const totalPages = Math.ceil(total / limit);
 
       const delegates =
-        await query(`select  delegates.id, delegates.rank, delegates.name, delegates.unit, delegates.visit_start, delegates.visit_end, delegates.telephone_number, delegates.notes 
+        await query(`select  delegates.id, delegates.rank, delegates.name, delegates.unit, delegates.visit_start, delegates.visit_end, delegates.telephone_number, delegates.notes
                 from delegates ${searchClause} ORDER BY id desc LIMIT ? OFFSET ?`, [...params, limit, offset]);
 
       if (!delegates.length) {
