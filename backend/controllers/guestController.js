@@ -36,7 +36,9 @@ class GuestController {
         // Correctly instantiate the Guest object with the proper order of parameters
         const guestObject = new Guest(
             null,  // id is null, assuming auto-increment
+            req.body.rank,
             req.body.name,
+            req.body.unit,
             visitStart,
             visitEnd,
             req.body.visit_to,
@@ -45,7 +47,9 @@ class GuestController {
 
         // Log the guest data you're trying to insert into the database
         console.log('Executing query with data:', [
+            guestObject.getRank(),
             guestObject.getName(),
+            guestObject.getUnit(),
             guestObject.getVisitStart(),
             guestObject.getVisitEnd(),
             guestObject.getVisitTo(),
@@ -54,9 +58,11 @@ class GuestController {
 
         // Now insert the guest into the database
         await query(
-            "INSERT INTO guests SET name = ?, visit_start = ?, visit_end = ?, visit_to = ?, reason = ?",
+            "INSERT INTO guests SET guests.rank = ?, name = ?, unit = ?, visit_start = ?, visit_end = ?, visit_to = ?, reason = ?",
             [
+                guestObject.getRank(),
                 guestObject.getName(),
+                guestObject.getUnit(),
                 guestObject.getVisitStart(),
                 guestObject.getVisitEnd(),
                 guestObject.getVisitTo(),
@@ -114,7 +120,9 @@ class GuestController {
             
 
             const guestObject = new Guest(
+                req.body.rank,
                 req.body.name,
+                req.body.unit,
                 req.body.visit_start,
                 req.body.visit_end,
                 req.body.visit_to,
@@ -122,21 +130,17 @@ class GuestController {
             );
 
               console.log('Executing query with data:', [
-    guestObject.getName(),
-    guestObject.getVisitStart(),
-    guestObject.getVisitEnd(),
-    guestObject.getVisitTo(),
-    guestObject.getReason()
+                guestObject.getRank(),
+                guestObject.getName(),
+                guestObject.getUnit(),
+                guestObject.getVisitStart(),
+                guestObject.getVisitEnd(),
+                guestObject.getVisitTo(),
+                guestObject.getReason()
 ]);
 
-            
-            
-
-             
-
-
-            await query(`update guests set  name =?, visit_start = ?, visit_end = ?, visit_to = ?, reason = ? where id = ?`,
-                [guestObject.getName(), guestObject.getVisitStart(), guestObject.getVisitEnd(), guestObject.getVisitTo(), guestObject.getReason(), req.params.id]);
+            await query(`update guests set  guests.rank =?, name =?, unit = ?, visit_start = ?, visit_end = ?, visit_to = ?, reason = ? where id = ?`,
+                [guestObject.getRank(), guestObject.getName(), guestObject.getUnit(), guestObject.getVisitStart(), guestObject.getVisitEnd(), guestObject.getVisitTo(), guestObject.getReason(), req.params.id]);
 
 
 
@@ -221,9 +225,9 @@ class GuestController {
         const params = [];
         if (req.query.search) {
           searchClause =
-            "WHERE guests.name LIKE ? OR guests.visit_to LIKE ? OR guests.reason LIKE ?";
+            "WHERE guests.name LIKE ? OR guests.visit_to LIKE ? OR guests.reason LIKE ? OR guests.unit LIKE ? OR guests.rank LIKE ?";
           const searchValue = `%${req.query.search}%`;
-          params.push(searchValue, searchValue, searchValue);
+          params.push(searchValue, searchValue, searchValue, searchValue, searchValue);
         }
 
         // --- Total count for pagination ---
@@ -233,7 +237,7 @@ class GuestController {
         const totalPages = Math.ceil(total / limit);
 
 
-            const guests = await query(`select guests.id, guests.name, guests.visit_start, guests.visit_end, guests.visit_to, guests.reason, officers.rank, officers.name as officer_name 
+            const guests = await query(`select guests.id, guests.rank, guests.name, guests.unit, guests.visit_start, guests.visit_end, guests.visit_to, guests.reason, officers.rank as officer_rank, officers.name as officer_name 
                 from guests
                 left join officers on guests.visit_to = officers.id
                 ${searchClause}
@@ -356,7 +360,7 @@ class GuestController {
 
             // SQL query to fetch guests with null end_date in expert_record
             const guests = await query(`
-                SELECT guests.id ,guests.name, guests.visit_start, guests.visit_end, guests.visit_to, guests.reason, officers.rank, officers.name as officer_name
+                SELECT guests.id ,guests.name, guests.visit_start, guests.visit_end, guests.visit_to, guests.reason, officers.rank as officer_rank, officers.name as officer_name
                 FROM officers
                 RIGHT JOIN guests ON guests.visit_to = officers.id
                  WHERE guests.visit_end IS NULL AND guests.visit_start IS NOT NULL

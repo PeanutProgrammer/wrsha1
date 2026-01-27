@@ -2,7 +2,7 @@
 const connection = require("../db/dbConnection");
 const util = require("util");
 
-const securityHead = async (req, res, next) => {
+const leader = async (req, res, next) => {
   const query = util.promisify(connection.query).bind(connection);
   const { token } = req.headers;
 
@@ -10,7 +10,7 @@ const securityHead = async (req, res, next) => {
 
   if (
     userData[0] &&
-    (userData[0].type === "مبنى القيادة" || userData[0].type === "admin")
+    (userData[0].type === "مبنى القيادة" || userData[0].type === "admin" || userData[0].type === "secretary")
   ) {
     return next();
   }
@@ -18,4 +18,4 @@ const securityHead = async (req, res, next) => {
   throw new Error("leader");
 };
 
-module.exports = securityHead;
+module.exports = leader;

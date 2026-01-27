@@ -14,6 +14,8 @@ const schema = yup.object().shape({
   name: yup.string().min(3, 'اسم الزائر يجب أن يكون أكثر من 3 حروف').max(30, 'اسم الزائر يجب ألا يتجاوز 30 حرف').required('اسم الزائر مطلوب'),
   reason: yup.string().optional('سبب الزيارة اختياري'),
   visit_to: yup.string().required('المسؤول الذي تتم زيارته مطلوب'),
+  rank: yup.string().required('الرتبة مطلوبة'),
+  unit: yup.string().optional('الوحدة مطلوبة'),
 });
 
 const GuestArrival = () => {
@@ -38,7 +40,7 @@ const GuestArrival = () => {
     resolver: yupResolver(schema)
   });
 
-  // Function to format date in "YYYY-MM-DD HH:mm:ss"
+  // Function to format date in "YYYY/MM/DD HH:mm:ss"
   const formatDateToLocalString = (date) => {
     const d = new Date(date);
     const year = d.getFullYear();
@@ -75,6 +77,8 @@ const createGuest = async (data) => {
           visit_to: "",
           name: "",
           reason: "",
+          rank: "",
+          unit: "",
           err: null,
           success: "تمت الإضافة بنجاح!",
         });
@@ -97,6 +101,8 @@ const createGuest = async (data) => {
           visit_to: "",
           name: "",
           reason: "",
+          rank: "",
+          unit: "",
           loading: false,
           err: errorMessage,
           success: null,
@@ -109,7 +115,7 @@ const createGuest = async (data) => {
   useEffect(() => {
   if (!auth?.token) return;
     axios
-      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/officer/`, {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/officer?limit=200`, {
         headers: {
           token: auth.token,
         },
@@ -131,6 +137,68 @@ const createGuest = async (data) => {
         setValue("visit_to", selectedOption.value); // Set the visit_to field in react-hook-form
       }
     };
+
+    const rankOptions = [
+      "مدني",
+    "جندي",
+    "عريف مجند",
+    "عريف",
+    "رقيب",
+    "رقيب أول",
+    "مساعد",
+    "مساعد أول",
+    "صانع ماهر",
+    "صانع دقيق",
+    "صانع ممتاز",
+    "ملاحظ",
+    "ملاحظ فني",
+    "ملازم",
+    "ملازم أول",
+    "نقيب",
+    "نقيب أ ح",
+    "رائد",
+    "رائد أ ح",
+    "مقدم",
+    "مقدم أ ح",
+    "عقيد",
+    "عقيد أ ح",
+    "عميد",
+    "عميد أ ح",
+    "لواء",
+    "لواء أ ح",
+    "فريق",
+    "فريق أول",
+    "مشير",
+  ].map((rank) => ({ value: rank, label: rank }));
+
+
+  const rankSelectStyles = {
+    control: (provided, state) => ({
+      ...provided,
+      borderRadius: "0.375rem",
+      borderColor: state.isFocused ? "#86b7fe" : "#ced4da",
+      boxShadow: state.isFocused ? "0 0 0 0.25rem rgba(13,110,253,.25)" : null,
+      minHeight: "38px",
+      direction: "rtl", // Arabic friendly
+    }),
+    menu: (provided) => ({
+      ...provided,
+      direction: "rtl",
+      textAlign: "right",
+    }),
+    option: (provided, state) => ({
+      ...provided,
+      backgroundColor: state.isFocused ? "#f8f9fa" : "white",
+      color: "black",
+      cursor: "pointer",
+      textAlign: "right",
+    }),
+    singleValue: (provided) => ({
+      ...provided,
+      textAlign: "right",
+      direction: "rtl",
+    }),
+  };
 
     // Custom styles for react-select to prevent conflict with Bootstrap's form-control
     const customStyles = {
@@ -155,7 +223,10 @@ const createGuest = async (data) => {
         color: state.isSelected ? "#fff" : "#495057",
         fontWeight: state.isSelected ? "600" : "500",
       }),
+
+
     };
+
 
   return (
     <div className="add-officer-form">
@@ -178,6 +249,25 @@ const createGuest = async (data) => {
       )}
 
       <Form onSubmit={handleSubmit(createGuest)} className="form">
+
+        <Form.Group controlId="rank" className="form-group">
+                  <Form.Label>الرتبة / الدرجة</Form.Label>
+        
+                  <Select
+                    options={rankOptions}
+                    placeholder="إختر رتبة / درجة الزائر"
+                    isSearchable
+                    styles={rankSelectStyles}
+                    classNamePrefix="react-select"
+                    onChange={(selected) => setValue("rank", selected.value)}
+                  />
+        
+                  {errors.rank && (
+                    <div className="invalid-feedback d-block">
+                      {errors.rank.message}
+                    </div>
+                  )}
+                </Form.Group>
         <Form.Group controlId="name" className="form-group">
           <Form.Label>اسم الزائر</Form.Label>
           <Form.Control
@@ -190,6 +280,19 @@ const createGuest = async (data) => {
             <div className="invalid-feedback">{errors.name.message}</div>
           )}
         </Form.Group>
+
+         <Form.Group controlId="unit" className="form-group">
+                  <Form.Label>اسم الوحدة / الشركة</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="أدخل اسم الوحدة"
+                    {...register("unit")}
+                    className={`form-control ${errors.unit ? "is-invalid" : ""}`}
+                  />
+                  {errors.unit && (
+                    <div className="invalid-feedback">{errors.unit.message}</div>
+                  )}
+                </Form.Group>
 
         <Form.Group controlId="visit_to" className="form-group">
           <Form.Label>المسؤول الذي تتم زيارته</Form.Label>

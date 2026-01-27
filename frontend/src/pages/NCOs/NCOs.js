@@ -262,7 +262,7 @@ const NCOs = () => {
         officer.rank,
         officer.name,
         officer.department,
-        moment(officer.join_date).format("YYYY-MM-DD"),
+        moment(officer.join_date).format("YYYY/MM/DD"),
         officer.attached ? "نعم" : "لا",
         officer.in_unit ? "متواجد" : "غير موجود",
       ]);
@@ -499,7 +499,7 @@ const NCOs = () => {
                   <td>{officer.rank}</td>
                   <td>{officer.name}</td>
                   <td>{officer.department}</td>
-                  <td>{moment(officer.join_date).format("YYYY-MM-DD")}</td>
+                  <td>{moment(officer.join_date).format("YYYY/MM/DD")}</td>
                   <td>{officer.attached ? "نعم" : "لا"}</td>
                   <td>
                     <span

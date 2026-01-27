@@ -20,6 +20,7 @@ const schema = yup.object().shape({
     .required("اسم المندوب مطلوب"),
   notes: yup.string().required("سبب الزيارة مطلوب"),
   unit: yup.string().required("اسم الوحدة مطلوب"),
+  telephone_number: yup.string().optional(),
 });
 
 const DelegateArrival = () => {
@@ -40,7 +41,7 @@ const DelegateArrival = () => {
     resolver: yupResolver(schema),
   });
 
-  // Function to format date in "YYYY-MM-DD HH:mm:ss"
+  // Function to format date in "YYYY/MM/DD HH:mm:ss"
   const formatDateToLocalString = (date) => {
     const d = new Date(date);
     const year = d.getFullYear();
@@ -237,6 +238,19 @@ const DelegateArrival = () => {
           />
           {errors.unit && (
             <div className="invalid-feedback">{errors.unit.message}</div>
+          )}
+        </Form.Group>
+
+        <Form.Group controlId="telephone_number" className="form-group">
+          <Form.Label>رقم الهاتف</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="أدخل رقم الهاتف"
+            {...register("telephone_number")}
+            className={`form-control ${errors.telephone_number ? "is-invalid" : ""}`}
+          />
+          {errors.telephone_number && (
+            <div className="invalid-feedback">{errors.telephone_number.message}</div>
           )}
         </Form.Group>
 

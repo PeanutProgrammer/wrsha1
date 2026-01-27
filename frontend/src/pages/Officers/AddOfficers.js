@@ -67,7 +67,7 @@ const AddOfficers = () => {
 
       console.log("Request Data:", data);
 
-  // Format the dates (join_date and dob) to yyyy-MM-DD format
+  // Format the dates (join_date and dob) to YYYY/MM/DD format
   const formattedData = {
     ...data,
     join_date: data.join_date ? formatDateToLocalString(data.join_date) : "",

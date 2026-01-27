@@ -34,8 +34,9 @@ const schema = yup.object().shape({
       'مبنى القيادة', 
       'شؤون ضباط', 
       'شؤون ادارية', 
-      'قائد الامن'
-    ], 'النوع يجب أن يكون "admin" أو "بوابة" أو "مبنى القيادة" أو "شؤون ضباط" أو "شؤون ادارية" أو "قائد الامن"')  // Type must be one of the above values
+      'قائد الامن',
+      'secretary'
+    ], 'النوع يجب أن يكون "admin" أو "بوابة" أو "مبنى القيادة" أو "شؤون ضباط" أو "شؤون ادارية" أو "قائد الامن" أو "secretary"')  // Type must be one of the above values
     .required('النوع مطلوب')  // Type is required
 });
 
@@ -178,6 +179,7 @@ const AddUsers = () => {
             <option value="شؤون ضباط">شؤون ضباط</option>
             <option value="شؤون ادارية">شؤون ادارية</option>
             <option value="قائد الامن">قائد الامن</option>
+            <option value="secretary">secretary</option>
             
           </Form.Control>
           {errors.type && <div className="invalid-feedback">{errors.type.message}</div>}

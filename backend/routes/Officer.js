@@ -100,14 +100,14 @@ router.get("/tmam", (allowAny(security,shuoonOfficers,leader)), (req,res) => {
     OfficerController.getOfficersTmam(req,res);
 });
 
-router.get("/vacations", shuoonOfficers, (req,res) => {
+router.get("/vacations", allowAny(shuoonOfficers, leader), (req,res) => {
     OfficerController.getVacationingOfficers(req,res);
 });
 
 router.get("/missions", shuoonOfficers, (req,res) => {
     OfficerController.getMissionOfficers(req,res);
 });
-
+    
 router.get("/courses", shuoonOfficers, (req,res) => {
     OfficerController.getCourseOfficers(req,res);
 });

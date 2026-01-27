@@ -279,8 +279,9 @@ LEFT JOIN leave_type lt
       }
 
       // Calculate the summary
-      const totalUnits = units.length;
       const totalAttached = units.filter((unit) => unit.attached).length;
+      const totalUnits = units.length - totalAttached;
+
       const available = units.filter((unit) => unit.in_unit).length;
       const missing = totalUnits - available;
       const fixedMission = units.filter(
@@ -561,16 +562,17 @@ LEFT JOIN leave_type lt
       }
 
       // --- Type filter (soldiers, ncos, both) ---
-      const type = req.query.type || "all"; // Default to 'all' if no type is provided
+      const type = req.query.type || "all";
+      // frontend sends: all | officers | ncos | soldiers
 
-      let typeCondition = "";
-      if (type === "soldiers") {
-        typeCondition = "AND s.mil_id IS NOT NULL"; // Filter for soldiers
-      } else if (type === "ncos") {
-        typeCondition = "AND n.mil_id IS NOT NULL"; // Filter for NCOs
-      } else if (type !== "officrs") {
-        typeCondition = "AND o.mil_id IS NOT NULL"; // Filter for Officers
-      }
+      const normalizedType =
+        type === "all"
+          ? "all"
+          : type === "officers"
+          ? "officer"
+          : type === "ncos"
+          ? "nco"
+          : "soldier";
 
       // --- Filter for 'Returning Today' ---
       const filterReturningToday = req.query.filterReturningToday === "true"; // Get the parameter from query string
@@ -579,207 +581,186 @@ LEFT JOIN leave_type lt
       let ncosReturningTodayCondition = "";
       let officersReturningTodayCondition = "";
       if (filterReturningToday) {
-        const today = moment().format("YYYY-MM-DD"); // Get today's date
-
         // Separate returning today condition for soldiers and NCOs
         soldiersReturningTodayCondition = `
-        AND sl.end_date = ?  -- Filter for soldiers' returning today
+AND DATE(sl.end_date) = CURDATE()
       `;
         ncosReturningTodayCondition = `
-        AND nl.end_date = ?  -- Filter for NCOs' returning today
+        AND DATE(nl.end_date) = CURDATE()  -- Filter for NCOs' returning today
       `;
         officersReturningTodayCondition = `
-        AND ol.end_date = ?  -- Filter for Officers' returning today
+        AND DATE(ol.end_date) = CURDATE()  -- Filter for Officers' returning today
       `;
-
-        // Add today's date to the params for filtering
-        params.push(today, today, today);
       }
 
       // --- Total count for pagination ---
       const countQuery = `
-    SELECT COUNT(*) AS total FROM (   
-        SELECT 1 FROM officers o
-        JOIN 
-          officer_leave_details ol ON o.id = ol.officerID
-        JOIN 
-          leave_type lt ON ol.leaveTypeID = lt.id
-        WHERE 
-          ol.leaveTypeID IN (1, 2, 3, 5, 6, 7, 11, 12, 13)  -- filter by leave types
-          AND o.in_unit = 0  -- filter for Officers not in unit
-          AND ol.id = (
-            -- Subquery to get the latest leave record for each Officer
-            SELECT MAX(id) 
-            FROM officer_leave_details 
-            WHERE officerID = o.id
-          )
-          ${officerSearchClause}
-          ${
-            type === "soldiers" || type === "ncos" ? "AND 1=0" : ""
-          } -- If filtering for soldiers or NCOs, exclude Officers
-          ${officersReturningTodayCondition}  -- Apply the returning today filter for Officers if active
+SELECT COUNT(*) AS total
+FROM (
+    SELECT
+      'officer' AS person_type,
+      o.id
+    FROM officers o
+    JOIN officer_leave_details ol ON o.id = ol.officerID
+    WHERE
+      ol.leaveTypeID IN (1,2,3,5,6,7,11,12,13)
+      AND o.in_unit = 0
+      AND CURDATE() BETWEEN ol.start_date AND ol.end_date
+      AND ol.id = (
+        SELECT MAX(id)
+        FROM officer_leave_details
+        WHERE officerID = o.id
+      )
+      ${officerSearchClause}
+      ${officersReturningTodayCondition}
 
-        UNION ALL
+    UNION ALL
 
+    SELECT
+      'nco' AS person_type,
+      n.id
+    FROM ncos n
+    JOIN nco_leave_details nl ON n.id = nl.ncoID
+    WHERE
+      nl.leaveTypeID IN (1,2,3,5,6,7,11,12,13)
+      AND n.in_unit = 0
+      AND CURDATE() BETWEEN nl.start_date AND nl.end_date
+      AND nl.id = (
+        SELECT MAX(id)
+        FROM nco_leave_details
+        WHERE ncoID = n.id
+      )
+      ${ncoSearchClause}
+      ${ncosReturningTodayCondition}
 
+    UNION ALL
 
-      SELECT COUNT(*) AS total FROM (   
-        SELECT 1 FROM ncos n
-        JOIN 
-          nco_leave_details nl ON n.id = nl.ncoID
-        JOIN 
-          leave_type lt ON nl.leaveTypeID = lt.id
-        WHERE 
-          nl.leaveTypeID IN (1, 2, 3, 5, 6, 7, 11, 12, 13)  -- filter by leave types
-          AND n.in_unit = 0  -- filter for NCOs not in unit
-          AND nl.id = (
-            -- Subquery to get the latest leave record for each NCO
-            SELECT MAX(id) 
-            FROM nco_leave_details 
-            WHERE ncoID = n.id
-          )
-          ${ncoSearchClause}
-          ${
-            type === "soldiers" || type === "officers" ? "AND 1=0" : ""
-          } -- If filtering for soldiers or officers, exclude NCOs
-          ${ncosReturningTodayCondition}  -- Apply the returning today filter for NCOs if active
-
-        UNION ALL
-
-        SELECT 1 FROM soldiers s
-        JOIN 
-          soldier_leave_details sl ON s.id = sl.soldierID
-        JOIN 
-          leave_type lt ON sl.leaveTypeID = lt.id
-        WHERE 
-          sl.leaveTypeID IN (1, 2, 3, 5, 6, 7, 11, 12, 13)  -- filter by leave types
-          AND s.in_unit = 0  -- filter for soldiers not in unit
-          AND sl.id = (
-            -- Subquery to get the latest leave record for each soldier
-            SELECT MAX(id) 
-            FROM soldier_leave_details 
-            WHERE soldierID = s.id
-          )
-          ${soldierSearchClause}
-          ${
-            type === "ncos" || type === "officers" ? "AND 1=0" : ""
-          } -- If filtering for NCOs or Officers, exclude soldiers
-          ${soldiersReturningTodayCondition}  -- Apply the returning today filter for soldiers if active
-      ) AS combined
-    `;
+    SELECT
+      'soldier' AS person_type,
+      s.id
+    FROM soldiers s
+    JOIN soldier_leave_details sl ON s.id = sl.soldierID
+    WHERE
+      sl.leaveTypeID IN (1,2,3,5,6,7,11,12,13)
+      AND s.in_unit = 0
+      AND CURDATE() BETWEEN sl.start_date AND sl.end_date
+      AND sl.id = (
+        SELECT MAX(id)
+        FROM soldier_leave_details
+        WHERE soldierID = s.id
+      )
+      ${soldierSearchClause}
+      ${soldiersReturningTodayCondition}
+) AS all_people
+WHERE
+  (? = 'all' OR person_type = ?)
+`;
 
       // Execute the count query
-      const countResult = await query(countQuery, params.length ? params : []);
+      const countParams = [...params, normalizedType, normalizedType];
+      const countResult = await query(countQuery, countParams);
       const total = countResult[0].total;
       const totalPages = Math.ceil(total / limit);
 
       // --- Main query ---
       const allQuery = `
-      SELECT 
-        s.mil_id, 
-        s.name, 
-        s.rank, 
-        s.department,
-        sl.leaveTypeID,
-        sl.start_date,
-        sl.end_date,
-        lt.name AS leave_type_name
-      FROM 
-        soldiers s
-      JOIN 
-        soldier_leave_details sl ON s.id = sl.soldierID
-      JOIN 
-        leave_type lt ON sl.leaveTypeID = lt.id
-      WHERE 
-        sl.leaveTypeID IN (1, 2, 3, 5, 6, 7, 11, 12, 13)  -- filter by leave types
-        AND s.in_unit = 0  -- filter for soldiers not in unit
-            AND CURDATE() BETWEEN sl.start_date AND sl.end_date  -- leave is ongoing today
+SELECT *
+FROM (
+    SELECT
+      'soldier' AS person_type,
+      s.mil_id,
+      s.name,
+      s.rank,
+      s.department,
+      sl.leaveTypeID,
+      sl.start_date,
+      sl.end_date,
+      lt.name AS leave_type_name
+    FROM soldiers s
+    JOIN soldier_leave_details sl ON s.id = sl.soldierID
+    JOIN leave_type lt ON sl.leaveTypeID = lt.id
+    WHERE
+      sl.leaveTypeID IN (1,2,3,5,6,7,11,12,13)
+      AND s.in_unit = 0
+      AND CURDATE() BETWEEN sl.start_date AND sl.end_date
+      AND sl.id = (
+        SELECT MAX(id)
+        FROM soldier_leave_details
+        WHERE soldierID = s.id
+      )
+      ${soldierSearchClause}
+      ${soldiersReturningTodayCondition}
 
-        AND sl.id = (
-          -- Subquery to get the latest leave record for each soldier
-          SELECT MAX(id) 
-          FROM soldier_leave_details 
-          WHERE soldierID = s.id
-        )
-        ${soldierSearchClause}
-        ${
-          type === "ncos" ? "AND 1=0" : ""
-        } -- If filtering for NCOs, exclude soldiers
-        ${soldiersReturningTodayCondition}  -- Apply the returning today filter for soldiers if active
+    UNION ALL
 
-      UNION
+    SELECT
+      'nco' AS person_type,
+      n.mil_id,
+      n.name,
+      n.rank,
+      n.department,
+      nl.leaveTypeID,
+      nl.start_date,
+      nl.end_date,
+      lt.name AS leave_type_name
+    FROM ncos n
+    JOIN nco_leave_details nl ON n.id = nl.ncoID
+    JOIN leave_type lt ON nl.leaveTypeID = lt.id
+    WHERE
+      nl.leaveTypeID IN (1,2,3,5,6,7,11,12,13)
+      AND n.in_unit = 0
+      AND CURDATE() BETWEEN nl.start_date AND nl.end_date
+      AND nl.id = (
+        SELECT MAX(id)
+        FROM nco_leave_details
+        WHERE ncoID = n.id
+      )
+      ${ncoSearchClause}
+      ${ncosReturningTodayCondition}
 
-      SELECT 
-        n.mil_id, 
-        n.name, 
-        n.rank, 
-        n.department,
-        nl.leaveTypeID,
-        nl.start_date,
-        nl.end_date,
-        lt.name AS leave_type_name
-      FROM 
-        ncos n
-      JOIN 
-        nco_leave_details nl ON n.id = nl.ncoID
-      JOIN 
-        leave_type lt ON nl.leaveTypeID = lt.id
-      WHERE 
-        nl.leaveTypeID IN (1, 2, 3, 5, 6, 7, 11, 12, 13)  -- filter by leave types
-        AND n.in_unit = 0  -- filter for NCOs not in unit
-            AND CURDATE() BETWEEN nl.start_date AND nl.end_date  -- leave is ongoing today
+    UNION ALL
 
-        AND nl.id = (
-          -- Subquery to get the latest leave record for each NCO
-          SELECT MAX(id) 
-          FROM nco_leave_details 
-          WHERE ncoID = n.id
-        )
-        ${ncoSearchClause}
-        ${
-          type === "soldiers" ? "AND 1=0" : ""
-        } -- If filtering for soldiers, exclude NCOs
-        ${ncosReturningTodayCondition}  -- Apply the returning today filter for NCOs if active
-
-         UNION
-
-      SELECT 
-        o.mil_id, 
-        o.name, 
-        o.rank, 
-        o.department,
-        ol.leaveTypeID,
-        ol.start_date,
-        ol.end_date,
-        lt.name AS leave_type_name
-      FROM 
-        officers o
-      JOIN 
-        officer_leave_details ol ON o.id = ol.officerID
-      JOIN 
-        leave_type lt ON ol.leaveTypeID = lt.id
-      WHERE 
-        ol.leaveTypeID IN (1, 2, 3, 5, 6, 7, 11, 12, 13)  -- filter by leave types
-        AND o.in_unit = 0  -- filter for Officers not in unit
-            AND CURDATE() BETWEEN ol.start_date AND ol.end_date  -- leave is ongoing today
-
-        AND ol.id = (
-          -- Subquery to get the latest leave record for each Officer
-          SELECT MAX(id) 
-          FROM officer_leave_details 
-          WHERE officerID = o.id
-        )
-        ${officerSearchClause}
-        ${
-          type === "soldiers" || type === "ncos" ? "AND 1=0" : ""
-        } -- If filtering for soldiers or NCOs, exclude Officers
-        ${officersReturningTodayCondition}  -- Apply the returning today filter for Officers if active
-
-      LIMIT ? OFFSET ?
-    `;
+    SELECT
+      'officer' AS person_type,
+      o.mil_id,
+      o.name,
+      o.rank,
+      o.department,
+      ol.leaveTypeID,
+      ol.start_date,
+      ol.end_date,
+      lt.name AS leave_type_name
+    FROM officers o
+    JOIN officer_leave_details ol ON o.id = ol.officerID
+    JOIN leave_type lt ON ol.leaveTypeID = lt.id
+    WHERE
+      ol.leaveTypeID IN (1,2,3,5,6,7,11,12,13)
+      AND o.in_unit = 0
+      AND CURDATE() BETWEEN ol.start_date AND ol.end_date
+      AND ol.id = (
+        SELECT MAX(id)
+        FROM officer_leave_details
+        WHERE officerID = o.id
+      )
+      ${officerSearchClause}
+      ${officersReturningTodayCondition}
+) AS all_people
+WHERE
+  (? = 'all' OR person_type = ?)
+ORDER BY start_date DESC
+LIMIT ? OFFSET ?
+`;
 
       // Execute the main query with pagination and filtering
-      const result = await query(allQuery, [...params, limit, offset]);
+      const dataParams = [
+        ...params,
+        normalizedType,
+        normalizedType,
+        limit,
+        offset,
+      ];
+
+      const result = await query(allQuery, dataParams);
 
       if (!result.length) {
         return res.status(404).json({ msg: "No one found" });
@@ -850,9 +831,6 @@ FROM (
       const officers = count[0].officers;
       const ncos = count[0].ncos;
       const soldiers = count[0].soldiers;
-     
-
-     
 
       return res.status(200).json({
         officersCount: officers,

@@ -7,7 +7,7 @@ import moment from 'moment';
 
 const Civillians = () => {
   const auth = getAuthUser();
-    const now = moment().format("YYYY-MM-DD HH:mm:ss");
+    const now = moment().format("YYYY/MM/DD HH:mm:ss");
   const [civillians, setCivillians] = useState({
     loading: true,
     err: null,
@@ -151,7 +151,7 @@ const Civillians = () => {
                 <td>{civillian.nationalID}</td>
                 <td>{civillian.name}</td>
                 <td>{civillian.department}</td>
-                <td>{moment(civillian.join_date).format('YYYY-MM-DD')}</td>
+                <td>{moment(civillian.join_date).format('YYYY/MM/DD')}</td>
                 <td>
                   <span
                     className={`status-badge ${

@@ -63,10 +63,85 @@
   color: #ffcc70;
 }
 
+/* RIGHT section containing both buttons */
+.header-right-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* space between buttons */
+  justify-content: flex-end;
+}
+
+/* Return Home Button - cinematic gold */
+.return-home-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  height: 36px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  font-size: 0.9em;
+  cursor: pointer;
+  background: linear-gradient(
+    145deg,
+    #fff4b1 0%,
+    #ffd700 25%,
+    #e6c200 50%,
+    #cfae3b 75%,
+    #b8962e 100%
+  );
+  color: #1a1a1a;
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.45),
+    inset 0 1px 2px rgba(255, 255, 255, 0.35);
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.return-home-btn .home-icon {
+  font-size: 1.1em;
+  color: #ffcc70;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+/* Hover effect with glow */
+.return-home-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(212, 175, 55, 0.6),
+    inset 0 1px 3px rgba(255, 255, 255, 0.45);
+}
+
+.return-home-btn:hover .home-icon {
+  transform: scale(1.2);
+  color: #fff;
+}
+
+/* Logout button - red gradient pop */
+.header-right.logout-btn {
+  padding: 6px 16px;
+  height: 36px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  background: linear-gradient(145deg, #e74c3c, #c0392b, #a93226);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(255, 100, 90, 0.6),
+    inset 0 1px 2px rgba(255, 255, 255, 0.15);
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.header-right.logout-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(255, 100, 90, 0.8),
+    inset 0 1px 3px rgba(255, 255, 255, 0.25);
+}
+
 .logout-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -80,7 +155,7 @@
   border-radius: 12px;
   width: 320px;
   text-align: center;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .logout-modal h3 {

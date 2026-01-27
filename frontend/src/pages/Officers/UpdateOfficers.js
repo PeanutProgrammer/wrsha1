@@ -36,7 +36,7 @@ const UpdateOfficers = () => {
     rank: '',
     mil_id: '',
     department: '',
-    join_date: '',  // store as string "YYYY-MM-DD"
+    join_date: '',  // store as string "YYYY/MM/DD"
     address: '',
     height: '',
     weight: '',

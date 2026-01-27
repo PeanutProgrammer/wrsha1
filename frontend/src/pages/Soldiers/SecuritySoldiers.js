@@ -154,6 +154,11 @@ const SecuritySoldiers = () => {
     return 0;
   });
 
+   const isToday = (date) => {
+      if (!date) return false;
+      return moment(date).isSame(moment(), "day");
+    };
+
   return (
     <div className="Officers p-5">
       <div className="header d-flex justify-content-between mb-3">
@@ -277,7 +282,7 @@ const SecuritySoldiers = () => {
                   <td>{soldier.rank}</td>
                   <td>{soldier.name}</td>
                   <td>{soldier.department}</td>
-                  <td>{moment(soldier.end_date).format("YYYY-MM-DD")}</td>
+                  <td>{moment(soldier.end_date).format("YYYY/MM/DD")}</td>
                                     <td
                     className={
                       soldier.in_unit
@@ -289,19 +294,46 @@ const SecuritySoldiers = () => {
                   </td>
                   
                   <td>
-                    {soldier.latest_arrival
-                      ? moment(soldier.latest_arrival).format(
-                          "YYYY-MM-DD HH:mm:ss"
-                        )
-                      : "لا يوجد"}
+                    {soldier.latest_arrival ? (
+                      <>
+                        <div>
+                          {moment(soldier.latest_arrival).format("YYYY/MM/DD")}
+                        </div>
+                        <div>
+                          {moment(soldier.latest_arrival).format("hh:mm")}
+                          <span>
+                            {moment(soldier.latest_arrival).format("a") === "am"
+                              ? " ص"
+                              : " م"}
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      "لا يوجد"
+                    )}
                   </td>
+
                   <td>
-                    {soldier.latest_departure
-                      ? moment(soldier.latest_departure).format(
-                          "YYYY-MM-DD HH:mm:ss"
-                        )
-                      : "لا يوجد"}
+                    {soldier.latest_departure ? (
+                      <>
+                        <div>
+                          {moment(soldier.latest_departure).format("YYYY/MM/DD")}
+                        </div>
+                        <div>
+                          {moment(soldier.latest_departure).format("hh:mm")}
+                          <span>
+                            {moment(soldier.latest_departure).format("a") ===
+                            "am"
+                              ? " ص"
+                              : " م"}
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      "لا يوجد"
+                    )}
                   </td>
+
 
                   <td>{soldier.in_unit ? "لا يوجد" : soldier.tmam}</td>
                   {/* <td>

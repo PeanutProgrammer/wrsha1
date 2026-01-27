@@ -8,14 +8,9 @@ const admin = async (req, res,next) => {
     const adminData = await query("select * from users where token = ?", [token]);
     if (adminData[0] && adminData[0].type == "admin") { 
         next();
-    } else {
-        res.status(403).json({
-            msg: "you are not authorized to access this route "
-        })
-    }
-    
-
-}
+    } 
+    throw new Error("admin");
+};
 
 
 module.exports = admin; 

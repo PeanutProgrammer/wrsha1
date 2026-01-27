@@ -17,7 +17,7 @@ const SecurityExperts = () => {
     key: "",
     direction: "asc",
   });
-  const now = moment().format("YYYY-MM-DD HH:mm:ss");
+  const now = moment().format("YYYY/MM/DD HH:mm:ss");
   const [experts, setExperts] = useState({
     loading: true,
     err: null,
@@ -332,8 +332,8 @@ const SecurityExperts = () => {
                   <td>{(experts.page - 1) * experts.limit + index + 1}</td>
                   <td>{expert.nationalID}</td>
                   <td>{expert.name}</td>
-                  {/* <td>{moment(expert.valid_from).format("YYYY-MM-DD")}</td>
-                <td>{moment(expert.valid_through).format("YYYY-MM-DD")}</td> */}
+                  {/* <td>{moment(expert.valid_from).format("YYYY/MM/DD")}</td>
+                <td>{moment(expert.valid_through).format("YYYY/MM/DD")}</td> */}
                   <td>{expert.department}</td>
 
                   <td
@@ -374,7 +374,7 @@ const SecurityExperts = () => {
                     {expert.latest_arrival ? (
                       <>
                         <div>
-                          {moment(expert.latest_arrival).format("YYYY-MM-DD")}
+                          {moment(expert.latest_arrival).format("YYYY/MM/DD")}
                         </div>
                         <div>
                           {moment(expert.latest_arrival).format("hh:mm")}
@@ -394,7 +394,7 @@ const SecurityExperts = () => {
                     {expert.latest_departure ? (
                       <>
                         <div>
-                          {moment(expert.latest_departure).format("YYYY-MM-DD")}
+                          {moment(expert.latest_departure).format("YYYY/MM/DD")}
                         </div>
                         <div>
                           {moment(expert.latest_departure).format("hh:mm")}

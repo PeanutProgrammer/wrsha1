@@ -156,6 +156,10 @@ const AllInUnit = () => {
     return 0;
   });
 
+   const isToday = (date) => {
+      if (!date) return false;
+      return moment(date).isSame(moment(), "day");
+    };
   return (
     <div className="Officers p-5">
      <div className="header d-flex justify-content-between mb-3">
@@ -246,7 +250,31 @@ const AllInUnit = () => {
                 <td>{unit.rank}</td>
                 <td>{unit.name}</td>
                 <td>{unit.department}</td>
-                <td>{ unit.event_time ? moment(unit.event_time).format('YYYY-MM-DD HH:mm') : "لا يوجد"}</td>
+                <td>
+                  {unit.event_time ? (
+                    <>
+                      <div className=" align-items-center ">
+                                {isToday(unit.event_time) && (
+                          <span className="badge bg-warning text-dark today-badge ml-2">
+                            اليوم
+                          </span>
+                        )}
+                        <span>{moment(unit.event_time).format("YYYY/MM/DD")}</span>
+                
+                
+                      </div>
+                
+                      <div>
+                        {moment(unit.event_time).format("hh:mm")}
+                        <span>
+                          {moment(unit.event_time).format("a") === "am" ? " ص" : " م"}
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    "لا يوجد"
+                  )}
+                </td>
               </tr>
             ))
           ) : (

@@ -281,7 +281,7 @@ const LeaderCivillians = () => {
                  <td>
   {civillian.latest_arrival ? (
     <>
-      <div>{moment(civillian.latest_arrival).format("YYYY-MM-DD")}</div>
+      <div>{moment(civillian.latest_arrival).format("YYYY/MM/DD")}</div>
       <div>
         {moment(civillian.latest_arrival).format("hh:mm")}
         <span>
@@ -297,7 +297,7 @@ const LeaderCivillians = () => {
 <td>
   {civillian.latest_departure ? (
     <>
-      <div>{moment(civillian.latest_departure).format("YYYY-MM-DD")}</div>
+      <div>{moment(civillian.latest_departure).format("YYYY/MM/DD")}</div>
       <div>
         {moment(civillian.latest_departure).format("hh:mm")}
         <span>

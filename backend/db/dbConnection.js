@@ -24,7 +24,7 @@ pool.getConnection((err, connection) => {
         return;
     }
     console.log("DB connected"); 
-    connection.release();
+    connection.release(); 
 });
 
 module.exports = pool;

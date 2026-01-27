@@ -291,7 +291,7 @@ const sortedSoldiers = useMemo(() => {
 <td>
   {soldier.latest_arrival ? (
     <>
-      <div>{moment(soldier.latest_arrival).format("YYYY-MM-DD")}</div>
+      <div>{moment(soldier.latest_arrival).format("YYYY/MM/DD")}</div>
       <div>
         {moment(soldier.latest_arrival).format("hh:mm")}
         <span>
@@ -306,7 +306,7 @@ const sortedSoldiers = useMemo(() => {
 <td>
   {soldier.latest_departure ? (
     <>
-      <div>{moment(soldier.latest_departure).format("YYYY-MM-DD")}</div>
+      <div>{moment(soldier.latest_departure).format("YYYY/MM/DD")}</div>
       <div>
         {moment(soldier.latest_departure).format("hh:mm")}
         <span>

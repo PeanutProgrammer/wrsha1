@@ -78,7 +78,7 @@ const CivillianDetails = () => {
               </tr>
               <tr>
                 <td><strong>تاريخ الضم:</strong></td>
-                <td>{moment(civillian.results._join_date).format('YYYY-MM-DD')}</td>
+                <td>{moment(civillian.results._join_date).format('YYYY/MM/DD')}</td>
               </tr>
               <tr>
                 <td><strong>العنوان:</strong></td>
@@ -90,7 +90,7 @@ const CivillianDetails = () => {
               </tr>
               <tr>
                 <td><strong>تاريخ الميلاد:</strong></td>
-                <td>{moment(civillian.results._dob).format('YYYY-MM-DD')}</td>
+                <td>{moment(civillian.results._dob).format('YYYY/MM/DD')}</td>
               </tr>
               <tr>
                 <td><strong>التمام:</strong></td>

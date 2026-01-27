@@ -8,7 +8,7 @@ const ExpertLogController = require("../controllers/expertLogController");
 const moment = require("moment");
 const allowAny = require("../middleware/allowAny");
 const leader = require("../middleware/leader");
-
+const securityHead = require("../middleware/securityHead");
 // Arrival route (already exists)
 router.post("/", gate,
     body("expertID")
@@ -113,6 +113,10 @@ router.put("/end-visit/:id", gate, (req, res) => {
 
 router.get("/current", gate,(req, res) => {
     ExpertLogController.getExpertsWithNullEndDate(req, res);
+});
+
+router.get("/report", allowAny(securityHead),(req, res) => {
+    ExpertLogController.getMonthlyExpertLog(req, res);
 });
 
 router.get("/", allowAny(admin,leader),(req, res) => {

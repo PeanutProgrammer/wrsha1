@@ -67,6 +67,10 @@ router.get("/daily-summary", allowAny(security,leader,shuoonSarya), (req, res) =
     NCOController.getDailySummary(req, res);
 });
 
+router.get("/vacations", allowAny(shuoonSarya, leader), (req,res) => {
+    NCOController.getVacationingNCOs(req,res);
+});
+
 
 
 

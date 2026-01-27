@@ -1,8 +1,14 @@
 import React, { useState, useEffect, useMemo } from "react";
 import "../../style/style.css";
-import { Table, Alert, Form, InputGroup, Button, Dropdown, DropdownButton } from "react-bootstrap";
-import { Link, useParams } from "react-router-dom";
-import { io } from "socket.io-client";
+import {
+  Table,
+  Alert,
+  Form,
+  InputGroup,
+  Button,
+  Dropdown,
+  DropdownButton,
+} from "react-bootstrap";
 import axios from "axios";
 import { getAuthUser } from "../../helper/Storage";
 import moment from "moment";
@@ -25,23 +31,21 @@ const ManageVacation = () => {
     search: "",
     limit: 15,
     tempSearch: "",
+    filterReturningToday: false, // Track if filtering for those returning today
   });
 
-  // State for filter toggle
-  const [filterReturningToday, setFilterReturningToday] = useState(false);
-
+  // Fetch data when page, search, or selectedType change
   useEffect(() => {
-    const socket = io(`${process.env.REACT_APP_BACKEND_BASE_URL}`); // backend port
-
     const fetchData = () => {
       const searchValue = toWesternDigits(officers.search.trim());
-      const resp = axios
-        .get(
-          `${process.env.REACT_APP_BACKEND_BASE_URL}/officer/vacations?page=${officers.page}&limit=${officers.limit}&search=${searchValue}`,
-          {
-            headers: { token: auth.token },
-          }
-        )
+
+      // Include filterReturningToday in the query parameters
+      const url = `${process.env.REACT_APP_BACKEND_BASE_URL}/officer/vacations?page=${officers.page}&limit=${officers.limit}&search=${searchValue}&type=${officers.selectedType}&filterReturningToday=${officers.filterReturningToday}`;
+
+      axios
+        .get(url, {
+          headers: { token: auth.token },
+        })
         .then((resp) => {
           setOfficers({
             ...officers,
@@ -63,21 +67,10 @@ const ManageVacation = () => {
         });
     };
 
-    fetchData(); // ✅ Initial fetch on component mount
+    fetchData(); // Initial data fetch or when state changes
+  }, [officers.page, officers.search, officers.filterReturningToday]); // Dependency array includes filterReturningToday
 
-    socket.on("connect", () => {
-      console.log("🟢 Connected to WebSocket:", socket.id);
-    });
-
-    socket.on("officersUpdated", () => {
-      console.log("📢 Officers updated — refetching data...");
-      fetchData(); // ✅ Re-fetch on update
-    });
-
-    return () => socket.disconnect();
-  }, [officers.page, officers.search]);
-
-  // Handling search submit
+  // Handle search form submit
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     const normalized = toWesternDigits(officers.tempSearch.trim());
@@ -85,18 +78,18 @@ const ManageVacation = () => {
       ...prev,
       search: normalized,
       page: 1,
-      results: [],
+      results: [], // Clear results when a new search is performed
     }));
   };
 
-  // Clear search
+  // Clear search input
   const handleClearSearch = () => {
     setOfficers((prev) => ({
       ...prev,
       search: "",
       tempSearch: "",
       page: 1,
-      results: [],
+      results: [], // Clear results when search is cleared
     }));
   };
 
@@ -131,24 +124,28 @@ const ManageVacation = () => {
     let result = officers.results;
 
     // If filterReturningToday is active, filter the officers
-    if (filterReturningToday) {
-      const today = moment().format("YYYY-MM-DD");
-      result = result.filter((officer) => moment(officer.end_date).isSame(today, "day"));
+    if (officers.filterReturningToday) {
+      const today = moment().format("YYYY/MM/DD");
+      result = result.filter((officer) =>
+        moment(officer.end_date).isSame(today, "day")
+      );
     }
 
     // Apply sorting
     if (sortConfig.key) {
       result = result.sort((a, b) => {
-        if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === "asc" ? 1 : -1;
-        if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === "asc" ? -1 : 1;
+        if (a[sortConfig.key] > b[sortConfig.key])
+          return sortConfig.direction === "asc" ? 1 : -1;
+        if (a[sortConfig.key] < b[sortConfig.key])
+          return sortConfig.direction === "asc" ? -1 : 1;
         return 0;
       });
     }
 
     return result;
-  }, [officers.results, filterReturningToday, sortConfig]);
+  }, [officers.results, officers.filterReturningToday, sortConfig]);
 
-  // Render page buttons for pagination
+  // Render pagination buttons
   const renderPageButtons = () => {
     const pages = [];
     const maxButtons = 5;
@@ -173,16 +170,15 @@ const ManageVacation = () => {
 
   return (
     <div className="Officers p-5">
-      {/* Header: Search + Add + Export */}
+      {/* Header */}
       <div className="header d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-        {/* Page Title */}
-        <h3 className="text-white">إدارة اجازات الضباط</h3>
-        
-
-
+        <h3 className="text-white"> اجازات الضباط </h3>
 
         {/* Search bar */}
-        <Form className="d-flex align-items-center flex-grow-1" onSubmit={handleSearchSubmit}>
+        <Form
+          className="d-flex align-items-center flex-grow-1"
+          onSubmit={handleSearchSubmit}
+        >
           <InputGroup className="w-50 shadow-sm me-5">
             <Form.Control
               size="sm"
@@ -193,28 +189,35 @@ const ManageVacation = () => {
               }
             />
             {officers.tempSearch && (
-              <Button size="sm" variant="outline-secondary" onClick={handleClearSearch}>
+              <Button
+                size="sm"
+                variant="outline-secondary"
+                onClick={handleClearSearch}
+              >
                 ×
               </Button>
             )}
           </InputGroup>
         </Form>
-                {/* Filter Toggle: Officers returning today */}
-<Form.Check
-  type="checkbox"
-  label="عرض عودة اليوم"
-  checked={filterReturningToday}
-  onChange={() => setFilterReturningToday((prev) => !prev)}
-  className="text-white"
-  style={{
-    display: 'flex',
-alignItems: 'baseline',
-// marginRight: '100px',
-flexDirection: 'row-reverse',
-flexWrap: 'nowrap',
-justifyContent: 'flex-start'
-  }}
-/>
+
+        {/* Filter Toggle */}
+        <div className="filter-toggle">
+          <input
+            type="checkbox"
+            id="filterReturningToday"
+            checked={officers.filterReturningToday}
+            onChange={() =>
+              setOfficers((prev) => ({
+                ...prev,
+                filterReturningToday: !prev.filterReturningToday,
+                page: 1,
+                results: [],
+                loading: true,
+              }))
+            }
+          />
+          <label htmlFor="filterReturningToday">عرض عودة اليوم</label>
+        </div>
       </div>
 
       {/* Loading Indicator */}
@@ -243,7 +246,8 @@ justifyContent: 'flex-start'
                     ? " 🔼"
                     : " 🔽"
                   : ""}
-                الرقم العسكري</th>
+                الرقم العسكري
+              </th>
               <th onClick={() => handleSort("rank")}>
                 {sortConfig.key === "rank"
                   ? sortConfig.direction === "asc"
@@ -251,7 +255,6 @@ justifyContent: 'flex-start'
                     : " 🔽"
                   : ""}
                 الرتبة
-
               </th>
               <th onClick={() => handleSort("name")}>
                 {sortConfig.key === "name"
@@ -293,6 +296,7 @@ justifyContent: 'flex-start'
                   : ""}
                 الفترة إلى
               </th>
+              <th>المتبقي</th>
             </tr>
           </thead>
           <tbody>
@@ -305,13 +309,24 @@ justifyContent: 'flex-start'
                   <td>{officer.name}</td>
                   <td>{officer.department}</td>
                   <td>{officer.leave_type_name}</td>
-                  <td>{officer.start_date ? moment(officer.start_date).format("YYYY-MM-DD") : "لا يوجد"}</td>
-                  <td>{officer.end_date ? moment(officer.end_date).format("YYYY-MM-DD") : "لا يوجد"}</td>
+                  <td>
+                    {officer.start_date
+                      ? moment(officer.start_date).format("YYYY/MM/DD")
+                      : "لا يوجد"}
+                  </td>
+                  <td>
+                    {officer.end_date
+                      ? moment(officer.end_date).format("YYYY/MM/DD")
+                      : "لا يوجد"}
+                  </td>
+                  <td>{officer.remaining || "لا يوجد"}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="8" className="text-center">لا توجد بيانات</td>
+                <td colSpan="9" className="text-center">
+                  لا توجد بيانات
+                </td>
               </tr>
             )}
           </tbody>
@@ -320,11 +335,21 @@ justifyContent: 'flex-start'
 
       {/* Pagination Controls */}
       <div className="d-flex justify-content-between align-items-center mt-3">
-        <Button onClick={handlePrevPage} disabled={officers.page === 1} variant="secondary" size="sm">
+        <Button
+          onClick={handlePrevPage}
+          disabled={officers.page === 1}
+          variant="secondary"
+          size="sm"
+        >
           السابق
         </Button>
         <div>{renderPageButtons()}</div>
-        <Button onClick={handleNextPage} disabled={officers.page === officers.totalPages} variant="secondary" size="sm">
+        <Button
+          onClick={handleNextPage}
+          disabled={officers.page === officers.totalPages}
+          variant="secondary"
+          size="sm"
+        >
           التالي
         </Button>
       </div>

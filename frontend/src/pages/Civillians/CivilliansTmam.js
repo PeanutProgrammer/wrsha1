@@ -253,14 +253,14 @@ const CivilliansTmam = () => {
                    <td>
                      {civillian.latest_arrival
                        ? moment(civillian.latest_arrival).format(
-                           "YYYY-MM-DD HH:mm:ss"
+                           "YYYY/MM/DD HH:mm:ss"
                          )
                        : "لا يوجد"}
                    </td>
                    <td>
                      {civillian.latest_departure
                        ? moment(civillian.latest_departure).format(
-                           "YYYY-MM-DD HH:mm:ss"
+                           "YYYY/MM/DD HH:mm:ss"
                          )
                        : "لا يوجد"}
                    </td>

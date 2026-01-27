@@ -211,13 +211,24 @@ const LeaderGuests = () => {
           <thead className="table-dark">
             <tr>
               <th>م</th>
+              <th onClick={() => handleSort("rank")}>
+                الرتبة / الدرجة
+                {sortConfig.key === "rank" && (
+                  <span>{sortConfig.direction === "asc" ? " 🔼" : " 🔽"}</span>
+                )}
+              </th>
               <th onClick={() => handleSort("name")}>
                 {sortConfig.key === "name"
                   ? sortConfig.direction === "asc"
-                    ? " 🔼"
-                    : " 🔽"
+                    ? " 🔼" : " 🔽"
                   : ""}{" "}
                 الاسم
+              </th>
+               <th onClick={() => handleSort("unit")}>
+                اسم الوحدة / الشركة
+                {sortConfig.key === "unit" && (
+                  <span>{sortConfig.direction === "asc" ? " 🔼" : " 🔽"}</span>
+                )}
               </th>
               <th onClick={() => handleSort("visit_to")}>
                 {sortConfig.key === "visit_to"
@@ -260,8 +271,10 @@ const LeaderGuests = () => {
                 className={isToday(guest.visit_start) ? "today-row" : ""}
               >
                 <td> {(guests.page - 1) * guests.limit + index + 1}</td>
+                <td>{guest.rank ? guest.rank : "لا يوجد"}</td>
                 <td>{guest.name}</td>
-                <td>{guest.rank + " " + guest.officer_name}</td>
+                <td>{guest.unit ? guest.unit : "لا يوجد"}</td>
+                <td>{guest.officer_rank + " " + guest.officer_name}</td>
                 <td>
   {guest.visit_start ? (
     <>
@@ -271,7 +284,7 @@ const LeaderGuests = () => {
             اليوم
           </span>
         )}
-        <span>{moment(guest.visit_start).format("YYYY-MM-DD")}</span>
+        <span>{moment(guest.visit_start).format("YYYY/MM/DD")}</span>
 
 
       </div>
@@ -291,7 +304,7 @@ const LeaderGuests = () => {
                 <td>
                   {guest.visit_end ? (
                     <>
-                      <div>{moment(guest.visit_end).format("YYYY-MM-DD")}</div>
+                      <div>{moment(guest.visit_end).format("YYYY/MM/DD")}</div>
                       <div>
                         {moment(guest.visit_end).format("hh:mm")}
                         <span>

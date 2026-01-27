@@ -38,6 +38,7 @@ import ManageVacation from "./pages/Officers/ManageVacation";
 import ManageMission from "./pages/Officers/ManageMission";
 import ManageCourse from "./pages/Officers/ManageCourse";
 import LeaderOfficers from "./pages/Officers/LeaderOfficers";
+import LeaderOfficersVacations from "./pages/Officers/LeaderVacations";
 // NCOs
 import NCOs from "./pages/NCOs/NCOs";
 import AddNCOs from "./pages/NCOs/AddNCOs";
@@ -54,6 +55,7 @@ import ManageNCOTmam from "./pages/NCOs/ManageTmam";
 import AddNCOTmam from "./pages/NCOs/AddTmam";
 import UpdateNCOTmam from "./pages/NCOs/UpdateTmam";
 import LeaderNCOs from "./pages/NCOs/LeaderNCOs";
+import LeaderNCOsVacations from "./pages/NCOs/LeaderVacations";
 // Soldiers
 import Soldiers from "./pages/Soldiers/Soldiers";
 import AddSoldiers from "./pages/Soldiers/AddSoldiers";
@@ -70,6 +72,7 @@ import ManageSoldierTmam from "./pages/Soldiers/ManageTmam";
 import AddSoldierTmam from "./pages/Soldiers/AddTmam";
 import UpdateSoldierTmam from "./pages/Soldiers/UpdateTmam";
 import LeaderSoldiers from "./pages/Soldiers/LeaderSoldiers";
+import LeaderSoldiersVacations from "./pages/Soldiers/LeaderVacations";
 // import RealTimeMonitor from "./pages/Soldiers/RealTimeMonitor";
 
 // Civillians
@@ -132,6 +135,8 @@ import SecurityGuests from "./pages/Guests/SecurityGuests";
 import SecurityDelegates from "./pages/Delegates/SecurityDelegates";
 import AllInUnit from "./pages/Unit/AllInUnit";
 import LeaderUnits from "./pages/Unit/LeaderUnits";
+import LeaderVacations from "./pages/Unit/LeaderVacations";
+import MonthlyReport from "./pages/Experts/MonthlyReport";
 
 import ManageShuoonVacation from "./pages/Shuoon/ManageVacation";
 import ManageShuoonMission from "./pages/Shuoon/ManageMission";
@@ -157,48 +162,120 @@ export const router = createBrowserRouter([
       // Leader Routes
       {
         path: "leader-officers",
-        element: <ProtectedRoute allowedTypes={["مبنى القيادة"]} />,
+        element: (
+          <ProtectedRoute
+            allowedTypes={["مبنى القيادة", "secretary", "admin"]}
+          />
+        ),
         children: [{ path: "", element: <LeaderOfficers /> }],
       },
-            {
+      {
         path: "leader-ncos",
-        element: <ProtectedRoute allowedTypes={["مبنى القيادة"]} />,
+        element: (
+          <ProtectedRoute
+            allowedTypes={["مبنى القيادة", "secretary", "admin"]}
+          />
+        ),
         children: [{ path: "", element: <LeaderNCOs /> }],
       },
       {
         path: "leader-soldiers",
-        element: <ProtectedRoute allowedTypes={["مبنى القيادة"]} />,
+        element: (
+          <ProtectedRoute
+            allowedTypes={["مبنى القيادة", "secretary", "admin"]}
+          />
+        ),
         children: [{ path: "", element: <LeaderSoldiers /> }],
       },
       {
         path: "leader-civillians",
-        element: <ProtectedRoute allowedTypes={["مبنى القيادة"]} />,
+        element: (
+          <ProtectedRoute
+            allowedTypes={["مبنى القيادة", "secretary", "admin"]}
+          />
+        ),
         children: [{ path: "", element: <LeaderCivillians /> }],
       },
       {
         path: "leader-units",
-        element: <ProtectedRoute allowedTypes={["مبنى القيادة"]} />,
+        element: (
+          <ProtectedRoute
+            allowedTypes={["مبنى القيادة", "secretary", "admin"]}
+          />
+        ),
         children: [{ path: "", element: <LeaderUnits /> }],
       },
-            {
+      {
         path: "leader-delegates",
-        element: <ProtectedRoute allowedTypes={["مبنى القيادة"]} />,
+        element: (
+          <ProtectedRoute
+            allowedTypes={["مبنى القيادة", "secretary", "admin"]}
+          />
+        ),
         children: [{ path: "", element: <LeaderDelegates /> }],
       },
       {
         path: "leader-guests",
-        element: <ProtectedRoute allowedTypes={["مبنى القيادة"]} />,
+        element: (
+          <ProtectedRoute
+            allowedTypes={["مبنى القيادة", "secretary", "admin"]}
+          />
+        ),
         children: [{ path: "", element: <LeaderGuests /> }],
       },
       {
         path: "leader-experts",
-        element: <ProtectedRoute allowedTypes={["مبنى القيادة"]} />,
+        element: (
+          <ProtectedRoute
+            allowedTypes={["مبنى القيادة", "secretary", "admin"]}
+          />
+        ),
         children: [{ path: "", element: <LeaderExperts /> }],
       },
       {
+        path: "leader-vacations",
+        element: (
+          <ProtectedRoute
+            allowedTypes={["مبنى القيادة", "secretary", "admin"]}
+          />
+        ),
+        children: [{ path: "", element: <LeaderVacations /> }],
+      },
+      {
         path: "calendar",
-        element: <ProtectedRoute allowedTypes={["admin", "مبنى القيادة"]} />,
+        element: (
+          <ProtectedRoute
+            allowedTypes={["admin", "مبنى القيادة", "secretary"]}
+          />
+        ),
         children: [{ path: "", element: <Calendar /> }],
+      },
+      {
+        path: "officers-vacations",
+        element: (
+          <ProtectedRoute
+            allowedTypes={["مبنى القيادة", "secretary", "admin"]}
+          />
+        ),
+        children: [{ path: "", element: <LeaderOfficersVacations /> }],
+      },
+      {
+        path: "ncos-vacations",
+        element: (
+          <ProtectedRoute
+            allowedTypes={["مبنى القيادة", "secretary", "admin"]}
+          />
+        ),
+        children: [{ path: "", element: <LeaderNCOsVacations /> }],
+      },
+      {
+        path: "soldiers-vacations",
+        element: (
+          <ProtectedRoute
+            allowedTypes={["مبنى القيادة", "secretary", "admin"]}
+          />
+        ),
+        children: [{ path: "", element: <LeaderSoldiersVacations /> }],
       },
 
       // Security Routes
@@ -241,6 +318,11 @@ export const router = createBrowserRouter([
         path: "security-unit",
         element: <ProtectedRoute allowedTypes={["قائد الامن"]} />,
         children: [{ path: "", element: <AllInUnit /> }],
+      },
+      {
+        path: "security-experts-report",
+        element: <ProtectedRoute allowedTypes={["قائد الامن"]} />,
+        children: [{ path: "", element: <MonthlyReport /> }],
       },
 
       // Officers Routes
@@ -339,22 +421,22 @@ export const router = createBrowserRouter([
         ],
       },
 
-      // Shuoon Routes 
-                {
-            path: "shuoon/manage-vacation",
-            element: <ProtectedRoute allowedTypes={"شؤون ادارية"} />,
-            children: [{ path: "", element: <ManageShuoonVacation /> }],
-          },
-          {
-            path: "shuoon/manage-mission",
-            element: <ProtectedRoute allowedTypes={"شؤون ادارية"} />,
-            children: [{ path: "", element: <ManageShuoonMission /> }],
-          },
-          {
-            path: "shuoon/manage-course",
-            element: <ProtectedRoute allowedTypes={"شؤون ادارية"} />,
-            children: [{ path: "", element: <ManageShuoonCourse /> }],
-          },
+      // Shuoon Routes
+      {
+        path: "shuoon/manage-vacation",
+        element: <ProtectedRoute allowedTypes={"شؤون ادارية"} />,
+        children: [{ path: "", element: <ManageShuoonVacation /> }],
+      },
+      {
+        path: "shuoon/manage-mission",
+        element: <ProtectedRoute allowedTypes={"شؤون ادارية"} />,
+        children: [{ path: "", element: <ManageShuoonMission /> }],
+      },
+      {
+        path: "shuoon/manage-course",
+        element: <ProtectedRoute allowedTypes={"شؤون ادارية"} />,
+        children: [{ path: "", element: <ManageShuoonCourse /> }],
+      },
 
       // NCOs Routes
       {
@@ -389,7 +471,7 @@ export const router = createBrowserRouter([
             element: <ProtectedRoute allowedTypes={["admin", "شؤون ادارية"]} />,
             children: [{ path: "", element: <NCOsTmam /> }],
           },
-                    {
+          {
             path: "tmam/add",
             element: <ProtectedRoute allowedTypes={"شؤون ادارية"} />,
             children: [{ path: "", element: <AddNCOTmam /> }],
@@ -399,7 +481,7 @@ export const router = createBrowserRouter([
             element: <ProtectedRoute allowedTypes={["admin", "شؤون ادارية"]} />,
             children: [{ path: "", element: <NCOsTmamDetails /> }],
           },
-                    {
+          {
             path: "tmam/:id",
             element: <ProtectedRoute allowedTypes={["شؤون ادارية"]} />,
             children: [{ path: "", element: <UpdateNCOTmam /> }],
@@ -664,27 +746,37 @@ export const router = createBrowserRouter([
           { path: "", element: <PastWorkersHome /> },
           {
             path: "officers",
-            element: <ProtectedRoute allowedTypes={["admin", "مبنى القيادة"]} />,
+            element: (
+              <ProtectedRoute allowedTypes={["admin", "مبنى القيادة"]} />
+            ),
             children: [{ path: "", element: <PastOfficers /> }],
           },
           {
             path: "officers/:id",
-            element: <ProtectedRoute allowedTypes={["admin", "مبنى القيادة"]} />,
+            element: (
+              <ProtectedRoute allowedTypes={["admin", "مبنى القيادة"]} />
+            ),
             children: [{ path: "", element: <PastOfficerDetails /> }],
           },
           {
             path: "ncos",
-            element: <ProtectedRoute allowedTypes={["admin", "مبنى القيادة"]} />,
+            element: (
+              <ProtectedRoute allowedTypes={["admin", "مبنى القيادة"]} />
+            ),
             children: [{ path: "", element: <PastNCOs /> }],
           },
           {
             path: "ncos/:id",
-            element: <ProtectedRoute allowedTypes={["admin", "مبنى القيادة"]} />,
+            element: (
+              <ProtectedRoute allowedTypes={["admin", "مبنى القيادة"]} />
+            ),
             children: [{ path: "", element: <PastNCODetails /> }],
           },
           {
             path: "search",
-            element: <ProtectedRoute allowedTypes={["admin", "مبنى القيادة"]} />,
+            element: (
+              <ProtectedRoute allowedTypes={["admin", "مبنى القيادة"]} />
+            ),
             children: [{ path: "", element: <SearchPastWorkers /> }],
           },
         ],

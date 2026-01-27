@@ -78,6 +78,14 @@ const ExpertsHome = () => {
                                </div>
                                <Link to={"../security-experts"} className="button">Go</Link>
                              </div>
+
+                             <div className="card">
+                               <div className="card-header">
+                                 <FaClipboardCheck className="card-icon" />
+                                 <h2>التقرير الشهري للخبراء</h2>
+                               </div>
+                               <Link to={"../security-experts-report"} className="button">Go</Link>
+                             </div>
                    
                              <div className="card">
                                <div className="card-header">

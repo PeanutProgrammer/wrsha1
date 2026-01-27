@@ -93,7 +93,7 @@ const SoldierDetails = () => {
                   <strong>تاريخ الضم:</strong>
                 </td>
                 <td>
-                  {moment(soldier.results._join_date).format("YYYY-MM-DD")}
+                  {moment(soldier.results._join_date).format("YYYY/MM/DD")}
                 </td>
               </tr>
 
@@ -102,7 +102,7 @@ const SoldierDetails = () => {
                   <strong>تاريخ التسريح:</strong>
                 </td>
                 <td>
-                  {moment(soldier.results._end_date).format("YYYY-MM-DD")}
+                  {moment(soldier.results._end_date).format("YYYY/MM/DD")}
                 </td>
               </tr>
               <tr>
@@ -159,7 +159,7 @@ const SoldierDetails = () => {
               </tr>
               <tr>
                 <td><strong>تاريخ الميلاد:</strong></td>
-                <td>{moment(soldier.results._dob).format('YYYY-MM-DD')}</td>
+                <td>{moment(soldier.results._dob).format('YYYY/MM/DD')}</td>
               </tr> */}
               <tr>
                 <td>

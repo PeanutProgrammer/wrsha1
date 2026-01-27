@@ -398,7 +398,7 @@
 
 .mini-calendar.vacations {
   border-left: 5px solid #ff4500; /* different accent color for vacations */
-  grid-column: span 3;
+  grid-column: span 2;
   border-radius: 15px;
 }
 
@@ -436,6 +436,29 @@
   justify-content: center;
 }
 
+.vac-section {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.vac-section:hover {
+  transform: translateY(-6px) scale(1.04);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+}
+
+.vac-section.officer {
+  border: 2px solid rgba(13,110,253,0.6);
+}
+
+.vac-section.nco {
+  border: 2px solid rgba(25,135,84,0.6);
+}
+
+.vac-section.soldier {
+  border: 2px solid rgba(253,126,20,0.6);
+}
+
+
 /* Label inside section */
 .vac-label {
   font-size: 1.1rem;
@@ -456,7 +479,7 @@
 /* Make MiniVacationsCard behave like leader-card / mini-calendar on hover */
 .mini-calendar.vacations {
   transition: all 0.3s ease;
-  cursor: pointer;
+  cursor: default;
   position: relative;
   overflow: hidden;
   background: rgba(0, 0, 0, 0.65);
@@ -485,6 +508,65 @@
   pointer-events: none;
   opacity: 0.3;
 }
+
+/* ===== Reactive glow hover effect ===== */
+
+.glow-hover {
+  position: relative;
+  overflow: hidden;
+}
+
+.glow-hover::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    120px circle at var(--x, 50%) var(--y, 50%),
+    rgba(255, 255, 255, 0.25),
+    transparent 60%
+  );
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.glow-hover:hover::before {
+  opacity: 1;
+}
+
+/* extra depth */
+.glow-hover:hover {
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.35),
+    0 0 20px rgba(255,255,255,0.05);
+}
+
+/* ===== Magnetic pull + parallax ===== */
+
+.magnetic {
+  transform-style: preserve-3d;
+  transition: transform 0.15s ease-out;
+  transform: var(--transform);
+}
+
+.magnetic:hover {
+  transition: transform 0.05s linear;
+}
+
+/* Depth for inner content */
+.magnetic .vac-label {
+  transform: translateZ(18px);
+}
+
+.magnetic .vac-count {
+  transform: translateZ(30px);
+}
+
+.vac-section {
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
 
 
 

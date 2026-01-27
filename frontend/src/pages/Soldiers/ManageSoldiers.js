@@ -203,7 +203,7 @@ const ManageSoldiers = () => {
   //               officer.rank,
   //               officer.name,
   //               officer.department,
-  //               moment(officer.join_date).format('YYYY-MM-DD'),
+  //               moment(officer.join_date).format('YYYY/MM/DD'),
   //               officer.in_unit ? 'متواجد' : 'غير موجود',
   //             ]),
   //           ],
@@ -477,8 +477,8 @@ const ManageSoldiers = () => {
                   <td>{soldier.rank}</td>
                   <td>{soldier.name}</td>
                   <td>{soldier.department}</td>
-                  <td>{moment(soldier.join_date).format("YYYY-MM-DD")}</td>
-                    <td>{soldier.end_date ? moment(soldier.end_date).format("YYYY-MM-DD") : "-"}</td>
+                  <td>{moment(soldier.join_date).format("YYYY/MM/DD")}</td>
+                    <td>{soldier.end_date ? moment(soldier.end_date).format("YYYY/MM/DD") : "-"}</td>
                   <td>{soldier.attached ? "نعم" : "لا"}</td>
                   <td>
                     <span

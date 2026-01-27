@@ -45,6 +45,7 @@ const schema = yup.object().shape({
     .optional(),
 
   destination: yup.string().max(255, "الوجهة يجب ألا تتجاوز 255 حرف").optional(),
+    remaining: yup.string().max(255, "المتبقي يجب ألا يتجاوز 255 حرف").optional(),
 });
 
 
@@ -61,6 +62,7 @@ const AddTmam = () => {
     start_date: '',
     end_date: '',
     destination: '',
+    remaining: '',
     success: null,
   });
 
@@ -77,8 +79,8 @@ const AddTmam = () => {
 
     const formattedData = {
       ...data,
-      start_date: data.start_date ? moment(data.start_date).format("YYYY-MM-DD") : null,
-      end_date: data.end_date ? moment(data.end_date).format("YYYY-MM-DD") : null,
+      start_date: data.start_date ? moment(data.start_date).format("YYYY/MM/DD") : null,
+      end_date: data.end_date ? moment(data.end_date).format("YYYY/MM/DD") : null,
 
     };
 
@@ -99,6 +101,7 @@ const AddTmam = () => {
         start_date: '',
         end_date: '',
         destination: '',
+        remaining: '',
       });
 
       reset(); // Reset form after successful submission
@@ -266,6 +269,18 @@ const AddTmam = () => {
                   />
                   {errors.end_date && <div className="invalid-feedback">{errors.end_date.message}</div>}
                 </Form.Group>
+
+        <Form.Group controlId="remaining" className="form-group">
+          <Form.Label>المتبقي</Form.Label>
+          <Form.Control
+            as="textarea"
+            rows={1}
+            placeholder="أدخل المتبقي"
+            {...register("remaining")}
+            className={`form-control ${errors.remaining ? 'is-invalid' : ''}`}
+          />
+          {errors.remaining && <div className="invalid-feedback">{errors.remaining.message}</div>}
+        </Form.Group>
 
         {/* Notes */}
         <Form.Group controlId="notes" className="form-group">

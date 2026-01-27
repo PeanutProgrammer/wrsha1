@@ -117,7 +117,7 @@ const ManageShuoonVacation = () => {
 
     // If filterReturningToday is active, filter the units
     if (units.filterReturningToday) {
-      const today = moment().format("YYYY-MM-DD");
+      const today = moment().format("YYYY/MM/DD");
       result = result.filter((unit) => moment(unit.end_date).isSame(today, "day"));
     }
 
@@ -301,8 +301,8 @@ justifyContent: 'flex-start'
                   <td>{unit.name}</td>
                   <td>{unit.department}</td>
                   <td>{unit.leave_type_name}</td>
-                  <td>{unit.start_date ? moment(unit.start_date).format("YYYY-MM-DD") : "لا يوجد"}</td>
-                  <td>{unit.end_date ? moment(unit.end_date).format("YYYY-MM-DD") : "لا يوجد"}</td>
+                  <td>{unit.start_date ? moment(unit.start_date).format("YYYY/MM/DD") : "لا يوجد"}</td>
+                  <td>{unit.end_date ? moment(unit.end_date).format("YYYY/MM/DD") : "لا يوجد"}</td>
                 </tr>
               ))
             ) : (

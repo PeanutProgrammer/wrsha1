@@ -119,25 +119,25 @@ class SoldierLogController {
             soldierObject.getLoggerID(),
           ]
         );
-          
-          const soldierLogID = soldierLogResult.insertId;
+
+        const soldierLogID = soldierLogResult.insertId;
 
         // 4) Update status
         await query("UPDATE soldiers SET in_unit = 1 WHERE id = ?", [
           soldierObject.getSoldierID(),
         ]);
-          
-              await query(
-                "insert into soldier_leave_details set movementID = ?, leaveTypeID = ?, soldierID = ?, start_date = ?, end_date = ?, destination = ?",
-                [
-                  soldierLogID,
-                  req.body.leaveTypeID,
-                  req.body.soldierID,
-                  req.body.start_date,
-                  req.body.end_date,
-                  req.body.destination,
-                ]
-              );
+
+        await query(
+          "insert into soldier_leave_details set movementID = ?, leaveTypeID = ?, soldierID = ?, start_date = ?, end_date = ?, destination = ?",
+          [
+            soldierLogID,
+            req.body.leaveTypeID,
+            req.body.soldierID,
+            req.body.start_date,
+            req.body.end_date,
+            req.body.destination,
+          ]
+        );
       });
 
       req.app.get("io").emit("soldiersUpdated");
@@ -205,9 +205,9 @@ class SoldierLogController {
         await query(
           `INSERT INTO soldier_leave_details SET movementID=?, leaveTypeID = ?, soldierID = ?, start_date=?, end_date=?, destination=?`,
           [
-              movementID,
-              req.body.leaveTypeID,
-              req.body.soldierID,
+            movementID,
+            req.body.leaveTypeID,
+            req.body.soldierID,
             req.body.start_date,
             req.body.end_date,
             req.body.destination,
@@ -222,73 +222,83 @@ class SoldierLogController {
     }
   }
 
-
-    static async createTmam(req,res) {
-        try {
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                console.log(errors.array()); // Log errors
-                return res.status(400).json({ errors: errors.array() });
-            }
-            const { soldierID, leaveTypeID, start_date, end_date, destination } = req.body;
-
-            const query = util.promisify(connection.query).bind(connection);
-
-            const result = await query(
-                `INSERT INTO soldier_leave_details (soldierID, leaveTypeID, start_date, end_date, destination)
-                 VALUES (?, ?, ?, ?, ?)`,
-                [soldierID, leaveTypeID, start_date, end_date, destination]
-            );
-
-            return res.status(201).json({ msg: "تمت الإضافة بنجاح", id: result.insertId });
-        } catch (err) {
-            return res.status(500).json({ err });
-        }
-    }
-
-      static async updateTmam(req, res) {
+  static async createTmam(req, res) {
     try {
       const errors = validationResult(req);
-        if (!errors.isEmpty()) {
+      if (!errors.isEmpty()) {
         console.log(errors.array()); // Log errors
         return res.status(400).json({ errors: errors.array() });
+      }
+      const { soldierID, leaveTypeID, start_date, end_date, destination } =
+        req.body;
+
+      const query = util.promisify(connection.query).bind(connection);
+
+      const result = await query(
+        `INSERT INTO soldier_leave_details (soldierID, leaveTypeID, start_date, end_date, destination)
+                 VALUES (?, ?, ?, ?, ?)`,
+        [soldierID, leaveTypeID, start_date, end_date, destination]
+      );
+
+      req.app.get("io").emit("soldiersUpdated");
+
+      return res
+        .status(201)
+        .json({ msg: "تمت الإضافة بنجاح", id: result.insertId });
+    } catch (err) {
+      return res.status(500).json({ err });
     }
-    const {  leaveTypeID, start_date, end_date, destination } = req.body;
-    const leaveID = req.params.id;
+  }
 
-        const query = util.promisify(connection.query).bind(connection);
+  static async updateTmam(req, res) {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        console.log(errors.array()); // Log errors
+        return res.status(400).json({ errors: errors.array() });
+      }
+      const { leaveTypeID, start_date, end_date, destination } = req.body;
+      const leaveID = req.params.id;
 
-        const existing = await query(
-            `SELECT * FROM soldier_leave_details WHERE id = ?`,
-            [leaveID]
-        );
+      const query = util.promisify(connection.query).bind(connection);
 
-        if (existing.length === 0) {
-            return res.status(404).json({ msg: "Record not found" });
-        }
+      const existing = await query(
+        `SELECT * FROM soldier_leave_details WHERE id = ?`,
+        [leaveID]
+      );
 
-        await query(
-            `UPDATE soldier_leave_details
+      if (existing.length === 0) {
+        return res.status(404).json({ msg: "Record not found" });
+      }
+
+      await query(
+        `UPDATE soldier_leave_details
              SET leaveTypeID = ?, start_date = ?, end_date = ?, destination = ?
              WHERE id = ?`,
-            [leaveTypeID || null, start_date || null, end_date || null, destination || null, leaveID]
-        );
+        [
+          leaveTypeID || null,
+          start_date || null,
+          end_date || null,
+          destination || null,
+          leaveID,
+        ]
+      );
 
-        return res.status(200).json({ msg: "تم التحديث بنجاح" });
+      req.app.get("io").emit("soldiersUpdated");
 
+      return res.status(200).json({ msg: "تم التحديث بنجاح" });
     } catch (err) {
-        return res.status(500).json({ err });
+      return res.status(500).json({ err });
     }
-}
+  }
 
-
-    static async getOneTmam(req, res) {
+  static async getOneTmam(req, res) {
     try {
-        const leaveID = req.params.id;
-        const query = util.promisify(connection.query).bind(connection);
+      const leaveID = req.params.id;
+      const query = util.promisify(connection.query).bind(connection);
 
-        const result = await query(
-            `SELECT 
+      const result = await query(
+        `SELECT 
                 old.id AS leaveID,
                 old.leaveTypeID,
                 old.start_date,
@@ -301,20 +311,18 @@ class SoldierLogController {
             LEFT JOIN soldiers AS soldier
                 ON soldier.id = old.soldierID
             WHERE old.id = ?`,
-            [leaveID]
-        );
+        [leaveID]
+      );
 
-        if (result.length === 0) {
-            return res.status(404).json({ msg: "Record not found" });
-        }
+      if (result.length === 0) {
+        return res.status(404).json({ msg: "Record not found" });
+      }
 
-        return res.status(200).json(result[0]);
-
+      return res.status(200).json(result[0]);
     } catch (err) {
-        return res.status(500).json({ err });
+      return res.status(500).json({ err });
     }
-}
-
+  }
 }
 
 module.exports = SoldierLogController;

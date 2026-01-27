@@ -269,14 +269,14 @@ const SoldiersTmam = () => {
                   <td>
                     {soldier.latest_arrival
                       ? moment(soldier.latest_arrival).format(
-                          "YYYY-MM-DD HH:mm:ss"
+                          "YYYY/MM/DD HH:mm:ss"
                         )
                       : "لا يوجد"}
                   </td>
                   <td>
                     {soldier.latest_departure
                       ? moment(soldier.latest_departure).format(
-                          "YYYY-MM-DD HH:mm:ss"
+                          "YYYY/MM/DD HH:mm:ss"
                         )
                       : "لا يوجد"}
                   </td>

@@ -115,18 +115,18 @@ const OfficersTmamDetails = () => {
                 <td>{rec.destination || "—"}</td>
                 <td>
                   {rec.start_date
-                    ? moment(rec.start_date).format("YYYY-MM-DD")
+                    ? moment(rec.start_date).format("YYYY/MM/DD")
                     : "—"}
                 </td>
                 <td>
                   {rec.end_date
-                    ? moment(rec.end_date).format("YYYY-MM-DD")
+                    ? moment(rec.end_date).format("YYYY/MM/DD")
                     : "—"}
                 </td>
                 <td>
                   {/* Time and Event Type */}
                   {rec.event_type && rec.event_time
-                    ? ` ${moment(rec.event_time).format("YYYY-MM-DD HH:mm ")}`
+                    ? ` ${moment(rec.event_time).format("YYYY/MM/DD HH:mm ")}`
                     : "—"}
                 </td>
                 <td>{rec.notes || "—"}</td>

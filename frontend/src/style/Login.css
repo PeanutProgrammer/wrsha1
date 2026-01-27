@@ -1,142 +1,584 @@
+/* REMOVE DEFAULT BROWSER FOCUS COLORS */
+input,
+button,
+textarea,
+select {
+  outline: none !important;
+  box-shadow: none;
+  caret-color: #ffd700;
+}
+
+/* TEXT SELECTION */
+::selection {
+  background: rgba(212, 175, 55, 0.35);
+  color: #fff;
+}
+
+/* Chrome / Safari autofill */
+input:-webkit-autofill {
+  -webkit-text-fill-color: #f5f5f5 !important; /* text color */
+  -webkit-box-shadow: 0 0 0px 1000px rgba(0, 0, 0, 0.55) inset !important; /* dark background */
+  border: 1.5px solid rgba(212, 175, 55, 0.45);
+  border-radius: 10px;
+  caret-color: #ffd700;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* FIREFOX AUTOFILL FIX */
+input:-moz-autofill {
+  box-shadow: 0 0 0px 1000px rgba(0, 0, 0, 0.55) inset !important;
+  -moz-text-fill-color: #f5f5f5 !important;
+  border: 1.5px solid rgba(212, 175, 55, 0.45);
+  border-radius: 10px;
+}
+
+/* Overlay */
+.success-splash {
+  position: absolute;
+  inset: 0;
+  background: rgba(11, 11, 11, 0.85); /* dark transparent */
+  backdrop-filter: blur(6px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 50;
+  animation: fadeIn 0.5s ease forwards;
+}
+
+/* Splash container with soft glow */
+.splash-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 60px;
+  border-radius: 18px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 2px solid rgba(212, 175, 55, 0.55);
+  box-shadow: 0 0 40px rgba(255, 215, 0, 0.25),
+    inset 0 0 20px rgba(255, 215, 0, 0.15);
+  animation: popIn 0.5s ease forwards;
+}
+
+/* Splash logo */
+.splash-logo {
+  width: 120px;
+  height: auto;
+  margin-bottom: 20px;
+  filter: drop-shadow(0 0 12px #ffd700)
+    drop-shadow(0 0 20px rgba(255, 215, 0, 0.4));
+  animation: floatLogo 6s ease-in-out infinite,
+    goldGlowPulse 4s ease-in-out infinite;
+}
+
+/* Floating and glowing text */
+.splash-text {
+  font-family: 'Poppins', 'Segoe UI', sans-serif;
+  font-size: 1.6em;
+  font-weight: 700;
+  text-align: center;
+  background: linear-gradient(120deg, #fff4b1, #ffd700, #e6c200);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 6px rgba(255,215,0,0.5);
+  position: relative;
+  overflow: hidden; /* needed for shine effect */
+}
+
+/* Shine overlay using pseudo-element */
+.splash-text::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -75%; /* start off-screen */
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.6) 50%,
+    rgba(255,255,255,0) 100%
+  );
+  transform: skewX(-25deg);
+  animation: shineSweep 2s ease-in-out infinite;
+}
+
+/* Animate shine across the text */
+@keyframes shineSweep {
+  0% { left: -75%; }
+  100% { left: 125%; }
+}
+
+
+/* Fade in overlay */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Pop in container */
+@keyframes popIn {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Floating logo animation (same as login logo) */
+@keyframes floatLogo {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* Glowing pulse for logo */
+@keyframes goldGlowPulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.4));
+  }
+  50% {
+    filter: drop-shadow(0 0 24px rgba(255, 215, 0, 0.7))
+      drop-shadow(0 0 40px rgba(255, 215, 0, 0.4));
+  }
+}
+
+/* Glowing pulse for text */
+@keyframes textGlow {
+  0%,
+  100% {
+    text-shadow: 0 0 6px rgba(255, 215, 0, 0.5);
+  }
+  50% {
+    text-shadow: 0 0 12px rgba(255, 215, 0, 0.8),
+      0 0 20px rgba(255, 215, 0, 0.5);
+  }
+}
+
 .Log {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    width: 100%;
-    background: url('../../src/assets/images/auth/Login_bg.jpg') no-repeat center/cover;
-    background-size: cover;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  /* 👇 THIS is the key */
+  background-image: url("../../src/assets/images/auth/login_bg.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+
+  /* cinematic bars */
+  background-color: #0b0b0b;
+
+  position: relative;
+  overflow: hidden;
+}
+.Log::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 255, 255, 0.04),
+    rgba(0, 0, 0, 0.75) 70%
+  );
+
+  pointer-events: none;
 }
 
 /* Form Box */
 .form-box {
-    position: relative;
-    width: 400px;
-    height: 450px;  /* Ensure form has enough height */
-    background: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    border-radius: 12px;
-    padding: 20px;
-    backdrop-filter: blur(15px);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;  /* Ensures the content is spread out */
-    align-items: center;
-    direction: rtl; /* Ensure the form itself is RTL */
+  position: relative;
+  z-index: 2;
+  width: 400px;
+  height: 450px; /* Ensure form has enough height */
+  /* background: rgba(255, 255, 255, 0.12); */
+  backdrop-filter: blur(18px);
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6),
+    inset 0 0 40px rgba(255, 200, 120, 0.15);
+  padding: 30px;
+  backdrop-filter: blur(15px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Ensures the content is spread out */
+  align-items: center;
+  direction: rtl; /* Ensure the form itself is RTL */
+}
+
+.login-logo {
+  width: 140px;
+  height: auto;
+  margin-bottom: 0px;
+
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: -120px;
+
+  filter: drop-shadow(0 12px 30px rgba(0, 0, 0, 0.6));
+  z-index: 3;
+  animation: floatLogo 6s ease-in-out infinite,
+    goldGlowPulse 4s ease-in-out infinite;
+}
+
+@keyframes floatLogo {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+@keyframes goldGlowPulse {
+  0% {
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.35))
+      drop-shadow(0 0 18px rgba(255, 170, 60, 0.25));
+  }
+
+  50% {
+    filter: drop-shadow(0 0 18px rgba(255, 215, 0, 0.75))
+      drop-shadow(0 0 40px rgba(255, 170, 60, 0.55))
+      drop-shadow(0 0 70px rgba(255, 140, 0, 0.35));
+  }
+
+  100% {
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.35))
+      drop-shadow(0 0 18px rgba(255, 170, 60, 0.25));
+  }
+}
+
+.gold-input {
+  position: relative;
+  margin: 28px 0;
+}
+
+/* INPUT FIELD */
+.gold-input input {
+  width: 100%;
+  padding: 14px 44px 14px 44px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1.5px solid rgba(212, 175, 55, 0.45);
+  border-radius: 10px;
+
+  color: #f5f5f5;
+  font-size: 15px;
+  letter-spacing: 0.3px;
+
+  outline: none;
+  transition: all 0.35s ease;
+  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.6);
+}
+
+/* GOLD FOCUS STATE */
+.gold-input input:focus {
+  border-color: #d4af37;
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.45),
+    inset 0 0 10px rgba(212, 175, 55, 0.15);
+  background: rgba(0, 0, 0, 0.7);
+}
+
+/* ICON */
+.gold-input ion-icon {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  transform: translateY(-50%);
+  font-size: 18px;
+  color: #d4af37;
+  pointer-events: none;
+  transition: color 0.3s ease;
+}
+
+.gold-input input:focus ~ ion-icon {
+  color: #ffd700;
+}
+
+/* LABEL */
+.gold-input label {
+  position: absolute;
+  display: flex;
+  top: 50%;
+  right: 14px;
+  gap: 4px; /* spacing between icon and text */
+
+  transform: translateY(-50%);
+  font-size: 13px;
+  color: rgba(212, 175, 55, 0.75);
+  pointer-events: none;
+  transition: 0.3s ease;
+  background: transparent;
+}
+
+/* FLOAT LABEL */
+.gold-input input:focus ~ label,
+.gold-input input:valid ~ label {
+  top: -8px;
+  font-size: 11px;
+  color: #ffd700;
+  background: #0b0b0b;
+  padding: 0 4px;
+}
+
+.gold-input::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  background: linear-gradient(
+    120deg,
+    transparent 40%,
+    rgba(255, 215, 0, 0.35),
+    transparent 60%
+  );
+  opacity: 0;
+  pointer-events: none;
+}
+
+.gold-input input:focus ~ ::after {
+  animation: goldSweep 1.6s ease forwards;
+}
+
+@keyframes goldSweep {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 /* Header Style */
 .hh2 {
-    text-align: center;
-    color: #fff;
-    font-size: 2em;
-    margin-bottom: 50px; /* Increased margin for more space */
-    width: 100%; /* Ensures heading is centered */
+  text-align: center;
+  font-size: 2.2em; /* slightly larger for presence */
+  font-weight: 700; /* bold but clean */
+  font-family: "Poppins", "Segoe UI", sans-serif; /* modern font */
+  background: linear-gradient(120deg, #ffd700, #e6c200, #fff4b1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent; /* gradient text */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6),
+    /* subtle shadow for depth */ 0 0 6px rgba(255, 215, 0, 0.3); /* glow effect */
+  margin-bottom: 50px;
+  width: 100%;
+  position: relative;
+}
+
+/* Optional: subtle glowing pulse animation */
+@keyframes goldTextGlow {
+  0%,
+  100% {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6), 0 0 6px rgba(255, 215, 0, 0.3);
+  }
+  50% {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6), 0 0 12px rgba(255, 215, 0, 0.6);
+  }
+}
+
+.hh2 {
+  animation: goldTextGlow 4s ease-in-out infinite;
 }
 
 /* Input Field Box */
 .inputbox {
-    position: relative;
-    width: 100%; /* Make sure the input takes full width of the form */
-    margin-bottom: 50px; /* Add extra space between inputs */
+  position: relative;
+  width: 100%; /* Make sure the input takes full width of the form */
+  margin-bottom: 50px; /* Add extra space between inputs */
 }
 
 .inputbox label {
-    position: absolute;
-    top: 50%;
-    right: 12px;  /* Align label inside the input box */
-    transform: translateY(-50%);
-    color: #fff;
-    font-size: 1em;
-    pointer-events: none;
-    transition: all 0.3s;
+  position: absolute;
+  top: 50%;
+  right: 12px; /* Align label inside the input box */
+  transform: translateY(-50%);
+  color: #fff;
+  font-size: 1em;
+  pointer-events: none;
+  transition: all 0.3s;
 }
 
 .inputbox input {
-    width: 100%;
-    height: 50px;
-    padding: 0 10px 0 40px; /* Space for the icon */
-    background: transparent;
-    border: none;
-    border-bottom: 2px solid #fff;
-    color: #fff;
-    font-size: 1em;
+  width: 100%;
+  height: 50px;
+  padding: 0 10px 0 40px; /* Space for the icon */
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid #fff;
+  color: #fff;
+  font-size: 1em;
 }
 
 .inputbox input:focus {
-    outline: none;
-    border-bottom: 2px solid #5c6bc0;
+  outline: none;
+  /* border-bottom: 2px solid; */
 }
 
 .inputbox input:focus ~ label,
 .inputbox input:valid ~ label {
-    top: -10px;
-    font-size: 0.9em;
-    color: rgba(27, 11, 46, 0.933);
+  top: -10px;
+  font-size: 0.9em;
+  background-color: transparent;
 }
 
 /* Ion Icon */
 .inputbox ion-icon {
-    position: absolute;
-    right: 12px; /* Align the icon on the right for RTL */
-    top: 50%;
-    transform: translateY(-50%);
-    color: #fff;
-    font-size: 1.2em;
+  position: absolute;
+  right: 12px; /* Align the icon on the right for RTL */
+  top: 50%;
+  transform: translateY(-50%);
+  color: #fff;
+  font-size: 1.2em;
 }
 
-/* Forget Password */
-.forget {
-    font-size: 0.9em;
-    color: #fff;
-    display: flex;
-    justify-content: space-between;
-    width: 100%;  /* Make sure it's aligned with the form */
+@keyframes goldIconPulse {
+  0%,
+  100% {
+    color: rgba(212, 175, 55, 0.85);
+    text-shadow: 0 0 4px rgba(255, 215, 0, 0.5);
+  }
+  50% {
+    color: #ffd700;
+    text-shadow: 0 0 8px #ffd700, 0 0 14px rgba(255, 215, 0, 0.6);
+  }
 }
 
-.forget label a {
-    color: #fff;
-}
-
-.forget label a:hover {
-    text-decoration: underline;
+.label-icon {
+  animation: goldIconPulse 4s ease-in-out infinite;
 }
 
 /* Button Style */
 .Buton {
-    width: 100%;  /* Make the button full-width */
-    height: 45px;
-    background: linear-gradient(135deg, #6a11cb, #2575fc);
-    border: none;
-    border-radius: 25px;
-    font-weight: bold;
-    color: white;
-    cursor: pointer;
-    transition: background 0.3s ease;
-    margin-top: 50px;  /* Adds spacing above the button */
+  width: 100%;
+  padding: 14px;
+  margin-top: 18px;
+
+  /* GOLD GRADIENT */
+  background: linear-gradient(
+    145deg,
+    #fff4b1 0%,
+    /* light gold highlight */ #ffd700 25%,
+    /* main gold */ #e6c200 50%,
+    /* darker gold */ #cfae3b 75%,
+    /* shadowed gold */ #b8962e 100% /* rich gold edge */
+  );
+
+  border: none;
+  border-radius: 10px;
+
+  color: #1a1a1a;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.45),
+    inset 0 1px 2px rgba(255, 255, 255, 0.35);
+
+  transition: all 0.25s ease;
+  background-size: 200% 200%; /* for animated shine */
+  position: relative;
+  overflow: hidden;
 }
 
+/* Hover effect: subtle shift and shine */
 .Buton:hover {
-    background: linear-gradient(135deg, #2575fc, #6a11cb);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(212, 175, 55, 0.6),
+    inset 0 2px 4px rgba(255, 255, 255, 0.45);
+
+  background-position: right center;
+}
+
+/* Optional: animated shine across button */
+.Buton::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-25deg);
+  transition: all 0.7s ease;
+}
+
+.Buton:hover::after {
+  left: 125%;
+  transition: all 0.7s ease;
+}
+
+/* Label Icons Styling */
+.label-icon {
+  font-size: 18px; /* Make it slightly bigger */
+  color: rgba(212, 175, 55, 0.85); /* Gold tone */
+  transition: all 0.4s ease;
+  margin-left: 6px; /* spacing between icon and label text */
+  display: inline-flex;
+  align-items: center;
+  text-shadow: 0 0 4px rgba(255, 215, 0, 0.5);
+}
+
+/* Focus effect: icon glows when input is focused */
+.gold-input input:focus ~ label .label-icon {
+  color: #ffd700;
+  text-shadow: 0 0 6px #ffd700, 0 0 12px rgba(255, 215, 0, 0.6),
+    0 0 20px rgba(255, 215, 0, 0.4);
+  transform: translateY(-1px) scale(1.1);
+}
+
+/* Optional: subtle hover effect if user hovers over the label */
+.gold-input label:hover .label-icon {
+  color: #ffe066;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
 }
 
 /* Error Message */
 .Alert {
-    margin-bottom: 15px;
+  margin-bottom: 15px;
 }
 
 /* Register link */
 .register {
-    text-align: center;
-    font-size: 0.9em;
-    color: #fff;
-    margin-top: 20px;
+  text-align: center;
+  font-size: 0.9em;
+  color: #fff;
+  margin-top: 20px;
 }
 
 /* ✅ Floating error container */
 .error-container {
   position: absolute;
-  top: -60px;  /* distance above the form box */
+  top: -60px; /* distance above the form box */
   left: 50%;
   transform: translateX(-50%);
   width: 90%;
@@ -157,6 +599,12 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

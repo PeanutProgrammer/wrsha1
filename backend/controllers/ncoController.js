@@ -1,10 +1,9 @@
 const NCO = require("../models/nco");
-const { validationResult, check } = require('express-validator');
+const { validationResult, check } = require("express-validator");
 const connection = require("../db/dbConnection");
 const util = require("util");
 const moment = require("moment");
 const PastNCO = require("../models/pastNCO");
-
 
 class NCOController {
   static async createOfficer(req, res) {
@@ -55,6 +54,7 @@ class NCOController {
           officerObject.getAttached(),
         ]
       );
+      req.app.get("io").emit("ncosUpdated");
 
       return res.status(200).json(officerObject.toJSON());
     } catch (err) {
@@ -120,6 +120,8 @@ class NCOController {
 
       console.log(req.body.department);
 
+      req.app.get("io").emit("ncosUpdated");
+
       return res.status(200).json({ msg: "NCO updated!" });
     } catch (err) {
       return res.status(500).json({ err: err });
@@ -135,11 +137,9 @@ class NCOController {
 
       const query = util.promisify(connection.query).bind(connection);
 
-      
       const checkOfficer = await query("SELECT * from ncos where mil_id = ?", [
         req.params.mil_id,
       ]);
-      
 
       if (checkOfficer.length == 0) {
         return res.status(400).json({
@@ -152,25 +152,24 @@ class NCOController {
       }
 
       console.log(checkOfficer[0].mil_id);
-      
 
       // Create a PastOfficer object with the officer's data
-      const PastNCOObject = new PastNCO( 
-                 checkOfficer[0].name,
-          checkOfficer[0].join_date,
+      const PastNCOObject = new PastNCO(
+        checkOfficer[0].name,
+        checkOfficer[0].join_date,
 
         checkOfficer[0].mil_id,
-         checkOfficer[0].rank,
-         checkOfficer[0].address,
+        checkOfficer[0].rank,
+        checkOfficer[0].address,
         checkOfficer[0].dob,
         // If you have additional fields such as 'end_date', 'transferID', etc.
-         req.body.end_date || new Date().toISOString(),
-         req.body.transferID || null,
-         req.body.transferred_to || null,
+        req.body.end_date || new Date().toISOString(),
+        req.body.transferID || null,
+        req.body.transferred_to || null
       );
 
       console.log(PastNCOObject.getMilID());
-      
+
       // Insert the officer data into the past_officers table
       await query(
         "INSERT INTO past_ncos set mil_id = ?, `rank` = ?, name = ?, join_date = ?, address = ?, dob = ?, end_date = ?, transferID = ?, transferred_to = ?",
@@ -192,12 +191,15 @@ class NCOController {
         checkOfficer[0].mil_id,
       ]);
 
+      req.app.get("io").emit("ncosUpdated");
+
       return res.status(200).json({
         msg: "NCO deleted!",
       });
     } catch (err) {
-      return res.status(500).json({         message: "An unexpected error occurred",
-        error: err.message, });
+      return res
+        .status(500)
+        .json({ message: "An unexpected error occurred", error: err.message });
     }
   }
 
@@ -454,7 +456,7 @@ LIMIT ? OFFSET ?`,
       );
 
       console.log(officerTmam[0]);
-      
+
       return res.status(200).json(officerTmam);
     } catch (err) {
       return res.status(500).json({ err: err });
@@ -611,8 +613,7 @@ LEFT JOIN leave_type lt
     ON lt.id = old.leaveTypeID
 
 WHERE o.in_unit = 0; `);
-      
-      
+
       if (ncos.length == 0) {
         return res.status(404).json({
           msg: "no ncos found hey",
@@ -625,18 +626,17 @@ WHERE o.in_unit = 0; `);
     }
   }
 
-  
-  static async getDailySummary(req, res)  {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
+  static async getDailySummary(req, res) {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
 
-    const query = util.promisify(connection.query).bind(connection);
+      const query = util.promisify(connection.query).bind(connection);
 
-    // Query all officers' data for the summary calculation
-    const officers = await query(`
+      // Query all officers' data for the summary calculation
+      const officers = await query(`
 SELECT 
     o.mil_id,
     o.rank,
@@ -669,71 +669,208 @@ LEFT JOIN leave_type lt
     ON lt.id = old.leaveTypeID;
     `);
 
-    if (!officers.length) {
-      return res.status(404).json({ msg: "No officers found" });
+      if (!officers.length) {
+        return res.status(404).json({ msg: "No officers found" });
+      }
+
+      // Calculate the summary
+      const totalOfficers = officers.length;
+      const totalAttached = officers.filter(
+        (officer) => officer.attached
+      ).length;
+      const available = officers.filter((officer) => officer.in_unit).length;
+      const missing = totalOfficers - available;
+      const fixedMission = officers.filter(
+        (officer) => officer.tmam === "مأمورية ثابتة" && !officer.in_unit
+      ).length;
+      const course = officers.filter(
+        (officer) => officer.tmam === "فرقة / دورة" && !officer.in_unit
+      ).length;
+
+      // Breakdown for اجازة types
+      const normalLeave = officers.filter(
+        (officer) => officer.tmam === "راحة" && !officer.in_unit
+      ).length;
+      const compensatoryLeave = officers.filter(
+        (officer) => officer.tmam === "بدل راحة" && !officer.in_unit
+      ).length;
+      const casualLeave = officers.filter(
+        (officer) => officer.tmam === "عارضة" && !officer.in_unit
+      ).length;
+      const fieldLeave = officers.filter(
+        (officer) => officer.tmam === "اجازة ميدانية" && !officer.in_unit
+      ).length;
+      const grantLeave = officers.filter(
+        (officer) => officer.tmam === "منحة" && !officer.in_unit
+      ).length;
+
+      // Other categories
+      const annualLeave = officers.filter(
+        (officer) => officer.tmam === "اجازة سنوية" && !officer.in_unit
+      ).length;
+      const sickLeave = officers.filter(
+        (officer) => officer.tmam === "اجازة مرضية" && !officer.in_unit
+      ).length;
+      const travel = officers.filter(
+        (officer) => officer.tmam === "سفر" && !officer.in_unit
+      ).length;
+      const mission = officers.filter(
+        (officer) =>
+          (officer.tmam === "مأمورية" ||
+            officer.tmam === "مأمورية جهاز الخدمات العامة") &&
+          !officer.in_unit
+      ).length;
+      const hospital = officers.filter(
+        (officer) => officer.tmam === "عيادة" && !officer.in_unit
+      ).length;
+
+      // Calculating total exits (اجمالي الخوارج)
+      const totalExits =
+        fixedMission +
+        course +
+        normalLeave +
+        compensatoryLeave +
+        casualLeave +
+        fieldLeave +
+        grantLeave +
+        annualLeave +
+        sickLeave +
+        travel +
+        mission +
+        hospital;
+
+      // Calculate the percentage of available officers
+      const percentageAvailable = totalOfficers
+        ? ((missing / totalOfficers) * 100).toFixed(2)
+        : 0;
+
+      // Return the daily summary response
+      return res.status(200).json({
+        total: totalOfficers,
+        available: available,
+        attached: totalAttached,
+        missing: missing,
+        تمام_الخوارج: {
+          ثابتة: fixedMission,
+          فرقة_دورة: course,
+          راحة: normalLeave,
+          بدل_راحة: compensatoryLeave,
+          عارضة: casualLeave,
+          اجازة_ميدانية: fieldLeave,
+          منحة: grantLeave,
+          اجازة_سنوية: annualLeave,
+          اجازة_مرضية: sickLeave,
+          سفر: travel,
+          مأمورية: mission,
+          مستشفى: hospital,
+        },
+        اجمالي_الخوارج: totalExits,
+        percentageAvailable: percentageAvailable,
+      });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({
+        message: "An unexpected error occurred",
+        error: err.message,
+      });
     }
-
-    // Calculate the summary
-    const totalOfficers = officers.length;
-    const totalAttached = officers.filter((officer) => officer.attached).length;
-    const available = officers.filter((officer) => officer.in_unit).length;
-    const missing = totalOfficers - available;
-    const fixedMission = officers.filter((officer) => officer.tmam === "مأمورية ثابتة" && !officer.in_unit).length;
-    const course = officers.filter((officer) => officer.tmam === "فرقة / دورة"  && !officer.in_unit).length;
-
-    // Breakdown for اجازة types
-    const normalLeave = officers.filter((officer) => officer.tmam === "راحة"  && !officer.in_unit).length;
-    const compensatoryLeave = officers.filter((officer) => officer.tmam === "بدل راحة"  && !officer.in_unit).length;
-    const casualLeave = officers.filter((officer) => officer.tmam === "عارضة" && !officer.in_unit).length;
-    const fieldLeave = officers.filter((officer) => officer.tmam === "اجازة ميدانية" && !officer.in_unit).length;
-    const grantLeave = officers.filter((officer) => officer.tmam === "منحة" && !officer.in_unit).length;
-
-    // Other categories
-    const annualLeave = officers.filter((officer) => officer.tmam === "اجازة سنوية"  && !officer.in_unit).length;
-    const sickLeave = officers.filter((officer) => officer.tmam === "اجازة مرضية" && !officer.in_unit).length;
-    const travel = officers.filter((officer) => officer.tmam === "سفر" && !officer.in_unit).length;
-    const mission = officers.filter((officer) => (officer.tmam === "مأمورية" || officer.tmam === "مأمورية جهاز الخدمات العامة") && !officer.in_unit).length;
-    const hospital = officers.filter((officer) => officer.tmam === "عيادة" && !officer.in_unit).length;
-
-    // Calculating total exits (اجمالي الخوارج)
-    const totalExits = fixedMission + course + normalLeave + compensatoryLeave + casualLeave + fieldLeave + grantLeave + annualLeave + sickLeave + travel + mission + hospital;
-
-    // Calculate the percentage of available officers
-    const percentageAvailable = totalOfficers ? ((missing / totalOfficers) * 100).toFixed(2) : 0;
-
-    // Return the daily summary response
-    return res.status(200).json({
-      total: totalOfficers,
-      available: available,
-      attached: totalAttached,
-      missing: missing,
-      تمام_الخوارج: {
-        ثابتة: fixedMission,
-        فرقة_دورة: course,
-        راحة: normalLeave,
-        بدل_راحة: compensatoryLeave,
-        عارضة: casualLeave,
-        اجازة_ميدانية: fieldLeave,
-        منحة: grantLeave,
-        اجازة_سنوية: annualLeave,
-        اجازة_مرضية: sickLeave,
-        سفر: travel,
-        مأمورية: mission,
-        مستشفى: hospital,
-      },
-      اجمالي_الخوارج: totalExits,
-      percentageAvailable: percentageAvailable,
-    });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({
-      message: "An unexpected error occurred",
-      error: err.message,
-    });
   }
-};
+
+  static async getVacationingNCOs(req, res) {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const query = util.promisify(connection.query).bind(connection);
+
+      // --- Pagination params ---
+      const page = parseInt(req.query.page) || 1; // default to page 1
+      const limit = parseInt(req.query.limit) || 20; // default 20 rows per page
+      const offset = (page - 1) * limit;
+
+      // --- Search params ---
+      let searchClause = "";
+      const params = [];
+      if (req.query.search) {
+        searchClause =
+          "AND (n.name LIKE ? OR n.department LIKE ? OR n.mil_id LIKE ? OR n.rank LIKE ?)";
+        const searchValue = `%${req.query.search}%`;
+        params.push(searchValue, searchValue, searchValue, searchValue);
+      }
+
+      // --- Total count for pagination ---
+      const countQuery = `SELECT COUNT(*) AS total FROM ncos n JOIN 
+    nco_leave_details nld ON n.id = nld.officerID
+JOIN 
+    leave_type lt ON nld.leaveTypeID = lt.id
+WHERE 
+    nld.leaveTypeID IN (1, 2, 3, 5, 6, 7, 11, 12, 13)  -- filter by leave types
+    AND n.in_unit = 0  -- filter for officers not in unit
+    AND nld.id = (
+        -- Subquery to get the latest leave record for each officer
+        SELECT MAX(id) 
+        FROM nco_leave_details 
+        WHERE ncoID = n.id
+    )  ${searchClause}`;
+      const countResult = await query(countQuery, params);
+      const total = countResult[0].total;
+      const totalPages = Math.ceil(total / limit);
+
+      // --- Main query ---
+      const NCOsQuery = `
+      SELECT 
+    n.mil_id, 
+    n.name, 
+    n.rank, 
+    n.department,
+    nld.leaveTypeID,
+    nld.start_date,
+    nld.end_date,
+    lt.name AS leave_type_name
+FROM 
+    ncos n
+JOIN 
+    nco_leave_details nld ON n.id = nld.ncoID
+JOIN 
+    leave_type lt ON nld.leaveTypeID = lt.id
+WHERE 
+    nld.leaveTypeID IN (1, 2, 3, 5, 6, 7, 11, 12, 13)  -- filter by leave types
+    AND n.in_unit = 0  -- filter for officers not in unit
+    AND nld.id = (
+        -- Subquery to get the latest leave record for each officer
+        SELECT MAX(id) 
+        FROM nco_leave_details 
+        WHERE ncoID = n.id
+    )
+         AND nld.start_date <= CURRENT_DATE AND nld.end_date >= CURRENT_DATE
+    ${searchClause}  -- for any additional search filters
+LIMIT ? OFFSET ?
+`;
+
+      // --- Execute the query ---
+      const NCOs = await query(NCOsQuery, [...params, limit, offset]);
+
+      if (!NCOs.length) {
+        return res.status(404).json({ msg: "No ncos found" });
+      }
+
+      return res.status(200).json({
+        page,
+        limit,
+        total,
+        totalPages,
+        data: NCOs,
+      });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({
+        message: "An unexpected error occurred",
+        error: err.message,
+      });
+    }
+  }
 }
-
-
 
 module.exports = NCOController;

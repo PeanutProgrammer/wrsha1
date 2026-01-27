@@ -11,7 +11,7 @@ const toWesternDigits = (str) => {
 };
 const Experts = () => {
   const auth = getAuthUser();
-  const now = moment().format("YYYY-MM-DD HH:mm:ss");
+  const now = moment().format("YYYY/MM/DD HH:mm:ss");
   const [sortConfig, setSortConfig] = useState({
     key: "",
     direction: "asc",
@@ -251,8 +251,8 @@ const Experts = () => {
                   <td>{expert.nationalID}</td>
                   <td>{expert.name}</td>
                   <td>{expert.security_clearance_number}</td>
-                  {/* <td>{moment(expert.valid_from).format("YYYY-MM-DD")}</td>
-                <td>{moment(expert.valid_through).format("YYYY-MM-DD")}</td> */}
+                  {/* <td>{moment(expert.valid_from).format("YYYY/MM/DD")}</td>
+                <td>{moment(expert.valid_through).format("YYYY/MM/DD")}</td> */}
                   <td>{expert.department}</td>
                   <td>{expert.company_name}</td>
 

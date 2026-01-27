@@ -4,6 +4,6 @@ import { getAuthUser } from '../helper/Storage';
 
 export const Leader = () => {
 const auth=getAuthUser();
-  return <>{auth && (auth.type=="مبنى القيادة" || auth.type == "admin") ?<Outlet /> :<Navigate to={"/login"}/>}</>;
+  return <>{auth && (auth.type==="مبنى القيادة" || auth.type === "admin" || auth.type === "secretary") ?<Outlet /> :<Navigate to={"/login"}/>}</>;
 }
 

@@ -253,9 +253,9 @@ const Delegates = () => {
                 <td>{delegate.name}</td>
                 <td>{delegate.unit}</td>
                 <td>{delegate.telephone_number ? delegate.telephone_number : "لا يوجد"}</td>
-                <td>{moment(delegate.visit_start).format('YYYY-MM-DD HH:mm')}</td>
+                <td>{moment(delegate.visit_start).format('YYYY/MM/DD HH:mm')}</td>
                 {/* Conditionally show visit_end */}
-                <td>{delegate.visit_end ? moment(delegate.visit_end).format('YYYY-MM-DD HH:mm') : 'لا يوجد'}</td>
+                <td>{delegate.visit_end ? moment(delegate.visit_end).format('YYYY/MM/DD HH:mm') : 'لا يوجد'}</td>
                 <td>{delegate.notes ? delegate.notes : "لا يوجد"}</td>
 
                 <td>

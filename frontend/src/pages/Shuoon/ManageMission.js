@@ -289,12 +289,12 @@ const ManageShuoonMission = () => {
                              <td>{unit.leave_type_name === "مأمورية جهاز الخدمات العامة" ? "مأمورية جهاز الخدمات العامة" : unit.destination ? unit.destination : "لا يوجد"}</td>
                              <td>
                                {unit.start_date
-                                 ? moment(unit.start_date).format("YYYY-MM-DD")
+                                 ? moment(unit.start_date).format("YYYY/MM/DD")
                                  : "لا يوجد"}
                              </td>
                              <td>
                                {unit.end_date
-                                 ? moment(unit.end_date).format("YYYY-MM-DD")
+                                 ? moment(unit.end_date).format("YYYY/MM/DD")
                                  : "لا يوجد"}
                              </td>
                            </tr>

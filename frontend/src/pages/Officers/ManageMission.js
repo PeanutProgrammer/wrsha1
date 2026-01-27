@@ -307,12 +307,12 @@ const filteredOfficers = useMemo(() => {
                   <td>{officer.leave_type_name === "مأمورية جهاز الخدمات العامة" ? "مأمورية جهاز الخدمات العامة" : officer.destination ? officer.destination : "لا يوجد"}</td>
                   <td>
                     {officer.start_date
-                      ? moment(officer.start_date).format("YYYY-MM-DD")
+                      ? moment(officer.start_date).format("YYYY/MM/DD")
                       : "لا يوجد"}
                   </td>
                   <td>
                     {officer.end_date
-                      ? moment(officer.end_date).format("YYYY-MM-DD")
+                      ? moment(officer.end_date).format("YYYY/MM/DD")
                       : "لا يوجد"}
                   </td>
                 </tr>

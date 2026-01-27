@@ -213,6 +213,41 @@ const Aside = ({ setCollapsed, collapsed }) => {
             </li>
           </>
         )}
+
+                {auth?.type === "secretary" && (
+          <>
+            <li className="tabs">
+              <Link to={"Home"}>الصفحة الرئيسية</Link>
+            </li>
+            <li className="tabs">
+              <Link to={"leader-units"}>تمام الوحدة</Link>
+            </li>
+            <li className="tabs">
+              <Link to={"leader-officers"}>تمام الضباط</Link>
+            </li>
+            <li className="tabs">
+              <Link to={"leader-ncos"}>تمام ضباط الصف</Link>
+            </li>
+            <li className="tabs">
+              <Link to={"leader-soldiers"}>تمام الجنود</Link>
+            </li>
+            <li className="tabs">
+              <Link to={"leader-civillians"}>تمام المدنيين</Link>
+            </li>
+            <li className="tabs">
+              <Link to={"leader-experts"}>سجل الخبراء</Link>
+            </li>
+            <li className="tabs">
+              <Link to={"leader-delegates"}>سجل المناديب</Link>
+            </li>
+            <li className="tabs">
+              <Link to={"leader-guests"}>سجل الزوار</Link>
+            </li>
+            <li className="tabs">
+              <Link to={"past-workers"}>العاملين السابقين</Link>
+            </li>
+          </>
+        )}
       </ul>
     </div>
   );

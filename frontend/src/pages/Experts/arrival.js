@@ -43,7 +43,7 @@ const ExpertArrival = () => {
 
     const formattedData = {
       ...data,
-      start_date: moment().format("YYYY-MM-DD HH:mm:ss"),
+      start_date: moment().format("YYYY/MM/DD HH:mm:ss"),
       end_date: null,
       loggerID: auth.id
     };

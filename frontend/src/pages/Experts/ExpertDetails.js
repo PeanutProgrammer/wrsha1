@@ -79,12 +79,12 @@ const ExpertDetails = () => {
 
               <tr>
                 <td><strong>الفترة من:</strong></td>
-                <td>{moment(expert.results._valid_from).format('YYYY-MM-DD')}</td>
+                <td>{moment(expert.results._valid_from).format('YYYY/MM/DD')}</td>
               </tr>
 
               <tr>
                 <td><strong>الفترة إلى:</strong></td>
-                <td>{moment(expert.results._valid_through).format('YYYY-MM-DD')}</td>
+                <td>{moment(expert.results._valid_through).format('YYYY/MM/DD')}</td>
               </tr>
 
               <tr>

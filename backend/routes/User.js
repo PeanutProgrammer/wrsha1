@@ -14,8 +14,8 @@ router.post("/", admin,
     body("password").isStrongPassword({ minLength: 8, minLowercase: 1, minUppercase: 1, minNumbers: 1 })
         .withMessage("الرجاء إدخال كلمة مرور صالحة"),
     body("type")
-        .isIn(['admin', 'بوابة', 'مبنى القيادة', 'شؤون ضباط', 'شؤون ادارية', 'قائد الامن'])
-        .withMessage("النوع يجب أن يكون 'admin', 'بوابة', 'مبنى القيادة', 'شؤون ضباط', 'شؤون ادارية' أو 'قائد الامن'"),
+        .isIn(['admin', 'بوابة', 'مبنى القيادة', 'شؤون ضباط', 'شؤون ادارية', 'قائد الامن', 'secretary'])
+        .withMessage("النوع يجب أن يكون 'admin', 'بوابة', 'مبنى القيادة', 'شؤون ضباط', 'شؤون ادارية' أو 'قائد الامن' أو 'secretary'"),
       (req, res) => {
             UserController.createUser(req, res);
         }
@@ -31,8 +31,8 @@ router.put("/:id", admin,
     body("password").isStrongPassword({ minLength: 8, minLowercase: 1, minUppercase: 1, minNumbers: 1 })
     .withMessage("الرجاء إدخال كلمة مرور صالحة"),
       body("type")
-        .isIn(['admin', 'بوابة', 'مبنى القيادة', 'شؤون ضباط', 'شؤون ادارية', 'قائد الامن'])
-        .withMessage("النوع يجب أن يكون 'admin', 'بوابة', 'مبنى القيادة', 'شؤون ضباط', 'شؤون ادارية' أو 'قائد الامن'"),
+        .isIn(['admin', 'بوابة', 'مبنى القيادة', 'شؤون ضباط', 'شؤون ادارية', 'قائد الامن', 'secretary'])
+        .withMessage("النوع يجب أن يكون 'admin', 'بوابة', 'مبنى القيادة', 'شؤون ضباط', 'شؤون ادارية' أو 'قائد الامن' أو 'secretary'"),
     (req, res) => {
     UserController.updateUser(req, res); 
 });

@@ -144,7 +144,9 @@ const GuestDeparture = () => {
           <thead className='table-dark'>
             <tr>
               {/* <th>#</th> */}
-              <th>الإسم</th>
+              <th>الرتبة / الدرجة</th>
+              <th>الاسم</th>
+              <th>اسم الوحدة / الشركة</th>
               <th>زيارة إلى</th>
               <th>وقت الدخول</th>
               <th>وقت الخروج</th>
@@ -156,12 +158,40 @@ const GuestDeparture = () => {
             {currentRecords.map((guest) => (
               <tr key={guest.id}>
                 {/* <td>{guest.id}</td> */}
-                <td>{guest.name}</td>
-                <td>{guest.rank + " " + guest.officer_name}</td>
-                <td>{moment(guest.visit_start).format('YYYY-MM-DD HH:mm')}</td>
+                <td>{guest.rank ? guest.rank : "لا يوجد"}</td>
+                <td>{guest.name ? guest.name : "لا يوجد"}</td>
+                <td>{guest.unit ? guest.unit : "لا يوجد"}</td>
+                <td>{guest.officer_rank + "/ " + guest.officer_name}</td>
                 <td>
-                  {/* Show the updated end time */}
-                  {guest.visit_end ? moment(guest.visit_end).format('YYYY-MM-DD HH:mm') : 'لا يوجد'}
+                  {guest.visit_start ? (
+                    <>
+                      <div>{moment(guest.visit_start).format("YYYY-MM-DD")}</div>
+                      <div>
+                        {moment(guest.visit_start).format("hh:mm")}
+                        <span>
+                          {moment(guest.visit_start).format("a") === "am" ? " ص" : " م"}
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    "لا يوجد"
+                  )}
+                </td>
+                
+                <td>
+                  {guest.visit_end ? (
+                    <>
+                      <div>{moment(guest.visit_end).format("YYYY-MM-DD")}</div>
+                      <div>
+                        {moment(guest.visit_end).format("hh:mm")}
+                        <span>
+                          {moment(guest.visit_end).format("a") === "am" ? " ص" : " م"}
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    "لا يوجد"
+                  )}
                 </td>
                 <td>{guest.reason ? guest.reason : "لا يوجد"}</td>
                 <td>

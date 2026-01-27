@@ -275,7 +275,7 @@ const NCOsTmam = () => {
                               <td>
                                 {nco.latest_arrival ? (
                                   <>
-                                    <div>{moment(nco.latest_arrival).format("YYYY-MM-DD")}</div>
+                                    <div>{moment(nco.latest_arrival).format("YYYY/MM/DD")}</div>
                                     <div>
                                       {moment(nco.latest_arrival).format("hh:mm")}
                                       <span>
@@ -291,7 +291,7 @@ const NCOsTmam = () => {
                               <td>
                                 {nco.latest_departure ? (
                                   <>
-                                    <div>{moment(nco.latest_departure).format("YYYY-MM-DD")}</div>
+                                    <div>{moment(nco.latest_departure).format("YYYY/MM/DD")}</div>
                                     <div>
                                       {moment(nco.latest_departure).format("hh:mm")}
                                       <span>

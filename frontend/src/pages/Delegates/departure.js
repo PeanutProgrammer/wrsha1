@@ -60,7 +60,7 @@ const DelegateDeparture = () => {
   }, [delegates.reload]);
 
   const endVisit = (delegateId) => {
-    const visitEnd = moment().format("YYYY-MM-DD HH:mm:ss"); // Current time
+    const visitEnd = moment().format("YYYY/MM/DD HH:mm:ss"); // Current time
 
     axios
       .put(
@@ -114,6 +114,11 @@ const DelegateDeparture = () => {
     pageNumbers.push(i);
   }
 
+   const isToday = (date) => {
+        if (!date) return false;
+        return moment(date).isSame(moment(), "day");
+      };
+
   return (
     <div className="Officers p-5">
       <div className="header d-flex justify-content-between mb-3">
@@ -149,6 +154,7 @@ const DelegateDeparture = () => {
               <th>الرتبة / الدرجة</th>
               <th>الاسم</th>
               <th>اسم الوحدة</th>
+              <th>رقم الهاتف</th>
               <th>وقت الدخول</th>
               <th>وقت الخروج</th>
               <th>سبب الزيارة</th>
@@ -162,10 +168,35 @@ const DelegateDeparture = () => {
                 <td>{delegate.rank}</td>
                 <td>{delegate.name}</td>
                 <td>{delegate.unit}</td>
-                <td>{moment(delegate.visit_start).format('YYYY-MM-DD HH:mm')}</td>
+                <td>{delegate.telephone_number ? delegate.telephone_number : "لا يوجد"}</td>
+                <td>
+                                  {delegate.visit_start ? (
+                                    <>
+                                      <div className=" align-items-center ">
+                                                {isToday(delegate.visit_start) && (
+                                          <span className="badge bg-warning text-dark today-badge ml-2">
+                                            اليوم
+                                          </span>
+                                        )}
+                                        <span>{moment(delegate.visit_start).format("YYYY/MM/DD")}</span>
+                                
+                                
+                                      </div>
+                                
+                                      <div>
+                                        {moment(delegate.visit_start).format("hh:mm")}
+                                        <span>
+                                          {moment(delegate.visit_start).format("a") === "am" ? " ص" : " م"}
+                                        </span>
+                                      </div>
+                                    </>
+                                  ) : (
+                                    "لا يوجد"
+                                  )}
+                                </td>
                 <td>
                   {/* Show the updated end time */}
-                  {delegate.visit_end ? moment(delegate.visit_end).format('YYYY-MM-DD HH:mm') : 'لا يوجد'}
+                  {delegate.visit_end ? moment(delegate.visit_end).format('YYYY/MM/DD HH:mm') : 'لا يوجد'}
                 </td>
                 <td>{delegate.notes ? delegate.notes : "لا يوجد"}</td>
                 <td>

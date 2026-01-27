@@ -86,7 +86,7 @@ const NCODetails = () => {
                <td>
                  <strong>تاريخ الضم:</strong>
                </td>
-               <td>{moment(nco.results._join_date).format("YYYY-MM-DD")}</td>
+               <td>{moment(nco.results._join_date).format("YYYY/MM/DD")}</td>
              </tr>
              <tr>
                <td>
@@ -102,8 +102,8 @@ const NCODetails = () => {
                  <strong>تاريخ الميلاد:</strong>
                </td>
                <td>
-                 {moment(nco.results._dob).format("YYYY-MM-DD")
-                   ? moment(nco.results._dob).format("YYYY-MM-DD")
+                 {moment(nco.results._dob).format("YYYY/MM/DD")
+                   ? moment(nco.results._dob).format("YYYY/MM/DD")
                    : "لا يوجد"}
                </td>
              </tr>

@@ -153,6 +153,11 @@ const SecurityDelegates = () => {
     return 0;
   });
 
+   const isToday = (date) => {
+      if (!date) return false;
+      return moment(date).isSame(moment(), "day");
+    };
+
   return (
     <div className="Officers p-5">
       <div className="header d-flex justify-content-between mb-3">
@@ -267,14 +272,56 @@ const SecurityDelegates = () => {
                   </td>
 
                   <td>
-                    {moment(delegate.visit_start).format("YYYY-MM-DD HH:mm")}
-                  </td>
+                                                   {delegate.visit_start ? (
+                                                     <>
+                                                       <div className=" align-items-center ">
+                                                                 {isToday(delegate.visit_start) && (
+                                                           <span className="badge bg-warning text-dark today-badge ml-2">
+                                                             اليوم
+                                                           </span>
+                                                         )}
+                                                         <span>{moment(delegate.visit_start).format("YYYY/MM/DD")}</span>
+                                                 
+                                                 
+                                                       </div>
+                                                 
+                                                       <div>
+                                                         {moment(delegate.visit_start).format("hh:mm")}
+                                                         <span>
+                                                           {moment(delegate.visit_start).format("a") === "am" ? " ص" : " م"}
+                                                         </span>
+                                                       </div>
+                                                     </>
+                                                   ) : (
+                                                     "لا يوجد"
+                                                   )}
+                                                 </td>
                   {/* Conditionally show visit_end */}
-                  <td>
-                    {delegate.visit_end
-                      ? moment(delegate.visit_end).format("YYYY-MM-DD HH:mm")
-                      : "لا يوجد"}
-                  </td>
+                   <td>
+                                  {delegate.visit_end ? (
+                                    <>
+                                      <div className=" align-items-center ">
+                                                {isToday(delegate.visit_end) && (
+                                          <span className="badge bg-warning text-dark today-badge ml-2">
+                                            اليوم
+                                          </span>
+                                        )}
+                                        <span>{moment(delegate.visit_end).format("YYYY/MM/DD")}</span>
+                                
+                                
+                                      </div>
+                                
+                                      <div>
+                                        {moment(delegate.visit_end).format("hh:mm")}
+                                        <span>
+                                          {moment(delegate.visit_end).format("a") === "am" ? " ص" : " م"}
+                                        </span>
+                                      </div>
+                                    </>
+                                  ) : (
+                                    "لا يوجد"
+                                  )}
+                                </td>
                   <td>{delegate.notes ? delegate.notes : "لا يوجد"}</td>
                 </tr>
               ))

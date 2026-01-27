@@ -132,7 +132,7 @@ const Guests = () => {
 
     // ✅ Function to end the visit (update visit_end)
   const endVisit = (guestId) => {
-    const visitEnd = moment().format("YYYY-MM-DD HH:mm:ss");  // Current time
+    const visitEnd = moment().format("YYYY/MM/DD HH:mm:ss");  // Current time
 
     axios
       .put(
@@ -286,9 +286,9 @@ const Guests = () => {
                   <td>{(guests.page - 1) * guests.limit + index + 1}</td>
                 <td>{guest.name}</td>
                 <td>{guest.rank + " " + guest.officer_name}</td>
-                <td>{moment(guest.visit_start).format('YYYY-MM-DD HH:mm')}</td>
+                <td>{moment(guest.visit_start).format('YYYY/MM/DD HH:mm')}</td>
                 {/* Conditionally show visit_end */}
-                <td>{guest.visit_end ? moment(guest.visit_end).format('YYYY-MM-DD HH:mm') : 'لا يوجد'}</td>
+                <td>{guest.visit_end ? moment(guest.visit_end).format('YYYY/MM/DD HH:mm') : 'لا يوجد'}</td>
                 <td>{guest.reason ? guest.reason : "لا يوجد"}</td>
 
                 <td>

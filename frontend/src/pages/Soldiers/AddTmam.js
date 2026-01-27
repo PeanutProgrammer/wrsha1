@@ -77,8 +77,8 @@ const AddSoldierTmam = () => {
 
     const formattedData = {
       ...data,
-      start_date: data.start_date ? moment(data.start_date).format("YYYY-MM-DD") : null,
-      end_date: data.end_date ? moment(data.end_date).format("YYYY-MM-DD") : null,
+      start_date: data.start_date ? moment(data.start_date).format("YYYY/MM/DD") : null,
+      end_date: data.end_date ? moment(data.end_date).format("YYYY/MM/DD") : null,
 
     };
 

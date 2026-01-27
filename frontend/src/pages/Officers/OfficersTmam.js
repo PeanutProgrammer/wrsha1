@@ -282,14 +282,14 @@ const OfficersTmam = () => {
                   <td>
                     {officer.latest_arrival
                       ? moment(officer.latest_arrival).format(
-                          "YYYY-MM-DD HH:mm:ss"
+                          "YYYY/MM/DD HH:mm:ss"
                         )
                       : "لا يوجد"}
                   </td>
                   <td>
                     {officer.latest_departure
                       ? moment(officer.latest_departure).format(
-                          "YYYY-MM-DD HH:mm:ss"
+                          "YYYY/MM/DD HH:mm:ss"
                         )
                       : "لا يوجد"}
                   </td>

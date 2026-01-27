@@ -282,7 +282,7 @@ const LeaderDelegates = () => {
                             اليوم
                           </span>
                         )}
-                        <span>{moment(delegate.visit_start).format("YYYY-MM-DD")}</span>
+                        <span>{moment(delegate.visit_start).format("YYYY/MM/DD")}</span>
                 
                 
                       </div>
@@ -300,11 +300,31 @@ const LeaderDelegates = () => {
                 </td>
                 
                   {/* Conditionally show visit_end */}
-                  <td>
-                    {delegate.visit_end
-                      ? moment(delegate.visit_end).format("YYYY-MM-DD HH:mm")
-                      : "لا يوجد"}
-                  </td>
+                   <td>
+                  {delegate.visit_end ? (
+                    <>
+                      <div className=" align-items-center ">
+                                {isToday(delegate.visit_end) && (
+                          <span className="badge bg-warning text-dark today-badge ml-2">
+                            اليوم
+                          </span>
+                        )}
+                        <span>{moment(delegate.visit_end).format("YYYY/MM/DD")}</span>
+
+
+                      </div>
+                
+                      <div>
+                        {moment(delegate.visit_end).format("hh:mm")}
+                        <span>
+                          {moment(delegate.visit_end).format("a") === "am" ? " ص" : " م"}
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    "لا يوجد"
+                  )}
+                </td>
                   <td>{delegate.notes ? delegate.notes : "لا يوجد"}</td>
                 </tr>
               ))

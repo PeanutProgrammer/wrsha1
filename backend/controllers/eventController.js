@@ -72,6 +72,54 @@ class EventController {
       return res.status(500).json({ err: err });
     }
   }
+
+
+  
+    static async deleteEvent(req, res) {
+        try {
+
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+            }
+
+            const query = util.promisify(connection.query).bind(connection);
+              const checkEvent = await query(
+            "SELECT * from events where id = ?",
+            [req.params.id]
+             );
+
+
+             if (checkEvent.length == 0) {
+                return res.status(400).json({
+                    errors: [
+                        {
+                            msg: "Event does not exist"
+                        }
+                    ],
+                }); 
+             }
+
+
+
+
+
+            await query("delete from events where id = ?", [checkEvent[0].id])
+
+             req.app.get("io").emit("eventsUpdated");
+
+            return res.status(200).json({
+                msg: "Event deleted!"
+            })
+
+
+
+        } catch (err) {
+
+            return res.status(500).json({ err: err });
+
+        }
+    }
 }
 
 module.exports = EventController;

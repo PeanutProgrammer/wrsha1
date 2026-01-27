@@ -693,6 +693,7 @@ WHERE
     old.leaveTypeID,
     old.start_date,
     old.end_date,
+    old.remaining,
     lt.name AS leave_type_name
 FROM 
     officers o
@@ -709,6 +710,7 @@ WHERE
         FROM officer_leave_details 
         WHERE officerID = o.id
     )
+         AND CURRENT_DATE() BETWEEN old.start_date AND old.end_date
     ${searchClause}  -- for any additional search filters
 LIMIT ? OFFSET ?
 `;
@@ -967,8 +969,9 @@ LEFT JOIN leave_type lt
     }
 
     // Calculate the summary
-    const totalOfficers = officers.length;
     const totalAttached = officers.filter((officer) => officer.attached).length;
+        const totalOfficers = officers.length - totalAttached;
+
     const available = officers.filter((officer) => officer.in_unit).length;
     const missing = totalOfficers - available;
     const fixedMission = officers.filter((officer) => officer.tmam === "مأمورية ثابتة" && !officer.in_unit).length;

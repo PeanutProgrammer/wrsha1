@@ -101,15 +101,15 @@ const PastOfficerDetails = () => {
               </tr>
               <tr>
                 <td><strong>تاريخ الميلاد:</strong></td>
-                <td>{moment(officer.results._dob).format('YYYY-MM-DD')}</td>
+                <td>{moment(officer.results._dob).format('YYYY/MM/DD')}</td>
               </tr>
               <tr>
                 <td><strong>تاريخ الضم:</strong></td>
-                <td>{moment(officer.results._join_date).format('YYYY-MM-DD')}</td>
+                <td>{moment(officer.results._join_date).format('YYYY/MM/DD')}</td>
               </tr>
               <tr>
                 <td><strong>تاريخ النقل:</strong></td>
-                <td>{moment(officer.results._end_date).format('YYYY-MM-DD')}</td>
+                <td>{moment(officer.results._end_date).format('YYYY/MM/DD')}</td>
               </tr>
               <tr>
                 <td><strong>النقل إلى:</strong></td>

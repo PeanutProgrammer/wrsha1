@@ -1,14 +1,13 @@
 const router = require("express").Router();
-const { body } = require('express-validator');
-const SoldierController = require("../controllers/soldierController"); 
+const { body } = require("express-validator");
+const SoldierController = require("../controllers/soldierController");
 const authorized = require("../middleware/authorized");
 const admin = require("../middleware/admin");
 const shuoonSarya = require("../middleware/shuoonSarya");
 const gate = require("../middleware/gate");
 const securityHead = require("../middleware/securityHead");
 const allowAny = require("../middleware/allowAny");
-const leader = require("../middleware/leader")
-
+const leader = require("../middleware/leader");
 
 router.post(
   "/",
@@ -47,7 +46,6 @@ router.post(
     SoldierController.createSoldier(req, res);
   }
 );
-
 
 router.put(
   "/:id",
@@ -88,62 +86,48 @@ router.put(
   }
 );
 
-
-
-
-router.delete("/:mil_id", admin,  (req, res) => {
-    SoldierController.deleteSoldier(req, res);
+router.delete("/:mil_id", admin, (req, res) => {
+  SoldierController.deleteSoldier(req, res);
 });
 
-
-
-router.get("/filter",  authorized,(req, res) => {
-    SoldierController.filterSoldiers(req, res);
-});  
-
-
-router.get("/daily-summary", allowAny(leader,shuoonSarya), (req, res) => {
-    SoldierController.getDailySummary(req, res);
+router.get("/filter", authorized, (req, res) => {
+  SoldierController.filterSoldiers(req, res);
 });
 
-
-
-
-router.get("/", allowAny(gate,shuoonSarya),(req, res) => {
-    SoldierController.getSoldiers(req, res);
+router.get("/daily-summary", allowAny(leader, shuoonSarya), (req, res) => {
+  SoldierController.getDailySummary(req, res);
 });
 
-router.get("/tmam/:id", shuoonSarya, (req,res) => {
-    SoldierController.getSoldierTmamDetails(req,res);
+router.get("/vacations", allowAny(shuoonSarya, leader), (req, res) => {
+    SoldierController.getVacationingSoldiers(req, res);
 });
 
-router.get("/tmam", allowAny(securityHead,shuoonSarya), (req,res) => {
-    SoldierController.getSoldiersTmam(req,res);
+router.get("/", allowAny(gate, shuoonSarya), (req, res) => {
+  SoldierController.getSoldiers(req, res);
 });
 
+router.get("/tmam/:id", shuoonSarya, (req, res) => {
+  SoldierController.getSoldierTmamDetails(req, res);
+});
 
+router.get("/tmam", allowAny(securityHead, shuoonSarya), (req, res) => {
+  SoldierController.getSoldiersTmam(req, res);
+});
 
-
-router.get("/log", shuoonSarya, (req,res) => {
-    SoldierController.getSoldiersLog(req,res);
+router.get("/log", shuoonSarya, (req, res) => {
+  SoldierController.getSoldiersLog(req, res);
 });
 
 router.get("/absent", gate, (req, res) => {
-    SoldierController.getAbsentSoldiers(req, res);
+  SoldierController.getAbsentSoldiers(req, res);
 });
 
 router.get("/current", gate, (req, res) => {
-    SoldierController.getCurrentSoldiers(req, res);
+  SoldierController.getCurrentSoldiers(req, res);
 });
 
 router.get("/:id", shuoonSarya, (req, res) => {
-    SoldierController.getSoldier(req, res);
+  SoldierController.getSoldier(req, res);
 });
-
-
-
- 
- 
-
 
 module.exports = router;

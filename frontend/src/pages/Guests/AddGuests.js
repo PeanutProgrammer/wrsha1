@@ -34,7 +34,7 @@ const AddGuests = () => {
     resolver: yupResolver(schema)
   });
 
-  // Function to format date in "YYYY-MM-DD HH:mm:ss"
+  // Function to format date in "YYYY/MM/DD HH:mm:ss"
   const formatDateToLocalString = (date) => {
     const d = new Date(date);
     const year = d.getFullYear();

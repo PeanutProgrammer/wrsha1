@@ -701,6 +701,101 @@ LEFT JOIN leave_type lt
   }
 };
 
+ static async getVacationingSoldiers(req, res) {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const query = util.promisify(connection.query).bind(connection);
+
+      // --- Pagination params ---
+      const page = parseInt(req.query.page) || 1; // default to page 1
+      const limit = parseInt(req.query.limit) || 20; // default 20 rows per page
+      const offset = (page - 1) * limit;
+
+      // --- Search params ---
+      let searchClause = "";
+      const params = [];
+      if (req.query.search) {
+        searchClause =
+          "AND (s.name LIKE ? OR s.department LIKE ? OR s.mil_id LIKE ? OR s.rank LIKE ?)";
+        const searchValue = `%${req.query.search}%`;
+        params.push(searchValue, searchValue, searchValue, searchValue);
+      }
+
+      // --- Total count for pagination ---
+      const countQuery = `SELECT COUNT(*) AS total FROM soldiers s JOIN 
+    soldier_leave_details sld ON s.id = sld.soldierID
+JOIN 
+    leave_type lt ON sld.leaveTypeID = lt.id
+WHERE 
+    sld.leaveTypeID IN (1, 2, 3, 5, 6, 7, 11, 12, 13)  -- filter by leave types
+    AND s.in_unit = 0  -- filter for soldiers not in unit
+    AND sld.id = (
+        -- Subquery to get the latest leave record for each soldier
+        SELECT MAX(id) 
+        FROM soldier_leave_details 
+        WHERE soldierID = s.id
+    )  ${searchClause}`;
+      const countResult = await query(countQuery, params);
+      const total = countResult[0].total;
+      const totalPages = Math.ceil(total / limit);
+
+      // --- Main query ---
+      const soldiersQuery = `
+      SELECT 
+    s.mil_id, 
+    s.name, 
+    s.rank, 
+    s.department,
+    sld.leaveTypeID,
+    sld.start_date,
+    sld.end_date,
+    lt.name AS leave_type_name
+FROM 
+    soldiers s
+JOIN 
+    soldier_leave_details sld ON s.id = sld.soldierID
+JOIN 
+    leave_type lt ON sld.leaveTypeID = lt.id
+WHERE 
+    sld.leaveTypeID IN ( 2, 3, 5, 12, 13, 21)  -- filter by leave types
+    AND s.in_unit = 0  -- filter for soldiers not in unit
+    AND sld.id = (
+        -- Subquery to get the latest leave record for each soldier
+        SELECT MAX(id) 
+        FROM soldier_leave_details 
+        WHERE soldierID = s.id
+    )
+         AND sld.start_date <= CURRENT_DATE AND sld.end_date >= CURRENT_DATE
+    ${searchClause}  -- for any additional search filters
+LIMIT ? OFFSET ?
+`;
+
+      // --- Execute the query ---
+      const soldiers = await query(soldiersQuery, [...params, limit, offset]);
+
+      if (!soldiers.length) {
+        return res.status(404).json({ msg: "No soldiers found" });
+      }
+
+      return res.status(200).json({
+        page,
+        limit,
+        total,
+        totalPages,
+        data: soldiers,
+      });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({
+        message: "An unexpected error occurred",
+        error: err.message,
+      });
+    }
+  }
   
 }
 

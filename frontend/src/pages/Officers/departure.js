@@ -80,10 +80,10 @@ const OfficerDeparture = () => {
     const formattedData = {
       ...data,
       event_type: 'خروج',
-      event_time: moment().format("YYYY-MM-DD HH:mm:ss"),
+      event_time: moment().format("YYYY/MM/DD HH:mm:ss"),
       loggerID: auth.id,
-      start_date: data.start_date ? moment(data.start_date).format("YYYY-MM-DD") : null,
-      end_date: data.end_date ? moment(data.end_date).format("YYYY-MM-DD") : null,
+      start_date: data.start_date ? moment(data.start_date).format("YYYY/MM/DD") : null,
+      end_date: data.end_date ? moment(data.end_date).format("YYYY/MM/DD") : null,
 
     };
 

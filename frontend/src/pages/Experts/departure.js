@@ -52,7 +52,7 @@ const ExpertDeparture = () => {
 
   // Function to end the visit (update visit_end for expert)
   const endVisit = (expertId) => {
-    const visitEnd = moment().format("YYYY-MM-DD HH:mm:ss"); // Current time
+    const visitEnd = moment().format("YYYY/MM/DD HH:mm:ss"); // Current time
 
     axios
       .put(
@@ -135,7 +135,7 @@ const ExpertDeparture = () => {
           <thead className="table-dark">
             <tr>
               <th>الرقم القومي</th>
-              <th>الإسم</th>
+              <th>الاسم</th>
               <th>رقم التصريح الأمني</th>
               <th>اسم الشركة</th>
               <th>مكان التواجد</th>
@@ -152,8 +152,47 @@ const ExpertDeparture = () => {
                 <td>{expert.security_clearance_number}</td>
                 <td>{expert.company_name}</td>
                 <td>{expert.department}</td>
-                <td>{moment(expert.start_date).format('YYYY-MM-DD HH:mm')}</td>
-                <td>{expert.end_date ? moment(expert.end_date).format('YYYY-MM-DD HH:mm') : 'لا يوجد'}</td>
+                 <td>
+                                    {expert.start_date ? (
+                                      <>
+                                        <div>
+                                          {moment(expert.start_date).format("YYYY/MM/DD")}
+                                        </div>
+                                        <div>
+                                          {moment(expert.start_date).format("hh:mm")}
+                                          <span>
+                                            {moment(expert.start_date).format("a") === "am"
+                                              ? " ص"
+                                              : " م"}
+                                          </span>
+                                        </div>
+                                      </>
+                                    ) : (
+                                      "لا يوجد"
+                                    )}
+                                  </td>
+                
+                                  <td>
+                                    {expert.end_date ? (
+                                      <>
+                                        <div>
+                                          {moment(expert.end_date).format("YYYY/MM/DD")}
+                                        </div>
+                                        <div>
+                                          {moment(expert.end_date).format("hh:mm")}
+                                          <span>
+                                            {moment(expert.end_date).format("a") ===
+                                            "am"
+                                              ? " ص"
+                                              : " م"}
+                                          </span>
+                                        </div>
+                                      </>
+                                    ) : (
+                                      "لا يوجد"
+                                    )}
+                                  </td>
+                
 
                 <td>
                   <div className="action-buttons">

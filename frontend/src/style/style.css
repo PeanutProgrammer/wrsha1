@@ -7,7 +7,7 @@
   width: 100%;
   max-width: 1500px; /* Optional max width */
   box-sizing: border-box; /* Include padding in width */
-  padding: 20px;    /* Optional spacing */
+  padding: 20px; /* Optional spacing */
 }
 
 .Officers .header {
@@ -18,13 +18,12 @@
   padding: 10px 15px;
   border-radius: 5px;
   margin-bottom: 20px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 .Officers .header h3 {
   color: #fff;
   margin: 0;
-
 }
 
 /* Make tables compact */
@@ -127,8 +126,6 @@
   }
 }
 
-
-
 /* Custom Dropdown Button */
 .custom-dropdown-button .btn-outline-secondary {
   background-color: #343a40 !important; /* Slightly lighter button background */
@@ -168,7 +165,7 @@
 }
 
 /* Active/Selected Item Effect */
-.custom-dropdown-button .dropdown-item.active, 
+.custom-dropdown-button .dropdown-item.active,
 .custom-dropdown-button .dropdown-item:active {
   background-color: #75746e !important; /* Same as hover for active state */
   color: #fff !important; /* Text color on active */
@@ -205,12 +202,6 @@
   border: 1px solid #201f19 !important; /* Keep a consistent border */
 }
 
-
-
-
-
-
-
 .action-buttons {
   display: flex;
   gap: 6px;
@@ -236,7 +227,7 @@
 h1 {
   font-size: 2rem;
   font-weight: 700; /* bold */
-  color: #212529;   /* darker text for contrast */
+  color: #212529; /* darker text for contrast */
 }
 
 .form-group label {
@@ -257,17 +248,13 @@ h1 {
   margin-bottom: 20px;
 }
 
-
-
-
-
 .form-control:focus {
   border-color: #5c6bc0;
   box-shadow: 0 0 5px rgba(92, 107, 192, 0.5);
 }
 
 .form-control::placeholder {
-  color: #6c757d;  /* darker gray */
+  color: #6c757d; /* darker gray */
   opacity: 1;
 }
 
@@ -358,6 +345,353 @@ h1 {
 /* Guest role: text-align fix on submit button */
 .guest .submit-btn {
   text-align: center !important;
+}
+
+/* Modern Toggle Switch */
+.filter-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.filter-toggle input {
+  position: relative;
+  width: 50px;
+  height: 24px;
+  -webkit-appearance: none;
+  background: #6c757d;
+  outline: none;
+  border-radius: 12px;
+  transition: background 0.3s;
+  cursor: pointer;
+}
+
+.filter-toggle input:checked {
+  background: #0d6efd; /* Matches primary blue theme */
+}
+
+.filter-toggle input::before {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  background: #fff;
+  transition: 0.3s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.filter-toggle input:checked::before {
+  transform: translateX(26px);
+}
+
+.filter-toggle label {
+  font-weight: 600;
+  color: #fff; /* Matches header text */
+  font-size: 0.95rem;
+}
+
+/* Gold-Themed Toggle */
+.gold-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.gold-toggle input {
+  position: relative;
+  width: 50px;
+  height: 24px;
+  -webkit-appearance: none;
+  background: #d4af37; /* muted gold when off */
+  outline: none;
+  border-radius: 12px;
+  transition: background 0.3s;
+  cursor: pointer;
+}
+
+.gold-toggle input:checked {
+  background: #ffd700; /* bright gold when on */
+}
+
+.gold-toggle input::before {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  background: #fff;
+  transition: 0.3s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.gold-toggle input:checked::before {
+  transform: translateX(26px);
+}
+
+.gold-toggle label {
+  font-weight: 600;
+  color: #fff; /* text stays readable */
+  font-size: 0.95rem;
+}
+
+.monthly-report-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* =====================
+   HEADER / TITLE
+   ===================== */
+.monthly-report-header {
+  margin-bottom: 1.5rem;
+}
+
+.monthly-report-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #b8860b; /* Dark gold */
+  text-align: center;
+}
+
+/* =====================
+   FILTERS
+   ===================== */
+.monthly-report-filters {
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.monthly-report-filter {
+  max-width: 200px;
+}
+
+.monthly-report-select,
+.monthly-report-input {
+  border-radius: 8px;
+  border: 1px solid #d4af37; /* gold border */
+  padding: 6px 10px;
+  font-size: 0.95rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.monthly-report-select:focus,
+.monthly-report-input:focus {
+  border-color: #ffd700; /* bright gold */
+  box-shadow: 0 0 6px rgba(255, 215, 0, 0.5);
+  outline: none;
+}
+
+.monthly-report-refresh-btn {
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 6px 14px;
+  border: 1px solid #ffd700;
+  color: #212529;
+  transition: all 0.2s ease;
+}
+
+.monthly-report-refresh-btn:hover {
+  background-color: #ffd700;
+  color: #000;
+}
+
+/* =====================
+   TABLE WRAPPER
+   ===================== */
+.monthly-report-table-wrapper {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  overflow-x: auto;
+  width: 100%;
+}
+
+/* =====================
+   TABLE STYLING
+   ===================== */
+.monthly-report-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.9rem;
+  min-width: 800px;
+}
+
+/* HEADER */
+.monthly-report-thead th {
+  position: sticky;
+  top: 0;
+  background: linear-gradient(180deg, #212529, #343a40);
+  color: #fff !important;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  padding: 10px 12px;
+  border-bottom: 2px solid #d4af37; /* gold underline */
+  z-index: 5;
+  text-align: center;
+}
+
+/* DAY HEADER */
+.monthly-report-day-header {
+  background-color: #fdf6e3; /* soft gold background for days */
+  color: #b8860b;
+  font-weight: 600;
+}
+
+/* STICKY COLUMNS */
+.sticky-col {
+  position: sticky;
+  left: 0;
+  background-color: #fff;
+  z-index: 6;
+  border-right: 2px solid #d4af37;
+  font-weight: 600;
+}
+
+/* CELLS */
+.monthly-report-table td {
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  vertical-align: middle;
+  text-align: center;
+  transition: background 0.15s ease;
+}
+
+/* ZEBRA STRIPES */
+.monthly-report-table tbody tr:nth-child(even) td {
+  background-color: #f8f8f8;
+}
+
+/* HOVER */
+.monthly-report-table tbody tr:hover td {
+  background-color: #fff8dc; /* light gold hover */
+}
+
+/* EMPTY STATE */
+.monthly-report-no-data {
+  color: #6c757d;
+  font-size: 0.95rem;
+  padding: 25px;
+}
+
+/* =====================
+   PRESENT / ABSENT CELLS
+   ===================== */
+/* Badge inside the table cell */
+.monthly-report-day {
+  position: relative;
+  width: 31px; /* equal small width for all day cells */
+  max-width: 31px;
+  padding: 2px 0; /* smaller padding for compactness */
+  text-align: center;
+  white-space: nowrap;
+  font-size: 0.7rem; /* smaller check/cross */
+  line-height: 1; /* reduces vertical spacing */
+}
+
+.monthly-report-day.present-day,
+.monthly-report-day.absent-day {
+  font-size: 0.65rem !important; /* even smaller font for badges */
+}
+
+.monthly-report-thead th:last-child, tbody td:last-child {
+  min-width: 31px;
+}
+
+/* Present badge */
+.present-day span {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  text-align: center;
+  background-color: #fff8dc; /* light gold */
+  color: #b8860b; /* dark gold */
+  border: 1.5px solid #ffd700;
+  border-radius: 50%; /* circle */
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+/* Absent badge */
+.absent-day span {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  text-align: center;
+  background-color: #f8d7da; /* light red */
+  color: #842029; /* dark red */
+  border: 1.5px solid #dc3545;
+  border-radius: 50%;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+/* Hover effect for both */
+.present-day span:hover {
+  box-shadow: 0 0 6px rgba(255, 215, 0, 0.6);
+}
+
+.absent-day span:hover {
+  box-shadow: 0 0 6px rgba(220, 53, 69, 0.6);
+}
+
+/* Hover effect */
+.monthly-report-day:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.15);
+  cursor: default;
+}
+
+/* LOADING */
+.monthly-report-loading {
+  padding: 20px;
+  font-weight: 600;
+  color: #b8860b;
+}
+
+/* =====================
+   RESPONSIVE
+   ===================== */
+@media (max-width: 768px) {
+  .monthly-report-filters {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .monthly-report-table {
+    font-size: 0.8rem;
+    min-width: 600px;
+  }
+
+  .sticky-col {
+    font-size: 0.85rem;
+  }
+}
+
+.monthly-report-table-wrapper::-webkit-scrollbar {
+  height: 6px;
+}
+
+.monthly-report-table-wrapper::-webkit-scrollbar-thumb {
+  background-color: #d4af37;
+  border-radius: 3px;
+}
+
+.monthly-report-table-wrapper::-webkit-scrollbar-track {
+  background: #f1f1f1;
 }
 
 /* Add more role-specific tweaks below as needed */

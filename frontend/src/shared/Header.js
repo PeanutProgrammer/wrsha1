@@ -9,14 +9,12 @@ const Header = ({ collapsed }) => {
   const auth = getAuthUser();
   const navigate = useNavigate();
   const location = useLocation();
-    const [dateTime, setDateTime] = useState(new Date());
-    const [showLogout, setShowLogout] = useState(false);
+  const [dateTime, setDateTime] = useState(new Date());
+  const [showLogout, setShowLogout] = useState(false);
 
-      const isHomePage = ["/dashboard", "/dashboard/Home"].includes(
-        location.pathname
-      );
-
-    
+  const isHomePage = ["/dashboard", "/dashboard/Home"].includes(
+    location.pathname
+  );
 
   const logout = () => {
     axios.post(
@@ -44,109 +42,113 @@ const Header = ({ collapsed }) => {
 
   const formattedTime = dateTime.toLocaleTimeString("ar-EG");
 
-const ENTITY_MAP = {
-  officers: { label: "الضباط", icon: <FaUserShield /> },
-  ncos: { label: "ضباط الصف", icon: <FaUsers /> },
-  soldiers: { label: "الجنود", icon: <FaUsers /> },
-  civillians: { label: "المدنيين", icon: <FaUsers /> },
-  experts: { label: "الخبراء", icon: <FaUsers /> },
-  guests: { label: "الزوار", icon: <FaUsers /> },
-  delegates: { label: "المناديب", icon: <FaUsers /> },
-  "past-workers": { label: "العاملين السابقين", icon: <FaUsers /> },
-  users: { label: "إدارة الحسابات", icon: <FaUsers /> },
+  const ENTITY_MAP = {
+    officers: { label: "الضباط", icon: <FaUserShield /> },
+    ncos: { label: "ضباط الصف", icon: <FaUsers /> },
+    soldiers: { label: "الجنود", icon: <FaUsers /> },
+    civillians: { label: "المدنيين", icon: <FaUsers /> },
+    experts: { label: "الخبراء", icon: <FaUsers /> },
+    guests: { label: "الزوار", icon: <FaUsers /> },
+    delegates: { label: "المناديب", icon: <FaUsers /> },
+    "past-workers": { label: "العاملين السابقين", icon: <FaUsers /> },
+    users: { label: "إدارة الحسابات", icon: <FaUsers /> },
 
-  "security-officers": { label: "الضباط", icon: <FaUserShield /> },
-  "security-ncos": { label: "ضباط الصف", icon: <FaUsers /> },
+    "security-officers": { label: "الضباط", icon: <FaUserShield /> },
+    "security-ncos": { label: "ضباط الصف", icon: <FaUsers /> },
     "security-soldiers": { label: "الجنود", icon: <FaUsers /> },
     "security-civillians": { label: "المدنيين", icon: <FaUsers /> },
     "security-experts": { label: "الخبراء", icon: <FaUsers /> },
-  "security-guests": { label: "الزوار", icon: <FaUsers /> },
+    "security-guests": { label: "الزوار", icon: <FaUsers /> },
     "security-delegates": { label: "المناديب", icon: <FaUsers /> },
-  "security-unit": { label: "الوحدة", icon: <FaHome /> },
+    "security-unit": { label: "الوحدة", icon: <FaHome /> },
 
-  "leader-units"    : { label: "تمام الوحدة", icon: <FaClipboardList /> },
-  "leader-officers": { label: "تمام الضباط", icon: <FaClipboardList /> },
-  "leader-ncos": { label: "تمام ضباط الصف", icon: <FaClipboardList /> },
+    "leader-units": { label: "تمام الوحدة", icon: <FaClipboardList /> },
+    "leader-officers": { label: "تمام الضباط", icon: <FaClipboardList /> },
+    "leader-ncos": { label: "تمام ضباط الصف", icon: <FaClipboardList /> },
     "leader-soldiers": { label: "تمام الجنود", icon: <FaClipboardList /> },
     "leader-civillians": { label: "تمام المدنيين", icon: <FaClipboardList /> },
     "leader-experts": { label: "تمام الخبراء", icon: <FaClipboardList /> },
-  "leader-guests": { label: "تمام الزوار", icon: <FaClipboardList /> },
+    "leader-guests": { label: "تمام الزوار", icon: <FaClipboardList /> },
     "leader-delegates": { label: "تمام المناديب", icon: <FaClipboardList /> },
-  
+    "leader-vacations": { label: "إجازات الوحدة", icon: <FaClipboardList /> },
+    "officers-vacations": { label: "إجازات الضباط", icon: <FaClipboardList /> },
+    "ncos-vacations": { label: "إجازات ضباط الصف", icon: <FaClipboardList /> },
+    "soldiers-vacations": { label: "إجازات الجنود", icon: <FaClipboardList /> },
+
     calendar: { label: "الإلتزامات", icon: <FaClipboardList /> },
 
-  shuoon: { label: "الشؤون الإدارية", icon: <FaClipboardList /> },
-};
+    shuoon: { label: "الشؤون الإدارية", icon: <FaClipboardList /> },
+  };
 
-const ACTION_MAP = {
-  list: "عرض",
-  add: "إضافة",
-  manage: "إدارة",
-  tmam: "التمام",
-  log: "السجل",
-  search: "بحث",
-  arrival: "وصول",
-  departure: "مغادرة",
-  details: "تفاصيل",
-};
+  const ACTION_MAP = {
+    list: "عرض",
+    add: "إضافة",
+    manage: "إدارة",
+    tmam: "التمام",
+    log: "السجل",
+    search: "بحث",
+    arrival: "وصول",
+    departure: "مغادرة",
+    details: "تفاصيل",
+  };
 
-const CONTEXT_MAP = {
-  "manage-tmam": "التمام",
-  "manage-vacation": "الإجازات",
-  "manage-mission": "المأموريات",
-  "manage-course": "الفرق",
-};
+  const CONTEXT_MAP = {
+    "manage-tmam": "التمام",
+    "manage-vacation": "الإجازات",
+    "manage-mission": "المأموريات",
+    "manage-course": "الفرق",
+  };
 
- const pathSegments = location.pathname
-   .replace("/dashboard", "")
-   .split("/")
-   .filter(Boolean);
+  const pathSegments = location.pathname
+    .replace("/dashboard", "")
+    .split("/")
+    .filter(Boolean);
 
-const breadcrumbs = [];
-let accumulatedPath = "/dashboard";
+  const breadcrumbs = [];
+  let accumulatedPath = "/dashboard";
 
-const filteredSegments = pathSegments.filter(
-  (segment) => !/^\d+$/.test(segment)
-);
-
-filteredSegments.forEach((segment, idx) => {
-  let label = "";
-  let icon = <FaClipboardList />;
-
-  if (ENTITY_MAP[segment]) {
-    label = ENTITY_MAP[segment].label;
-    icon = ENTITY_MAP[segment].icon;
-  } else if (CONTEXT_MAP[segment]) {
-    label = CONTEXT_MAP[segment];
-  } else if (ACTION_MAP[segment]) {
-    label = ACTION_MAP[segment];
-  }
-
-  const isLast = idx === filteredSegments.length - 1;
-
-  // Compute the path to navigate to for this breadcrumb
-  // Only include segments UP TO this one, skip numeric IDs
-  const navPathSegments = pathSegments.slice(
-    0,
-    pathSegments.indexOf(segment) + 1
+  const filteredSegments = pathSegments.filter(
+    (segment) => !/^\d+$/.test(segment)
   );
-  const navPath = "/dashboard/" + navPathSegments.join("/");
 
-  breadcrumbs.push(
-    <span
-      key={idx}
-      className={`breadcrumb-item ${!isLast ? "clickable" : ""}`}
-      onClick={() => {
-        console.log("Breadcrumb clicked:", segment);
-        console.log("Navigating to:", navPath);
-        if (!isLast) navigate(navPath);
-      }}
-      style={{ cursor: !isLast ? "pointer" : "default" }}
-    >
-      {icon} <span>{label}</span>
-    </span>
-  );
-});
+  filteredSegments.forEach((segment, idx) => {
+    let label = "";
+    let icon = <FaClipboardList />;
+
+    if (ENTITY_MAP[segment]) {
+      label = ENTITY_MAP[segment].label;
+      icon = ENTITY_MAP[segment].icon;
+    } else if (CONTEXT_MAP[segment]) {
+      label = CONTEXT_MAP[segment];
+    } else if (ACTION_MAP[segment]) {
+      label = ACTION_MAP[segment];
+    }
+
+    const isLast = idx === filteredSegments.length - 1;
+
+    // Compute the path to navigate to for this breadcrumb
+    // Only include segments UP TO this one, skip numeric IDs
+    const navPathSegments = pathSegments.slice(
+      0,
+      pathSegments.indexOf(segment) + 1
+    );
+    const navPath = "/dashboard/" + navPathSegments.join("/");
+
+    breadcrumbs.push(
+      <span
+        key={idx}
+        className={`breadcrumb-item ${!isLast ? "clickable" : ""}`}
+        onClick={() => {
+          console.log("Breadcrumb clicked:", segment);
+          console.log("Navigating to:", navPath);
+          if (!isLast) navigate(navPath);
+        }}
+        style={{ cursor: !isLast ? "pointer" : "default" }}
+      >
+        {icon} <span>{label}</span>
+      </span>
+    );
+  });
 
   return (
     <header className={`app-header ${collapsed ? "collapsed" : ""}`}>
@@ -156,7 +158,7 @@ filteredSegments.forEach((segment, idx) => {
         <div className="time">{formattedTime}</div>
       </div>
       {/* CENTER → Breadcrumb or Welcome */}
-          {/* Determine if we are on the homepage */}
+      {/* Determine if we are on the homepage */}
       <div className="header-center breadcrumb">
         {isHomePage ? (
           <>
@@ -166,13 +168,29 @@ filteredSegments.forEach((segment, idx) => {
           breadcrumbs.reduce((prev, curr) => [prev, " / ", curr])
         )}
       </div>
-      {/* RIGHT → Logout */}
-      <div
-        className="header-right logout-btn"
-        onClick={() => setShowLogout(true)}
-      >
-        تسجيل خروج
+
+      {/* RIGHT → Return Home + Logout */}
+      <div className="header-right-actions">
+        {/* Return to Homepage button */}
+        {!isHomePage && (
+          <button
+            className="return-home-btn"
+            onClick={() => navigate("/dashboard/Home")}
+          >
+            <FaHome className="home-icon" />
+            الرئيسية
+          </button>
+        )}
+
+        {/* Logout button */}
+        <div
+          className="header-right logout-btn"
+          onClick={() => setShowLogout(true)}
+        >
+          تسجيل خروج
+        </div>
       </div>
+
       {showLogout && (
         <div className="logout-modal-overlay">
           <div className="logout-modal">
@@ -192,10 +210,6 @@ filteredSegments.forEach((segment, idx) => {
       )}
     </header>
   );
-    
-    
 };
-
-
 
 export default Header;

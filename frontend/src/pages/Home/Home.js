@@ -7,9 +7,9 @@ import {
   FaUserShield,
   FaTasks,
   FaCalendarAlt,
-  FaCalendar 
+  FaCalendar ,
 } from "react-icons/fa";
-import logo from "../../assets/images/dashboard/logo2.png";
+import logo from "../../assets/images/dashboard/logo3.png";
 import axios from "axios";
 import {io} from "socket.io-client";
 import "./Home.css";
@@ -96,6 +96,7 @@ const Home = () => {
       icon: <FaUsers />,
       count: countUnit.delegates,
     },
+
     {
       label: "الالتزامات",
       path: "/dashboard/past-workers",
@@ -107,10 +108,16 @@ const Home = () => {
       path: "/dashboard/leader-vacations",
       icon: <FaCalendar />,
       count: 5,
-    }
+    },
+        {
+      label: "نوبتجية اليوم",
+      path: "/dashboard/Home",
+      icon: <FaUserShield />,
+      count: 15,
+    },
   ];
 
-  if (auth?.type !== "مبنى القيادة") {
+  if ((auth?.type !== "مبنى القيادة") && (auth?.type !== "admin") && (auth?.type !== "secretary")) {
     return (
       <div className="home-container">
         <div className="home-overlay"></div>

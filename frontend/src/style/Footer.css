@@ -1,13 +1,21 @@
-footer {
+.app-footer {
+  width: 100%;
+  padding: 20px;
+  background-color: #212529;
+  color: aliceblue;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
+  margin-right: 240px; /* space for expanded sidebar */
+  box-sizing: border-box;
+}
 
-	color: aliceblue;
-	padding: 20px;
-	text-align: center;
-	position: auto;
-	bottom: 0;
-	width: 100%;
-  }
-  
-  footer p {
-	margin: 0;
-  }
+.app-footer.collapsed {
+  margin-right: 60px; /* space for collapsed sidebar */
+}
+
+.app-footer p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #fff;
+}

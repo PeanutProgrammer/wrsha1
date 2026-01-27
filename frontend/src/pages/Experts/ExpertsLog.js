@@ -11,7 +11,7 @@ const toWesternDigits = (str) => {
   return str.replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
 };
 
-const now = moment().format("YYYY-MM-DD HH:mm:ss");
+const now = moment().format("YYYY/MM/DD HH:mm:ss");
 
 const ExpertsLog = () => {
   const auth = getAuthUser()
@@ -215,7 +215,7 @@ const ExpertsLog = () => {
                     {expert.start_date ? (
                       <>
                         <div>
-                          {moment(expert.start_date).format("YYYY-MM-DD")}
+                          {moment(expert.start_date).format("YYYY/MM/DD")}
                         </div>
                         <div>
                           {moment(expert.start_date).format("hh:mm")}
@@ -235,7 +235,7 @@ const ExpertsLog = () => {
                     {expert.end_date ? (
                       <>
                         <div>
-                          {moment(expert.end_date).format("YYYY-MM-DD")}
+                          {moment(expert.end_date).format("YYYY/MM/DD")}
                         </div>
                         <div>
                           {moment(expert.end_date).format("hh:mm")}

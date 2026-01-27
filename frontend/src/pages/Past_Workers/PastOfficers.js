@@ -124,8 +124,8 @@ const PastOfficers = () => {
                 <td>{officer.mil_id}</td>
                 <td>{officer.rank}</td>
                 <td>{officer.name}</td>
-                <td>{moment(officer.join_date).format('YYYY-MM-DD')}</td>
-                <td>{moment(officer.end_date).format('YYYY-MM-DD')}</td>
+                <td>{moment(officer.join_date).format('YYYY/MM/DD')}</td>
+                <td>{moment(officer.end_date).format('YYYY/MM/DD')}</td>
                 <td>{officer.transferred_to}</td>
                 <td>
                   <div className="action-buttons">
