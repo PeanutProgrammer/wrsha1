@@ -43,11 +43,9 @@ const OfficerArrival = () => {
     const formattedData = {
       ...data,
       event_type: 'دخول',
-      event_time: moment().format("YYYY/MM/DD HH:mm:ss"),
+event_time: moment().locale("en").format("YYYY-MM-DD HH:mm:ss"),
       loggerID: auth.id,
-      start_date: moment(data.start_date).format("YYYY/MM/DD"),
-      end_date: null
-      
+      start_date: moment(data.start_date).locale("en").format("YYYY-MM-DD"),
     };
 
         console.log("Formatted Request Data:", formattedData);

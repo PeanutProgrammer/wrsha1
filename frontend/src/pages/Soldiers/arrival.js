@@ -62,14 +62,14 @@ const SoldierArrival = () => {
       .catch((err) => console.log(err));
   }, []);
 
-    const filteredLeaveTypes = leaveType.filter(
-      (type) => ![1,6,7,8,9,17,18,22].includes(type.id)
-    );
+  const filteredLeaveTypes = leaveType.filter(
+    (type) => ![1, 6, 7, 8, 9, 17, 18, 22].includes(type.id)
+  );
   const leaveTypeOptions = filteredLeaveTypes.map((type) => ({
     value: type.id,
     label: type.name,
   }));
-  
+
   // Convert soldiers into react-select format
   const soldierOptions = soldier.map((s) => ({
     value: s.id,
@@ -88,8 +88,8 @@ const SoldierArrival = () => {
         (opt) => opt.value === selectedOption.leaveTypeID
       );
       setSelectedLeaveType(found || null);
-    };
-  }
+    }
+  };
 
   // Submit
   const createSoldierLog = async (data) => {
@@ -98,16 +98,20 @@ const SoldierArrival = () => {
     const formattedData = {
       ...data,
       event_type: "دخول",
-      event_time: moment().format("YYYY/MM/DD HH:mm:ss"),
+      event_time: moment().locale("en").format("YYYY-MM-DD HH:mm:ss"),
       loggerID: auth.id,
-      start_date: moment().format("YYYY/MM/DD"),
+      start_date: moment(data.start_date).locale("en").format("YYYY-MM-DD"),
       end_date: null,
     };
 
     try {
-      await axios.post(`${process.env.REACT_APP_BACKEND_BASE_URL}/soldierLog/`, formattedData, {
-        headers: { token: auth.token },
-      });
+      await axios.post(
+        `${process.env.REACT_APP_BACKEND_BASE_URL}/soldierLog/`,
+        formattedData,
+        {
+          headers: { token: auth.token },
+        }
+      );
 
       setSoldierLog({
         loading: false,

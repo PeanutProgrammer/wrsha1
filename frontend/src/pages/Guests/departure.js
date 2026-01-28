@@ -60,7 +60,7 @@ const GuestDeparture = () => {
   }, [Guests.reload]);
 
   const endVisit = (guestId) => {
-    const visitEnd = moment().format("YYYY-MM-DD HH:mm:ss"); // Current time
+    const visitEnd =  moment().locale("en").format("YYYY-MM-DD HH:mm:ss"); // Current time
 
     axios
       .put(

@@ -25,8 +25,13 @@ router.get("/vacations-count", allowAny(security,leader), (req, res) => {
     UnitController.getVacationsCount(req, res);
 });
 
+router.get("/missions", allowAny(security,leader), (req, res) => {
+    UnitController.getMissions(req, res);
+});
 
-
+router.get("/missions-count", allowAny(security,leader), (req, res) => {
+    UnitController.getMissionsCount(req, res);
+});
 
 router.get("/", allowAny(security,leader), (req,res) => {
     UnitController.getAllInUnit(req,res);

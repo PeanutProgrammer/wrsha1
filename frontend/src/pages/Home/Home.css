@@ -568,6 +568,96 @@
 }
 
 
+/* ============================= */
+/* Mini Logs Card (Visits theme) */
+/* ============================= */
+
+.mini-calendar.logs {
+  border-left: 5px solid #3b82f6; /* cool blue accent */
+  grid-column: span 2;
+  border-radius: 15px;
+
+}
+
+/* Tag badge */
+.mini-calendar.logs::after {
+  content: "زيارات";
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: linear-gradient(145deg, #3b82f6, #1d4ed8);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+
+.mini-calendar.logs:hover {
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  background: rgba(0,0,0,0.8);
+}
+
+/* Header color tweak */
+.mini-calendar.logs .mini-header {
+  /* color: #bfdbfe; */
+  border-bottom: 1px solid rgba(59, 130, 246, 0.35);
+}
+
+/* Sections layout stays SAME */
+.mini-calendar.logs .vacation-sections {
+  margin-top: 22px;
+}
+
+/* Section cards – softer, calmer than vacations */
+.mini-calendar.logs .vac-section {
+  /* background: rgba(59, 130, 246, 0.08); */
+  border-radius: 14px;
+  transition: all 0.25s ease;
+}
+
+/* Hover feel: more “glass”, less aggressive */
+.mini-calendar.logs .vac-section:hover {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.45),
+    inset 0 0 0 1px rgba(147, 197, 253, 0.15);
+}
+
+/* Individual categories — cool palette */
+.mini-calendar.logs .vac-section.officer {
+  border: 2px solid rgba(59, 130, 246, 0.7);
+}
+
+.mini-calendar.logs .vac-section.nco {
+  border: 2px solid rgba(14, 165, 233, 0.7);
+}
+
+.mini-calendar.logs .vac-section.soldier {
+  border: 2px solid rgba(34, 211, 238, 0.7);
+}
+
+/* Labels */
+.mini-calendar.logs .vac-label {
+  color: #e0f2fe;
+  font-weight: 800;
+}
+
+/* Numbers feel more “dashboard” */
+.mini-calendar.logs .vac-count {
+  color: #ffffff;
+  font-size: 1.6rem;
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 12px rgba(59, 130, 246, 0.35);
+}
+
+/* Empty state */
+.mini-calendar.logs .no-events {
+  color: #93c5fd;
+  opacity: 0.9;
+}
+
+
 
 
 /* Logo animation */

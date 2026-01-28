@@ -137,12 +137,14 @@ import AllInUnit from "./pages/Unit/AllInUnit";
 import LeaderUnits from "./pages/Unit/LeaderUnits";
 import LeaderVacations from "./pages/Unit/LeaderVacations";
 import MonthlyReport from "./pages/Experts/MonthlyReport";
+import LeaderMissions from "./pages/Unit/LeaderMissions";
 
 import ManageShuoonVacation from "./pages/Shuoon/ManageVacation";
 import ManageShuoonMission from "./pages/Shuoon/ManageMission";
 import ManageShuoonCourse from "./pages/Shuoon/ManageCourse";
 
 import Calendar from "./pages/Events/Calendar";
+
 
 export const router = createBrowserRouter([
   {
@@ -276,6 +278,15 @@ export const router = createBrowserRouter([
           />
         ),
         children: [{ path: "", element: <LeaderSoldiersVacations /> }],
+      },
+            {
+        path: "leader-missions",
+        element: (
+          <ProtectedRoute
+            allowedTypes={["مبنى القيادة", "secretary", "admin"]}
+          />
+        ),
+        children: [{ path: "", element: <LeaderMissions /> }],
       },
 
       // Security Routes

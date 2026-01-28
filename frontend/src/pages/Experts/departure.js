@@ -52,7 +52,7 @@ const ExpertDeparture = () => {
 
   // Function to end the visit (update visit_end for expert)
   const endVisit = (expertId) => {
-    const visitEnd = moment().format("YYYY/MM/DD HH:mm:ss"); // Current time
+    const visitEnd =moment().locale("en").format("YYYY-MM-DD HH:mm:ss"); // Current time
 
     axios
       .put(

@@ -15,6 +15,7 @@ import {io} from "socket.io-client";
 import "./Home.css";
 import MiniCalendarCard from "../Events/MiniCalendarCard";
 import MiniVacationsCard from "../Events/MiniVacationsCard";
+import MiniLogsCard from "../Events/MiniLogsCard";
 
 const Home = () => {
   const auth = getAuthUser();
@@ -24,8 +25,10 @@ const Home = () => {
       civillians: 0,
       delegates: 0,
       experts: 0,
-      guests: 0
+      guests: 0,
   });
+
+  const [missionsToday, setMissionsToday] = useState(0);
 
    // Fetch officers data and summary from the backend
     useEffect(() => {
@@ -48,6 +51,19 @@ const Home = () => {
           .catch((err) => {
             console.error("Error fetching unit count", err);
 
+          });
+
+          axios.get(
+            `${process.env.REACT_APP_BACKEND_BASE_URL}/unit/missions-count`,
+            {
+              headers: { token: auth.token },
+            }
+          )
+          .then((resp) => {
+            setMissionsToday(resp.data.totalMissions);
+          })
+          .catch((err) => {
+            console.error("Error fetching missions count", err);
           });
       };
   
@@ -79,23 +95,18 @@ const Home = () => {
       count: ` ${countUnit.civillians} / ${countUnit.civilliansInUnit}`,
     },
     {
-      label: "سجل الزوار",
+      label: "زيارات",
       path: "/dashboard/leader-guests",
       icon: <FaUserShield />,
-      count: countUnit.guests,
+      count: `${countUnit.guests + countUnit.expertsInUnit + countUnit.delegates}  `,
     },
-    {
-      label: "سجل الخبراء",
-      path: "/dashboard/leader-experts",
-      icon: <FaClipboardList />,
-      count: `${countUnit.experts} / ${countUnit.expertsInUnit}`,
+            {
+      label: "مأموريات اليوم",
+      path: "/dashboard/leader-missions",
+      icon: <FaUserShield />,
+      count: `${missionsToday}`,
     },
-    {
-      label: "سجل المناديب",
-      path: "/dashboard/leader-delegates",
-      icon: <FaUsers />,
-      count: countUnit.delegates,
-    },
+
 
     {
       label: "الالتزامات",
@@ -109,12 +120,12 @@ const Home = () => {
       icon: <FaCalendar />,
       count: 5,
     },
-        {
+                {
       label: "نوبتجية اليوم",
       path: "/dashboard/Home",
       icon: <FaUserShield />,
-      count: 15,
     },
+
   ];
 
   if ((auth?.type !== "مبنى القيادة") && (auth?.type !== "admin") && (auth?.type !== "secretary")) {
@@ -147,6 +158,9 @@ const Home = () => {
     }
     if (btn.label === "اجازات") {
       return <MiniVacationsCard key={idx} token={auth.token} />;
+    }
+    if (btn.label === "زيارات") {
+      return <MiniLogsCard key={idx} token={auth.token} />;
     }
     return (
       <div

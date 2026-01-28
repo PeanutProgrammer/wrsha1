@@ -360,7 +360,7 @@ class GuestController {
 
             // SQL query to fetch guests with null end_date in expert_record
             const guests = await query(`
-                SELECT guests.id ,guests.name, guests.visit_start, guests.visit_end, guests.visit_to, guests.reason, officers.rank as officer_rank, officers.name as officer_name
+                SELECT guests.id , guests.rank, guests.name, guests.unit, guests.visit_start, guests.visit_end, guests.visit_to, guests.reason, officers.rank as officer_rank, officers.name as officer_name
                 FROM officers
                 RIGHT JOIN guests ON guests.visit_to = officers.id
                  WHERE guests.visit_end IS NULL AND guests.visit_start IS NOT NULL

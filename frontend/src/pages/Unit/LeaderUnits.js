@@ -313,7 +313,8 @@ const LeaderUnits = () => {
   // Top-right header block
   const headerLines = [
     "إدارة الأسلحة والذخيرة",
-    "الورش الرئيسية للأسلحة رقم (1)",
+    "الورش الرئيسية للأسلحة رقم 1",
+    "فرع نظم المعلومات",
     `التاريخ: ${dateStr}`,
   ];
   doc.setFont("Amiri", "bold");
@@ -326,7 +327,7 @@ const LeaderUnits = () => {
 
   // Title with day and date in parentheses
   const dayName = now.format("dddd"); // Arabic day name
-  const titleText = `يومية عددية بالرتب عن (يوم ${dayName} الموافق ${dateStr})`;
+  const titleText = `يومية عددية بالرتب عن يوم ${dayName} الموافق ${dateStr}`;
   doc.setFont("Amiri", "bold");
   doc.setFontSize(16);
   doc.text(titleText, pageWidth / 2, startY + 10, { align: "center" });
@@ -354,7 +355,7 @@ const LeaderUnits = () => {
   // Footer with Arabic AM/PM
   const arabicMeridiem = now.format("a") === "am" ? "ص" : "م";
   const currentDateTime = now.format("YYYY/MM/DD hh:mm") + " " + arabicMeridiem;
-  const footerText = `تمت الطباعة في ${currentDateTime}`;
+  const footerText = `تمت الطباعة في ${currentDateTime} بواسطة ${auth.name}`;
   const pageHeight = doc.internal.pageSize.getHeight();
   doc.setFontSize(10);
   doc.setFont("Amiri", "normal");
@@ -382,7 +383,7 @@ const LeaderUnits = () => {
         >
           <h5 className="section-title">📊 يومية عددية</h5>
           <div className="d-flex align-items-center gap-2">
-            <button
+            {/* <button
               className="btn btn-sm btn-outline-primary d-flex align-items-center gap-1"
               onClick={(e) => {
                 e.stopPropagation(); // prevent collapse toggle
@@ -390,7 +391,7 @@ const LeaderUnits = () => {
               }}
             >
               <FaPrint /> طباعة
-            </button>
+            </button> */}
             <span className={`section-arrow ${showDailySummary ? "open" : ""}`}>
               ▼
             </span>
@@ -564,7 +565,7 @@ const LeaderUnits = () => {
         >
           <h5 className="section-title">📋 الموجودين اليوم</h5>
           <div className="d-flex align-items-center gap-2">
-            <button
+            {/* <button
               className="btn btn-sm btn-outline-primary d-flex align-items-center gap-1"
               onClick={(e) => {
                 e.stopPropagation(); // prevent collapse toggle
@@ -572,7 +573,7 @@ const LeaderUnits = () => {
               }}
             >
               <FaPrint /> طباعة
-            </button>
+            </button> */}
             <span className={`section-arrow ${showUnitTable ? "open" : ""}`}>
               ▼
             </span>

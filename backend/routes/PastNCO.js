@@ -9,7 +9,7 @@ const leader = require("../middleware/leader");
 
 
 
-
+ 
 
 // router.get("/filter",  authorized,(req, res) => {
 //     PastNCOController.filterOfficers(req, res);
@@ -21,7 +21,7 @@ const leader = require("../middleware/leader");
 router.get("/", allowAny(leader),(req, res) => {
     console.log("Getting Officers");
     
-    PastNCOController.getNCOs(req, res);
+    PastNCOController.getNCOs(req, res); 
 });
 
 

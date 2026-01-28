@@ -1,23 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import { Form, Button, Alert } from 'react-bootstrap';
+import React, { useState, useEffect } from "react";
+import { Form, Button, Alert } from "react-bootstrap";
 import "../../style/style.css";
-import axios from 'axios';
-import { getAuthUser } from '../../helper/Storage';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
+import axios from "axios";
+import { getAuthUser } from "../../helper/Storage";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import "react-datetime/css/react-datetime.css";
-import moment from 'moment';
-import Select from 'react-select'; // Importing react-select
+import moment from "moment";
+import Select from "react-select"; // Importing react-select
 
 // Validation schema using yup
 const schema = yup.object().shape({
-  notes: yup.string().max(500, 'الملاحظات يجب ألا تتجاوز 500 حرف').optional(),
-  ncoID: yup.number().required(' اسم ضابط الصف مطلوب '),
-  leaveTypeID: yup.number().optional('سبب الخروج مطلوب'),
-  start_date: yup.date().required('تاريخ البداية مطلوب').typeError('يرجى إدخال تاريخ صحيح'),
-  end_date: yup.date().required('تاريخ النهاية مطلوب').min(yup.ref('start_date'), 'تاريخ النهاية يجب أن يكون بعد تاريخ البداية').typeError('يرجى إدخال تاريخ صحيح'),
-  destination: yup.string().max(255, 'الوجهة يجب ألا تتجاوز 255 حرف').optional(),
+  notes: yup.string().max(500, "الملاحظات يجب ألا تتجاوز 500 حرف").optional(),
+  ncoID: yup.number().required(" اسم ضابط الصف مطلوب "),
+  leaveTypeID: yup.number().optional("سبب الخروج مطلوب"),
+  start_date: yup
+    .date()
+    .required("تاريخ البداية مطلوب")
+    .typeError("يرجى إدخال تاريخ صحيح"),
+  end_date: yup
+    .date()
+    .required("تاريخ النهاية مطلوب")
+    .min(yup.ref("start_date"), "تاريخ النهاية يجب أن يكون بعد تاريخ البداية")
+    .typeError("يرجى إدخال تاريخ صحيح"),
+  destination: yup
+    .string()
+    .max(255, "الوجهة يجب ألا تتجاوز 255 حرف")
+    .optional(),
 });
 
 const NCODeparture = () => {
@@ -26,22 +36,26 @@ const NCODeparture = () => {
   const auth = getAuthUser();
   const [officerLog, setOfficerLog] = useState({
     loading: false,
-    err: '',
-    notes: '',
-    ncoID: '',
-    leaveTypeID: '',
-    start_date: '',
-    end_date: '',
-    destination: '',
+    err: "",
+    notes: "",
+    ncoID: "",
+    leaveTypeID: "",
+    start_date: "",
+    end_date: "",
+    destination: "",
     success: null,
   });
 
-  const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    setValue,
+  } = useForm({
     resolver: yupResolver(schema),
   });
 
-
-  
   // Handle form submission
   const createOfficerLog = async (data) => {
     console.log("Request Data:", data);
@@ -49,30 +63,39 @@ const NCODeparture = () => {
 
     const formattedData = {
       ...data,
-      event_type: 'خروج',
-      event_time: moment().format("YYYY/MM/DD HH:mm:ss"),
+      event_type: "خروج",
+      event_time: moment().locale("en").format("YYYY-MM-DD HH:mm:ss"),
       loggerID: auth.id,
-      start_date: moment(data.start_date).format("YYYY/MM/DD"),
-      end_date: moment(data.end_date).format("YYYY/MM/DD"),
+      start_date: data.start_date
+        ? moment(data.start_date).locale("en").format("YYYY-MM-DD")
+        : null,
+
+      end_date: data.end_date
+        ? moment(data.end_date).locale("en").format("YYYY-MM-DD")
+        : null,
     };
 
     console.log("Formatted Request Data:", formattedData);
 
     try {
-      await axios.post(`${process.env.REACT_APP_BACKEND_BASE_URL}/ncoLog/departure`, formattedData, {
-        headers: { token: auth.token },
-      });
+      await axios.post(
+        `${process.env.REACT_APP_BACKEND_BASE_URL}/ncoLog/departure`,
+        formattedData,
+        {
+          headers: { token: auth.token },
+        }
+      );
 
       setOfficerLog({
         loading: false,
         err: null,
-        success: 'تمت الإضافة بنجاح!',
-        notes: '',
-        ncoID: '',
-        leaveTypeID: '',
-        start_date: '',
-        end_date: '',
-        destination: '',
+        success: "تمت الإضافة بنجاح!",
+        notes: "",
+        ncoID: "",
+        leaveTypeID: "",
+        start_date: "",
+        end_date: "",
+        destination: "",
       });
 
       reset(); // Reset form after successful submission
@@ -84,7 +107,9 @@ const NCODeparture = () => {
       setOfficerLog({
         ...officerLog,
         loading: false,
-        err: err.response ? JSON.stringify(err.response.data.errors) : 'Something went wrong. Please try again later.',
+        err: err.response
+          ? JSON.stringify(err.response.data.errors)
+          : "Something went wrong. Please try again later.",
         success: null,
       });
     }
@@ -112,10 +137,9 @@ const NCODeparture = () => {
       .catch((err) => console.log(err));
   }, []);
 
-    const filteredLeaveTypes = leaveType.filter(
-      (type) => ![16, 17, 18].includes(type.id)
-    );
-  
+  const filteredLeaveTypes = leaveType.filter(
+    (type) => ![16, 17, 18].includes(type.id)
+  );
 
   const leaveTypeOptions = filteredLeaveTypes.map((type) => ({
     value: type.id,
@@ -138,10 +162,10 @@ const NCODeparture = () => {
   const customStyles = {
     control: (provided) => ({
       ...provided,
-      width: '100%',
-      padding: '0.375rem 0.75rem',
-      borderRadius: '0.25rem',
-      border: '1px solid #ced4da',
+      width: "100%",
+      padding: "0.375rem 0.75rem",
+      borderRadius: "0.25rem",
+      border: "1px solid #ced4da",
     }),
     menu: (provided) => ({
       ...provided,
@@ -149,9 +173,13 @@ const NCODeparture = () => {
     }),
     option: (provided, state) => ({
       ...provided,
-      backgroundColor: state.isSelected ? '#007bff' : state.isFocused ? '#f8f9fa' : null,
-      color: state.isSelected ? '#fff' : '#495057',
-      fontWeight: state.isSelected ? '600' : '500',
+      backgroundColor: state.isSelected
+        ? "#007bff"
+        : state.isFocused
+        ? "#f8f9fa"
+        : null,
+      color: state.isSelected ? "#fff" : "#495057",
+      fontWeight: state.isSelected ? "600" : "500",
     }),
   };
 

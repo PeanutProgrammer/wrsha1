@@ -7,8 +7,9 @@ const admin = async (req, res,next) => {
     const { token } = req.headers; 
     const adminData = await query("select * from users where token = ?", [token]);
     if (adminData[0] && adminData[0].type == "admin") { 
-        next();
+        return next();
     } 
+
     throw new Error("admin");
 };
 

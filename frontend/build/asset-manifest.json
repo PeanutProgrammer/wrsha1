@@ -1,22 +1,22 @@
 {
   "files": {
-    "main.css": "/static/css/main.000a04ab.css",
-    "main.js": "/static/js/main.1125844d.js",
+    "main.css": "/static/css/main.275a8f8e.css",
+    "main.js": "/static/js/main.d04f1333.js",
     "static/js/239.33db63d8.chunk.js": "/static/js/239.33db63d8.chunk.js",
     "static/js/977.baba56c4.chunk.js": "/static/js/977.baba56c4.chunk.js",
     "static/js/455.f7204a3c.chunk.js": "/static/js/455.f7204a3c.chunk.js",
-    "static/media/Login_bg.jpg": "/static/media/Login_bg.9bbb578e48d1dbd9c7b7.jpg",
+    "static/media/login_bg.png": "/static/media/login_bg.0d30adac97c0517ad577.png",
     "static/media/Amiri-Regular.ttf": "/static/media/Amiri-Regular.06cfafa0afe4079f99f0.ttf",
-    "static/media/logo2.png": "/static/media/logo2.255c12e565bffa0c5127.png",
+    "static/media/logo3.png": "/static/media/logo3.e3a9e979634c7fe0ac8c.png",
     "index.html": "/index.html",
-    "main.000a04ab.css.map": "/static/css/main.000a04ab.css.map",
-    "main.1125844d.js.map": "/static/js/main.1125844d.js.map",
+    "main.275a8f8e.css.map": "/static/css/main.275a8f8e.css.map",
+    "main.d04f1333.js.map": "/static/js/main.d04f1333.js.map",
     "239.33db63d8.chunk.js.map": "/static/js/239.33db63d8.chunk.js.map",
     "977.baba56c4.chunk.js.map": "/static/js/977.baba56c4.chunk.js.map",
     "455.f7204a3c.chunk.js.map": "/static/js/455.f7204a3c.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.000a04ab.css",
-    "static/js/main.1125844d.js"
+    "static/css/main.275a8f8e.css",
+    "static/js/main.d04f1333.js"
   ]
 }

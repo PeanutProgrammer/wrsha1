@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { Form, Button, Alert } from 'react-bootstrap';
+import React, { useState, useEffect } from "react";
+import { Form, Button, Alert } from "react-bootstrap";
 import "../../style/style.css";
-import axios from 'axios';
-import { getAuthUser } from '../../helper/Storage';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
+import axios from "axios";
+import { getAuthUser } from "../../helper/Storage";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import "react-datetime/css/react-datetime.css";
-import moment from 'moment';
-import Select from 'react-select'; // Importing react-select
+import moment from "moment";
+import Select from "react-select"; // Importing react-select
 
 // Validation schema using yup
 const schema = yup.object().shape({
@@ -46,9 +46,11 @@ const schema = yup.object().shape({
     )
     .optional(),
 
-  destination: yup.string().max(255, "الوجهة يجب ألا تتجاوز 255 حرف").optional(),
+  destination: yup
+    .string()
+    .max(255, "الوجهة يجب ألا تتجاوز 255 حرف")
+    .optional(),
 });
-
 
 const OfficerDeparture = () => {
   const [officer, setOfficer] = useState([]);
@@ -56,22 +58,26 @@ const OfficerDeparture = () => {
   const auth = getAuthUser();
   const [officerLog, setOfficerLog] = useState({
     loading: false,
-    err: '',
-    notes: '',
-    officerID: '',
-    leaveTypeID: '',
-    start_date: '',
-    end_date: '',
-    destination: '',
+    err: "",
+    notes: "",
+    officerID: "",
+    leaveTypeID: "",
+    start_date: "",
+    end_date: "",
+    destination: "",
     success: null,
   });
 
-  const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    setValue,
+  } = useForm({
     resolver: yupResolver(schema),
   });
 
-
-  
   // Handle form submission
   const createOfficerLog = async (data) => {
     console.log("Request Data:", data);
@@ -79,31 +85,39 @@ const OfficerDeparture = () => {
 
     const formattedData = {
       ...data,
-      event_type: 'خروج',
-      event_time: moment().format("YYYY/MM/DD HH:mm:ss"),
+      event_type: "خروج",
+      event_time: moment().locale("en").format("YYYY-MM-DD HH:mm:ss"),
       loggerID: auth.id,
-      start_date: data.start_date ? moment(data.start_date).format("YYYY/MM/DD") : null,
-      end_date: data.end_date ? moment(data.end_date).format("YYYY/MM/DD") : null,
+      start_date: data.start_date
+        ? moment(data.start_date).locale("en").format("YYYY-MM-DD")
+        : null,
 
+      end_date: data.end_date
+        ? moment(data.end_date).locale("en").format("YYYY-MM-DD")
+        : null,
     };
 
     console.log("Formatted Request Data:", formattedData);
 
     try {
-      await axios.post(`${process.env.REACT_APP_BACKEND_BASE_URL}/officerLog/departure`, formattedData, {
-        headers: { token: auth.token },
-      });
+      await axios.post(
+        `${process.env.REACT_APP_BACKEND_BASE_URL}/officerLog/departure`,
+        formattedData,
+        {
+          headers: { token: auth.token },
+        }
+      );
 
       setOfficerLog({
         loading: false,
         err: null,
-        success: 'تمت الإضافة بنجاح!',
-        notes: '',
-        officerID: '',
-        leaveTypeID: '',
-        start_date: '',
-        end_date: '',
-        destination: '',
+        success: "تمت الإضافة بنجاح!",
+        notes: "",
+        officerID: "",
+        leaveTypeID: "",
+        start_date: "",
+        end_date: "",
+        destination: "",
       });
 
       reset(); // Reset form after successful submission
@@ -115,7 +129,9 @@ const OfficerDeparture = () => {
       setOfficerLog({
         ...officerLog,
         loading: false,
-        err: err.response ? JSON.stringify(err.response.data.errors) : 'Something went wrong. Please try again later.',
+        err: err.response
+          ? JSON.stringify(err.response.data.errors)
+          : "Something went wrong. Please try again later.",
         success: null,
       });
     }
@@ -143,14 +159,13 @@ const OfficerDeparture = () => {
       .catch((err) => console.log(err));
   }, []);
 
-    const filteredLeaveTypes = leaveType.filter(
-      (type) => ![16, 17, 18].includes(type.id)
-    );
+  const filteredLeaveTypes = leaveType.filter(
+    (type) => ![16, 17, 18].includes(type.id)
+  );
   const leaveTypeOptions = filteredLeaveTypes.map((type) => ({
     value: type.id,
     label: type.name,
   }));
-  
 
   // Transform officers into format required by react-select
   const officerOptions = officer.map((officer) => ({
