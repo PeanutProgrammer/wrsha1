@@ -2,6 +2,7 @@ const { validationResult } = require("express-validator");
 const connection = require("../db/dbConnection");
 const util = require("util");
 const OfficerLog = require("../models/officerLog");
+const Officer = require("../models/officer");
 const withTransaction = require("../utils/withTransaction");
 
 class OfficerLogController {
@@ -26,7 +27,7 @@ class OfficerLogController {
       const result = await query(
         `INSERT INTO officer_leave_details (officerID, leaveTypeID, start_date, end_date, destination, remaining)
                  VALUES (?, ?, ?, ?, ?,?)`,
-        [officerID, leaveTypeID, start_date, end_date, destination, remaining]
+        [officerID, leaveTypeID, start_date, end_date, destination, remaining],
       );
 
       req.app.get("io").emit("officersUpdated");
@@ -54,7 +55,7 @@ class OfficerLogController {
 
       const existing = await query(
         `SELECT * FROM officer_leave_details WHERE id = ?`,
-        [leaveID]
+        [leaveID],
       );
 
       if (existing.length === 0) {
@@ -72,7 +73,7 @@ class OfficerLogController {
           destination || null,
           remaining || null,
           leaveID,
-        ]
+        ],
       );
       req.app.get("io").emit("officersUpdated");
       return res.status(200).json({ msg: "تم التحديث بنجاح" });
@@ -173,7 +174,7 @@ class OfficerLogController {
             WHERE officer_log.officerID = ?
             ORDER BY officer_log.event_time DESC
             LIMIT 1`,
-        [officerID]
+        [officerID],
       );
 
       if (result.length === 0) {
@@ -200,7 +201,7 @@ class OfficerLogController {
         req.body.event_time,
         req.body.officerID,
         req.body.notes,
-        req.body.loggerID
+        req.body.loggerID,
       );
 
       console.log(officerObject.toJSON());
@@ -209,7 +210,7 @@ class OfficerLogController {
         // 1) LOCK officer row to prevent race conditions
         const [officer] = await query(
           "SELECT in_unit FROM officers WHERE id = ? FOR UPDATE",
-          [officerObject.getOfficerID()]
+          [officerObject.getOfficerID()],
         );
         // 2) Validate officer is not already in unit
         if (officer.in_unit === 1) {
@@ -230,7 +231,7 @@ class OfficerLogController {
             officerObject.getOfficerID(),
             officerObject.getNotes(),
             officerObject.getLoggerID(),
-          ]
+          ],
         );
 
         const officerLogId = officerLogResult.insertId;
@@ -248,7 +249,7 @@ class OfficerLogController {
             req.body.start_date,
             req.body.end_date,
             req.body.destination,
-          ]
+          ],
         );
       });
 
@@ -272,7 +273,7 @@ class OfficerLogController {
         req.body.event_time,
         req.body.officerID,
         req.body.notes,
-        req.body.loggerID
+        req.body.loggerID,
       );
 
       console.log(officerObject.toJSON());
@@ -281,7 +282,7 @@ class OfficerLogController {
         // 1) LOCK officer row to prevent race conditions
         const [officer] = await query(
           "SELECT in_unit FROM officers WHERE id = ? FOR UPDATE",
-          [officerObject.getOfficerID()]
+          [officerObject.getOfficerID()],
         );
         // 2) Validate officer is not already in unit
         if (officer.in_unit === 0) {
@@ -302,7 +303,7 @@ class OfficerLogController {
             officerObject.getOfficerID(),
             officerObject.getNotes(),
             officerObject.getLoggerID(),
-          ]
+          ],
         );
 
         const officerLogId = officerLogResult.insertId;
@@ -320,7 +321,7 @@ class OfficerLogController {
             req.body.start_date,
             req.body.end_date,
             req.body.destination,
-          ]
+          ],
         );
       });
       req.app.get("io").emit("officersUpdated");
@@ -353,7 +354,7 @@ class OfficerLogController {
             LEFT JOIN officers AS officer
                 ON officer.id = old.officerID
             WHERE old.id = ?`,
-        [leaveID]
+        [leaveID],
       );
 
       if (result.length === 0) {
@@ -363,6 +364,62 @@ class OfficerLogController {
       return res.status(200).json(result[0]);
     } catch (err) {
       return res.status(500).json({ err });
+    }
+  }
+
+  static async getOfficerVacationLog(req, res) {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const query = util.promisify(connection.query).bind(connection);
+      // let search = ""
+      // if (req.query.search) {
+      //     search =  `where name LIKE '%${req.query.search}%'`
+      // }
+      const officer = await query("select * from officers where mil_id = ?", [
+        req.params.id,
+      ]);
+      console.log("hey");
+      if (officer.length == 0) {
+        return res.status(404).json({
+          msg: "no officers found blah",
+        });
+      }
+
+      const officerObject = new Officer(
+        officer[0].name,
+        officer[0].join_date,
+        officer[0].department,
+        officer[0].mil_id,
+        officer[0].rank,
+        officer[0].in_unit,
+      );
+      const officerTmam = await query(
+        `SELECT officers.mil_id ,officers.rank,officers.name, officers.in_unit, officer_log.event_type, officer_log.event_time, officers.department, leave_type.name AS 'tmam', officer_leave_details.start_date, officer_leave_details.end_date, officer_leave_details.destination, officer_log.notes
+                                          FROM officers
+                                          LEFT JOIN officer_leave_details
+                                          ON officer_leave_details.officerID = officers.id
+                                          LEFT JOIN leave_type
+                                          on leave_type.id = officer_leave_details.leaveTypeID
+                                          LEFT JOIN officer_log
+                                          ON officer_log.id = officer_leave_details.movementID
+                                          WHERE officers.mil_id = ?
+                                          AND leave_type.id IN (1,2,3,5,6,7,11,12,13)
+                                          ORDER BY officer_leave_details.id DESC
+                                          `,
+        [officerObject.getMilID()],
+      );
+
+      return res.status(200).json(officerTmam);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({
+        message: "An unexpected error occurred",
+        error: err.message,
+      });
     }
   }
 }

@@ -74,6 +74,7 @@ const Header = ({ collapsed }) => {
     "officers-vacations": { label: "إجازات الضباط", icon: <FaClipboardList /> },
     "ncos-vacations": { label: "إجازات ضباط الصف", icon: <FaClipboardList /> },
     "soldiers-vacations": { label: "إجازات الجنود", icon: <FaClipboardList /> },
+    "officer-vacation-log": { label: "سجل إجازات الضباط", icon: <FaClipboardList /> },
 
     calendar: { label: "الإلتزامات", icon: <FaClipboardList /> },
 

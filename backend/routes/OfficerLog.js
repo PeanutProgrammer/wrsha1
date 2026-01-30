@@ -7,6 +7,7 @@ const OfficerLogController = require("../controllers/officerLogController");
 const gate = require("../middleware/gate");
 const moment = require("moment");
 const allowAny = require("../middleware/allowAny");
+const leader = require("../middleware/leader");
 
 // Arrival route (already exists)
 router.post(
@@ -177,6 +178,10 @@ router.put(
 
 router.get("/latest/:id", shuoonOfficers, (req, res) => {
   OfficerLogController.getLatestTmam(req, res);
+});
+
+router.get("/vacation-log/:id", allowAny(shuoonOfficers, leader), (req, res) => {
+  OfficerLogController.getOfficerVacationLog(req, res);
 });
 
 router.get("/:id", shuoonOfficers, (req, res) => {

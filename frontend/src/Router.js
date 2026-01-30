@@ -39,6 +39,7 @@ import ManageMission from "./pages/Officers/ManageMission";
 import ManageCourse from "./pages/Officers/ManageCourse";
 import LeaderOfficers from "./pages/Officers/LeaderOfficers";
 import LeaderOfficersVacations from "./pages/Officers/LeaderVacations";
+import OfficerVacationLog from "./pages/Officers/OfficersVacationLog";
 // NCOs
 import NCOs from "./pages/NCOs/NCOs";
 import AddNCOs from "./pages/NCOs/AddNCOs";
@@ -287,6 +288,11 @@ export const router = createBrowserRouter([
           />
         ),
         children: [{ path: "", element: <LeaderMissions /> }],
+      },
+      {
+        path: "officer-vacation-log/:id",
+        element: <ProtectedRoute allowedTypes={["admin", "مبنى القيادة", "secretary", "شؤون ضباط"]} />,
+        children: [{ path: "", element: <OfficerVacationLog /> }],
       },
 
       // Security Routes

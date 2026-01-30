@@ -369,7 +369,7 @@ class GuestController {
             if (guests.length === 0) {
                 return res.status(404).json({
                     msg: "No guests with null visit_end found"
-                });
+                }); 
             }
 
             return res.status(200).json(guests);

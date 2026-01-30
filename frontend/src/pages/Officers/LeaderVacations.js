@@ -12,6 +12,7 @@ import {
 import axios from "axios";
 import { getAuthUser } from "../../helper/Storage";
 import moment from "moment";
+import { Link } from "react-router-dom";
 
 // Helper: Convert Arabic-Indic digits to Western digits
 const toWesternDigits = (str) => {
@@ -297,6 +298,7 @@ const LeaderOfficersVacations = () => {
                 الفترة إلى
               </th>
               <th>المتبقي</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -320,6 +322,16 @@ const LeaderOfficersVacations = () => {
                       : "لا يوجد"}
                   </td>
                   <td>{officer.remaining || "لا يوجد"}</td>
+                                    <td>
+                                      {/* <button className="btn btn-sm btn-danger mx-1 p-2" onClick ={(e) =>  {deleteOfficer(officer.mil_id)}}>حذف</button> */}
+                  
+                                      <Link
+                                        to={`../officer-vacation-log/${officer.mil_id}`}
+                                        className="btn btn-sm btn-primary mx-1 p-2"
+                                      >
+                                        الاجازات السابقة{" "}
+                                      </Link>
+                                    </td>
                 </tr>
               ))
             ) : (

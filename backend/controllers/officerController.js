@@ -475,6 +475,8 @@ LIMIT ? OFFSET ?
     }
   }
 
+  
+
   static async filterOfficers(req, res) {
     try {
       const errors = validationResult(req);

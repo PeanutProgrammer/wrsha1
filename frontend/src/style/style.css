@@ -616,9 +616,9 @@ h1 {
   height: 24px;
   line-height: 24px;
   text-align: center;
-  background-color: #fff8dc; /* light gold */
-  color: #b8860b; /* dark gold */
-  border: 1.5px solid #ffd700;
+  background-color: #b3f183; /* light gold */
+  color: 842029; /* dark gold */
+  border: 1.5px solid #2f7302;
   border-radius: 50%; /* circle */
   font-weight: 700;
   transition: all 0.2s ease;
