@@ -236,7 +236,7 @@ const LeaderOfficers = () => {
 
             <Link to="../officer-view">
       <Button
-        size="sm"
+        size="md"
         variant="primary"
         className="px-3"
       >

@@ -74,7 +74,7 @@ router.get("/vacations", allowAny(shuoonSarya, leader), (req,res) => {
 
 
 
-router.get("/", allowAny(gate,shuoonSarya),(req, res) => {
+router.get("/", allowAny(gate,shuoonSarya, leader),(req, res) => {
     NCOController.getOfficers(req, res);
 });
 
@@ -82,7 +82,7 @@ router.get("/tmam/:id", shuoonSarya, (req,res) => {
     NCOController.getOfficerTmamDetails(req,res);
 });
 
-router.get("/tmam", allowAny(security,shuoonSarya), (req,res) => {
+router.get("/tmam", allowAny(security,shuoonSarya, leader), (req,res) => {
     NCOController.getOfficersTmam(req,res);
 });
 
@@ -101,7 +101,7 @@ router.get("/absent", gate, (req, res) => {
     NCOController.getAbsentOfficers(req, res);
 });
 
-router.get("/:id", shuoonSarya, (req, res) => {
+router.get("/:id", allowAny(shuoonSarya, leader), (req, res) => {
     NCOController.getOfficer(req, res);
 });
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Table, Alert, Modal, Button, Form } from "react-bootstrap";
+import { Table, Alert, Modal, Button, Form, Dropdown, DropdownButton, InputGroup } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { getAuthUser } from "../../helper/Storage";
@@ -8,6 +8,7 @@ import { io } from "socket.io-client";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import htmlDocx from "html-docx-js/dist/html-docx";
+import { FaPrint } from "react-icons/fa";
 // Helper: Convert Arabic-Indic digits to Western digits
 const toWesternDigits = (str) => {
   return str.replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
@@ -407,11 +408,45 @@ const NCOs = () => {
 
   return (
     <div className="Officers p-5">
-      <div className="header d-flex justify-content-between mb-3">
-        <h3 className="text-center mb-3">إدارة ضباط الصف</h3>
-        <Link to={"../add"} className="btn btn-success mb-4">
-          إنشاء ضابط صف جديد +
-        </Link>
+      {/* Header: Search + Add + Export */}
+      <div className=" header d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+        {/* Page Title */}
+        <h3>إدارة ضباط الصف</h3>
+        {/* Search bar */}
+        <Form
+          className="d-flex align-items-center flex-grow-1"
+          onSubmit={handleSearchSubmit}
+        >
+          <InputGroup className="w-50  shadow-sm me-5">
+            {/* <InputGroup.Text className="">🔍</InputGroup.Text> */}
+            <Form.Control
+              size="sm"
+              placeholder="بحث 🔍"
+              value={officers.tempSearch}
+              onChange={(e) =>
+                setOfficers((prev) => ({ ...prev, tempSearch: e.target.value }))
+              }
+            />
+            {officers.tempSearch && (
+              <Button
+                size="sm"
+                variant="outline-secondary"
+                onClick={handleClearSearch}
+              >
+                ×
+              </Button>
+            )}
+          </InputGroup>
+        </Form>
+
+        {/* Buttons: Add Officer + Export */}
+        <div className="d-flex flex-wrap gap-2">
+          <Link to="../add" className="btn btn-success btn-sm">
+            إنشاء ضابط صف جديد +
+          </Link>
+
+
+        </div>
       </div>
 
       {officers.success && (

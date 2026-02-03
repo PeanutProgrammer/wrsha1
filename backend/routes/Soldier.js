@@ -102,7 +102,7 @@ router.get("/vacations", allowAny(shuoonSarya, leader), (req, res) => {
     SoldierController.getVacationingSoldiers(req, res);
 });
 
-router.get("/", allowAny(gate, shuoonSarya), (req, res) => {
+router.get("/", allowAny(gate, shuoonSarya, leader), (req, res) => {
   SoldierController.getSoldiers(req, res);
 });
 
@@ -110,7 +110,7 @@ router.get("/tmam/:id", shuoonSarya, (req, res) => {
   SoldierController.getSoldierTmamDetails(req, res);
 });
 
-router.get("/tmam", allowAny(securityHead, shuoonSarya), (req, res) => {
+router.get("/tmam", allowAny(securityHead, shuoonSarya, leader), (req, res) => {
   SoldierController.getSoldiersTmam(req, res);
 });
 
@@ -126,7 +126,7 @@ router.get("/current", gate, (req, res) => {
   SoldierController.getCurrentSoldiers(req, res);
 });
 
-router.get("/:id", shuoonSarya, (req, res) => {
+router.get("/:id", allowAny(shuoonSarya, leader), (req, res) => {
   SoldierController.getSoldier(req, res);
 });
 

@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.29ab3dfd.css",
-    "main.js": "/static/js/main.19e39b2d.js",
+    "main.css": "/static/css/main.424e4ee3.css",
+    "main.js": "/static/js/main.0464f5c6.js",
     "static/js/239.33db63d8.chunk.js": "/static/js/239.33db63d8.chunk.js",
     "static/js/977.baba56c4.chunk.js": "/static/js/977.baba56c4.chunk.js",
     "static/js/455.f7204a3c.chunk.js": "/static/js/455.f7204a3c.chunk.js",
@@ -9,14 +9,14 @@
     "static/media/Amiri-Regular.ttf": "/static/media/Amiri-Regular.06cfafa0afe4079f99f0.ttf",
     "static/media/logo3.png": "/static/media/logo3.e3a9e979634c7fe0ac8c.png",
     "index.html": "/index.html",
-    "main.29ab3dfd.css.map": "/static/css/main.29ab3dfd.css.map",
-    "main.19e39b2d.js.map": "/static/js/main.19e39b2d.js.map",
+    "main.424e4ee3.css.map": "/static/css/main.424e4ee3.css.map",
+    "main.0464f5c6.js.map": "/static/js/main.0464f5c6.js.map",
     "239.33db63d8.chunk.js.map": "/static/js/239.33db63d8.chunk.js.map",
     "977.baba56c4.chunk.js.map": "/static/js/977.baba56c4.chunk.js.map",
     "455.f7204a3c.chunk.js.map": "/static/js/455.f7204a3c.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.29ab3dfd.css",
-    "static/js/main.19e39b2d.js"
+    "static/css/main.424e4ee3.css",
+    "static/js/main.0464f5c6.js"
   ]
 }

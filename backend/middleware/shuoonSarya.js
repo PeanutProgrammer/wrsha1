@@ -10,7 +10,7 @@ const shuoonSarya = async (req, res, next) => {
 
   if (
     userData[0] &&
-    (userData[0].type === "شؤون إدارية" || userData[0].type === "admin")
+    (userData[0].type === "شؤون ادارية" || userData[0].type === "admin")
   ) {
     return next();
   }

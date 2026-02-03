@@ -802,7 +802,7 @@ LEFT JOIN leave_type lt
 
       // --- Total count for pagination ---
       const countQuery = `SELECT COUNT(*) AS total FROM ncos n JOIN 
-    nco_leave_details nld ON n.id = nld.officerID
+    nco_leave_details nld ON n.id = nld.ncoID
 JOIN 
     leave_type lt ON nld.leaveTypeID = lt.id
 WHERE 

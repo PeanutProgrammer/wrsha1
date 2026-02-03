@@ -60,6 +60,7 @@ import AddNCOTmam from "./pages/NCOs/AddTmam";
 import UpdateNCOTmam from "./pages/NCOs/UpdateTmam";
 import LeaderNCOs from "./pages/NCOs/LeaderNCOs";
 import LeaderNCOsVacations from "./pages/NCOs/LeaderVacations";
+import NCOsView from "./pages/NCOs/NCOsView";
 // Soldiers
 import Soldiers from "./pages/Soldiers/Soldiers";
 import AddSoldiers from "./pages/Soldiers/AddSoldiers";
@@ -77,6 +78,7 @@ import AddSoldierTmam from "./pages/Soldiers/AddTmam";
 import UpdateSoldierTmam from "./pages/Soldiers/UpdateTmam";
 import LeaderSoldiers from "./pages/Soldiers/LeaderSoldiers";
 import LeaderSoldiersVacations from "./pages/Soldiers/LeaderVacations";
+import SoldiersView from "./pages/Soldiers/SoldiersView";
 // import RealTimeMonitor from "./pages/Soldiers/RealTimeMonitor";
 
 // Civillians
@@ -318,6 +320,24 @@ export const router = createBrowserRouter([
         ),
         children: [{ path: "", element: <OfficersView /> }],
       },
+      {
+        path: "nco-view",
+        element: (
+          <ProtectedRoute
+            allowedTypes={["مبنى القيادة", "secretary", "admin", "شؤون ضباط"]}
+          />
+        ),
+        children: [{ path: "", element: <NCOsView /> }],
+      },
+      {
+        path: "soldier-view",
+        element: (
+          <ProtectedRoute
+            allowedTypes={["مبنى القيادة", "secretary", "admin", "شؤون ضباط"]}
+          />
+        ),
+        children: [{ path: "", element: <SoldiersView /> }],
+      },
 
       // Security Routes
       {
@@ -494,7 +514,9 @@ export const router = createBrowserRouter([
       {
         path: "ncos",
         element: (
-          <ProtectedRoute allowedTypes={["admin", "بوابة", "شؤون ادارية"]} />
+          <ProtectedRoute
+            allowedTypes={["admin", "بوابة", "شؤون ادارية", "مبنى القيادة"]}
+          />
         ),
         children: [
           { path: "", element: <NCOsHome /> },
@@ -515,7 +537,11 @@ export const router = createBrowserRouter([
           },
           {
             path: "details/:id",
-            element: <ProtectedRoute allowedTypes={["admin", "شؤون ادارية"]} />,
+            element: (
+              <ProtectedRoute
+                allowedTypes={["admin", "شؤون ادارية", "مبنى القيادة"]}
+              />
+            ),
             children: [{ path: "", element: <NCODetails /> }],
           },
           {
@@ -567,7 +593,7 @@ export const router = createBrowserRouter([
       {
         path: "soldiers",
         element: (
-          <ProtectedRoute allowedTypes={["admin", "بوابة", "شؤون ادارية"]} />
+          <ProtectedRoute allowedTypes={["admin", "بوابة", "شؤون ادارية", "مبنى القيادة"]} />
         ),
         children: [
           { path: "", element: <SoldiersHome /> },
@@ -588,7 +614,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "details/:id",
-            element: <ProtectedRoute allowedTypes={["admin", "شؤون ادارية"]} />,
+            element: <ProtectedRoute allowedTypes={["admin", "شؤون ادارية", "مبنى القيادة"]} />,
             children: [{ path: "", element: <SoldierDetails /> }],
           },
           {

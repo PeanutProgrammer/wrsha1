@@ -196,33 +196,45 @@ const [dailySummary, setDailySummary] = useState({
 
   return (
     <div className="Officers p-5">
-      <div className="header d-flex justify-content-between mb-3">
-        <h3 className="text-center mb-3">تمام الجنود</h3>
-         {/* Search bar */}
-                <Form
-                  className="d-flex align-items-center flex-grow-1"
-                  onSubmit={handleSearchSubmit}
-                >
-                  <InputGroup className="w-50  shadow-sm me-5">
-                    <Form.Control
-                      size="sm"
-                      placeholder="بحث 🔍"
-                      value={soldiers.tempSearch}
-                      onChange={(e) =>
-                        setSoldiers((prev) => ({ ...prev, tempSearch: e.target.value }))
-                      }
-                    />
-                    {soldiers.tempSearch && (
-                      <Button
-                        size="sm"
-                        variant="outline-secondary"
-                        onClick={handleClearSearch}
-                      >
-                        ×
-                      </Button>
-                    )}
-                  </InputGroup>
-                </Form>
+       {/* Header */}
+      <div className="header d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+        <h3 className="text-white"> تمام الجنود </h3>
+
+        {/* Search bar */}
+        <Form
+          className="d-flex align-items-center flex-grow-1"
+          onSubmit={handleSearchSubmit}
+        >
+          <InputGroup className="w-50 shadow-sm me-5">
+            <Form.Control
+              size="sm"
+              placeholder="بحث 🔍"
+              value={soldiers.tempSearch}
+              onChange={(e) =>
+                setSoldiers((prev) => ({ ...prev, tempSearch: e.target.value }))
+              }
+            />
+            {soldiers.tempSearch && (
+              <Button
+                size="sm"
+                variant="outline-secondary"
+                onClick={handleClearSearch}
+              >
+                ×
+              </Button>
+            )}
+          </InputGroup>
+        </Form>
+
+            <Link to="../soldier-view">
+      <Button
+        size="md"
+        variant="primary"
+        className="px-3"
+      >
+        بيانات الجنود
+      </Button>
+    </Link>
       </div>
 
        <div className="daily-summary mt-4">
