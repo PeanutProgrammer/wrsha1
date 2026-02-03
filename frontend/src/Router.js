@@ -40,6 +40,9 @@ import ManageCourse from "./pages/Officers/ManageCourse";
 import LeaderOfficers from "./pages/Officers/LeaderOfficers";
 import LeaderOfficersVacations from "./pages/Officers/LeaderVacations";
 import OfficerVacationLog from "./pages/Officers/OfficersVacationLog";
+import OfficerDutyForm from "./pages/Officers/OfficersDuty";
+import OfficerDutyViewer from "./pages/Officers/LeaderOfficerDuty";
+import OfficersView from "./pages/Officers/OfficersView";
 // NCOs
 import NCOs from "./pages/NCOs/NCOs";
 import AddNCOs from "./pages/NCOs/AddNCOs";
@@ -145,7 +148,6 @@ import ManageShuoonMission from "./pages/Shuoon/ManageMission";
 import ManageShuoonCourse from "./pages/Shuoon/ManageCourse";
 
 import Calendar from "./pages/Events/Calendar";
-
 
 export const router = createBrowserRouter([
   {
@@ -280,7 +282,7 @@ export const router = createBrowserRouter([
         ),
         children: [{ path: "", element: <LeaderSoldiersVacations /> }],
       },
-            {
+      {
         path: "leader-missions",
         element: (
           <ProtectedRoute
@@ -291,8 +293,30 @@ export const router = createBrowserRouter([
       },
       {
         path: "officer-vacation-log/:id",
-        element: <ProtectedRoute allowedTypes={["admin", "مبنى القيادة", "secretary", "شؤون ضباط"]} />,
+        element: (
+          <ProtectedRoute
+            allowedTypes={["admin", "مبنى القيادة", "secretary", "شؤون ضباط"]}
+          />
+        ),
         children: [{ path: "", element: <OfficerVacationLog /> }],
+      },
+      {
+        path: "leader-officer-duty",
+        element: (
+          <ProtectedRoute
+            allowedTypes={["مبنى القيادة", "secretary", "admin", "شؤون ضباط"]}
+          />
+        ),
+        children: [{ path: "", element: <OfficerDutyViewer /> }],
+      },
+      {
+        path: "officer-view",
+        element: (
+          <ProtectedRoute
+            allowedTypes={["مبنى القيادة", "secretary", "admin", "شؤون ضباط"]}
+          />
+        ),
+        children: [{ path: "", element: <OfficersView /> }],
       },
 
       // Security Routes
@@ -346,7 +370,9 @@ export const router = createBrowserRouter([
       {
         path: "officers",
         element: (
-          <ProtectedRoute allowedTypes={["admin", "بوابة", "شؤون ضباط"]} />
+          <ProtectedRoute
+            allowedTypes={["admin", "بوابة", "شؤون ضباط", "مبنى القيادة"]}
+          />
         ),
         children: [
           { path: "", element: <OfficersHome /> },
@@ -367,7 +393,11 @@ export const router = createBrowserRouter([
           },
           {
             path: "details/:id",
-            element: <ProtectedRoute allowedTypes={["admin", "شؤون ضباط"]} />,
+            element: (
+              <ProtectedRoute
+                allowedTypes={["admin", "شؤون ضباط", "مبنى القيادة"]}
+              />
+            ),
             children: [{ path: "", element: <OfficerDetails /> }],
           },
           {
@@ -409,6 +439,11 @@ export const router = createBrowserRouter([
             path: "manage-tmam",
             element: <ProtectedRoute allowedTypes={"شؤون ضباط"} />,
             children: [{ path: "", element: <ManageTmam /> }],
+          },
+          {
+            path: "manage-duty",
+            element: <ProtectedRoute allowedTypes={"شؤون ضباط"} />,
+            children: [{ path: "", element: <OfficerDutyForm /> }],
           },
           {
             path: "manage-vacation",

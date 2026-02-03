@@ -39,7 +39,9 @@ const schema = yup.object().shape({
     .string()
     .max(255, "الوجهة يجب ألا تتجاوز 255 حرف")
     .optional(),
-  remaining: yup.string().max(255, "المتبقي يجب ألا يتجاوز 255 حرف").optional(),
+  remaining: yup.string().max(255, "الرصيد يجب ألا يتجاوز 255 حرف").optional(),
+  notes: yup.string().max(500, "الملاحظات يجب ألا تتجاوز 500 حرف").optional(),
+  duration: yup.string().max(255, "المدة يجب ألا تتجاوز 255 حرف").optional(),
 });
 
 const UpdateTmam = () => {
@@ -309,6 +311,20 @@ const UpdateTmam = () => {
           )}
         </Form.Group>
 
+        <Form.Group controlId="duration" className="form-group">
+          <Form.Label>المدة</Form.Label>
+          <Form.Control
+            as="textarea"
+            rows={1}
+            placeholder="أدخل المدة"
+            {...register("duration")}
+            className={`form-control ${errors.duration ? "is-invalid" : ""}`}
+          />
+          {errors.duration && (
+            <div className="invalid-feedback">{errors.duration.message}</div>
+          )}
+        </Form.Group>
+
         <Form.Group controlId="start_date" className="form-group">
           <Form.Label>الفترة من</Form.Label>
           <Form.Control
@@ -334,11 +350,11 @@ const UpdateTmam = () => {
         </Form.Group>
 
         <Form.Group controlId="remaining" className="form-group">
-          <Form.Label>المتبقي</Form.Label>
+          <Form.Label>الرصيد</Form.Label>
           <Form.Control
             as="textarea"
             rows={1}
-            placeholder="أدخل المتبقي"
+            placeholder="أدخل الرصيد"
             {...register("remaining")}
             className={`form-control ${errors.remaining ? "is-invalid" : ""}`}
           />

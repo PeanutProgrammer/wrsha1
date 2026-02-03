@@ -139,6 +139,9 @@ const Aside = ({ setCollapsed, collapsed }) => {
               <Link to={"officers/manage-tmam"}>تمام الضباط</Link>
             </li>
             <li className="tabs">
+              <Link to={"officers/manage-duty"}>نوبتجية الضباط</Link>
+            </li>
+            <li className="tabs">
               <Link to={"officers/manage-vacation"}>الاجازات</Link>
             </li>
             <li className="tabs">
@@ -214,7 +217,7 @@ const Aside = ({ setCollapsed, collapsed }) => {
           </>
         )}
 
-                {auth?.type === "secretary" && (
+        {auth?.type === "secretary" && (
           <>
             <li className="tabs">
               <Link to={"Home"}>الصفحة الرئيسية</Link>

@@ -139,6 +139,7 @@ router.post(
   }),
   body("destination").isString().withMessage("من فضلك أدخل الوجهة."),
   body("remaining").isString().withMessage("من فضلك أدخل المتبقي.").optional(),
+  body("duration").isString().withMessage("من فضلك أدخل المدة.").optional(),
   (req, res) => {
     OfficerLogController.createTmam(req, res);
   }
@@ -170,6 +171,8 @@ router.put(
   }),
   body("destination").isString().withMessage("من فضلك أدخل الوجهة."),
   body("remaining").isString().withMessage("من فضلك أدخل المتبقي.").optional(),
+    body("duration").isString().withMessage("من فضلك أدخل المدة.").optional(),
+
 
   (req, res) => {
     OfficerLogController.updateTmam(req, res);

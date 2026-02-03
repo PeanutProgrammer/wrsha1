@@ -104,6 +104,10 @@ const PastOfficerDetails = () => {
                 <td>{moment(officer.results._dob).format('YYYY/MM/DD')}</td>
               </tr>
               <tr>
+                <td><strong>رقم الهاتف:</strong></td>
+                <td>{officer.results._telephone_number ? officer.results._telephone_number : "لا يوجد"}</td>
+              </tr>
+              <tr>
                 <td><strong>تاريخ الضم:</strong></td>
                 <td>{moment(officer.results._join_date).format('YYYY/MM/DD')}</td>
               </tr>

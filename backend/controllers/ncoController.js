@@ -450,7 +450,7 @@ LIMIT ? OFFSET ?`,
                                           on leave_type.id = nco_leave_details.leaveTypeID
 
                                           WHERE ncos.mil_id = ?
-                                          ORDER BY nco_log.id DESC
+                                          ORDER BY nco_leave_details.id DESC
                                           `,
         [officerObject.getMilID()]
       );

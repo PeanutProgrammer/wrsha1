@@ -90,9 +90,11 @@ const OfficersTmamDetails = () => {
             <th>م</th>
             <th>نوع التمام</th>
             <th>إلى</th>
+            <th>المدة</th>
             <th>الفترة من</th>
             <th>الفترة إلى</th>
             <th>وقت الدخول/الخروج</th> {/* New column header */}
+            <th>الرصيد</th>
             <th>ملاحظات</th>
           </tr>
         </thead>
@@ -113,6 +115,7 @@ const OfficersTmamDetails = () => {
                     : "غير متواجد"}
                 </td>
                 <td>{rec.destination || "—"}</td>
+                <td>{rec.duration || "—"}</td>
                 <td>
                   {rec.start_date
                     ? moment(rec.start_date).format("YYYY/MM/DD")
@@ -129,12 +132,13 @@ const OfficersTmamDetails = () => {
                     ? ` ${moment(rec.event_time).format("YYYY/MM/DD HH:mm ")}`
                     : "—"}
                 </td>
+                <td>{rec.remaining || "—"}</td>
                 <td>{rec.notes || "—"}</td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="7" className="text-center">
+              <td colSpan="9*" className="text-center">
                 لا يوجد سجلات تمام.
               </td>
             </tr>

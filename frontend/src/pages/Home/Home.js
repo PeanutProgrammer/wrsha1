@@ -16,6 +16,7 @@ import "./Home.css";
 import MiniCalendarCard from "../Events/MiniCalendarCard";
 import MiniVacationsCard from "../Events/MiniVacationsCard";
 import MiniLogsCard from "../Events/MiniLogsCard";
+import moment from "moment";
 
 const Home = () => {
   const auth = getAuthUser();
@@ -122,8 +123,9 @@ const Home = () => {
     },
                 {
       label: "نوبتجية اليوم",
-      path: "/dashboard/Home",
+      path: "/dashboard/leader-officer-duty",
       icon: <FaUserShield />,
+      count: ` ${moment().locale("en").format("DD/MM/YYYY")}`,
     },
 
   ];

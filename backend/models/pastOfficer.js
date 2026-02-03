@@ -1,7 +1,7 @@
 
 
 class PastOfficer {
-    constructor(name, join_date, mil_id, rank, address, height, weight, dob, seniority_number, end_date, transferID, transferred_to) {
+    constructor(name, join_date, mil_id, rank, address, height, weight, dob, telephone_number, seniority_number, end_date, transferID, transferred_to) {
         this._name = name;
         this._join_date = join_date;
         this._mil_id = mil_id;
@@ -10,6 +10,7 @@ class PastOfficer {
         this._height = height;
         this._weight = weight;
         this._dob = dob;
+        this._telephone_number = telephone_number;
         this._seniority_number = seniority_number;
         this._end_date = end_date;
         this._transferID = transferID;
@@ -51,6 +52,9 @@ class PastOfficer {
         return this._dob;
     }
 
+    getTelephoneNumber = () => {
+        return this._telephone_number;
+    }
 
     getSeniorityNumber = () => {
         return this._seniority_number;
@@ -104,6 +108,10 @@ class PastOfficer {
 
     setDOB = (dob) => {
         this._dob = dob;
+    }
+
+    setTelephoneNumber = (telephone_number) => {
+        this._telephone_number = telephone_number;
     }
 
 

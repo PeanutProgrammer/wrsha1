@@ -45,7 +45,8 @@ const schema = yup.object().shape({
     .optional(),
 
   destination: yup.string().max(255, "الوجهة يجب ألا تتجاوز 255 حرف").optional(),
-    remaining: yup.string().max(255, "المتبقي يجب ألا يتجاوز 255 حرف").optional(),
+    remaining: yup.string().max(255, "الرصيد يجب ألا يتجاوز 255 حرف").optional(),
+    duration: yup.string().max(255, "المدة يجب ألا تتجاوز 255 حرف").optional(),
 });
 
 
@@ -63,6 +64,7 @@ const AddTmam = () => {
     end_date: '',
     destination: '',
     remaining: '',
+    duration: '',
     success: null,
   });
 
@@ -79,8 +81,8 @@ const AddTmam = () => {
 
     const formattedData = {
       ...data,
-      start_date: data.start_date ? moment(data.start_date).format("YYYY/MM/DD") : null,
-      end_date: data.end_date ? moment(data.end_date).format("YYYY/MM/DD") : null,
+      start_date: data.start_date ? moment(data.start_date).locale("en").format("YYYY-MM-DD") : null,
+      end_date: data.end_date ? moment(data.end_date).locale("en").format("YYYY-MM-DD") : null,
 
     };
 
@@ -102,6 +104,7 @@ const AddTmam = () => {
         end_date: '',
         destination: '',
         remaining: '',
+        duration: '',
       });
 
       reset(); // Reset form after successful submission
@@ -270,12 +273,26 @@ const AddTmam = () => {
                   {errors.end_date && <div className="invalid-feedback">{errors.end_date.message}</div>}
                 </Form.Group>
 
+                <Form.Group controlId="duration" className="form-group">
+                  <Form.Label>المدة</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={1}
+                    placeholder="أدخل المدة"
+                    {...register("duration")}
+                    className={`form-control ${errors.duration ? 'is-invalid' : ''}`}
+                  />
+                  {errors.duration && <div className="invalid-feedback">{errors.duration.message}</div>}
+                </Form.Group>
+
+        {/* Remaining */}
+
         <Form.Group controlId="remaining" className="form-group">
-          <Form.Label>المتبقي</Form.Label>
+          <Form.Label>الرصيد</Form.Label>
           <Form.Control
             as="textarea"
             rows={1}
-            placeholder="أدخل المتبقي"
+            placeholder="أدخل الرصيد"
             {...register("remaining")}
             className={`form-control ${errors.remaining ? 'is-invalid' : ''}`}
           />

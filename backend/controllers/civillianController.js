@@ -374,7 +374,7 @@ ORDER BY o.id
                                           LEFT JOIN leave_type
                                           on leave_type.id = civillian_leave_details.leaveTypeID
                                           WHERE civillians.nationalID = ?
-                                          ORDER BY civillian_log.id DESC
+                                          ORDER BY civillian_leave_details.id DESC
                                           `,
         [civillianObject.getNationalID()]
       );

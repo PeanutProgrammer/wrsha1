@@ -1,7 +1,7 @@
 
 
 class Officer {
-    constructor(name, join_date, department, mil_id, rank, address, height, weight, dob, seniority_number, in_unit, attached) {
+    constructor(name, join_date, department, mil_id, rank, address, height, weight, dob, telephone_number, seniority_number, in_unit, attached) {
         this._name = name;
         this._join_date = join_date;
         this._department = department;
@@ -11,6 +11,7 @@ class Officer {
         this._height = height;
         this._weight = weight;
         this._dob = dob;
+        this._telephone_number = telephone_number;
         this._seniority_number = seniority_number;
         this._in_unit = in_unit;
         this._attached = attached;
@@ -55,6 +56,9 @@ class Officer {
         return this._dob;
     }
 
+    getTelephoneNumber = () => {
+        return this._telephone_number;
+    }
 
     getSeniorityNumber = () => {
         return this._seniority_number;
@@ -110,6 +114,9 @@ class Officer {
         this._dob = dob;
     }
 
+    setTelephoneNumber = (telephone_number) => {
+        this._telephone_number = telephone_number;
+    }
 
     setSeniorityNumber = (seniority_number) => {
         this._seniority_number = seniority_number;

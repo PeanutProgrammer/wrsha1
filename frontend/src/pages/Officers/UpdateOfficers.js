@@ -1,27 +1,47 @@
-import React, { useState, useEffect } from 'react';
-import { Form, Button, Alert } from 'react-bootstrap';
+import React, { useState, useEffect } from "react";
+import { Form, Button, Alert } from "react-bootstrap";
 import "../../style/update.css";
-import { useParams } from 'react-router-dom';
-import axios from 'axios';
-import { getAuthUser } from '../../helper/Storage';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
-  import moment from 'moment';
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import { getAuthUser } from "../../helper/Storage";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import moment from "moment";
 
 // Validation schema using yup
 const schema = yup.object().shape({
-  name: yup.string().min(3, 'اسم الضابط يجب أن يكون أكثر من 3 حروف').max(50, 'اسم الضابط يجب ألا يتجاوز 50 حرف').required('اسم الضابط مطلوب'),
-  rank: yup.string().required('الرتبة مطلوبة'),
-  mil_id: yup.string().matches(/^\d+$/, 'الرقم العسكري يجب أن يحتوي على أرقام فقط').required('الرقم العسكري مطلوب'),
-  department: yup.string().required('الفرع / الورشة مطلوب'),
-  join_date: yup.date().required('تاريخ الضم مطلوب').typeError('يرجى إدخال تاريخ صحيح'),
-  address: yup.string().required('العنوان مطلوب'),
-  height: yup.number().typeError('الطول يجب أن يكون رقماً').required('الطول مطلوب'),
-  weight: yup.number().typeError('الوزن يجب أن يكون رقماً').required('الوزن مطلوب'),
-  dob: yup.date().required('تاريخ الميلاد مطلوب').typeError('يرجى إدخال تاريخ صحيح'),
-  seniority_number: yup.string().required('رقم الأقدمية مطلوب'),
-  attached: yup.boolean().required('حقل الملحق مطلوب'),
+  name: yup
+    .string()
+    .min(3, "اسم الضابط يجب أن يكون أكثر من 3 حروف")
+    .max(50, "اسم الضابط يجب ألا يتجاوز 50 حرف")
+    .required("اسم الضابط مطلوب"),
+  rank: yup.string().required("الرتبة مطلوبة"),
+  mil_id: yup
+    .string()
+    .matches(/^\d+$/, "الرقم العسكري يجب أن يحتوي على أرقام فقط")
+    .required("الرقم العسكري مطلوب"),
+  department: yup.string().required("الفرع / الورشة مطلوب"),
+  join_date: yup
+    .date()
+    .required("تاريخ الضم مطلوب")
+    .typeError("يرجى إدخال تاريخ صحيح"),
+  address: yup.string().required("العنوان مطلوب"),
+  height: yup
+    .number()
+    .typeError("الطول يجب أن يكون رقماً")
+    .required("الطول مطلوب"),
+  weight: yup
+    .number()
+    .typeError("الوزن يجب أن يكون رقماً")
+    .required("الوزن مطلوب"),
+  dob: yup
+    .date()
+    .required("تاريخ الميلاد مطلوب")
+    .typeError("يرجى إدخال تاريخ صحيح"),
+  telephone_number: yup.string().optional("رقم الهاتف مطلوب"),
+  seniority_number: yup.string().required("رقم الأقدمية مطلوب"),
+  attached: yup.boolean().required("حقل الملحق مطلوب"),
 });
 
 const UpdateOfficers = () => {
@@ -31,62 +51,70 @@ const UpdateOfficers = () => {
   const [dept, setDept] = useState([]);
   const [officer, setOfficer] = useState({
     loading: false,
-    err: '',
-    name: '',
-    rank: '',
-    mil_id: '',
-    department: '',
-    join_date: '',  // store as string "YYYY/MM/DD"
-    address: '',
-    height: '',
-    weight: '',
-    dob: '',
-    seniority_number: '',
+    err: "",
+    name: "",
+    rank: "",
+    mil_id: "",
+    department: "",
+    join_date: "", // store as string "YYYY/MM/DD"
+    address: "",
+    height: "",
+    weight: "",
+    dob: "",
+    telephone_number: "",
+    seniority_number: "",
     attached: false,
     success: null,
     reload: false,
   });
 
   // Use Form Hook from react-hook-form
-  const { register, handleSubmit, formState: { errors }, reset } = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({
     resolver: yupResolver(schema),
   });
 
   const formatDateToInput = (date) => {
-    if (!date) return '';
+    if (!date) return "";
     const d = new Date(date);
     const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   };
 
   const updateOfficers = (data) => {
     setOfficer({ ...officer, loading: true });
 
-          console.log("Request Data:", data);
+    console.log("Request Data:", data);
 
-           const formattedData = {
-    ...data,
-    join_date: data.join_date ? formatDateToInput(data.join_date) : '',
-             dob: data.dob ? formatDateToInput(data.dob) : '',
-              attached: data.attached === true ? true : false,
-  };
-
-
+    const formattedData = {
+      ...data,
+      join_date: data.join_date ? formatDateToInput(data.join_date) : "",
+      dob: data.dob ? formatDateToInput(data.dob) : "",
+      attached: data.attached === true ? true : false,
+    };
 
     axios
-      .put(`${process.env.REACT_APP_BACKEND_BASE_URL}/Officer/` + id, formattedData, {
-        headers: {
-          token: auth.token,
-        },
-      })
+      .put(
+        `${process.env.REACT_APP_BACKEND_BASE_URL}/Officer/` + id,
+        formattedData,
+        {
+          headers: {
+            token: auth.token,
+          },
+        }
+      )
       .then((resp) => {
         setOfficer({
           ...officer,
           loading: false,
-          success: 'تم تعديل بيانات الضابط بنجاح!',
-          err: '',
+          success: "تم تعديل بيانات الضابط بنجاح!",
+          err: "",
         });
 
         setTimeout(() => {
@@ -99,7 +127,7 @@ const UpdateOfficers = () => {
           loading: false,
           err: err.response
             ? JSON.stringify(err.response.data.errors)
-            : 'Something went wrong. Please try again later.',
+            : "Something went wrong. Please try again later.",
           success: null,
         });
       });
@@ -119,26 +147,32 @@ const UpdateOfficers = () => {
           rank: resp.data._rank,
           name: resp.data._name,
           department: resp.data._department,
-          join_date: resp.data._join_date ? formatDateToInput(resp.data._join_date) : '',
+          join_date: resp.data._join_date
+            ? formatDateToInput(resp.data._join_date)
+            : "",
           address: resp.data._address,
           height: resp.data._height,
           weight: resp.data._weight,
-          dob: resp.data._dob ? formatDateToInput(resp.data._dob) : '',
+          dob: resp.data._dob ? formatDateToInput(resp.data._dob) : "",
+          telephone_number: resp.data._telephone_number,
           seniority_number: resp.data._seniority_number,
           attached: resp.data._attached,
           loading: false,
-          err: '',
+          err: "",
         });
         reset({
           mil_id: resp.data._mil_id,
           rank: resp.data._rank,
           name: resp.data._name,
           department: resp.data._department,
-          join_date: resp.data._join_date ? formatDateToInput(resp.data._join_date) : '',
+          join_date: resp.data._join_date
+            ? formatDateToInput(resp.data._join_date)
+            : "",
           address: resp.data._address,
           height: resp.data._height,
           weight: resp.data._weight,
-          dob: resp.data._dob ? formatDateToInput(resp.data._dob) : '',
+          dob: resp.data._dob ? formatDateToInput(resp.data._dob) : "",
+          telephone_number: resp.data._telephone_number,
           seniority_number: resp.data._seniority_number,
 
           attached: resp.data._attached,
@@ -150,7 +184,7 @@ const UpdateOfficers = () => {
           loading: false,
           err: err.response
             ? JSON.stringify(err.response.data.errors)
-            : 'Something went wrong. Please try again later.',
+            : "Something went wrong. Please try again later.",
           success: null,
         });
       });
@@ -338,6 +372,23 @@ const UpdateOfficers = () => {
           />
           {errors.dob && (
             <div className="invalid-feedback">{errors.dob.message}</div>
+          )}
+        </Form.Group>
+
+        <Form.Group controlId="telephone_number" className="form-group">
+          <Form.Label>رقم الهاتف</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="أدخل رقم الهاتف"
+            {...register("telephone_number")}
+            className={`form-control ${
+              errors.telephone_number ? "is-invalid" : ""
+            }`}
+          />
+          {errors.telephone_number && (
+            <div className="invalid-feedback">
+              {errors.telephone_number.message}
+            </div>
           )}
         </Form.Group>
 

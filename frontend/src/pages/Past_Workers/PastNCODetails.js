@@ -88,14 +88,6 @@ const PastNCODetails = () => {
                 <td>{officer.results._address ? officer.results._address : "لا يوجد"}</td>
               </tr>
               <tr>
-                <td><strong>الوزن:</strong></td>
-                <td>{officer.results._weight} كجم</td>
-              </tr>
-              <tr>
-                <td><strong>الطول:</strong></td>
-                <td>{officer.results._height} سم</td>
-              </tr>
-              <tr>
                 <td><strong>تاريخ الميلاد:</strong></td>
                 <td>{moment(officer.results._dob).format('YYYY/MM/DD') }</td>
               </tr>

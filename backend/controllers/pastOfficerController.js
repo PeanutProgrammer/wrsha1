@@ -68,7 +68,7 @@ class PastOfficerController {
 
             console.log(officer[0]); 
 
-            const officerObject = new PastOfficer(officer[0].name, officer[0].join_date,  officer[0].mil_id, officer[0].rank, officer[0].address, officer[0].height, officer[0].weight, officer[0].dob, officer[0].seniority_number, officer[0].end_date, officer[0].transferID, officer[0].transferred_to);
+            const officerObject = new PastOfficer(officer[0].name, officer[0].join_date,  officer[0].mil_id, officer[0].rank, officer[0].address, officer[0].height, officer[0].weight, officer[0].dob, officer[0].telephone_number, officer[0].seniority_number, officer[0].end_date, officer[0].transferID, officer[0].transferred_to);
             return res.status(200).json(officerObject.toJSON());
 
 

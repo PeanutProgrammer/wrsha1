@@ -54,6 +54,9 @@ const Officers = () => {
   const [endDate, setEndDate] = useState("");
   const [transferID, setTransferID] = useState("");
   const [transferredTo, setTransferredTo] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
+  const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
+  const [showDeleteError, setShowDeleteError] = useState(false);
 
   useEffect(() => {
     const socket = io(`${process.env.REACT_APP_BACKEND_BASE_URL}`); //  backend port
@@ -142,21 +145,22 @@ const Officers = () => {
         setEndDate("");
         setTransferID("");
         setTransferredTo("");
-        setOfficers({
-          ...officers,
-          reload: officers.reload + 1,
-          success: "تم حذف الضابط  بنجاح ✅",
-          err: null,
-        });
+
+        setShowDeleteSuccess(true);
+        setTimeout(() => setShowDeleteSuccess(false), 3000);
+
+        setOfficers((prev) => ({
+          ...prev,
+          reload: prev.reload + 1,
+        }));
       })
       .catch((err) => {
-        setOfficers({
-          ...officers,
-          err: err.response
-            ? JSON.stringify(err.response.data.errors)
-            : "Something went wrong. Please try again later.",
-        });
+        console.error("Delete failed:", err);
+
         setShowConfirm(false);
+
+        setShowDeleteError(true);
+        setTimeout(() => setShowDeleteError(false), 3000);
       });
   };
 
@@ -478,6 +482,7 @@ const Officers = () => {
         </div>
       </div>
 
+
       {/* Table */}
       <div className="table-responsive shadow-sm rounded bg-white">
         <Table id="officer-table" striped bordered hover className="mb-0">
@@ -597,6 +602,19 @@ const Officers = () => {
           </tbody>
         </Table>
       </div>
+      {showDeleteSuccess && (
+  <div className="calendar-toast-delete success">
+    <div className="toast-icon">🗑</div>
+    <div className="toast-text">تم حذف الضابط بنجاح</div>
+  </div>
+)}
+
+{showDeleteError && (
+  <div className="calendar-toast-delete error">
+    <div className="toast-icon">⚠</div>
+    <div className="toast-text">فشل حذف الضابط</div>
+  </div>
+)}
 
       {/* Pagination Controls */}
 

@@ -39,13 +39,14 @@ class OfficerController {
         req.body.height,
         req.body.weight,
         req.body.dob,
+        req.body.telephone_number,
         req.body.seniority_number,
         true,
         req.body.attached || false
       );
 
       await query(
-        "insert into officers set name =?, join_date = ?, department = ?, mil_id = ?, `rank` = ?, address = ?, height = ?, weight = ?, dob = ?, seniority_number = ?, attached = ?",
+        "insert into officers set name =?, join_date = ?, department = ?, mil_id = ?, `rank` = ?, address = ?, height = ?, weight = ?, dob = ?, telephone_number = ?, seniority_number = ?, attached = ?",
         [
           officerObject.getName(),
           officerObject.getJoinDate(),
@@ -56,6 +57,7 @@ class OfficerController {
           officerObject.getHeight(),
           officerObject.getWeight(),
           officerObject.getDOB(),
+          officerObject.getTelephoneNumber(),
           officerObject.getSeniorityNumber(),
           officerObject.getAttached(),
         ]
@@ -100,6 +102,7 @@ class OfficerController {
         req.body.height,
         req.body.weight,
         req.body.dob,
+        req.body.telephone_number,
         req.body.seniority_number,
         checkOfficer[0].in_unit,
         req.body.attached || false
@@ -108,7 +111,7 @@ class OfficerController {
       console.log("hello");
 
       await query(
-        "update officers set name =?, join_date = ?, department = ?, `rank` = ?, address = ?,  height = ?, weight = ?, dob = ?, seniority_number = ?, attached = ? where id = ?",
+        "update officers set name =?, join_date = ?, department = ?, `rank` = ?, address = ?,  height = ?, weight = ?, dob = ?, telephone_number = ?, seniority_number = ?, attached = ? where id = ?",
         [
           officerObject.getName(),
           officerObject.getJoinDate(),
@@ -118,6 +121,7 @@ class OfficerController {
           officerObject.getHeight(),
           officerObject.getWeight(),
           officerObject.getDOB(),
+          officerObject.getTelephoneNumber(),
           officerObject.getSeniorityNumber(),
           officerObject.getAttached(),
           checkOfficer[0].id,
@@ -171,6 +175,7 @@ class OfficerController {
         height: checkOfficer[0].height,
         weight: checkOfficer[0].weight,
         dob: checkOfficer[0].dob,
+        telephone_number: checkOfficer[0].telephone_number,
         seniority_number: checkOfficer[0].seniority_number,
         // If you have additional fields such as 'end_date', 'transferID', etc.
         end_date: req.body.end_date || new Date().toISOString(),
@@ -180,7 +185,7 @@ class OfficerController {
 
       // Insert the officer data into the past_officers table
       await query(
-        "INSERT INTO past_officers (mil_id, `rank`, name, join_date, address, height, weight, dob, seniority_number, end_date, transferID, transferred_to) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO past_officers (mil_id, `rank`, name, join_date, address, height, weight, dob, telephone_number, seniority_number, end_date, transferID, transferred_to) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         [
           PastOfficerObject.mil_id,
           PastOfficerObject.rank,
@@ -190,6 +195,7 @@ class OfficerController {
           PastOfficerObject.height,
           PastOfficerObject.weight,
           PastOfficerObject.dob,
+          PastOfficerObject.telephone_number,
           PastOfficerObject.seniority_number,
           PastOfficerObject.end_date,
           PastOfficerObject.transferID,
@@ -303,6 +309,7 @@ class OfficerController {
         officer[0].height,
         officer[0].weight,
         officer[0].dob,
+        officer[0].telephone_number,
         officer[0].seniority_number,
         officer[0].in_unit,
         officer[0].attached
@@ -455,7 +462,7 @@ LIMIT ? OFFSET ?
         officer[0].in_unit
       );
       const officerTmam = await query(
-        `SELECT officers.mil_id ,officers.rank,officers.name, officers.in_unit, officer_log.event_type, officer_log.event_time, officers.department, leave_type.name AS 'tmam', officer_leave_details.start_date, officer_leave_details.end_date, officer_leave_details.destination, officer_log.notes
+        `SELECT officers.mil_id ,officers.rank,officers.name, officers.in_unit, officer_log.event_type, officer_log.event_time, officers.department, leave_type.name AS 'tmam', officer_leave_details.start_date, officer_leave_details.end_date, officer_leave_details.destination, officer_leave_details.duration, officer_leave_details.remaining, officer_log.notes
                                           FROM officers
                                           LEFT JOIN officer_leave_details
                                           ON officer_leave_details.officerID = officers.id

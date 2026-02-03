@@ -234,6 +234,14 @@ const SecurityOfficers = () => {
                     : " 🔽"
                   : ""}
               </th>
+              <th onClick={() => handleSort("telephone_number")}>
+                رقم الهاتف
+                {sortConfig.key === "telephone_number"
+                  ? sortConfig.direction === "asc"
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}
+              </th>
               <th onClick={() => handleSort("in_unit")}>
                 التمام
                 {sortConfig.key === "in_unit"
@@ -268,6 +276,7 @@ const SecurityOfficers = () => {
                   <td>{officer.rank}</td>
                   <td>{officer.name}</td>
                   <td>{officer.department}</td>
+                  <td>{officer.telephone_number ? officer.telephone_number : "لا يوجد"}</td>
                   <td
                   className={
                     officer.in_unit

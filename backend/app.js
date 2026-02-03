@@ -70,6 +70,7 @@ const unit = require("./routes/Unit");
 const delegate = require("./routes/Delegate");
 const shuoon = require("./routes/Shuoon");
 const event = require("./routes/Event");
+const officerDuty = require("./routes/OfficerDuty");
 
 
 
@@ -96,6 +97,7 @@ app.use("/unit", unit);
 app.use("/delegate", delegate);
 app.use("/shuoon", shuoon);
 app.use("/event", event);
+app.use("/officerDuty", officerDuty);
 
 
 // app.use("/busses", busses);

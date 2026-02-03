@@ -296,7 +296,7 @@ const ManageVacation = () => {
                   : ""}
                 الفترة إلى
               </th>
-              <th>المتبقي</th>
+              <th>الرصيد</th>
             </tr>
           </thead>
           <tbody>

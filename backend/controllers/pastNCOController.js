@@ -35,8 +35,6 @@ class PastNCOController {
         officer[0].mil_id,
         officer[0].rank,
         officer[0].address,
-        officer[0].height,
-        officer[0].weight,
         officer[0].dob,
         officer[0].end_date,
         officer[0].transferID,

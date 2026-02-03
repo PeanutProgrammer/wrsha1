@@ -20,14 +20,15 @@ class OfficerLogController {
         end_date,
         destination,
         remaining,
+        duration,
       } = req.body;
 
       const query = util.promisify(connection.query).bind(connection);
 
       const result = await query(
-        `INSERT INTO officer_leave_details (officerID, leaveTypeID, start_date, end_date, destination, remaining)
-                 VALUES (?, ?, ?, ?, ?,?)`,
-        [officerID, leaveTypeID, start_date, end_date, destination, remaining],
+        `INSERT INTO officer_leave_details (officerID, leaveTypeID, start_date, end_date, destination, remaining, duration)
+                 VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [officerID, leaveTypeID, start_date, end_date, destination, remaining, duration],
       );
 
       req.app.get("io").emit("officersUpdated");
@@ -47,7 +48,7 @@ class OfficerLogController {
         console.log(errors.array()); // Log errors
         return res.status(400).json({ errors: errors.array() });
       }
-      const { leaveTypeID, start_date, end_date, destination, remaining } =
+      const { leaveTypeID, start_date, end_date, destination, remaining, duration } =
         req.body;
       const leaveID = req.params.id;
 
@@ -64,7 +65,7 @@ class OfficerLogController {
 
       await query(
         `UPDATE officer_leave_details 
-             SET leaveTypeID = ?, start_date = ?, end_date = ?, destination = ?, remaining = ?
+             SET leaveTypeID = ?, start_date = ?, end_date = ?, destination = ?, remaining = ?, duration = ?
              WHERE id = ?`,
         [
           leaveTypeID || null,
@@ -72,6 +73,7 @@ class OfficerLogController {
           end_date || null,
           destination || null,
           remaining || null,
+          duration || null,
           leaveID,
         ],
       );
@@ -161,6 +163,7 @@ class OfficerLogController {
                 officer_leave_details.end_date,
                 officer_leave_details.destination,
                 officer_leave_details.remaining,
+                officer_leave_details.duration,
                 leave_type.name AS leaveTypeName,
                 officer.name AS officerName,
                 officer.rank AS officerRank,
@@ -347,6 +350,7 @@ class OfficerLogController {
                 old.end_date,
                 old.destination,
                 old.remaining,
+                old.duration,
                 officer.name AS officerName,
                 officer.rank AS officerRank,
                 officer.id AS officerID

@@ -281,12 +281,22 @@ const LeaderOfficersVacations = () => {
                   : ""}
                 نوع الاجازة
               </th>
+              <th onClick={() => handleSort("duration")}>
+                {sortConfig.key === "duration"
+                  ? sortConfig.direction === "asc"
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}
+                المدة
+              </th>
+
               <th onClick={() => handleSort("start_date")}>
                 {sortConfig.key === "start_date"
                   ? sortConfig.direction === "asc"
                     ? " 🔼"
                     : " 🔽"
                   : ""}
+                  
                 الفترة من
               </th>
               <th onClick={() => handleSort("end_date")}>
@@ -297,7 +307,7 @@ const LeaderOfficersVacations = () => {
                   : ""}
                 الفترة إلى
               </th>
-              <th>المتبقي</th>
+              <th>الرصيد</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -311,6 +321,7 @@ const LeaderOfficersVacations = () => {
                   <td>{officer.name}</td>
                   <td>{officer.department}</td>
                   <td>{officer.leave_type_name}</td>
+                  <td>{officer.duration || "لا يوجد"}</td>
                   <td>
                     {officer.start_date
                       ? moment(officer.start_date).format("YYYY/MM/DD")
@@ -336,7 +347,7 @@ const LeaderOfficersVacations = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="9" className="text-center">
+                <td colSpan="11" className="text-center">
                   لا توجد بيانات
                 </td>
               </tr>

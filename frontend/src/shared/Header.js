@@ -75,6 +75,9 @@ const Header = ({ collapsed }) => {
     "ncos-vacations": { label: "إجازات ضباط الصف", icon: <FaClipboardList /> },
     "soldiers-vacations": { label: "إجازات الجنود", icon: <FaClipboardList /> },
     "officer-vacation-log": { label: "سجل إجازات الضباط", icon: <FaClipboardList /> },
+    "manage-duty": { label: "نوبتجية الضباط", icon: <FaClipboardList /> },
+    "officer-view": { label: "عرض الضباط", icon: <FaClipboardList /> },
+    "leader-officer-duty": { label: "نوبتجية الضباط ", icon: <FaClipboardList /> },
 
     calendar: { label: "الإلتزامات", icon: <FaClipboardList /> },
 

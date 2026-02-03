@@ -157,7 +157,7 @@ const sortedNCOs = useMemo(() => {
       {/* Header: Search + Add + Export */}
       <div className=" header d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
         {/* Page Title */}
-        <h3>إدارة تمام الجنود</h3>
+        <h3>إدارة تمام ضباط الصف</h3>
         {/* Search bar */}
         <Form
           className="d-flex align-items-center flex-grow-1"
