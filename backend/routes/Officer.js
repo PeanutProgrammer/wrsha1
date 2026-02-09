@@ -95,7 +95,7 @@ router.get("/", allowAny(shuoonOfficers,leader), (req, res) => {
   OfficerController.getOfficers(req, res);
 });
 
-router.get("/tmam/:id", shuoonOfficers, (req, res) => {
+router.get("/tmam/:id", allowAny(shuoonOfficers, leader), (req, res) => {
   OfficerController.getOfficerTmamDetails(req, res);
 });
 

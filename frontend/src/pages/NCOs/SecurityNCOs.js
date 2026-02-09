@@ -69,7 +69,7 @@ const SecurityNCOs = () => {
         console.log("🟢 Connected to WebSocket:", socket.id);
       });
 
-      socket.on("officersUpdated", () => {
+    socket.on("ncosUpdated", () => {
         console.log("📢 ncos updated — refetching data...");
         fetchData(); // ✅ Re-fetch on update
       });
@@ -280,10 +280,8 @@ const SecurityNCOs = () => {
     <>
       <div>{moment(nco.latest_arrival).format("YYYY/MM/DD")}</div>
       <div>
-        {moment(nco.latest_arrival).format("hh:mm")}
-        <span>
-          {moment(nco.latest_arrival).format("a") === "am" ? " ص" : " م"}
-        </span>
+        {moment(nco.latest_arrival).format("hh:mm a")}
+
       </div>
     </>
   ) : (
@@ -296,10 +294,8 @@ const SecurityNCOs = () => {
     <>
       <div>{moment(nco.latest_departure).format("YYYY/MM/DD")}</div>
       <div>
-        {moment(nco.latest_departure).format("hh:mm")}
-        <span>
-          {moment(nco.latest_departure).format("a") === "am" ? " ص" : " م"}
-        </span>
+        {moment(nco.latest_departure).format("hh:mm a")}
+
       </div>
     </>
   ) : (

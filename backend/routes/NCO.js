@@ -29,7 +29,7 @@ router.post("/", shuoonSarya,
     body("attached")
         .isBoolean().withMessage("يرجى إدخال قيمة صحيحة للملحق"),
     (req, res) => {
-            NCOController.createOfficer(req, res);
+            NCOController.createNCO(req, res);
         }
 );
 
@@ -45,7 +45,7 @@ router.put(
   body("dob").isDate().withMessage("يرجى إدخال تاريخ الميلاد بشكل صحيح"),
   body("attached").isBoolean().withMessage("يرجى إدخال قيمة صحيحة للملحق"),
   (req, res) => {
-    NCOController.updateOfficer(req, res);
+    NCOController.updateNCO(req, res);
     console.log("BODY RECEIVED:", req.body);
   }
 );
@@ -54,13 +54,13 @@ router.put(
 
 
 router.delete("/:mil_id", admin,  (req, res) => {
-    NCOController.deleteOfficer(req, res);
+    NCOController.deleteNCO(req, res);
 });
 
 
 
 router.get("/filter",  authorized,(req, res) => {
-    NCOController.filterOfficers(req, res);
+    NCOController.filterNCOs(req, res);
 });  
 
 router.get("/daily-summary", allowAny(security,leader,shuoonSarya), (req, res) => {
@@ -75,34 +75,34 @@ router.get("/vacations", allowAny(shuoonSarya, leader), (req,res) => {
 
 
 router.get("/", allowAny(gate,shuoonSarya, leader),(req, res) => {
-    NCOController.getOfficers(req, res);
+    NCOController.getNCOs(req, res);
 });
 
 router.get("/tmam/:id", shuoonSarya, (req,res) => {
-    NCOController.getOfficerTmamDetails(req,res);
+    NCOController.getNCOTmamDetails(req,res);
 });
 
 router.get("/tmam", allowAny(security,shuoonSarya, leader), (req,res) => {
-    NCOController.getOfficersTmam(req,res);
+    NCOController.getNCOsTmam(req,res);
 });
 
 
 
 
 router.get("/log", shuoonSarya, (req,res) => {
-    NCOController.getOfficersTmam(req,res);
+    NCOController.getNCOsTmam(req,res);
 });
 
 router.get("/current", gate, (req, res) => {
-    NCOController.getCurrentOfficers(req, res);
+    NCOController.getCurrentNCOs(req, res);
 });
 
 router.get("/absent", gate, (req, res) => {
-    NCOController.getAbsentOfficers(req, res);
+    NCOController.getAbsentNCOs(req, res);
 });
 
 router.get("/:id", allowAny(shuoonSarya, leader), (req, res) => {
-    NCOController.getOfficer(req, res);
+    NCOController.getNCO(req, res);
 });
 
 

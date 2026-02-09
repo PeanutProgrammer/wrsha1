@@ -14,7 +14,6 @@ router.post(
   "/",
   gate,
   body("ncoID").isNumeric().withMessage("من فضلك أدخل اسم ضابط صف صحيح"),
-  body("leaveTypeID").isNumeric().withMessage("من فضلك أدخل نوع عودة صحيح"),
   body("loggerID").isNumeric(),
   body("event_type").isAlphanumeric("ar-EG"),
   body("event_time").custom((value) => {
@@ -41,7 +40,6 @@ router.post(
   "/departure",
   gate,
   body("ncoID").isNumeric().withMessage("من فضلك أدخل اسم ضابط صف صحيح"),
-  body("leaveTypeID").isNumeric().withMessage("من فضلك أدخل نوع عودة صحيح"),
   body("loggerID").isNumeric(),
   body("event_type").isAlphanumeric("ar-EG"),
   body("event_time").custom((value) => {
@@ -59,29 +57,7 @@ router.post(
     return true;
   }),
   // New validation for start_date, end_date, and destination
-  body("start_date").custom((value, { req }) => {
-    if (!moment(value, "YYYY-MM-DD", true).isValid()) {
-      throw new Error(
-        "تاريخ ووقت الخروج يجب أن يكون بالتنسيق الصحيح (YYYY-MM-DD)."
-      );
-    }
-    if (moment(value).isAfter(req.body.end_date)) {
-      throw new Error("تاريخ ووقت الخروج يجب أن يكون قبل تاريخ الانتهاء.");
-    }
-    return true;
-  }),
-  body("end_date").custom((value, { req }) => {
-    if (!moment(value, "YYYY-MM-DD", true).isValid()) {
-      throw new Error(
-        "تاريخ ووقت العودة يجب أن يكون بالتنسيق الصحيح (YYYY-MM-DD)."
-      );
-    }
-    if (moment(value).isBefore(req.body.start_date)) {
-      throw new Error("تاريخ ووقت العودة يجب أن يكون بعد تاريخ البدء.");
-    }
-    return true;
-  }),
-  body("destination").isString().withMessage("من فضلك أدخل الوجهة.").optional(),
+ 
 
   (req, res) => {
     NcoLogController.createDeparture(req, res);

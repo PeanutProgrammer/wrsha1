@@ -1,12 +1,11 @@
 const NCO = require("../models/nco");
-const { validationResult, check } = require("express-validator");
+const { validationResult } = require("express-validator");
 const connection = require("../db/dbConnection");
 const util = require("util");
 const moment = require("moment");
-const PastNCO = require("../models/pastNCO");
 
 class NCOController {
-  static async createOfficer(req, res) {
+  static async createNCO(req, res) {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -14,11 +13,12 @@ class NCOController {
       }
 
       const query = util.promisify(connection.query).bind(connection);
-      const checkOfficer = await query("SELECT * from ncos where mil_id = ?", [
-        req.body.mil_id,
-      ]);
+      const checkNCO = await query(
+        "SELECT * from ncos where mil_id = ?",
+        [req.body.mil_id]
+      );
 
-      if (checkOfficer.length > 0) {
+      if (checkNCO.length > 0) {
         return res.status(400).json({
           errors: [
             {
@@ -28,41 +28,40 @@ class NCOController {
         });
       }
 
-      const officerObject = new NCO(
+      const ncoObject = new NCO(
         req.body.name,
         req.body.join_date,
         req.body.department,
         req.body.mil_id,
         req.body.rank,
         req.body.address,
-
         req.body.dob,
-        true, // in_unit defaults to true on creation
-        req.body.attached
+        true,
+        req.body.attached || false
       );
 
       await query(
-        "insert into ncos set name =?, join_date = ?, department = ?, mil_id = ?, `rank` = ?, address = ?, dob = ?, attached = ? ",
+        "insert into ncos set name =?, join_date = ?, department = ?, mil_id = ?, `rank` = ?, address = ?, dob = ?, attached = ?",
         [
-          officerObject.getName(),
-          officerObject.getJoinDate(),
-          officerObject.getDepartment(),
-          officerObject.getMilID(),
-          officerObject.getRank(),
-          officerObject.getAddress(),
-          officerObject.getDOB(),
-          officerObject.getAttached(),
+          ncoObject.getName(),
+          ncoObject.getJoinDate(),
+          ncoObject.getDepartment(),
+          ncoObject.getMilID(),
+          ncoObject.getRank(),
+          ncoObject.getAddress(),
+          ncoObject.getDOB(),
+          ncoObject.getAttached(),
         ]
       );
-      req.app.get("io").emit("ncosUpdated");
 
-      return res.status(200).json(officerObject.toJSON());
+      req.app.get("io").emit("ncosUpdated");
+      return res.status(200).json(ncoObject.toJSON());
     } catch (err) {
-      return res.status(500).json({ err: "error" });
+      return res.status(500).json({ err: err });
     }
   }
 
-  static async updateOfficer(req, res) {
+  static async updateNCO(req, res) {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -70,11 +69,11 @@ class NCOController {
       }
 
       const query = util.promisify(connection.query).bind(connection);
-      const checkOfficer = await query("SELECT * from ncos where id = ?", [
+      const checkNCO = await query("SELECT * from ncos where id = ?", [
         req.params.id,
       ]);
 
-      if (checkOfficer.length == 0) {
+      if (checkNCO.length == 0) {
         return res.status(400).json({
           errors: [
             {
@@ -84,7 +83,7 @@ class NCOController {
         });
       }
 
-      const officerObject = new NCO(
+      const ncoObject = new NCO(
         req.body.name,
         req.body.join_date,
         req.body.department,
@@ -92,8 +91,8 @@ class NCOController {
         req.body.rank,
         req.body.address,
         req.body.dob,
-        checkOfficer[0].in_unit,
-        req.body.attached
+        checkNCO[0].in_unit,
+        req.body.attached || false
       );
 
       console.log("hello");
@@ -101,22 +100,22 @@ class NCOController {
       await query(
         "update ncos set name =?, join_date = ?, department = ?, `rank` = ?, address = ?, dob = ?, attached = ? where id = ?",
         [
-          officerObject.getName(),
-          officerObject.getJoinDate(),
-          officerObject.getDepartment(),
-          officerObject.getRank(),
-          officerObject.getAddress(),
-          officerObject.getDOB(),
-          officerObject.getAttached(),
-          checkOfficer[0].id,
+          ncoObject.getName(),
+          ncoObject.getJoinDate(),
+          ncoObject.getDepartment(),
+          ncoObject.getRank(),
+          ncoObject.getAddress(),
+          ncoObject.getDOB(),
+          ncoObject.getAttached(),
+          checkNCO[0].id,
         ]
       );
 
-      console.log("Name:", officerObject.getName());
-      console.log("Join Date:", officerObject.getJoinDate());
-      console.log("Department:", officerObject.getDepartment());
-      console.log("Mil ID:", officerObject.getMilID());
-      console.log("Rank:", officerObject.getRank());
+      console.log("Name:", ncoObject.getName());
+      console.log("Join Date:", ncoObject.getJoinDate());
+      console.log("Department:", ncoObject.getDepartment());
+      console.log("Mil ID:", ncoObject.getMilID());
+      console.log("Rank:", ncoObject.getRank());
 
       console.log(req.body.department);
 
@@ -128,7 +127,7 @@ class NCOController {
     }
   }
 
-  static async deleteOfficer(req, res) {
+  static async deleteNCO(req, res) {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -137,73 +136,66 @@ class NCOController {
 
       const query = util.promisify(connection.query).bind(connection);
 
-      const checkOfficer = await query("SELECT * from ncos where mil_id = ?", [
-        req.params.mil_id,
-      ]);
+      // Check if the nco exists
+      const checkNCO = await query(
+        "SELECT * FROM ncos WHERE mil_id = ?",
+        [req.params.mil_id]
+      );
 
-      if (checkOfficer.length == 0) {
+      if (checkNCO.length === 0) {
         return res.status(400).json({
-          errors: [
-            {
-              msg: "NCO does not exist",
-            },
-          ],
+          errors: [{ msg: "NCO does not exist" }],
         });
       }
 
-      console.log(checkOfficer[0].mil_id);
-
-      // Create a PastOfficer object with the officer's data
-      const PastNCOObject = new PastNCO(
-        checkOfficer[0].name,
-        checkOfficer[0].join_date,
-
-        checkOfficer[0].mil_id,
-        checkOfficer[0].rank,
-        checkOfficer[0].address,
-        checkOfficer[0].dob,
+      // Create a PastNCO object with the nco's data
+      const PastNCOObject = {
+        mil_id: checkNCO[0].mil_id,
+        rank: checkNCO[0].rank,
+        name: checkNCO[0].name,
+        join_date: checkNCO[0].join_date,
+        address: checkNCO[0].address,
+        dob: checkNCO[0].dob,
         // If you have additional fields such as 'end_date', 'transferID', etc.
-        req.body.end_date || new Date().toISOString(),
-        req.body.transferID || null,
-        req.body.transferred_to || null
-      );
+        end_date: req.body.end_date || new Date().toISOString(),
+        transferID: req.body.transferID || null,
+        transferred_to: req.body.transferred_to || null,
+      };
 
-      console.log(PastNCOObject.getMilID());
-
-      // Insert the officer data into the past_officers table
+      // Insert the nco data into the past_ncos table
       await query(
-        "INSERT INTO past_ncos set mil_id = ?, `rank` = ?, name = ?, join_date = ?, address = ?, dob = ?, end_date = ?, transferID = ?, transferred_to = ?",
+        "INSERT INTO past_ncos (mil_id, `rank`, name, join_date, address, dob, end_date, transferID, transferred_to) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
         [
-          PastNCOObject.getMilID(),
-          PastNCOObject.getRank(),
-          PastNCOObject.getName(),
-          PastNCOObject.getJoinDate(),
-          PastNCOObject.getAddress(),
-
-          PastNCOObject.getDOB(),
-          PastNCOObject.getEndDate(),
-          PastNCOObject.getTransferID(),
-          PastNCOObject.getTransferredTo(),
+          PastNCOObject.mil_id,
+          PastNCOObject.rank,
+          PastNCOObject.name,
+          PastNCOObject.join_date,
+          PastNCOObject.address,
+          PastNCOObject.dob,
+          PastNCOObject.end_date,
+          PastNCOObject.transferID,
+          PastNCOObject.transferred_to,
         ]
       );
 
-      await query("delete from ncos where mil_id = ?", [
-        checkOfficer[0].mil_id,
+      // Now delete the nco from the ncos table
+      await query("DELETE FROM ncos WHERE mil_id = ?", [
+        checkNCO[0].mil_id,
       ]);
 
+      // Emit the update (if you're using socket.io or any real-time system)
       req.app.get("io").emit("ncosUpdated");
 
       return res.status(200).json({
-        msg: "NCO deleted!",
+        msg: "NCO deleted and moved to past_ncos!",
       });
     } catch (err) {
-      return res
-        .status(500)
-        .json({ message: "An unexpected error occurred", error: err.message });
+      console.error("Error in deleting nco:", err);
+      return res.status(500).json({ err: err.message || err });
     }
   }
 
-  static async getOfficers(req, res) {
+  static async getNCOs(req, res) {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -257,7 +249,8 @@ class NCOController {
       });
     }
   }
-  static async getOfficer(req, res) {
+
+  static async getNCO(req, res) {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -281,7 +274,7 @@ class NCOController {
 
       console.log(nco[0]);
 
-      const officerObject = new NCO(
+      const ncoObject = new NCO(
         nco[0].name,
         nco[0].join_date,
         nco[0].department,
@@ -292,13 +285,14 @@ class NCOController {
         nco[0].in_unit,
         nco[0].attached
       );
-      return res.status(200).json(officerObject.toJSON());
+      console.log(ncoObject.toJSON());
+      return res.status(200).json(ncoObject.toJSON());
     } catch (err) {
       return res.status(500).json({ err: err });
     }
   }
 
-  static async getOfficersTmam(req, res) {
+  static async getNCOsTmam(req, res) {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -306,7 +300,6 @@ class NCOController {
       }
 
       const query = util.promisify(connection.query).bind(connection);
-
       // --- Pagination params ---
       const page = parseInt(req.query.page) || 1; // default to page 1
       const limit = parseInt(req.query.limit) || 20; // default 20 rows per page
@@ -327,59 +320,54 @@ class NCOController {
       const total = countResult[0].total;
       const totalPages = Math.ceil(total / limit);
 
-      console.log("hey");
-
       const ncos = await query(
         `
 SELECT 
-    o.mil_id,
-    o.rank,
-    o.name,
-    o.department,
-    o.in_unit,
+  o.mil_id,
+  o.rank,
+  o.name,
+  o.department,
+  o.in_unit,
 
-    -- Last departure
-    (
-        SELECT ol.event_time
-        FROM nco_log ol
-        WHERE ol.ncoID = o.id AND ol.event_type = 'خروج'
-        ORDER BY ol.event_time DESC
-        LIMIT 1
-    ) AS latest_departure,
+  (
+    SELECT ol.event_time
+    FROM nco_log ol
+    WHERE ol.ncoID = o.id AND ol.event_type = 'خروج'
+    ORDER BY ol.event_time DESC
+    LIMIT 1
+  ) AS latest_departure,
 
-    -- Last arrival
-    (
-        SELECT ol.event_time
-        FROM nco_log ol
-        WHERE ol.ncoID = o.id AND ol.event_type = 'دخول'
-        ORDER BY ol.event_time DESC
-        LIMIT 1
-    ) AS latest_arrival,
+  (
+    SELECT ol.event_time
+    FROM nco_log ol
+    WHERE ol.ncoID = o.id AND ol.event_type = 'دخول'
+    ORDER BY ol.event_time DESC
+    LIMIT 1
+  ) AS latest_arrival,
 
-        -- Latest leave ID
-    (
-        SELECT id
-        FROM nco_leave_details old
-        WHERE old.ncoID = o.id
-        ORDER BY old.id DESC
-        LIMIT 1
-    ) AS latest_leave_id,
+  (
+    SELECT old.id
+    FROM nco_leave_details old
+    WHERE old.ncoID = o.id
+      AND CURDATE() BETWEEN old.start_date AND old.end_date
+    LIMIT 1
+  ) AS active_tmam_id,
 
-    lt.name AS tmam
+  (
+    SELECT lt.name
+    FROM nco_leave_details old
+    JOIN leave_type lt ON lt.id = old.leaveTypeID
+    WHERE old.ncoID = o.id
+      AND CURDATE() BETWEEN old.start_date AND old.end_date
+    LIMIT 1
+  ) AS active_tmam
+
 FROM ncos o
-LEFT JOIN nco_leave_details old
-    ON old.id = (
-        SELECT id
-        FROM nco_leave_details
-        WHERE ncoID = o.id
-        ORDER BY id DESC
-        LIMIT 1
-    )
-LEFT JOIN leave_type lt
-    ON lt.id = old.leaveTypeID
-    ${searchClause}
+${searchClause}
 ORDER BY o.id
-LIMIT ? OFFSET ?`,
+LIMIT ? OFFSET ?
+
+`,
         [...params, limit, offset]
       );
 
@@ -406,7 +394,7 @@ LIMIT ? OFFSET ?`,
     }
   }
 
-  static async getOfficerTmamDetails(req, res) {
+  static async getNCOTmamDetails(req, res) {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -414,56 +402,65 @@ LIMIT ? OFFSET ?`,
       }
 
       const query = util.promisify(connection.query).bind(connection);
-      // let search = ""
-      // if (req.query.search) {
-      //     search =  `where name LIKE '%${req.query.search}%'`
-      // }
-      const nco = await query("select * from ncos where mil_id = ?", [
+
+      // Ensure nco exists
+      const nco = await query("SELECT id FROM ncos WHERE mil_id = ?", [
         req.params.id,
       ]);
-      console.log("hey");
-      if (nco.length == 0) {
+
+      if (nco.length === 0) {
         return res.status(404).json({
-          msg: "no ncos found blah",
+          msg: "NCO not found",
         });
       }
 
-      const officerObject = new NCO(
-        nco[0].name,
-        nco[0].join_date,
-        nco[0].department,
-        nco[0].mil_id,
-        nco[0].rank,
-        nco[0].address,
-        nco[0].dob,
-        nco[0].in_unit,
-        nco[0].attached
+      // Past TMAMs (Shuoon only)
+      const tmamHistory = await query(
+        `
+      SELECT
+          o.mil_id,
+          o.rank,
+          o.name,
+          o.department,
+
+          old.id AS tmam_id,
+          lt.name AS tmam,
+          old.start_date,
+          old.end_date,
+          old.destination,
+          old.duration,
+          old.remaining
+
+      FROM ncos o
+      JOIN nco_leave_details old
+          ON old.ncoID = o.id
+      JOIN leave_type lt
+          ON lt.id = old.leaveTypeID
+
+      WHERE o.mil_id = ?
+        AND old.end_date < CURDATE()
+        AND lt.id IN (1,2,3,4,5,6,7,8,10,11,12,13,14,22)
+
+      ORDER BY old.start_date DESC
+      `,
+        [req.params.id]
       );
-      const officerTmam = await query(
-        `SELECT ncos.mil_id ,ncos.rank,ncos.name, ncos.department, ncos.in_unit, ncos.join_date, leave_type.name AS 'tmam', nco_leave_details.start_date, nco_leave_details.end_date, nco_leave_details.destination, nco_log.notes, nco_log.event_type, nco_log.event_time
-                                          FROM ncos
-                                          LEFT JOIN nco_leave_details
-                                          ON ncos.id = nco_leave_details.ncoID
-                                          LEFT JOIN nco_log
-                                          ON nco_leave_details.MovementID = nco_log.id
-                                          LEFT JOIN leave_type
-                                          on leave_type.id = nco_leave_details.leaveTypeID
 
-                                          WHERE ncos.mil_id = ?
-                                          ORDER BY nco_leave_details.id DESC
-                                          `,
-        [officerObject.getMilID()]
-      );
-
-      console.log(officerTmam[0]);
-
-      return res.status(200).json(officerTmam);
+      return res.status(200).json({
+        ncoMilId: req.params.id,
+        total: tmamHistory.length,
+        data: tmamHistory,
+      });
     } catch (err) {
-      return res.status(500).json({ err: err });
+      console.error(err);
+      return res.status(500).json({
+        message: "An unexpected error occurred",
+        error: err.message,
+      });
     }
   }
 
-  static async filterOfficers(req, res) {
+  static async filterNCOs(req, res) {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -485,7 +482,7 @@ LIMIT ? OFFSET ?`,
       }
 
       if (req.query.name) {
-        filters.push(`(name LIKE ?)`);
+        filters.push(`name LIKE ?`);
         params.push(`%${req.query.name}%`);
       }
 
@@ -525,19 +522,19 @@ LIMIT ? OFFSET ?`,
         });
       }
 
-      // Optional: filter out officers who joined in the future
-      const validOfficers = ncos.filter((nco) =>
+      // Optional: filter out ncos who joined in the future
+      const validNCOs = ncos.filter((nco) =>
         moment(nco.join_date).isBefore(now)
       );
 
-      return res.status(200).json(validOfficers);
+      return res.status(200).json(validNCOs);
     } catch (err) {
       console.error(err);
       return res.status(500).json({ err: err.message });
     }
   }
 
-  static async getCurrentOfficers(req, res) {
+  static async getCurrentNCOs(req, res) {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -549,7 +546,7 @@ LIMIT ? OFFSET ?`,
       if (req.query.search) {
         search = `where name LIKE '%${req.query.search}%'`;
       }
-      const ncos = await query(`select * from ncos where in_unit = 1`);
+      const ncos = await query(`select * from ncos where in_unit = 1 `);
 
       if (ncos.length == 0) {
         return res.status(404).json({
@@ -563,7 +560,7 @@ LIMIT ? OFFSET ?`,
     }
   }
 
-  static async getAbsentOfficers(req, res) {
+  static async getAbsentNCOs(req, res) {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -575,7 +572,8 @@ LIMIT ? OFFSET ?`,
       if (req.query.search) {
         search = `where name LIKE '%${req.query.search}%'`;
       }
-      const ncos = await query(`SELECT
+      const ncos = await query(`
+SELECT
     o.id,
     o.mil_id,
     o.rank,
@@ -599,7 +597,7 @@ LEFT JOIN nco_log ol
     ON ol.ncoID = o.id 
     AND ol.event_time = lastLog.latest_event
 
--- 🔥 Get the LATEST leave_details row for each officer
+-- 🔥 Get the LATEST leave_details row for each nco
 LEFT JOIN nco_leave_details old
     ON old.id = (
         SELECT id
@@ -609,11 +607,13 @@ LEFT JOIN nco_leave_details old
         LIMIT 1
     )
 
+-- 🔥 Get leave type from nco_leave_details, not nco_log
 LEFT JOIN leave_type lt
     ON lt.id = old.leaveTypeID
 
-WHERE o.in_unit = 0; `);
+WHERE o.in_unit = 0;
 
+`);
       if (ncos.length == 0) {
         return res.status(404).json({
           msg: "no ncos found hey",
@@ -623,156 +623,6 @@ WHERE o.in_unit = 0; `);
       return res.status(200).json(ncos);
     } catch (err) {
       return res.status(500).json({ err: err });
-    }
-  }
-
-  static async getDailySummary(req, res) {
-    try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
-
-      const query = util.promisify(connection.query).bind(connection);
-
-      // Query all officers' data for the summary calculation
-      const officers = await query(`
-SELECT 
-    o.mil_id,
-    o.rank,
-    o.name,
-    o.department,
-    o.in_unit,
-    o.attached,
-
-
-    -- Latest leave ID
-    (
-        SELECT id
-        FROM officer_leave_details old
-        WHERE old.officerID = o.id
-        ORDER BY old.id DESC
-        LIMIT 1
-    ) AS latest_leave_id,
-
-    lt.name AS tmam
-FROM ncos o
-LEFT JOIN nco_leave_details old
-    ON old.id = (
-        SELECT id
-        FROM nco_leave_details
-        WHERE ncoID = o.id
-        ORDER BY id DESC
-        LIMIT 1
-    )
-LEFT JOIN leave_type lt
-    ON lt.id = old.leaveTypeID;
-    `);
-
-      if (!officers.length) {
-        return res.status(404).json({ msg: "No officers found" });
-      }
-
-      // Calculate the summary
-      const totalOfficers = officers.length;
-      const totalAttached = officers.filter(
-        (officer) => officer.attached
-      ).length;
-      const available = officers.filter((officer) => officer.in_unit).length;
-      const missing = totalOfficers - available;
-      const fixedMission = officers.filter(
-        (officer) => officer.tmam === "مأمورية ثابتة" && !officer.in_unit
-      ).length;
-      const course = officers.filter(
-        (officer) => officer.tmam === "فرقة / دورة" && !officer.in_unit
-      ).length;
-
-      // Breakdown for اجازة types
-      const normalLeave = officers.filter(
-        (officer) => officer.tmam === "راحة" && !officer.in_unit
-      ).length;
-      const compensatoryLeave = officers.filter(
-        (officer) => officer.tmam === "بدل راحة" && !officer.in_unit
-      ).length;
-      const casualLeave = officers.filter(
-        (officer) => officer.tmam === "عارضة" && !officer.in_unit
-      ).length;
-      const fieldLeave = officers.filter(
-        (officer) => officer.tmam === "اجازة ميدانية" && !officer.in_unit
-      ).length;
-      const grantLeave = officers.filter(
-        (officer) => officer.tmam === "منحة" && !officer.in_unit
-      ).length;
-
-      // Other categories
-      const annualLeave = officers.filter(
-        (officer) => officer.tmam === "اجازة سنوية" && !officer.in_unit
-      ).length;
-      const sickLeave = officers.filter(
-        (officer) => officer.tmam === "اجازة مرضية" && !officer.in_unit
-      ).length;
-      const travel = officers.filter(
-        (officer) => officer.tmam === "سفر" && !officer.in_unit
-      ).length;
-      const mission = officers.filter(
-        (officer) =>
-          (officer.tmam === "مأمورية" ||
-            officer.tmam === "مأمورية جهاز الخدمات العامة") &&
-          !officer.in_unit
-      ).length;
-      const hospital = officers.filter(
-        (officer) => officer.tmam === "عيادة" && !officer.in_unit
-      ).length;
-
-      // Calculating total exits (اجمالي الخوارج)
-      const totalExits =
-        fixedMission +
-        course +
-        normalLeave +
-        compensatoryLeave +
-        casualLeave +
-        fieldLeave +
-        grantLeave +
-        annualLeave +
-        sickLeave +
-        travel +
-        mission +
-        hospital;
-
-      // Calculate the percentage of available officers
-      const percentageAvailable = totalOfficers
-        ? ((missing / totalOfficers) * 100).toFixed(2)
-        : 0;
-
-      // Return the daily summary response
-      return res.status(200).json({
-        total: totalOfficers,
-        available: available,
-        attached: totalAttached,
-        missing: missing,
-        تمام_الخوارج: {
-          ثابتة: fixedMission,
-          فرقة_دورة: course,
-          راحة: normalLeave,
-          بدل_راحة: compensatoryLeave,
-          عارضة: casualLeave,
-          اجازة_ميدانية: fieldLeave,
-          منحة: grantLeave,
-          اجازة_سنوية: annualLeave,
-          اجازة_مرضية: sickLeave,
-          سفر: travel,
-          مأمورية: mission,
-          مستشفى: hospital,
-        },
-        اجمالي_الخوارج: totalExits,
-        percentageAvailable: percentageAvailable,
-      });
-    } catch (err) {
-      console.error(err);
-      return res.status(500).json({
-        message: "An unexpected error occurred",
-        error: err.message,
-      });
     }
   }
 
@@ -795,64 +645,65 @@ LEFT JOIN leave_type lt
       const params = [];
       if (req.query.search) {
         searchClause =
-          "AND (n.name LIKE ? OR n.department LIKE ? OR n.mil_id LIKE ? OR n.rank LIKE ?)";
+          "AND (o.name LIKE ? OR o.department LIKE ? OR o.mil_id LIKE ? OR o.rank LIKE ?)";
         const searchValue = `%${req.query.search}%`;
         params.push(searchValue, searchValue, searchValue, searchValue);
       }
 
       // --- Total count for pagination ---
-      const countQuery = `SELECT COUNT(*) AS total FROM ncos n JOIN 
-    nco_leave_details nld ON n.id = nld.ncoID
+      const countQuery = `SELECT COUNT(*) AS total FROM ncos o JOIN 
+    nco_leave_details old ON o.id = old.ncoID
 JOIN 
-    leave_type lt ON nld.leaveTypeID = lt.id
+    leave_type lt ON old.leaveTypeID = lt.id
 WHERE 
-    nld.leaveTypeID IN (1, 2, 3, 5, 6, 7, 11, 12, 13)  -- filter by leave types
-    AND n.in_unit = 0  -- filter for officers not in unit
-    AND nld.id = (
-        -- Subquery to get the latest leave record for each officer
+    old.leaveTypeID IN (1, 2, 3, 5, 6, 7, 11, 12, 13)  -- filter by leave types
+    AND o.in_unit = 0  -- filter for ncos not in unit
+    AND old.id = (
+        -- Subquery to get the latest leave record for each nco
         SELECT MAX(id) 
         FROM nco_leave_details 
-        WHERE ncoID = n.id
+        WHERE ncoID = o.id
     )  ${searchClause}`;
       const countResult = await query(countQuery, params);
       const total = countResult[0].total;
       const totalPages = Math.ceil(total / limit);
 
       // --- Main query ---
-      const NCOsQuery = `
+      const ncosQuery = `
       SELECT 
-    n.mil_id, 
-    n.name, 
-    n.rank, 
-    n.department,
-    nld.leaveTypeID,
-    nld.start_date,
-    nld.end_date,
+    o.mil_id, 
+    o.name, 
+    o.rank, 
+    o.department,
+    old.leaveTypeID,
+    old.start_date,
+    old.end_date,
+    old.remaining,
+    old.duration,
     lt.name AS leave_type_name
 FROM 
-    ncos n
+    ncos o
 JOIN 
-    nco_leave_details nld ON n.id = nld.ncoID
+    nco_leave_details old ON o.id = old.ncoID
 JOIN 
-    leave_type lt ON nld.leaveTypeID = lt.id
+    leave_type lt ON old.leaveTypeID = lt.id
 WHERE 
-    nld.leaveTypeID IN (1, 2, 3, 5, 6, 7, 11, 12, 13)  -- filter by leave types
-    AND n.in_unit = 0  -- filter for officers not in unit
-    AND nld.id = (
-        -- Subquery to get the latest leave record for each officer
+    old.leaveTypeID IN (1, 2, 3, 5, 6, 7, 11, 12, 13)  -- filter by leave types
+    AND old.id = (
+        -- Subquery to get the latest leave record for each nco
         SELECT MAX(id) 
         FROM nco_leave_details 
-        WHERE ncoID = n.id
+        WHERE ncoID = o.id
     )
-         AND nld.start_date <= CURRENT_DATE AND nld.end_date >= CURRENT_DATE
+         AND CURRENT_DATE() BETWEEN old.start_date AND old.end_date
     ${searchClause}  -- for any additional search filters
 LIMIT ? OFFSET ?
 `;
 
       // --- Execute the query ---
-      const NCOs = await query(NCOsQuery, [...params, limit, offset]);
+      const ncos = await query(ncosQuery, [...params, limit, offset]);
 
-      if (!NCOs.length) {
+      if (!ncos.length) {
         return res.status(404).json({ msg: "No ncos found" });
       }
 
@@ -861,7 +712,282 @@ LIMIT ? OFFSET ?
         limit,
         total,
         totalPages,
-        data: NCOs,
+        data: ncos,
+      });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({
+        message: "An unexpected error occurred",
+        error: err.message,
+      });
+    }
+  }
+
+  static async getMissionNCOs(req, res) {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const query = util.promisify(connection.query).bind(connection);
+
+      // --- Pagination params ---
+      const page = parseInt(req.query.page) || 1; // default to page 1
+      const limit = parseInt(req.query.limit) || 20; // default 20 rows per page
+      const offset = (page - 1) * limit;
+
+      // --- Search params ---
+      let searchClause = "";
+      const params = [];
+      if (req.query.search) {
+        searchClause =
+          "AND (o.name LIKE ? OR o.department LIKE ? OR o.mil_id LIKE ? OR o.rank LIKE ?)";
+        const searchValue = `%${req.query.search}%`;
+        params.push(searchValue, searchValue, searchValue, searchValue);
+      }
+
+      // --- Total count for pagination ---
+      const countQuery = `SELECT COUNT(*) AS total FROM ncos o JOIN nco_leave_details old ON o.id = old.ncoID
+  WHERE o.in_unit = 0
+    AND old.leaveTypeID IN (4, 15, 19)
+    AND CURDATE() BETWEEN old.start_date AND old.end_date
+    AND old.id = (
+        -- Subquery to get the latest mission leave for each nco
+        SELECT MAX(id) 
+        FROM nco_leave_details 
+        WHERE ncoID = o.id 
+        AND leaveTypeID IN (4, 15, 19)  -- filter by mission leave types
+    ) ${searchClause}`;
+      const countResult = await query(countQuery, params);
+      const total = countResult[0].total;
+      const totalPages = Math.ceil(total / limit);
+
+      // --- Main query ---
+      const ncosQuery = `
+      SELECT 
+    o.mil_id, 
+    o.name, 
+    o.rank, 
+    o.department,
+    old.leaveTypeID,
+    old.start_date,
+    old.end_date,
+    old.destination,
+    lt.name AS leave_type_name
+FROM 
+    ncos o
+JOIN 
+    nco_leave_details old ON o.id = old.ncoID
+JOIN 
+    leave_type lt ON old.leaveTypeID = lt.id
+WHERE 
+    old.leaveTypeID IN (4, 15, 19)  -- filter for mission leave types
+    AND o.in_unit = 0  -- ncos not in unit
+    AND CURDATE() BETWEEN old.start_date AND old.end_date  -- leave is ongoing today
+    AND old.id = (
+        -- Subquery to get the latest mission leave for each nco
+        SELECT MAX(id) 
+        FROM nco_leave_details 
+        WHERE ncoID = o.id 
+        AND leaveTypeID IN (4, 15, 19)  -- filter by mission leave types
+    )
+
+        ${searchClause}
+      LIMIT ? OFFSET ?`;
+
+      // --- Execute the query ---
+      const ncos = await query(ncosQuery, [...params, limit, offset]);
+
+      if (!ncos.length) {
+        return res.status(404).json({ msg: "No ncos found" });
+      }
+
+      console.log(ncosQuery);
+      return res.status(200).json({
+        page,
+        limit,
+        total,
+        totalPages,
+        data: ncos,
+      });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({
+        message: "An unexpected error occurred",
+        error: err.message,
+      });
+    }
+  }
+
+  static async getCourseNCOs(req, res) {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const query = util.promisify(connection.query).bind(connection);
+
+      // --- Pagination params ---
+      const page = parseInt(req.query.page) || 1; // default to page 1
+      const limit = parseInt(req.query.limit) || 20; // default 20 rows per page
+      const offset = (page - 1) * limit;
+
+      // --- Search params ---
+      let searchClause = "";
+      const params = [];
+      if (req.query.search) {
+        searchClause =
+          "AND (o.name LIKE ? OR o.department LIKE ? OR o.mil_id LIKE ? OR o.rank LIKE ?)";
+        const searchValue = `%${req.query.search}%`;
+        params.push(searchValue, searchValue, searchValue, searchValue);
+      }
+
+      // --- Total count for pagination ---
+      const countQuery = `SELECT COUNT(*) AS total FROM ncos o JOIN 
+        nco_leave_details old ON o.id = old.ncoID
+      JOIN 
+        leave_type lt ON old.leaveTypeID = lt.id
+      WHERE 
+        old.leaveTypeID IN (8)
+        AND CURDATE() BETWEEN old.start_date AND old.end_date ${searchClause}`;
+      const countResult = await query(countQuery, params);
+      const total = countResult[0].total;
+      const totalPages = Math.ceil(total / limit);
+
+      // --- Main query ---
+      const ncosQuery = `
+      SELECT 
+        o.mil_id, 
+        o.name, 
+        o.rank, 
+        o.department,
+        old.leaveTypeID,
+        old.start_date,
+        old.end_date,
+        old.destination,
+        lt.name AS leave_type_name
+      FROM 
+        ncos o
+      JOIN 
+        nco_leave_details old ON o.id = old.ncoID
+      JOIN 
+        leave_type lt ON old.leaveTypeID = lt.id
+      WHERE 
+        old.leaveTypeID IN (8)
+        AND CURDATE() BETWEEN old.start_date AND old.end_date
+        ${searchClause}
+      LIMIT ? OFFSET ?`;
+
+      // --- Execute the query ---
+      const ncos = await query(ncosQuery, [...params, limit, offset]);
+
+      if (!ncos.length) {
+        return res.status(404).json({ msg: "No ncos found" });
+      }
+
+      return res.status(200).json({
+        page,
+        limit,
+        total,
+        totalPages,
+        data: ncos,
+      });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({
+        message: "An unexpected error occurred",
+        error: err.message,
+      });
+    }
+  }
+
+  static async getDailySummary(req, res) {
+    try {
+      const query = util.promisify(connection.query).bind(connection);
+      const today = moment().format("YYYY-MM-DD"); // today
+
+      // Fetch all ncos
+      const ncos = await query(`
+            SELECT 
+        o.id,
+        o.mil_id,
+        o.rank,
+        o.name,
+        o.department,
+        o.attached,
+
+        -- Active leave for today
+        old.id AS active_tmam_id,
+        lt.name AS tmam
+      FROM ncos o
+      LEFT JOIN nco_leave_details old
+        ON old.ncoID = o.id
+      AND CURDATE() BETWEEN old.start_date AND old.end_date
+
+      LEFT JOIN leave_type lt
+        ON lt.id = old.leaveTypeID;
+
+    `);
+
+      if (!ncos.length) {
+        return res.status(404).json({ msg: "No ncos found" });
+      }
+
+      // Total attached ncos
+      const totalAttached = ncos.filter((o) => o.attached).length;
+      const totalNCOs = ncos.length - totalAttached;
+
+      // Available = ncos who have **no active tmam today**
+      const available = ncos.filter((o) => !o.active_tmam_id).length;
+      const missing = totalNCOs + totalAttached - available;
+
+      const keyMap = {
+        "فرقة / دورة": "فرقة_دورة",
+        "بدل راحة": "بدل_راحة",
+        "اجازة ميدانية": "اجازة_ميدانية",
+        "اجازة سنوية": "اجازة_سنوية",
+        "اجازة مرضية": "اجازة_مرضية",
+      };
+      // Count each tmam type
+      const tmamCounts = {
+        ثابتة: 0,
+        فرقة_دورة: 0,
+        راحة: 0,
+        بدل_راحة: 0,
+        عارضة: 0,
+        اجازة_ميدانية: 0,
+        منحة: 0,
+        اجازة_سنوية: 0,
+        اجازة_مرضية: 0,
+        سفر: 0,
+        مأمورية: 0,
+        عيادة: 0,
+      };
+
+      ncos.forEach((nco) => {
+        if (nco.tmam) {
+          const key = keyMap[nco.tmam] || nco.tmam.replace(/\s/g, "_");
+          if (tmamCounts.hasOwnProperty(key)) {
+            tmamCounts[key]++;
+          }
+        }
+      });
+
+      const totalExits = Object.values(tmamCounts).reduce((a, b) => a + b, 0);
+      const percentageAvailable = totalNCOs
+        ? ((missing / (totalNCOs + totalAttached)) * 100).toFixed(2)
+        : 0;
+
+      return res.status(200).json({
+        total: totalNCOs,
+        available,
+        attached: totalAttached,
+        missing,
+        تمام_الخوارج: tmamCounts,
+        اجمالي_الخوارج: totalExits,
+        percentageAvailable,
       });
     } catch (err) {
       console.error(err);

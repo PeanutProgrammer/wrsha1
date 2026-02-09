@@ -296,6 +296,7 @@ const ManageVacation = () => {
                   : ""}
                 الفترة إلى
               </th>
+              <th>المدة</th>
               <th>الرصيد</th>
             </tr>
           </thead>
@@ -319,12 +320,13 @@ const ManageVacation = () => {
                       ? moment(officer.end_date).format("YYYY/MM/DD")
                       : "لا يوجد"}
                   </td>
+                  <td>{officer.duration || "لا يوجد"}</td>
                   <td>{officer.remaining || "لا يوجد"}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="9" className="text-center">
+                <td colSpan="10" className="text-center">
                   لا توجد بيانات
                 </td>
               </tr>

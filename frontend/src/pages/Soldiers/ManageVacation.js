@@ -1,24 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { Table, Alert, Modal, Button, Form,  Dropdown, DropdownButton, InputGroup } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
-import { getAuthUser } from '../../helper/Storage';
-import moment from 'moment';
-import { io } from "socket.io-client";
-import 'jspdf-autotable';  // This imports the autoTable plugin
-import htmlDocx from 'html-docx-js/dist/html-docx';
-import { FaPrint } from 'react-icons/fa';  // Import the printer icon from react-icons
-import Soldiers from './Soldiers';
+import React, { useState, useEffect, useMemo } from "react";
+import "../../style/style.css";
+import {
+  Table,
+  Alert,
+  Form,
+  InputGroup,
+  Button,
+  Dropdown,
+  DropdownButton,
+} from "react-bootstrap";
+import axios from "axios";
+import { getAuthUser } from "../../helper/Storage";
+import moment from "moment";
 
 // Helper: Convert Arabic-Indic digits to Western digits
 const toWesternDigits = (str) => {
   return str.replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
 };
 
-const SecuritySoldiers = () => {
+const ManageSoldierVacation = () => {
   const auth = getAuthUser();
-      const [sortConfig, setSortConfig] = useState({ key: "", direction: "asc" });
-
+  const [sortConfig, setSortConfig] = useState({ key: "", direction: "asc" });
   const [soldiers, setSoldiers] = useState({
     loading: true,
     err: null,
@@ -27,28 +29,29 @@ const SecuritySoldiers = () => {
     page: 1,
     totalPages: 1,
     search: "",
-    limit: 0,
+    limit: 15,
     tempSearch: "",
+    filterReturningToday: false, // Track if filtering for those returning today
   });
-  useEffect(() => {
-    const socket = io(`${process.env.REACT_APP_BACKEND_BASE_URL}`); //  backend port
 
+  // Fetch data when page, search, or selectedType change
+  useEffect(() => {
     const fetchData = () => {
       const searchValue = toWesternDigits(soldiers.search.trim());
-      const limit = 15;
-      const resp = axios
-        .get(
-          `${process.env.REACT_APP_BACKEND_BASE_URL}/soldier/tmam?page=${soldiers.page}&limit=${limit}&search=${searchValue}`,
-          {
-            headers: { token: auth.token },
-          }
-        )
+
+      // Include filterReturningToday in the query parameters
+      const url = `${process.env.REACT_APP_BACKEND_BASE_URL}/soldier/vacations?page=${soldiers.page}&limit=${soldiers.limit}&search=${searchValue}&type=${soldiers.selectedType}&filterReturningToday=${soldiers.filterReturningToday}`;
+
+      axios
+        .get(url, {
+          headers: { token: auth.token },
+        })
         .then((resp) => {
           setSoldiers({
             ...soldiers,
             results: resp.data.data || [],
             totalPages: resp.data.totalPages || 1,
-            limit: resp.data.limit || limit,
+            limit: resp.data.limit || soldiers.limit,
             loading: false,
             err: null,
           });
@@ -64,20 +67,10 @@ const SecuritySoldiers = () => {
         });
     };
 
-    fetchData(); // ✅ Initial fetch on component mount
+    fetchData(); // Initial data fetch or when state changes
+  }, [soldiers.page, soldiers.search, soldiers.filterReturningToday]); // Dependency array includes filterReturningToday
 
-    socket.on("connect", () => {
-      console.log("🟢 Connected to WebSocket:", socket.id);
-    });
-
-    socket.on("soldiersUpdated", () => {
-      console.log("📢 Soldiers updated — refetching data...");
-      fetchData(); // ✅ Re-fetch on update
-    });
-
-    return () => socket.disconnect();
-  }, [soldiers.page, soldiers.search]);
-
+  // Handle search form submit
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     const normalized = toWesternDigits(soldiers.tempSearch.trim());
@@ -85,20 +78,22 @@ const SecuritySoldiers = () => {
       ...prev,
       search: normalized,
       page: 1,
-      results: [],
+      results: [], // Clear results when a new search is performed
     }));
   };
 
+  // Clear search input
   const handleClearSearch = () => {
     setSoldiers((prev) => ({
       ...prev,
       search: "",
       tempSearch: "",
       page: 1,
-      results: [],
+      results: [], // Clear results when search is cleared
     }));
   };
 
+  // Pagination handlers
   const handlePrevPage = () => {
     if (soldiers.page > 1)
       setSoldiers((prev) => ({ ...prev, page: prev.page - 1 }));
@@ -115,6 +110,7 @@ const SecuritySoldiers = () => {
     }
   };
 
+  // Sorting logic
   const handleSort = (key) => {
     let direction = "asc";
     if (sortConfig.key === key && sortConfig.direction === "asc") {
@@ -123,6 +119,33 @@ const SecuritySoldiers = () => {
     setSortConfig({ key, direction });
   };
 
+  // Filter logic: Apply if filter is active
+  const filteredSoldiers = useMemo(() => {
+    let result = soldiers.results;
+
+    // If filterReturningToday is active, filter the soldiers
+    if (soldiers.filterReturningToday) {
+      const today = moment().format("YYYY/MM/DD");
+      result = result.filter((soldier) =>
+        moment(soldier.end_date).isSame(today, "day")
+      );
+    }
+
+    // Apply sorting
+    if (sortConfig.key) {
+      result = result.sort((a, b) => {
+        if (a[sortConfig.key] > b[sortConfig.key])
+          return sortConfig.direction === "asc" ? 1 : -1;
+        if (a[sortConfig.key] < b[sortConfig.key])
+          return sortConfig.direction === "asc" ? -1 : 1;
+        return 0;
+      });
+    }
+
+    return result;
+  }, [soldiers.results, soldiers.filterReturningToday, sortConfig]);
+
+  // Render pagination buttons
   const renderPageButtons = () => {
     const pages = [];
     const maxButtons = 5;
@@ -145,30 +168,18 @@ const SecuritySoldiers = () => {
     return pages;
   };
 
-  const sortedSoldiers = [...soldiers.results].sort((a, b) => {
-    if (!sortConfig.key) return 0; // no sorting yet
-    if (a[sortConfig.key] > b[sortConfig.key])
-      return sortConfig.direction === "asc" ? 1 : -1;
-    if (a[sortConfig.key] < b[sortConfig.key])
-      return sortConfig.direction === "asc" ? -1 : 1;
-    return 0;
-  });
-
-   const isToday = (date) => {
-      if (!date) return false;
-      return moment(date).isSame(moment(), "day");
-    };
-
   return (
     <div className="Officers p-5">
-      <div className="header d-flex justify-content-between mb-3">
-        <h3 className="text-center mb-3">إدارة الجنود</h3>
+      {/* Header */}
+      <div className="header d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+        <h3 className="text-white"> اجازات الضباط </h3>
+
         {/* Search bar */}
         <Form
           className="d-flex align-items-center flex-grow-1"
           onSubmit={handleSearchSubmit}
         >
-          <InputGroup className="w-50  shadow-sm me-5">
+          <InputGroup className="w-50 shadow-sm me-5">
             <Form.Control
               size="sm"
               placeholder="بحث 🔍"
@@ -188,21 +199,44 @@ const SecuritySoldiers = () => {
             )}
           </InputGroup>
         </Form>
+
+        {/* Filter Toggle */}
+        <div className="filter-toggle">
+          <input
+            type="checkbox"
+            id="filterReturningToday"
+            checked={soldiers.filterReturningToday}
+            onChange={() =>
+              setSoldiers((prev) => ({
+                ...prev,
+                filterReturningToday: !prev.filterReturningToday,
+                page: 1,
+                results: [],
+                loading: true,
+              }))
+            }
+          />
+          <label htmlFor="filterReturningToday">عرض عودة اليوم</label>
+        </div>
       </div>
 
+      {/* Loading Indicator */}
+      {soldiers.loading && (
+        <div className="loading-spinner">
+          <div className="spinner"></div>
+          <p>جاري التحميل...</p>
+        </div>
+      )}
+
+      {/* Error Message */}
       {soldiers.err && (
-        <Alert variant="danger" className="p-2">
+        <Alert variant="danger" className="p-2 text-center">
           {soldiers.err}
         </Alert>
       )}
-      {soldiers.success && (
-        <Alert variant="success" className="p-2">
-          {soldiers.success}
-        </Alert>
-      )}
 
-      <div className="table-responsive">
-        <Table id="soldier-table" striped bordered hover className="mb-0">
+      <div className="table-responsive shadow-sm rounded bg-white">
+        <Table id="officer-table" striped bordered hover className="mb-0">
           <thead className="table-dark">
             <tr>
               <th>م</th>
@@ -211,143 +245,86 @@ const SecuritySoldiers = () => {
                   ? sortConfig.direction === "asc"
                     ? " 🔼"
                     : " 🔽"
-                  : ""}{" "}
+                  : ""}
                 الرقم العسكري
               </th>
               <th onClick={() => handleSort("rank")}>
-                الدرجة
                 {sortConfig.key === "rank"
                   ? sortConfig.direction === "asc"
                     ? " 🔼"
                     : " 🔽"
                   : ""}
+                الرتبة
               </th>
               <th onClick={() => handleSort("name")}>
-                الاسم{" "}
                 {sortConfig.key === "name"
                   ? sortConfig.direction === "asc"
                     ? " 🔼"
                     : " 🔽"
                   : ""}
+                الاسم
               </th>
               <th onClick={() => handleSort("department")}>
-                الورشة / الفرع
                 {sortConfig.key === "department"
                   ? sortConfig.direction === "asc"
                     ? " 🔼"
                     : " 🔽"
                   : ""}
+                الورشة / الفرع
+              </th>
+              <th onClick={() => handleSort("leave_type_name")}>
+                {sortConfig.key === "leave_type_name"
+                  ? sortConfig.direction === "asc"
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}
+                نوع الاجازة
+              </th>
+              <th onClick={() => handleSort("start_date")}>
+                {sortConfig.key === "start_date"
+                  ? sortConfig.direction === "asc"
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}
+                الفترة من
               </th>
               <th onClick={() => handleSort("end_date")}>
-                تاريخ التسريح
                 {sortConfig.key === "end_date"
                   ? sortConfig.direction === "asc"
                     ? " 🔼"
                     : " 🔽"
                   : ""}
+                الفترة إلى
               </th>
-              <th onClick={() => handleSort("in_unit")}>
-                التمام
-                {sortConfig.key === "in_unit"
-                  ? sortConfig.direction === "asc"
-                    ? " 🔼"
-                    : " 🔽"
-                  : ""}
-              </th>
-              <th onClick={() => handleSort("latest_arrival")}>
-                اخر دخول
-                {sortConfig.key === "latest_arrival"
-                  ? sortConfig.direction === "asc"
-                    ? " 🔼"
-                    : " 🔽"
-                  : ""}
-              </th>
-              <th onClick={() => handleSort("latest_departure")}>
-                اخر خروج
-                {sortConfig.key === "latest_departure"
-                  ? sortConfig.direction === "asc"
-                    ? " 🔼"
-                    : " 🔽"
-                  : ""}
-              </th>
-              <th>ملاحظات</th>
+
             </tr>
           </thead>
           <tbody>
-            {Array.isArray(soldiers.results) && soldiers.results.length > 0 ? (
-              sortedSoldiers.map((soldier, index) => (
+            {filteredSoldiers.length > 0 ? (
+              filteredSoldiers.map((soldier, index) => (
                 <tr key={soldier.mil_id}>
                   <td>{(soldiers.page - 1) * soldiers.limit + index + 1}</td>
                   <td>{soldier.mil_id}</td>
                   <td>{soldier.rank}</td>
                   <td>{soldier.name}</td>
                   <td>{soldier.department}</td>
-                  <td>{moment(soldier.end_date).format("YYYY/MM/DD")}</td>
-                                    <td
-                    className={
-                      soldier.in_unit
-                        ? "bg-success text-white"
-                        : "bg-danger text-white"
-                    }
-                  >
-                    {soldier.in_unit ? "متواجد" : "غير موجود"}
-                  </td>
-                  
+                  <td>{soldier.leave_type_name}</td>
                   <td>
-                    {soldier.latest_arrival ? (
-                      <>
-                        <div>
-                          {moment(soldier.latest_arrival).format("YYYY/MM/DD")}
-                        </div>
-                        <div>
-                          {moment(soldier.latest_arrival).format("hh:mm a")}
-
-                        </div>
-                      </>
-                    ) : (
-                      "لا يوجد"
-                    )}
+                    {soldier.start_date
+                      ? moment(soldier.start_date).format("YYYY/MM/DD")
+                      : "لا يوجد"}
                   </td>
-
                   <td>
-                    {soldier.latest_departure ? (
-                      <>
-                        <div>
-                          {moment(soldier.latest_departure).format("YYYY/MM/DD")}
-                        </div>
-                        <div>
-                          {moment(soldier.latest_departure).format("hh:mm a")}
-
-                        </div>
-                      </>
-                    ) : (
-                      "لا يوجد"
-                    )}
+                    {soldier.end_date
+                      ? moment(soldier.end_date).format("YYYY/MM/DD")
+                      : "لا يوجد"}
                   </td>
 
-
-                  <td>{soldier.in_unit ? "لا يوجد" : soldier.tmam}</td>
-                  {/* <td>
-                  <div className="action-buttons">
-                    <button
-                      className="btn btn-sm btn-danger"
-                      onClick={() => handleDeleteClick(officer)}
-                    >
-                      حذف
-                    </button>
-                    <Link to={`${officer.id}`} className="btn btn-sm btn-primary">
-                      تعديل
-                    </Link>
-                    <Link to={`details/${officer.id}`} className="btn btn-sm btn-primary">
-                      تفاصيل
-                    </Link>
-                  </div>
-                </td> */}
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="9" className="text-center">
+                <td colSpan="10" className="text-center">
                   لا توجد بيانات
                 </td>
               </tr>
@@ -357,7 +334,6 @@ const SecuritySoldiers = () => {
       </div>
 
       {/* Pagination Controls */}
-
       <div className="d-flex justify-content-between align-items-center mt-3">
         <Button
           onClick={handlePrevPage}
@@ -379,6 +355,6 @@ const SecuritySoldiers = () => {
       </div>
     </div>
   );
-    };
+};
 
-export default SecuritySoldiers;
+export default ManageSoldierVacation;

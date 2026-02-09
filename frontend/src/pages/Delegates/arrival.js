@@ -114,6 +114,10 @@ const DelegateArrival = () => {
     { value: "خروج سلاح", label: "خروج سلاح" },
     { value: "خروج معدات", label: "خروج معدات" },
     { value: "خروج مدافع", label: "خروج مدافع" },
+    { value: "استلام اصناف", label: "استلام اصناف" },
+    { value: "صرف اصناف", label: "صرف اصناف" },
+    { value: "دخول وسم اسلحة", label: "دخول وسم اسلحة" },
+    { value: "خروج وسم اسلحة", label: "خروج وسم اسلحة" },
   ];
 
   const rankOptions = [

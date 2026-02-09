@@ -156,7 +156,7 @@
 .event-name {
   font-weight: 800;
   margin-bottom: 6px;
-  font-size: 1.05rem;
+  font-size: 1.5rem !important;
 }
 
 .event-location {

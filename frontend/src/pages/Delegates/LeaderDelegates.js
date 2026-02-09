@@ -288,10 +288,8 @@ const LeaderDelegates = () => {
                       </div>
                 
                       <div>
-                        {moment(delegate.visit_start).format("hh:mm")}
-                        <span>
-                          {moment(delegate.visit_start).format("a") === "am" ? " ص" : " م"}
-                        </span>
+                        {moment(delegate.visit_start).format("hh:mm a")}
+
                       </div>
                     </>
                   ) : (
@@ -315,10 +313,8 @@ const LeaderDelegates = () => {
                       </div>
                 
                       <div>
-                        {moment(delegate.visit_end).format("hh:mm")}
-                        <span>
-                          {moment(delegate.visit_end).format("a") === "am" ? " ص" : " م"}
-                        </span>
+                        {moment(delegate.visit_end).format("hh:mm a")}
+
                       </div>
                     </>
                   ) : (

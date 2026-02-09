@@ -14,35 +14,17 @@ import Select from "react-select"; // Importing react-select
 const schema = yup.object().shape({
   notes: yup.string().max(500, "الملاحظات يجب ألا تتجاوز 500 حرف").optional(),
   ncoID: yup.number().required(" اسم ضابط الصف مطلوب "),
-  leaveTypeID: yup.number().optional("سبب الخروج مطلوب"),
-  start_date: yup
-    .date()
-    .required("تاريخ البداية مطلوب")
-    .typeError("يرجى إدخال تاريخ صحيح"),
-  end_date: yup
-    .date()
-    .required("تاريخ النهاية مطلوب")
-    .min(yup.ref("start_date"), "تاريخ النهاية يجب أن يكون بعد تاريخ البداية")
-    .typeError("يرجى إدخال تاريخ صحيح"),
-  destination: yup
-    .string()
-    .max(255, "الوجهة يجب ألا تتجاوز 255 حرف")
-    .optional(),
 });
 
 const NCODeparture = () => {
   const [officer, setOfficer] = useState([]);
-  const [leaveType, setLeaveType] = useState([]);
   const auth = getAuthUser();
   const [officerLog, setOfficerLog] = useState({
     loading: false,
     err: "",
     notes: "",
     ncoID: "",
-    leaveTypeID: "",
-    start_date: "",
-    end_date: "",
-    destination: "",
+
     success: null,
   });
 
@@ -66,13 +48,7 @@ const NCODeparture = () => {
       event_type: "خروج",
       event_time: moment().locale("en").format("YYYY-MM-DD HH:mm:ss"),
       loggerID: auth.id,
-      start_date: data.start_date
-        ? moment(data.start_date).locale("en").format("YYYY-MM-DD")
-        : null,
 
-      end_date: data.end_date
-        ? moment(data.end_date).locale("en").format("YYYY-MM-DD")
-        : null,
     };
 
     console.log("Formatted Request Data:", formattedData);
@@ -92,10 +68,6 @@ const NCODeparture = () => {
         success: "تمت الإضافة بنجاح!",
         notes: "",
         ncoID: "",
-        leaveTypeID: "",
-        start_date: "",
-        end_date: "",
-        destination: "",
       });
 
       reset(); // Reset form after successful submission
@@ -126,25 +98,7 @@ const NCODeparture = () => {
       .catch((err) => console.log(err));
   }, []);
 
-  useEffect(() => {
-    axios
-      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/leaveType/`, {
-        headers: {
-          token: auth.token,
-        },
-      })
-      .then((resp) => setLeaveType(resp.data))
-      .catch((err) => console.log(err));
-  }, []);
-
-  const filteredLeaveTypes = leaveType.filter(
-    (type) => ![16, 17, 18].includes(type.id)
-  );
-
-  const leaveTypeOptions = filteredLeaveTypes.map((type) => ({
-    value: type.id,
-    label: type.name,
-  }));
+ 
   // Transform officers into format required by react-select
   const officerOptions = officer.map((officer) => ({
     value: officer.id,
@@ -220,65 +174,7 @@ const NCODeparture = () => {
           )}
         </Form.Group>
 
-        {/* Leave Type Dropdown */}
-        <Form.Group controlId="leaveTypeID" className="form-group">
-          <Form.Label>سبب الخروج</Form.Label>
-          <Select
-            options={leaveTypeOptions}
-            placeholder="اختر سبب الخروج"
-            onChange={(selectedOption) => {
-              setValue("leaveTypeID", selectedOption.value);
-            }}
-            styles={customStyles}
-            className="react-select"
-          />
-          {errors.leaveTypeID && (
-            <div className="invalid-feedback d-block">
-              {errors.leaveTypeID.message}
-            </div>
-          )}
-          {errors.leaveTypeID && (
-            <div className="invalid-feedback">{errors.leaveTypeID.message}</div>
-          )}
-        </Form.Group>
-
-        <Form.Group controlId="destination" className="form-group">
-          <Form.Label>إلى</Form.Label>
-          <Form.Control
-            as="textarea"
-            rows={3}
-            placeholder="أدخل الوجهة"
-            {...register("destination")}
-            className={`form-control ${errors.destination ? "is-invalid" : ""}`}
-          />
-          {errors.destination && (
-            <div className="invalid-feedback">{errors.destination.message}</div>
-          )}
-        </Form.Group>
-
-        <Form.Group controlId="start_date" className="form-group">
-          <Form.Label>الفترة من</Form.Label>
-          <Form.Control
-            type="date"
-            {...register("start_date")}
-            className={`form-control ${errors.start_date ? "is-invalid" : ""}`}
-          />
-          {errors.start_date && (
-            <div className="invalid-feedback">{errors.start_date.message}</div>
-          )}
-        </Form.Group>
-
-        <Form.Group controlId="end_date" className="form-group">
-          <Form.Label>الفترة إلى</Form.Label>
-          <Form.Control
-            type="date"
-            {...register("end_date")}
-            className={`form-control ${errors.end_date ? "is-invalid" : ""}`}
-          />
-          {errors.end_date && (
-            <div className="invalid-feedback">{errors.end_date.message}</div>
-          )}
-        </Form.Group>
+       
 
         {/* Notes */}
         <Form.Group controlId="notes" className="form-group">

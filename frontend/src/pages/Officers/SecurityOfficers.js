@@ -242,14 +242,15 @@ const SecurityOfficers = () => {
                     : " 🔽"
                   : ""}
               </th>
-              <th onClick={() => handleSort("in_unit")}>
-                التمام
-                {sortConfig.key === "in_unit"
+              <th onClick={() => handleSort("tmam")}>
+                {sortConfig.key === "tmam"
                   ? sortConfig.direction === "asc"
                     ? " 🔼"
                     : " 🔽"
                   : ""}
+                التواجد
               </th>
+              <th>التمام</th>
               <th onClick={() => handleSort("latest_arrival")}>اخر دخول
                 {sortConfig.key === "latest_arrival"
                   ? sortConfig.direction === "asc"
@@ -286,15 +287,15 @@ const SecurityOfficers = () => {
                 >
                     {officer.in_unit ? "متواجد" : "غير موجود"}
                     </td>
+                                      <td>{officer.active_tmam ?? "بالوحدة"}</td>
+
 <td>
   {officer.latest_arrival ? (
     <>
       <div>{moment(officer.latest_arrival).format("YYYY/MM/DD")}</div>
       <div>
-        {moment(officer.latest_arrival).format("hh:mm")}
-        <span>
-          {moment(officer.latest_arrival).format("a") === "am" ? " ص" : " م"}
-        </span>
+        {moment(officer.latest_arrival).format("hh:mm a")}
+
       </div>
     </>
   ) : (
@@ -307,10 +308,8 @@ const SecurityOfficers = () => {
     <>
       <div>{moment(officer.latest_departure).format("YYYY/MM/DD")}</div>
       <div>
-        {moment(officer.latest_departure).format("hh:mm")}
-        <span>
-          {moment(officer.latest_departure).format("a") === "am" ? " ص" : " م"}
-        </span>
+        {moment(officer.latest_departure).format("hh:mm a")}
+
       </div>
     </>
   ) : (

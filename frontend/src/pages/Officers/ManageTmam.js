@@ -1,6 +1,14 @@
 import React, { useState, useEffect, useMemo } from "react";
 import "../../style/style.css";
-import { Table, Alert, Form, InputGroup, Button, Dropdown, DropdownButton} from "react-bootstrap";
+import {
+  Table,
+  Alert,
+  Form,
+  InputGroup,
+  Button,
+  Dropdown,
+  DropdownButton,
+} from "react-bootstrap";
 import { Link, useParams } from "react-router-dom";
 import { io } from "socket.io-client";
 import axios from "axios";
@@ -14,7 +22,7 @@ const toWesternDigits = (str) => {
 
 const ManageTmam = () => {
   const auth = getAuthUser();
-    const [sortConfig, setSortConfig] = useState({ key: "", direction: "asc" });
+  const [sortConfig, setSortConfig] = useState({ key: "", direction: "asc" });
   const [officers, setOfficers] = useState({
     loading: true,
     err: null,
@@ -27,26 +35,26 @@ const ManageTmam = () => {
     tempSearch: "",
   });
   const [dailySummary, setDailySummary] = useState({
-      total: 0,
-      available: 0,
-      missing: 0,
-      تمام_الخوارج: {
-        ثابتة: 0,
-        فرقة_دورة: 0,
-        راحة: 0,
-        بدل_راحة: 0,
-        عارضة: 0,
-        اجازة_ميدانية: 0,
-        منحة: 0,
-        اجازة_سنوية: 0,
-        اجازة_مرضية: 0,
-        سفر: 0,
-        مأمورية: 0,
-        مستشفى: 0,
-      },
-      اجمالي_الخوارج: 0,
-      percentageAvailable: 0,
-    });
+    total: 0,
+    available: 0,
+    missing: 0,
+    تمام_الخوارج: {
+      ثابتة: 0,
+      فرقة_دورة: 0,
+      راحة: 0,
+      بدل_راحة: 0,
+      عارضة: 0,
+      اجازة_ميدانية: 0,
+      منحة: 0,
+      اجازة_سنوية: 0,
+      اجازة_مرضية: 0,
+      سفر: 0,
+      مأمورية: 0,
+      عيادة: 0,
+    },
+    اجمالي_الخوارج: 0,
+    percentageAvailable: 0,
+  });
 
   useEffect(() => {
     const socket = io(`${process.env.REACT_APP_BACKEND_BASE_URL}`); //  backend port
@@ -58,7 +66,7 @@ const ManageTmam = () => {
           `${process.env.REACT_APP_BACKEND_BASE_URL}/officer/tmam?page=${officers.page}&limit=${officers.limit}&search=${searchValue}`,
           {
             headers: { token: auth.token },
-          } 
+          }
         )
         .then((resp) => {
           setOfficers({
@@ -80,20 +88,21 @@ const ManageTmam = () => {
           });
         });
 
-         // Fetch daily summary
+      // Fetch daily summary
       axios
-        .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/officer/daily-summary`, {
-          headers: { token: auth.token },
-        })
+        .get(
+          `${process.env.REACT_APP_BACKEND_BASE_URL}/officer/daily-summary`,
+          {
+            headers: { token: auth.token },
+          }
+        )
         .then((response) => {
           setDailySummary(response.data);
         })
         .catch((err) => {
           console.error("Error fetching daily summary", err);
         });
-    
     };
-    
 
     fetchData(); // ✅ Initial fetch on component mount
 
@@ -109,83 +118,83 @@ const ManageTmam = () => {
     return () => socket.disconnect();
   }, [officers.page, officers.search]);
 
-const handleSearchSubmit = (e) => {
-  e.preventDefault();
-  const normalized = toWesternDigits(officers.tempSearch.trim());
-  setOfficers((prev) => ({
-    ...prev,
-    search: normalized,
-    page: 1,
-    results: [],
-  }));
-};
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const normalized = toWesternDigits(officers.tempSearch.trim());
+    setOfficers((prev) => ({
+      ...prev,
+      search: normalized,
+      page: 1,
+      results: [],
+    }));
+  };
 
-const handleClearSearch = () => {
-  setOfficers((prev) => ({
-    ...prev,
-    search: "",
-    tempSearch: "",
-    page: 1,
-    results: [],
-  }));
-};
+  const handleClearSearch = () => {
+    setOfficers((prev) => ({
+      ...prev,
+      search: "",
+      tempSearch: "",
+      page: 1,
+      results: [],
+    }));
+  };
 
-const handlePrevPage = () => {
-  if (officers.page > 1)
-    setOfficers((prev) => ({ ...prev, page: prev.page - 1 }));
-};
+  const handlePrevPage = () => {
+    if (officers.page > 1)
+      setOfficers((prev) => ({ ...prev, page: prev.page - 1 }));
+  };
 
-const handleNextPage = () => {
-  if (officers.page < officers.totalPages)
-    setOfficers((prev) => ({ ...prev, page: prev.page + 1 }));
-};
+  const handleNextPage = () => {
+    if (officers.page < officers.totalPages)
+      setOfficers((prev) => ({ ...prev, page: prev.page + 1 }));
+  };
 
-const handleJumpToPage = (number) => {
-  if (number >= 1 && number <= officers.totalPages) {
-    setOfficers((prev) => ({ ...prev, page: number }));
-  }
-};
+  const handleJumpToPage = (number) => {
+    if (number >= 1 && number <= officers.totalPages) {
+      setOfficers((prev) => ({ ...prev, page: number }));
+    }
+  };
 
-const handleSort = (key) => {
-  let direction = "asc";
-  if (sortConfig.key === key && sortConfig.direction === "asc") {
-    direction = "desc";
-  }
-  setSortConfig({ key, direction });
-};
+  const handleSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
 
-const renderPageButtons = () => {
-  const pages = [];
-  const maxButtons = 5;
-  let start = Math.max(officers.page - 2, 1);
-  let end = Math.min(start + maxButtons - 1, officers.totalPages);
-  start = Math.max(end - maxButtons + 1, 1);
+  const renderPageButtons = () => {
+    const pages = [];
+    const maxButtons = 5;
+    let start = Math.max(officers.page - 2, 1);
+    let end = Math.min(start + maxButtons - 1, officers.totalPages);
+    start = Math.max(end - maxButtons + 1, 1);
 
-  for (let num = start; num <= end; num++) {
-    pages.push(
-      <Button
-        key={num}
-        onClick={() => handleJumpToPage(num)}
-        variant={num === officers.page ? "primary" : "outline-primary"}
-        className="mx-1 btn-sm"
-      >
-        {num}
-      </Button>
-    );
-  }
-  return pages;
-};
+    for (let num = start; num <= end; num++) {
+      pages.push(
+        <Button
+          key={num}
+          onClick={() => handleJumpToPage(num)}
+          variant={num === officers.page ? "primary" : "outline-primary"}
+          className="mx-1 btn-sm"
+        >
+          {num}
+        </Button>
+      );
+    }
+    return pages;
+  };
 
-const sortedOfficers = useMemo(() => {
-  return [...officers.results].sort((a, b) => {
-    if (!sortConfig.key) return 0;
-    if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === "asc" ? 1 : -1;
-    if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === "asc" ? -1 : 1;
-    return 0;
-  });
-}, [officers.results, sortConfig]);
-
-
+  const sortedOfficers = useMemo(() => {
+    return [...officers.results].sort((a, b) => {
+      if (!sortConfig.key) return 0;
+      if (a[sortConfig.key] > b[sortConfig.key])
+        return sortConfig.direction === "asc" ? 1 : -1;
+      if (a[sortConfig.key] < b[sortConfig.key])
+        return sortConfig.direction === "asc" ? -1 : 1;
+      return 0;
+    });
+  }, [officers.results, sortConfig]);
 
   return (
     <div className="Officers p-5">
@@ -201,7 +210,7 @@ const sortedOfficers = useMemo(() => {
           <InputGroup className="w-50  shadow-sm me-5">
             <Form.Control
               size="sm"
-              placeholder="بحث 🔍 " 
+              placeholder="بحث 🔍 "
               value={officers.tempSearch}
               onChange={(e) =>
                 setOfficers((prev) => ({ ...prev, tempSearch: e.target.value }))
@@ -224,50 +233,58 @@ const sortedOfficers = useMemo(() => {
         </Link>
       </div>
 
-
       <div className="daily-summary mt-4">
-              <Table striped bordered hover size="sm">
-                <thead className="table-dark">
-                  <tr className='table-summary-subheader'>
-                    <th colSpan="2">الإجمالي</th>
-                    <th colSpan="8" className="table-summary-header">تمام الخوارج</th>
-                    <th rowSpan={2}>اجمالي الخوارج</th>
-                    <th rowSpan={2}>موجود</th>
-                    <th rowSpan={2}>نسبة الخوارج</th>
-                  </tr>
-                  <tr className='table-summary-subheader'>
-                    <th>القوة</th>
-                    <th>الملاحق</th>
-                    <th>مأمورية ثابتة</th>
-                    <th>فرقة / دورة</th>
-                    <th>اجازة عادية</th>
-                    <th>اجازة سنوية</th>
-                    <th>اجازة مرضية</th>
-                    <th>سفر</th>
-                    <th>مأمورية</th>
-                    <th>مستشفى</th>
-      
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>{dailySummary.total}</td>
-                    <td>{dailySummary.attached}</td>
-                    <td>{dailySummary?.تمام_الخوارج?.ثابتة || 0}</td>
-                    <td>{dailySummary?.تمام_الخوارج?.فرقة_دورة || 0}</td>
-                    <td>{dailySummary?.تمام_الخوارج?.راحة + dailySummary?.تمام_الخوارج?.بدل_راحة + dailySummary?.تمام_الخوارج?.عارضة + dailySummary?.تمام_الخوارج?.اجازة_ميدانية + dailySummary?.تمام_الخوارج?.منحة || 0}</td>
-                    <td>{dailySummary?.تمام_الخوارج?.اجازة_سنوية || 0}</td>
-                    <td>{dailySummary?.تمام_الخوارج?.اجازة_مرضية || 0}</td>
-                    <td>{dailySummary?.تمام_الخوارج?.سفر || 0}</td>
-                    <td>{dailySummary?.تمام_الخوارج?.مأمورية || 0}</td>
-                    <td>{dailySummary?.تمام_الخوارج?.مستشفى || 0}</td>
-                    <td>{dailySummary.missing}</td>
-                    <td>{dailySummary.available}</td>
-                    <td className="percentage-column">{dailySummary.percentageAvailable} %</td>
-                  </tr>
-                </tbody>
-              </Table>
-            </div>
+        <Table striped bordered hover size="sm">
+          <thead className="table-dark">
+            <tr className="table-summary-subheader">
+              <th colSpan="2">الإجمالي</th>
+              <th colSpan="8" className="table-summary-header">
+                تمام الخوارج
+              </th>
+              <th rowSpan={2}>اجمالي الخوارج</th>
+              <th rowSpan={2}>موجود</th>
+              <th rowSpan={2}>نسبة الخوارج</th>
+            </tr>
+            <tr className="table-summary-subheader">
+              <th>القوة</th>
+              <th>الملاحق</th>
+              <th>مأمورية ثابتة</th>
+              <th>فرقة / دورة</th>
+              <th>اجازة عادية</th>
+              <th>اجازة سنوية</th>
+              <th>اجازة مرضية</th>
+              <th>سفر</th>
+              <th>مأمورية</th>
+              <th>عيادة</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{dailySummary.total}</td>
+              <td>{dailySummary.attached}</td>
+              <td>{dailySummary?.تمام_الخوارج?.ثابتة || 0}</td>
+              <td>{dailySummary?.تمام_الخوارج?.فرقة_دورة || 0}</td>
+              <td>
+                {dailySummary?.تمام_الخوارج?.راحة +
+                  dailySummary?.تمام_الخوارج?.بدل_راحة +
+                  dailySummary?.تمام_الخوارج?.عارضة +
+                  dailySummary?.تمام_الخوارج?.اجازة_ميدانية +
+                  dailySummary?.تمام_الخوارج?.منحة || 0}
+              </td>
+              <td>{dailySummary?.تمام_الخوارج?.اجازة_سنوية || 0}</td>
+              <td>{dailySummary?.تمام_الخوارج?.اجازة_مرضية || 0}</td>
+              <td>{dailySummary?.تمام_الخوارج?.سفر || 0}</td>
+              <td>{dailySummary?.تمام_الخوارج?.مأمورية || 0}</td>
+              <td>{dailySummary?.تمام_الخوارج?.عيادة || 0}</td>
+              <td>{dailySummary.missing}</td>
+              <td>{dailySummary.available}</td>
+              <td className="percentage-column">
+                {dailySummary.percentageAvailable} %
+              </td>
+            </tr>
+          </tbody>
+        </Table>
+      </div>
 
       {/* Loading Indicator */}
       {officers.loading && (
@@ -291,7 +308,8 @@ const sortedOfficers = useMemo(() => {
               <th onClick={() => handleSort("mil_id")}>
                 {sortConfig.key === "mil_id"
                   ? sortConfig.direction === "asc"
-                    ? " 🔼" : " 🔽"
+                    ? " 🔼"
+                    : " 🔽"
                   : ""}{" "}
                 الرقم العسكري
               </th>
@@ -325,8 +343,9 @@ const sortedOfficers = useMemo(() => {
                     ? " 🔼"
                     : " 🔽"
                   : ""}
-                التمام
+                التواجد
               </th>
+              <th>التمام</th>
               <th onClick={() => handleSort("latest_arrival")}>
                 {sortConfig.key === "latest_arrival"
                   ? sortConfig.direction === "asc"
@@ -355,63 +374,70 @@ const sortedOfficers = useMemo(() => {
                   <td>{officer.rank}</td>
                   <td>{officer.name}</td>
                   <td>{officer.department}</td>
-                    <td>
+                  <td>
                     <span
                       className={`status-badge ${
                         officer.in_unit ? "status-in" : "status-out"
                       }`}
                     >
-                                          {officer.in_unit
-                      ? "متواجد"
-                      : officer.tmam
-                      ? officer.tmam
-                      : "غير متواجد"}
+                      {officer.in_unit ? "متواجد" : "غير متواجد"}
                     </span>
                   </td>{" "}
-<td>
-  {officer.latest_arrival ? (
-    <>
-      <div>{moment(officer.latest_arrival).format("YYYY/MM/DD")}</div>
-      <div>
-        {moment(officer.latest_arrival).format("hh:mm")}
-        <span>
-          {moment(officer.latest_arrival).format("a") === "am" ? " ص" : " م"}
-        </span>
-      </div>
-    </>
-  ) : (
-    "لا يوجد"
-  )}
-</td>
-<td>
-  {officer.latest_departure ? (
-    <>
-      <div>{moment(officer.latest_departure).format("YYYY/MM/DD")}</div>
-      <div>
-        {moment(officer.latest_departure).format("hh:mm")}
-        <span>
-          {moment(officer.latest_departure).format("a") === "am" ? " ص" : " م"}
-        </span>
-      </div>
-    </>
-  ) : (
-    "لا يوجد"
-  )}
-</td>
-                  <td className="d-flex gap-1 p-3"> 
-                    {/* <button className="btn btn-sm btn-danger mx-1 p-2" onClick ={(e) =>  {deleteOfficer(officer.mil_id)}}>حذف</button> */}
-                    <Link
-                      to={`../tmam/${officer.latest_leave_id}`}
-                      className="btn btn-sm btn-primary mx-1 p-2"
-                    >
-                      تعديل
-                    </Link>
+                  <td>{officer.active_tmam ?? "بالوحدة"}</td>
+                  <td>
+                    {officer.latest_arrival ? (
+                      <>
+                        <div>
+                          {moment(officer.latest_arrival).format("YYYY/MM/DD")}
+                        </div>
+                        <div>
+                          {moment(officer.latest_arrival).format("hh:mm a")}
+
+                        </div>
+                      </>
+                    ) : (
+                      "لا يوجد"
+                    )}
+                  </td>
+                  <td>
+                    {officer.latest_departure ? (
+                      <>
+                        <div>
+                          {moment(officer.latest_departure).format(
+                            "YYYY/MM/DD"
+                          )}
+                        </div>
+                        <div>
+                          {moment(officer.latest_departure).format("hh:mm a")}
+
+                        </div>
+                      </>
+                    ) : (
+                      "لا يوجد"
+                    )}
+                  </td>
+                  <td className="d-flex gap-1 p-3">
+                    {officer.active_tmam_id ? (
+                      <Link
+                        to={`../tmam/${officer.active_tmam_id}`}
+                        className="btn btn-sm btn-primary mx-1 p-2"
+                      >
+                        تعديل
+                      </Link>
+                    ) : (
+                      <Link
+                        to={`../tmam/add?officer=${officer.mil_id}`}
+                        className="btn btn-sm btn-success mx-1 p-2"
+                      >
+                        إضافة تمام
+                      </Link>
+                    )}
 
                     <Link
                       to={`../tmam/details/${officer.mil_id}`}
-                      className="btn btn-sm btn-primary mx-1 p-2"
+                      className="btn btn-sm btn-secondary mx-1 p-2"
                     >
-                      تفاصيل{" "}
+                      تفاصيل
                     </Link>
                   </td>
                 </tr>
@@ -449,6 +475,6 @@ const sortedOfficers = useMemo(() => {
       </div>
     </div>
   );
-   };
+};
 
 export default ManageTmam;

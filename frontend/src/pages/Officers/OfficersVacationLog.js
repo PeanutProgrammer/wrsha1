@@ -92,7 +92,6 @@ const OfficersVacationLog = () => {
             <th>المدة</th>
             <th>الفترة من</th>
             <th>الفترة إلى</th>
-                      <th>وقت الدخول/الخروج</th> {/* New column header */}
                       <th>الرصيد</th>
             <th>ملاحظات</th>
           </tr>
@@ -103,15 +102,7 @@ const OfficersVacationLog = () => {
               <tr key={index}>
                 <td>{index + 1}</td>
                 <td>
-                  {rec.event_type
-                    ? rec.event_type === "دخول"
-                      ? `عودة ${rec.tmam || ""}` // If "دخول", show "عودة" with leave type
-                      : `خروج ${rec.tmam || ""}` // If "خروج", show "خروج" with leave type
-                    : rec.tmam
-                      ? `خروج ${rec.tmam}` // If event_type is null, check in_unit
-                      : rec.in_unit
-                        ? "متواجد"
-                        : "غير متواجد"}
+{rec.tmam? rec.tmam : "—"}
                 </td>
                 <td>{rec.duration || "—"}</td>
                 <td>
@@ -124,12 +115,6 @@ const OfficersVacationLog = () => {
                     ? moment(rec.end_date).format("YYYY/MM/DD")
                     : "—"}
                 </td>
-                <td>
-                  {/* Time and Event Type */}
-                  {rec.event_type && rec.event_time
-                    ? ` ${moment(rec.event_time).format("YYYY/MM/DD HH:mm ")}`
-                    : "—"}
-                    </td>
                     <td>{rec.remaining || "—"}</td>
                 <td>{rec.notes || "—"}</td>
               </tr>

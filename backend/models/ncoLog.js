@@ -1,11 +1,10 @@
 
 
 class NCOLog {
-    constructor(event_type, event_time, ncoID, leaveTypeID, notes, loggerID) {
+    constructor(event_type, event_time, ncoID, notes, loggerID) {
         this._event_type = event_type;
         this._event_time = event_time;
         this._ncoID = ncoID;
-        this._leaveTypeID = leaveTypeID;
         this._notes = notes;
         this._loggerID = loggerID;
     }
@@ -20,10 +19,6 @@ class NCOLog {
 
     getNcoID = () => {
         return this._ncoID;
-    }
-
-    getLeaveTypeID = () => {
-        return this._leaveTypeID;
     }
 
     getNotes = () => {
@@ -45,10 +40,6 @@ class NCOLog {
 
     setNcoID = (ncoID) => {
         this._ncoID = ncoID;
-    }
-
-    setLeaveTypeID = (leaveTypeID) => {
-        this._leaveTypeID = leaveTypeID;
     }
 
     setNotes = (notes) => {

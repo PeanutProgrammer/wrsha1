@@ -14,20 +14,16 @@ import Select from "react-select"; // Importing react-select
 const schema = yup.object().shape({
   notes: yup.string().max(500, "الملاحظات يجب ألا تتجاوز 500 حرف").optional(),
   ncoID: yup.number().required(" اسم ضابط الصف مطلوب "),
-  leaveTypeID: yup.number().required("نوع العودة مطلوب"),
 });
 
 const NCOArrival = () => {
   const [officer, setOfficer] = useState([]);
-  const [leaveType, setLeaveType] = useState([]);
-  const [selectedLeaveType, setSelectedLeaveType] = useState(null);
   const auth = getAuthUser();
   const [officerLog, setOfficerLog] = useState({
     loading: false,
     err: "",
     notes: "",
     ncoID: "",
-    leaveTypeID: "",
     success: null,
   });
 
@@ -51,8 +47,7 @@ const NCOArrival = () => {
       event_type: "دخول",
       event_time: moment().locale("en").format("YYYY-MM-DD HH:mm:ss"),
       loggerID: auth.id,
-      start_date: moment(data.start_date).locale("en").format("YYYY-MM-DD"),
-      end_date: null,
+
     };
 
     console.log("Formatted Request Data:", formattedData);
@@ -103,43 +98,19 @@ const NCOArrival = () => {
       .catch((err) => console.log(err));
   }, []);
 
-  useEffect(() => {
-    axios
-      .get(`${process.env.REACT_APP_BACKEND_BASE_URL}/leaveType/`, {
-        headers: {
-          token: auth.token,
-        },
-      })
-      .then((resp) => setLeaveType(resp.data))
-      .catch((err) => console.log(err));
-  }, []);
 
-  const filteredLeaveTypes = leaveType.filter(
-    (type) => ![16, 17, 18].includes(type.id)
-  );
-
-  const leaveTypeOptions = filteredLeaveTypes.map((type) => ({
-    value: type.id,
-    label: type.name,
-  }));
   // Transform officers into format required by react-select
   const officerOptions = officer.map((officer) => ({
     value: officer.id,
     label: `${officer.rank} / ${officer.name}`,
-    leaveTypeID: officer.leaveTypeID, // Attach latest leave type
   }));
 
   // Handle when an officer is selected
   const handleOfficerChange = (selectedOption) => {
     if (selectedOption) {
       setValue("ncoID", selectedOption.value); // Set the ncoID field in react-hook-form
-      setValue("leaveTypeID", selectedOption.leaveTypeID); // Set the leaveTypeID field based on selected officer
 
-      // NEW: Auto-select UI of leaveType
-      const found = leaveTypeOptions.find(
-        (opt) => opt.value === selectedOption.leaveTypeID
-      );
-      setSelectedLeaveType(found || null);
+    
     }
   };
 
@@ -205,29 +176,7 @@ const NCOArrival = () => {
           )}
         </Form.Group>
 
-        {/* Leave Type Dropdown */}
-        <Form.Group controlId="leaveTypeID" className="form-group">
-          <Form.Label>نوع العودة</Form.Label>
-          <Select
-            options={leaveTypeOptions}
-            placeholder="اختر نوع العودة"
-            value={selectedLeaveType} // AUTO SELECTED
-            onChange={(selectedOption) => {
-              setSelectedLeaveType(selectedOption); // Update UI
-              setValue("leaveTypeID", selectedOption.value); // Update form
-            }}
-            styles={customStyles}
-            className="react-select"
-          />
-          {errors.leaveTypeID && (
-            <div className="invalid-feedback d-block">
-              {errors.leaveTypeID.message}
-            </div>
-          )}
-          {errors.leaveTypeID && (
-            <div className="invalid-feedback">{errors.leaveTypeID.message}</div>
-          )}
-        </Form.Group>
+       
 
         {/* Notes */}
         <Form.Group controlId="notes" className="form-group">

@@ -177,9 +177,12 @@ const Calendar = () => {
               <div>
                 <div className="event-name">{e.name}</div>
                 <div className="event-location">📍 {e.location}</div>
+                <div className="event-description">{e.description}</div>
               </div>
 
               {/* X button */}
+                      {(auth?.type === "admin" || auth?.type === "secretary") && (
+
               <button
                 className="btn btn-sm btn-danger"
                 onClick={() => {
@@ -197,6 +200,7 @@ const Calendar = () => {
               >
                 ✖
               </button>
+                      )}
             </div>
           ))
         ) : (

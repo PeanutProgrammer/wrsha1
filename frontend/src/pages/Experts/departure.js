@@ -159,12 +159,8 @@ const ExpertDeparture = () => {
                                           {moment(expert.start_date).format("YYYY/MM/DD")}
                                         </div>
                                         <div>
-                                          {moment(expert.start_date).format("hh:mm")}
-                                          <span>
-                                            {moment(expert.start_date).format("a") === "am"
-                                              ? " ص"
-                                              : " م"}
-                                          </span>
+                                          {moment(expert.start_date).format("hh:mm a")}
+
                                         </div>
                                       </>
                                     ) : (
@@ -179,13 +175,8 @@ const ExpertDeparture = () => {
                                           {moment(expert.end_date).format("YYYY/MM/DD")}
                                         </div>
                                         <div>
-                                          {moment(expert.end_date).format("hh:mm")}
-                                          <span>
-                                            {moment(expert.end_date).format("a") ===
-                                            "am"
-                                              ? " ص"
-                                              : " م"}
-                                          </span>
+                                          {moment(expert.end_date).format("hh:mm a")}
+
                                         </div>
                                       </>
                                     ) : (

@@ -686,13 +686,8 @@ const LeaderUnits = () => {
                                 )}
                               </div>
                               <div>
-                                {moment(officer.event_time).format("hh:mm")}
-                                <span>
-                                  {moment(officer.event_time).format("a") ===
-                                  "am"
-                                    ? " ص"
-                                    : " م"}
-                                </span>
+                                {moment(officer.event_time).format("hh:mm a")}
+
                               </div>
                             </>
                           ) : (

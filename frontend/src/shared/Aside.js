@@ -170,8 +170,11 @@ const Aside = ({ setCollapsed, collapsed }) => {
             <li className="tabs">
               <Link to={"soldiers/manage-tmam"}>تمام الجنود</Link>
             </li>
+                        <li className="tabs">
+              <Link to={"ncos/manage-vacation"}>اجازات ضباط الصف</Link>
+            </li>
             <li className="tabs">
-              <Link to={"shuoon/manage-vacation"}>الاجازات</Link>
+              <Link to={"soldiers/manage-vacation"}>اجازات الجنود</Link>
             </li>
             <li className="tabs">
               <Link to={"shuoon/manage-mission"}>المأموريات</Link>

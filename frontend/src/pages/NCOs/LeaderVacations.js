@@ -280,6 +280,14 @@ const LeaderNCOsVacations = () => {
                   : ""}
                 نوع الاجازة
               </th>
+              <th onClick={() => handleSort("duration")}>
+                {sortConfig.key === "duration"
+                  ? sortConfig.direction === "asc"
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}
+                المدة
+              </th>
               <th onClick={() => handleSort("start_date")}>
                 {sortConfig.key === "start_date"
                   ? sortConfig.direction === "asc"
@@ -296,6 +304,7 @@ const LeaderNCOsVacations = () => {
                   : ""}
                 الفترة إلى
               </th>
+              <th>الرصيد</th>
             </tr>
           </thead>
           <tbody>
@@ -308,6 +317,7 @@ const LeaderNCOsVacations = () => {
                   <td>{officer.name}</td>
                   <td>{officer.department}</td>
                   <td>{officer.leave_type_name}</td>
+                  <td>{officer.duration ? officer.duration : "لا يوجد"}</td>
                   <td>
                     {officer.start_date
                       ? moment(officer.start_date).format("YYYY/MM/DD")
@@ -318,6 +328,7 @@ const LeaderNCOsVacations = () => {
                       ? moment(officer.end_date).format("YYYY/MM/DD")
                       : "لا يوجد"}
                   </td>
+                  <td>{officer.remaining ? officer.remaining : "لا يوجد"}</td>
                 </tr>
               ))
             ) : (

@@ -115,7 +115,7 @@ const LeaderNCOs = () => {
       console.log("🟢 Connected to WebSocket:", socket.id);
     });
 
-    socket.on("officersUpdated", () => {
+    socket.on("ncosUpdated", () => {
       console.log("📢 Officers updated — refetching data...");
       fetchData(); // Re-fetch on update
     });
@@ -391,12 +391,8 @@ const LeaderNCOs = () => {
                           {moment(officer.latest_arrival).format("YYYY/MM/DD")}
                         </div>
                         <div>
-                          {moment(officer.latest_arrival).format("hh:mm")}
-                          <span>
-                            {moment(officer.latest_arrival).format("a") === "am"
-                              ? " ص"
-                              : " م"}
-                          </span>
+                          {moment(officer.latest_arrival).format("hh:mm a")}
+
                         </div>
                       </>
                     ) : (

@@ -67,7 +67,7 @@ const NCOsTmam = () => {
         console.log("🟢 Connected to WebSocket:", socket.id);
       });
 
-      socket.on("officersUpdated", () => {
+    socket.on("ncosUpdated", () => {
         console.log("📢 ncos updated — refetching data...");
         fetchData(); // ✅ Re-fetch on update
       });

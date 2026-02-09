@@ -234,15 +234,11 @@ const LeaderOfficers = () => {
           </InputGroup>
         </Form>
 
-            <Link to="../officer-view">
-      <Button
-        size="md"
-        variant="primary"
-        className="px-3"
-      >
-        بيانات الضباط
-      </Button>
-    </Link>
+        <Link to="../officer-view">
+          <Button size="md" variant="primary" className="px-3">
+            بيانات الضباط
+          </Button>
+        </Link>
       </div>
 
       <div className="daily-summary mt-4">
@@ -346,14 +342,15 @@ const LeaderOfficers = () => {
                     : " 🔽"
                   : ""}
               </th>
-              <th onClick={() => handleSort("in_unit")}>
-                التمام
-                {sortConfig.key === "in_unit"
+              <th onClick={() => handleSort("tmam")}>
+                {sortConfig.key === "tmam"
                   ? sortConfig.direction === "asc"
                     ? " 🔼"
                     : " 🔽"
                   : ""}
+                التواجد
               </th>
+              <th>التمام</th>
               <th onClick={() => handleSort("latest_arrival")}>
                 اخر دخول
                 {sortConfig.key === "latest_arrival"
@@ -370,7 +367,7 @@ const LeaderOfficers = () => {
                     : " 🔽"
                   : ""}
               </th>
-              <th>ملاحظات</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -391,6 +388,8 @@ const LeaderOfficers = () => {
                   >
                     {officer.in_unit ? "متواجد" : "غير موجود"}
                   </td>
+                  <td>{officer.active_tmam ?? "بالوحدة"}</td>
+
                   <td>
                     {officer.latest_arrival ? (
                       <>
@@ -398,12 +397,8 @@ const LeaderOfficers = () => {
                           {moment(officer.latest_arrival).format("YYYY/MM/DD")}
                         </div>
                         <div>
-                          {moment(officer.latest_arrival).format("hh:mm")}
-                          <span>
-                            {moment(officer.latest_arrival).format("a") === "am"
-                              ? " ص"
-                              : " م"}
-                          </span>
+                          {moment(officer.latest_arrival).format("hh:mm a")}
+
                         </div>
                       </>
                     ) : (
@@ -420,22 +415,25 @@ const LeaderOfficers = () => {
                           )}
                         </div>
                         <div>
-                          {moment(officer.latest_departure).format("hh:mm")}
-                          <span>
-                            {moment(officer.latest_departure).format("a") ===
-                            "am"
-                              ? " ص"
-                              : " م"}
-                          </span>
+                          {moment(officer.latest_departure).format("hh:mm a")}
+  
                         </div>
                       </>
                     ) : (
                       "لا يوجد"
                     )}
                   </td>
-                  <td>{officer.in_unit ? "لا يوجد" : officer.tmam}</td>
+                                    <td className=" gap-1 p-1">
+                  
+                                      <Link
+                                        to={`../officers/tmam/details/${officer.mil_id}`}
+                                        className="btn btn-sm btn-secondary mx-1 p-2"
+                                      >
+                                        تفاصيل
+                                      </Link>
+                                    </td>
                 </tr>
-              ))
+              )) 
             ) : (
               <tr>
                 <td colSpan="9" className="text-center">

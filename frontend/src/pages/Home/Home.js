@@ -78,6 +78,21 @@ const Home = () => {
         console.log("📢 Units updated — refetching data...");
         fetchData(); // Re-fetch on update
       });
+
+            socket.on("officersUpdated", () => {
+        console.log("📢 Units updated — refetching data...");
+        fetchData(); // Re-fetch on update
+      });
+
+            socket.on("ncosUpdated", () => {
+        console.log("📢 Units updated — refetching data...");
+        fetchData(); // Re-fetch on update
+      });
+
+            socket.on("soldiersUpdated", () => {
+        console.log("📢 Units updated — refetching data...");
+        fetchData(); // Re-fetch on update
+      });
   
       return () => socket.disconnect();
     }, []);

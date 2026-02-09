@@ -22,7 +22,7 @@ router.get("/", allowAny(leader),(req, res) => {
     console.log("Getting Officers");
     
     PastNCOController.getNCOs(req, res); 
-});
+}); 
 
 
 

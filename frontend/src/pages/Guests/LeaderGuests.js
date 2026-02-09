@@ -290,10 +290,8 @@ const LeaderGuests = () => {
       </div>
 
       <div>
-        {moment(guest.visit_start).format("hh:mm")}
-        <span>
-          {moment(guest.visit_start).format("a") === "am" ? " ص" : " م"}
-        </span>
+        {moment(guest.visit_start).format("hh:mm a")}
+
       </div>
     </>
   ) : (
@@ -306,12 +304,8 @@ const LeaderGuests = () => {
                     <>
                       <div>{moment(guest.visit_end).format("YYYY/MM/DD")}</div>
                       <div>
-                        {moment(guest.visit_end).format("hh:mm")}
-                        <span>
-                          {moment(guest.visit_end).format("a") === "am"
-                            ? " ص"
-                            : " م"}
-                        </span>
+                        {moment(guest.visit_end).format("hh:mm a")}
+
                       </div>
                     </>
                   ) : (

@@ -371,10 +371,8 @@ const [dailySummary, setDailySummary] = useState({
     <>
       <div>{moment(soldier.latest_arrival).format("YYYY/MM/DD")}</div>
       <div>
-        {moment(soldier.latest_arrival).format("hh:mm")}
-        <span>
-          {moment(soldier.latest_arrival).format("a") === "am" ? " ص" : " م"}
-        </span>
+        {moment(soldier.latest_arrival).format("hh:mm a")}
+
       </div>
     </>
   ) : (
@@ -387,10 +385,8 @@ const [dailySummary, setDailySummary] = useState({
     <>
       <div>{moment(soldier.latest_departure).format("YYYY/MM/DD")}</div>
       <div>
-        {moment(soldier.latest_departure).format("hh:mm")}
-        <span>
-          {moment(soldier.latest_departure).format("a") === "am" ? " ص" : " م"}
-        </span>
+        {moment(soldier.latest_departure).format("hh:mm a")}
+
       </div>
     </>
   ) : (

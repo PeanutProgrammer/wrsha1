@@ -676,7 +676,7 @@ LEFT JOIN leave_type lt
 
     // Return the daily summary response
     return res.status(200).json({
-      total: totalSoldiers,
+      total: totalSoldiers - totalAttached,
       available: available,
       attached: totalAttached,
       missing: missing,
@@ -701,7 +701,7 @@ LEFT JOIN leave_type lt
   }
 };
 
- static async getVacationingSoldiers(req, res) {
+  static async getVacationingSoldiers(req, res) {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -720,24 +720,23 @@ LEFT JOIN leave_type lt
       const params = [];
       if (req.query.search) {
         searchClause =
-          "AND (s.name LIKE ? OR s.department LIKE ? OR s.mil_id LIKE ? OR s.rank LIKE ?)";
+          "AND (o.name LIKE ? OR o.department LIKE ? OR o.mil_id LIKE ? OR o.rank LIKE ?)";
         const searchValue = `%${req.query.search}%`;
         params.push(searchValue, searchValue, searchValue, searchValue);
       }
 
       // --- Total count for pagination ---
-      const countQuery = `SELECT COUNT(*) AS total FROM soldiers s JOIN 
-    soldier_leave_details sld ON s.id = sld.soldierID
+      const countQuery = `SELECT COUNT(*) AS total FROM soldiers o JOIN 
+    soldier_leave_details old ON o.id = old.soldierID
 JOIN 
-    leave_type lt ON sld.leaveTypeID = lt.id
+    leave_type lt ON old.leaveTypeID = lt.id
 WHERE 
-    sld.leaveTypeID IN (1, 2, 3, 5, 6, 7, 11, 12, 13)  -- filter by leave types
-    AND s.in_unit = 0  -- filter for soldiers not in unit
-    AND sld.id = (
+    old.leaveTypeID IN (2,3,5,12,21)  -- filter by leave types
+    AND old.id = (
         -- Subquery to get the latest leave record for each soldier
         SELECT MAX(id) 
         FROM soldier_leave_details 
-        WHERE soldierID = s.id
+        WHERE soldierID = o.id
     )  ${searchClause}`;
       const countResult = await query(countQuery, params);
       const total = countResult[0].total;
@@ -746,30 +745,29 @@ WHERE
       // --- Main query ---
       const soldiersQuery = `
       SELECT 
-    s.mil_id, 
-    s.name, 
-    s.rank, 
-    s.department,
-    sld.leaveTypeID,
-    sld.start_date,
-    sld.end_date,
+    o.mil_id, 
+    o.name, 
+    o.rank, 
+    o.department,
+    old.leaveTypeID,
+    old.start_date,
+    old.end_date,
     lt.name AS leave_type_name
 FROM 
-    soldiers s
+    soldiers o
 JOIN 
-    soldier_leave_details sld ON s.id = sld.soldierID
+    soldier_leave_details old ON o.id = old.soldierID
 JOIN 
-    leave_type lt ON sld.leaveTypeID = lt.id
+    leave_type lt ON old.leaveTypeID = lt.id
 WHERE 
-    sld.leaveTypeID IN ( 2, 3, 5, 12, 13, 21)  -- filter by leave types
-    AND s.in_unit = 0  -- filter for soldiers not in unit
-    AND sld.id = (
+    old.leaveTypeID IN (1, 2, 3, 5, 6, 7, 11, 12, 13)  -- filter by leave types
+    AND old.id = (
         -- Subquery to get the latest leave record for each soldier
         SELECT MAX(id) 
         FROM soldier_leave_details 
-        WHERE soldierID = s.id
+        WHERE soldierID = o.id
     )
-         AND sld.start_date <= CURRENT_DATE AND sld.end_date >= CURRENT_DATE
+         AND CURRENT_DATE() BETWEEN old.start_date AND old.end_date
     ${searchClause}  -- for any additional search filters
 LIMIT ? OFFSET ?
 `;

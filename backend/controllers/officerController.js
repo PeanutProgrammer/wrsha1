@@ -352,57 +352,49 @@ class OfficerController {
       const officers = await query(
         `
 SELECT 
-    o.mil_id,
-    o.rank,
-    o.name,
-    o.department,
-    o.in_unit,
+  o.mil_id,
+  o.rank,
+  o.name,
+  o.department,
+  o.in_unit,
 
-    -- Last departure
-    (
-        SELECT ol.event_time
-        FROM officer_log ol
-        WHERE ol.officerID = o.id AND ol.event_type = 'خروج'
-        ORDER BY ol.event_time DESC
-        LIMIT 1
-    ) AS latest_departure,
+  (
+    SELECT ol.event_time
+    FROM officer_log ol
+    WHERE ol.officerID = o.id AND ol.event_type = 'خروج'
+    ORDER BY ol.event_time DESC
+    LIMIT 1
+  ) AS latest_departure,
 
-    -- Last arrival
-    (
-        SELECT ol.event_time
-        FROM officer_log ol
-        WHERE ol.officerID = o.id AND ol.event_type = 'دخول'
-        ORDER BY ol.event_time DESC
-        LIMIT 1
-    ) AS latest_arrival,
+  (
+    SELECT ol.event_time
+    FROM officer_log ol
+    WHERE ol.officerID = o.id AND ol.event_type = 'دخول'
+    ORDER BY ol.event_time DESC
+    LIMIT 1
+  ) AS latest_arrival,
 
-    -- Latest leave ID
-    (
-        SELECT id
-        FROM officer_leave_details old
-        WHERE old.officerID = o.id
-        ORDER BY old.id DESC
-        LIMIT 1
-    ) AS latest_leave_id,
+  (
+    SELECT old.id
+    FROM officer_leave_details old
+    WHERE old.officerID = o.id
+      AND CURDATE() BETWEEN old.start_date AND old.end_date
+    LIMIT 1
+  ) AS active_tmam_id,
 
-    lt.name AS tmam
+  (
+    SELECT lt.name
+    FROM officer_leave_details old
+    JOIN leave_type lt ON lt.id = old.leaveTypeID
+    WHERE old.officerID = o.id
+      AND CURDATE() BETWEEN old.start_date AND old.end_date
+    LIMIT 1
+  ) AS active_tmam
+
 FROM officers o
-LEFT JOIN officer_leave_details old
-    ON old.id = (
-        SELECT id
-        FROM officer_leave_details
-        WHERE officerID = o.id
-        ORDER BY id DESC
-        LIMIT 1
-    )
-LEFT JOIN leave_type lt
-    ON lt.id = old.leaveTypeID
 ${searchClause}
 ORDER BY o.id
 LIMIT ? OFFSET ?
-
-
-
 
 `,
         [...params, limit, offset]
@@ -439,50 +431,63 @@ LIMIT ? OFFSET ?
       }
 
       const query = util.promisify(connection.query).bind(connection);
-      // let search = ""
-      // if (req.query.search) {
-      //     search =  `where name LIKE '%${req.query.search}%'`
-      // }
-      const officer = await query("select * from officers where mil_id = ?", [
+
+      // Ensure officer exists
+      const officer = await query("SELECT id FROM officers WHERE mil_id = ?", [
         req.params.id,
       ]);
-      console.log("hey");
-      if (officer.length == 0) {
+
+      if (officer.length === 0) {
         return res.status(404).json({
-          msg: "no officers found blah",
+          msg: "Officer not found",
         });
       }
 
-      const officerObject = new Officer(
-        officer[0].name,
-        officer[0].join_date,
-        officer[0].department,
-        officer[0].mil_id,
-        officer[0].rank,
-        officer[0].in_unit
-      );
-      const officerTmam = await query(
-        `SELECT officers.mil_id ,officers.rank,officers.name, officers.in_unit, officer_log.event_type, officer_log.event_time, officers.department, leave_type.name AS 'tmam', officer_leave_details.start_date, officer_leave_details.end_date, officer_leave_details.destination, officer_leave_details.duration, officer_leave_details.remaining, officer_log.notes
-                                          FROM officers
-                                          LEFT JOIN officer_leave_details
-                                          ON officer_leave_details.officerID = officers.id
-                                          LEFT JOIN leave_type
-                                          on leave_type.id = officer_leave_details.leaveTypeID
-                                          LEFT JOIN officer_log
-                                          ON officer_log.id = officer_leave_details.movementID
-                                          WHERE officers.mil_id = ?
-                                          ORDER BY officer_leave_details.id DESC
-                                          `,
-        [officerObject.getMilID()]
+      // Past TMAMs (Shuoon only)
+      const tmamHistory = await query(
+        `
+      SELECT
+          o.mil_id,
+          o.rank,
+          o.name,
+          o.department,
+
+          old.id AS tmam_id,
+          lt.name AS tmam,
+          old.start_date,
+          old.end_date,
+          old.destination,
+          old.duration,
+          old.remaining
+
+      FROM officers o
+      JOIN officer_leave_details old
+          ON old.officerID = o.id
+      JOIN leave_type lt
+          ON lt.id = old.leaveTypeID
+
+      WHERE o.mil_id = ?
+        AND old.end_date < CURDATE()
+        AND lt.id IN (1,2,3,4,5,6,7,8,10,11,12,13,14,22)
+
+      ORDER BY old.start_date DESC
+      `,
+        [req.params.id]
       );
 
-      return res.status(200).json(officerTmam);
+      return res.status(200).json({
+        officerMilId: req.params.id,
+        total: tmamHistory.length,
+        data: tmamHistory,
+      });
     } catch (err) {
-      return res.status(500).json({ err: err });
+      console.error(err);
+      return res.status(500).json({
+        message: "An unexpected error occurred",
+        error: err.message,
+      });
     }
   }
-
-  
 
   static async filterOfficers(req, res) {
     try {
@@ -703,6 +708,7 @@ WHERE
     old.start_date,
     old.end_date,
     old.remaining,
+    old.duration,
     lt.name AS leave_type_name
 FROM 
     officers o
@@ -712,7 +718,6 @@ JOIN
     leave_type lt ON old.leaveTypeID = lt.id
 WHERE 
     old.leaveTypeID IN (1, 2, 3, 5, 6, 7, 11, 12, 13)  -- filter by leave types
-    AND o.in_unit = 0  -- filter for officers not in unit
     AND old.id = (
         -- Subquery to get the latest leave record for each officer
         SELECT MAX(id) 
@@ -875,7 +880,6 @@ WHERE
         leave_type lt ON old.leaveTypeID = lt.id
       WHERE 
         old.leaveTypeID IN (8)
-        AND o.in_unit = 0
         AND CURDATE() BETWEEN old.start_date AND old.end_date ${searchClause}`;
       const countResult = await query(countQuery, params);
       const total = countResult[0].total;
@@ -901,7 +905,6 @@ WHERE
         leave_type lt ON old.leaveTypeID = lt.id
       WHERE 
         old.leaveTypeID IN (8)
-        AND o.in_unit = 0
         AND CURDATE() BETWEEN old.start_date AND old.end_date
         ${searchClause}
       LIMIT ? OFFSET ?`;
@@ -929,114 +932,100 @@ WHERE
     }
   }
 
+  static async getDailySummary(req, res) {
+    try {
+      const query = util.promisify(connection.query).bind(connection);
+      const today = moment().format("YYYY-MM-DD"); // today
 
-  static async getDailySummary(req, res)  {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
+      // Fetch all officers
+      const officers = await query(`
+            SELECT 
+        o.id,
+        o.mil_id,
+        o.rank,
+        o.name,
+        o.department,
+        o.attached,
 
-    const query = util.promisify(connection.query).bind(connection);
+        -- Active leave for today
+        old.id AS active_tmam_id,
+        lt.name AS tmam
+      FROM officers o
+      LEFT JOIN officer_leave_details old
+        ON old.officerID = o.id
+      AND CURDATE() BETWEEN old.start_date AND old.end_date
 
-    // Query all officers' data for the summary calculation
-    const officers = await query(`
-SELECT 
-    o.mil_id,
-    o.rank,
-    o.name,
-    o.department,
-    o.in_unit,
-    o.attached,
+      LEFT JOIN leave_type lt
+        ON lt.id = old.leaveTypeID;
 
-
-    -- Latest leave ID
-    (
-        SELECT id
-        FROM officer_leave_details old
-        WHERE old.officerID = o.id
-        ORDER BY old.id DESC
-        LIMIT 1
-    ) AS latest_leave_id,
-
-    lt.name AS tmam
-FROM officers o
-LEFT JOIN officer_leave_details old
-    ON old.id = (
-        SELECT id
-        FROM officer_leave_details
-        WHERE officerID = o.id
-        ORDER BY id DESC
-        LIMIT 1
-    )
-LEFT JOIN leave_type lt
-    ON lt.id = old.leaveTypeID;
     `);
 
-    if (!officers.length) {
-      return res.status(404).json({ msg: "No officers found" });
+      if (!officers.length) {
+        return res.status(404).json({ msg: "No officers found" });
+      }
+
+      // Total attached officers
+      const totalAttached = officers.filter((o) => o.attached).length;
+      const totalOfficers = officers.length - totalAttached;
+
+      // Available = officers who have **no active tmam today**
+      const available = officers.filter((o) => !o.active_tmam_id).length;
+      const missing = totalOfficers + totalAttached - available;
+
+      const keyMap = {
+        "فرقة / دورة": "فرقة_دورة",
+        "بدل راحة": "بدل_راحة",
+        "اجازة ميدانية": "اجازة_ميدانية",
+        "اجازة سنوية": "اجازة_سنوية",
+        "اجازة مرضية": "اجازة_مرضية",
+      };
+      // Count each tmam type
+      const tmamCounts = {
+        ثابتة: 0,
+        فرقة_دورة: 0,
+        راحة: 0,
+        بدل_راحة: 0,
+        عارضة: 0,
+        اجازة_ميدانية: 0,
+        منحة: 0,
+        اجازة_سنوية: 0,
+        اجازة_مرضية: 0,
+        سفر: 0,
+        مأمورية: 0,
+        عيادة: 0,
+      };
+
+      officers.forEach((officer) => {
+        if (officer.tmam) {
+          const key = keyMap[officer.tmam] || officer.tmam.replace(/\s/g, "_");
+          if (tmamCounts.hasOwnProperty(key)) {
+            tmamCounts[key]++;
+          }
+        }
+      });
+
+      const totalExits = Object.values(tmamCounts).reduce((a, b) => a + b, 0);
+      const percentageAvailable = totalOfficers
+        ? ((missing / (totalOfficers + totalAttached)) * 100).toFixed(2)
+        : 0;
+
+      return res.status(200).json({
+        total: totalOfficers,
+        available,
+        attached: totalAttached,
+        missing,
+        تمام_الخوارج: tmamCounts,
+        اجمالي_الخوارج: totalExits,
+        percentageAvailable,
+      });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({
+        message: "An unexpected error occurred",
+        error: err.message,
+      });
     }
-
-    // Calculate the summary
-    const totalAttached = officers.filter((officer) => officer.attached).length;
-        const totalOfficers = officers.length - totalAttached;
-
-    const available = officers.filter((officer) => officer.in_unit).length;
-    const missing = totalOfficers - available;
-    const fixedMission = officers.filter((officer) => officer.tmam === "مأمورية ثابتة" && !officer.in_unit).length;
-    const course = officers.filter((officer) => officer.tmam === "فرقة / دورة"  && !officer.in_unit).length;
-
-    // Breakdown for اجازة types
-    const normalLeave = officers.filter((officer) => officer.tmam === "راحة"  && !officer.in_unit).length;
-    const compensatoryLeave = officers.filter((officer) => officer.tmam === "بدل راحة"  && !officer.in_unit).length;
-    const casualLeave = officers.filter((officer) => officer.tmam === "عارضة" && !officer.in_unit).length;
-    const fieldLeave = officers.filter((officer) => officer.tmam === "اجازة ميدانية" && !officer.in_unit).length;
-    const grantLeave = officers.filter((officer) => officer.tmam === "منحة" && !officer.in_unit).length;
-
-    // Other categories
-    const annualLeave = officers.filter((officer) => officer.tmam === "اجازة سنوية"  && !officer.in_unit).length;
-    const sickLeave = officers.filter((officer) => officer.tmam === "اجازة مرضية" && !officer.in_unit).length;
-    const travel = officers.filter((officer) => officer.tmam === "سفر" && !officer.in_unit).length;
-    const mission = officers.filter((officer) => (officer.tmam === "مأمورية" || officer.tmam === "مأمورية جهاز الخدمات العامة") && !officer.in_unit).length;
-    const hospital = officers.filter((officer) => officer.tmam === "عيادة" && !officer.in_unit).length;
-
-    // Calculating total exits (اجمالي الخوارج)
-    const totalExits = fixedMission + course + normalLeave + compensatoryLeave + casualLeave + fieldLeave + grantLeave + annualLeave + sickLeave + travel + mission + hospital;
-
-    // Calculate the percentage of available officers
-    const percentageAvailable = totalOfficers ? ((missing / totalOfficers) * 100).toFixed(2) : 0;
-
-    // Return the daily summary response
-    return res.status(200).json({
-      total: totalOfficers,
-      available: available,
-      attached: totalAttached,
-      missing: missing,
-      تمام_الخوارج: {
-        ثابتة: fixedMission,
-        فرقة_دورة: course,
-        راحة: normalLeave,
-        بدل_راحة: compensatoryLeave,
-        عارضة: casualLeave,
-        اجازة_ميدانية: fieldLeave,
-        منحة: grantLeave,
-        اجازة_سنوية: annualLeave,
-        اجازة_مرضية: sickLeave,
-        سفر: travel,
-        مأمورية: mission,
-        مستشفى: hospital,
-      },
-      اجمالي_الخوارج: totalExits,
-      percentageAvailable: percentageAvailable,
-    });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({
-      message: "An unexpected error occurred",
-      error: err.message,
-    });
   }
-};
 }
 
 module.exports = OfficerController;

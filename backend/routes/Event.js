@@ -15,12 +15,12 @@ router.get("/", allowAny(leader), (req, res) => {
 router.post("/",allowAny(admin, secretary),
     body("name")
         .isString().withMessage("من فضلك أدخل اسم صحيح")
-        .isLength({ min: 3, max: 40 }).withMessage("الاسم يجب أن يكون بين 3 و 40 حرفًا"),
+        .isLength({ min: 3, max: 200 }).withMessage("الاسم يجب أن يكون بين 3 و 200 حرفًا"),
 
     body("location")
         .optional()
         .isString().withMessage("من فضلك أدخل مكان صحيح")
-        .isLength({ max: 100 }).withMessage("المكان يجب أن لا يزيد عن 100 حرف"),
+        .isLength({ max: 200 }).withMessage("المكان يجب أن لا يزيد عن 200 حرف"),
 
     body("description")
         .optional()

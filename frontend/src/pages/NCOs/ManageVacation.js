@@ -1,6 +1,14 @@
 import React, { useState, useEffect, useMemo } from "react";
 import "../../style/style.css";
-import { Table, Alert, Form, InputGroup, Button, Dropdown, DropdownButton } from "react-bootstrap";
+import {
+  Table,
+  Alert,
+  Form,
+  InputGroup,
+  Button,
+  Dropdown,
+  DropdownButton,
+} from "react-bootstrap";
 import axios from "axios";
 import { getAuthUser } from "../../helper/Storage";
 import moment from "moment";
@@ -10,10 +18,10 @@ const toWesternDigits = (str) => {
   return str.replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
 };
 
-const ManageShuoonVacation = () => {
+const ManageNCOVacation = () => {
   const auth = getAuthUser();
   const [sortConfig, setSortConfig] = useState({ key: "", direction: "asc" });
-  const [units, setUnits] = useState({
+  const [ncos, setNCOs] = useState({
     loading: true,
     err: null,
     results: [],
@@ -23,35 +31,34 @@ const ManageShuoonVacation = () => {
     search: "",
     limit: 15,
     tempSearch: "",
-    selectedType: "both", // Track selected filter type (soldiers, ncos, both)
     filterReturningToday: false, // Track if filtering for those returning today
   });
 
   // Fetch data when page, search, or selectedType change
   useEffect(() => {
     const fetchData = () => {
-      const searchValue = toWesternDigits(units.search.trim());
+      const searchValue = toWesternDigits(ncos.search.trim());
 
       // Include filterReturningToday in the query parameters
-      const url = `${process.env.REACT_APP_BACKEND_BASE_URL}/shuoon/vacations?page=${units.page}&limit=${units.limit}&search=${searchValue}&type=${units.selectedType}&filterReturningToday=${units.filterReturningToday}`;
+      const url = `${process.env.REACT_APP_BACKEND_BASE_URL}/nco/vacations?page=${ncos.page}&limit=${ncos.limit}&search=${searchValue}&type=${ncos.selectedType}&filterReturningToday=${ncos.filterReturningToday}`;
 
       axios
         .get(url, {
           headers: { token: auth.token },
         })
         .then((resp) => {
-          setUnits({
-            ...units,
+          setNCOs({
+            ...ncos,
             results: resp.data.data || [],
             totalPages: resp.data.totalPages || 1,
-            limit: resp.data.limit || units.limit,
+            limit: resp.data.limit || ncos.limit,
             loading: false,
             err: null,
           });
         })
         .catch((err) => {
-          setUnits({
-            ...units,
+          setNCOs({
+            ...ncos,
             loading: false,
             err: err.response
               ? JSON.stringify(err.response.data.errors)
@@ -61,13 +68,13 @@ const ManageShuoonVacation = () => {
     };
 
     fetchData(); // Initial data fetch or when state changes
-  }, [units.page, units.search, units.selectedType, units.filterReturningToday]); // Dependency array includes filterReturningToday
+  }, [ncos.page, ncos.search, ncos.filterReturningToday]); // Dependency array includes filterReturningToday
 
   // Handle search form submit
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    const normalized = toWesternDigits(units.tempSearch.trim());
-    setUnits((prev) => ({
+    const normalized = toWesternDigits(ncos.tempSearch.trim());
+    setNCOs((prev) => ({
       ...prev,
       search: normalized,
       page: 1,
@@ -77,7 +84,7 @@ const ManageShuoonVacation = () => {
 
   // Clear search input
   const handleClearSearch = () => {
-    setUnits((prev) => ({
+    setNCOs((prev) => ({
       ...prev,
       search: "",
       tempSearch: "",
@@ -88,17 +95,18 @@ const ManageShuoonVacation = () => {
 
   // Pagination handlers
   const handlePrevPage = () => {
-    if (units.page > 1) setUnits((prev) => ({ ...prev, page: prev.page - 1 }));
+    if (ncos.page > 1)
+      setNCOs((prev) => ({ ...prev, page: prev.page - 1 }));
   };
 
   const handleNextPage = () => {
-    if (units.page < units.totalPages)
-      setUnits((prev) => ({ ...prev, page: prev.page + 1 }));
+    if (ncos.page < ncos.totalPages)
+      setNCOs((prev) => ({ ...prev, page: prev.page + 1 }));
   };
 
   const handleJumpToPage = (number) => {
-    if (number >= 1 && number <= units.totalPages) {
-      setUnits((prev) => ({ ...prev, page: number }));
+    if (number >= 1 && number <= ncos.totalPages) {
+      setNCOs((prev) => ({ ...prev, page: number }));
     }
   };
 
@@ -112,33 +120,37 @@ const ManageShuoonVacation = () => {
   };
 
   // Filter logic: Apply if filter is active
-  const filteredUnits = useMemo(() => {
-    let result = units.results;
+  const filteredOfficers = useMemo(() => {
+    let result = ncos.results;
 
-    // If filterReturningToday is active, filter the units
-    if (units.filterReturningToday) {
+    // If filterReturningToday is active, filter the ncos
+    if (ncos.filterReturningToday) {
       const today = moment().format("YYYY/MM/DD");
-      result = result.filter((unit) => moment(unit.end_date).isSame(today, "day"));
+      result = result.filter((nco) =>
+        moment(nco.end_date).isSame(today, "day")
+      );
     }
 
     // Apply sorting
     if (sortConfig.key) {
       result = result.sort((a, b) => {
-        if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === "asc" ? 1 : -1;
-        if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === "asc" ? -1 : 1;
+        if (a[sortConfig.key] > b[sortConfig.key])
+          return sortConfig.direction === "asc" ? 1 : -1;
+        if (a[sortConfig.key] < b[sortConfig.key])
+          return sortConfig.direction === "asc" ? -1 : 1;
         return 0;
       });
     }
 
     return result;
-  }, [units.results, units.filterReturningToday, sortConfig]);
+  }, [ncos.results, ncos.filterReturningToday, sortConfig]);
 
   // Render pagination buttons
   const renderPageButtons = () => {
     const pages = [];
     const maxButtons = 5;
-    let start = Math.max(units.page - 2, 1);
-    let end = Math.min(start + maxButtons - 1, units.totalPages);
+    let start = Math.max(ncos.page - 2, 1);
+    let end = Math.min(start + maxButtons - 1, ncos.totalPages);
     start = Math.max(end - maxButtons + 1, 1);
 
     for (let num = start; num <= end; num++) {
@@ -146,7 +158,7 @@ const ManageShuoonVacation = () => {
         <Button
           key={num}
           onClick={() => handleJumpToPage(num)}
-          variant={num === units.page ? "primary" : "outline-primary"}
+          variant={num === ncos.page ? "primary" : "outline-primary"}
           className="mx-1 btn-sm"
         >
           {num}
@@ -160,49 +172,42 @@ const ManageShuoonVacation = () => {
     <div className="Officers p-5">
       {/* Header */}
       <div className="header d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-        <h3 className="text-white">إدارة اجازات الصف والجنود</h3>
-
-        {/* Type Filter Dropdown */}
-       <div className="custom-dropdown-button">
-  <DropdownButton
-    id="dropdown-type-button"
-    title={`عرض ${units.selectedType === "ncos" ? "ضباط الصف" : units.selectedType === "soldiers" ? "الجنود" : "الكل"}`}
-    variant="outline-secondary"
-    onSelect={(e) => setUnits((prev) => ({ ...prev, selectedType: e }))}>
-    <Dropdown.Item eventKey="both">عرض الكل</Dropdown.Item>
-    <Dropdown.Item eventKey="soldiers">الجنود</Dropdown.Item>
-    <Dropdown.Item eventKey="ncos">ضباط الصف</Dropdown.Item>
-  </DropdownButton>
-</div>
-
+        <h3 className="text-white"> اجازات الضباط </h3>
 
         {/* Search bar */}
-        <Form className="d-flex align-items-center flex-grow-1" onSubmit={handleSearchSubmit}>
+        <Form
+          className="d-flex align-items-center flex-grow-1"
+          onSubmit={handleSearchSubmit}
+        >
           <InputGroup className="w-50 shadow-sm me-5">
             <Form.Control
               size="sm"
               placeholder="بحث 🔍"
-              value={units.tempSearch}
+              value={ncos.tempSearch}
               onChange={(e) =>
-                setUnits((prev) => ({ ...prev, tempSearch: e.target.value }))
+                setNCOs((prev) => ({ ...prev, tempSearch: e.target.value }))
               }
             />
-            {units.tempSearch && (
-              <Button size="sm" variant="outline-secondary" onClick={handleClearSearch}>
+            {ncos.tempSearch && (
+              <Button
+                size="sm"
+                variant="outline-secondary"
+                onClick={handleClearSearch}
+              >
                 ×
               </Button>
             )}
           </InputGroup>
         </Form>
 
-               {/* Filter Toggle */}
+        {/* Filter Toggle */}
         <div className="filter-toggle">
           <input
             type="checkbox"
             id="filterReturningToday"
-            checked={units.filterReturningToday}
+            checked={ncos.filterReturningToday}
             onChange={() =>
-              setUnits((prev) => ({
+              setNCOs((prev) => ({
                 ...prev,
                 filterReturningToday: !prev.filterReturningToday,
                 page: 1,
@@ -216,7 +221,7 @@ const ManageShuoonVacation = () => {
       </div>
 
       {/* Loading Indicator */}
-      {units.loading && (
+      {ncos.loading && (
         <div className="loading-spinner">
           <div className="spinner"></div>
           <p>جاري التحميل...</p>
@@ -224,9 +229,9 @@ const ManageShuoonVacation = () => {
       )}
 
       {/* Error Message */}
-      {units.err && (
+      {ncos.err && (
         <Alert variant="danger" className="p-2 text-center">
-          {units.err}
+          {ncos.err}
         </Alert>
       )}
 
@@ -249,7 +254,7 @@ const ManageShuoonVacation = () => {
                     ? " 🔼"
                     : " 🔽"
                   : ""}
-                الدرجة
+                الرتبة
               </th>
               <th onClick={() => handleSort("name")}>
                 {sortConfig.key === "name"
@@ -291,25 +296,39 @@ const ManageShuoonVacation = () => {
                   : ""}
                 الفترة إلى
               </th>
+              <th>المدة</th>
+              <th>الرصيد</th>
             </tr>
           </thead>
           <tbody>
-            {filteredUnits.length > 0 ? (
-              filteredUnits.map((unit, index) => (
-                <tr key={unit.mil_id}>
-                  <td>{(units.page - 1) * units.limit + index + 1}</td>
-                  <td>{unit.mil_id}</td>
-                  <td>{unit.rank}</td>
-                  <td>{unit.name}</td>
-                  <td>{unit.department}</td>
-                  <td>{unit.leave_type_name}</td>
-                  <td>{unit.start_date ? moment(unit.start_date).format("YYYY/MM/DD") : "لا يوجد"}</td>
-                  <td>{unit.end_date ? moment(unit.end_date).format("YYYY/MM/DD") : "لا يوجد"}</td>
+            {filteredOfficers.length > 0 ? (
+              filteredOfficers.map((nco, index) => (
+                <tr key={nco.mil_id}>
+                  <td>{(ncos.page - 1) * ncos.limit + index + 1}</td>
+                  <td>{nco.mil_id}</td>
+                  <td>{nco.rank}</td>
+                  <td>{nco.name}</td>
+                  <td>{nco.department}</td>
+                  <td>{nco.leave_type_name}</td>
+                  <td>
+                    {nco.start_date
+                      ? moment(nco.start_date).format("YYYY/MM/DD")
+                      : "لا يوجد"}
+                  </td>
+                  <td>
+                    {nco.end_date
+                      ? moment(nco.end_date).format("YYYY/MM/DD")
+                      : "لا يوجد"}
+                  </td>
+                  <td>{nco.duration || "لا يوجد"}</td>
+                  <td>{nco.remaining || "لا يوجد"}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="8" className="text-center">لا توجد بيانات</td>
+                <td colSpan="10" className="text-center">
+                  لا توجد بيانات
+                </td>
               </tr>
             )}
           </tbody>
@@ -318,11 +337,21 @@ const ManageShuoonVacation = () => {
 
       {/* Pagination Controls */}
       <div className="d-flex justify-content-between align-items-center mt-3">
-        <Button onClick={handlePrevPage} disabled={units.page === 1} variant="secondary" size="sm">
+        <Button
+          onClick={handlePrevPage}
+          disabled={ncos.page === 1}
+          variant="secondary"
+          size="sm"
+        >
           السابق
         </Button>
         <div>{renderPageButtons()}</div>
-        <Button onClick={handleNextPage} disabled={units.page === units.totalPages} variant="secondary" size="sm">
+        <Button
+          onClick={handleNextPage}
+          disabled={ncos.page === ncos.totalPages}
+          variant="secondary"
+          size="sm"
+        >
           التالي
         </Button>
       </div>
@@ -330,4 +359,4 @@ const ManageShuoonVacation = () => {
   );
 };
 
-export default ManageShuoonVacation;
+export default ManageNCOVacation;

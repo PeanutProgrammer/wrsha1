@@ -79,7 +79,7 @@ const NCOs = () => {
       console.log("🟢 Connected to WebSocket:", socket.id);
     });
 
-    socket.on("officersUpdated", () => {
+    socket.on("ncosUpdated", () => {
       console.log("📢 Officers updated — refetching data...");
       fetchData(); // ✅ Re-fetch on update
     });

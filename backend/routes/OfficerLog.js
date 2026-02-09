@@ -14,7 +14,6 @@ router.post(
   "/",
   gate,
   body("officerID").isNumeric().withMessage("من فضلك أدخل اسم ضابط صحيح"),
-  body("leaveTypeID").isNumeric().withMessage("من فضلك أدخل نوع عودة صحيح"),
   body("loggerID").isNumeric(),
   body("event_type").isAlphanumeric("ar-EG"),
   body("event_time").custom((value) => {
@@ -41,15 +40,7 @@ router.post(
   "/departure",
   gate,
   body("officerID").isNumeric().withMessage("من فضلك أدخل اسم ضابط صحيح"),
-  body("leaveTypeID")
-    .optional({ nullable: true })
-    .custom((value) => {
-      if (value === null) return true; // null is allowed
-      if (!Number.isInteger(Number(value))) {
-        throw new Error("من فضلك أدخل نوع خروج صحيح");
-      }
-      return true;
-    }),
+ 
 
   body("loggerID").isNumeric(),
   body("event_type").isAlphanumeric("ar-EG"),
@@ -67,44 +58,6 @@ router.post(
     }
     return true;
   }),
-
-  // Updated validation for start_date (optional)
-  body("start_date")
-    .optional() // Make start_date optional
-    .custom((value, { req }) => {
-      if (value) {
-        // Only validate if start_date is provided
-        if (!moment(value, "YYYY-MM-DD", true).isValid()) {
-          throw new Error(
-            "تاريخ الخروج يجب أن يكون بالتنسيق الصحيح (YYYY-MM-DD)."
-          );
-        }
-        if (moment(value).isAfter(req.body.end_date)) {
-          throw new Error("تاريخ ووقت الخروج يجب أن يكون قبل تاريخ الانتهاء.");
-        }
-      }
-      return true;
-    }),
-
-  // Updated validation for end_date (optional)
-  body("end_date")
-    .optional() // Make end_date optional
-    .custom((value, { req }) => {
-      if (value) {
-        // Only validate if end_date is provided
-        if (!moment(value, "YYYY-MM-DD", true).isValid()) {
-          throw new Error(
-            "تاريخ العودة يجب أن يكون بالتنسيق الصحيح (YYYY-MM-DD)."
-          );
-        }
-        if (moment(value).isBefore(req.body.start_date)) {
-          throw new Error("تاريخ العودة يجب أن يكون بعد تاريخ البدء.");
-        }
-      }
-      return true;
-    }),
-
-  body("destination").isString().withMessage("من فضلك أدخل الوجهة.").optional(), // Optional destination
 
   // The final handler
   (req, res) => {
@@ -140,6 +93,8 @@ router.post(
   body("destination").isString().withMessage("من فضلك أدخل الوجهة."),
   body("remaining").isString().withMessage("من فضلك أدخل المتبقي.").optional(),
   body("duration").isString().withMessage("من فضلك أدخل المدة.").optional(),
+  body("notes").isString().withMessage("من فضلك أدخل الملاحظات.").optional(),
+
   (req, res) => {
     OfficerLogController.createTmam(req, res);
   }
@@ -172,6 +127,8 @@ router.put(
   body("destination").isString().withMessage("من فضلك أدخل الوجهة."),
   body("remaining").isString().withMessage("من فضلك أدخل المتبقي.").optional(),
     body("duration").isString().withMessage("من فضلك أدخل المدة.").optional(),
+      body("notes").isString().withMessage("من فضلك أدخل الملاحظات.").optional(),
+
 
 
   (req, res) => {

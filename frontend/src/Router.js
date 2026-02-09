@@ -61,6 +61,7 @@ import UpdateNCOTmam from "./pages/NCOs/UpdateTmam";
 import LeaderNCOs from "./pages/NCOs/LeaderNCOs";
 import LeaderNCOsVacations from "./pages/NCOs/LeaderVacations";
 import NCOsView from "./pages/NCOs/NCOsView";
+import ManageNCOVacation from "./pages/NCOs/ManageVacation";
 // Soldiers
 import Soldiers from "./pages/Soldiers/Soldiers";
 import AddSoldiers from "./pages/Soldiers/AddSoldiers";
@@ -79,6 +80,7 @@ import UpdateSoldierTmam from "./pages/Soldiers/UpdateTmam";
 import LeaderSoldiers from "./pages/Soldiers/LeaderSoldiers";
 import LeaderSoldiersVacations from "./pages/Soldiers/LeaderVacations";
 import SoldiersView from "./pages/Soldiers/SoldiersView";
+import ManageSoldierVacation from "./pages/Soldiers/ManageVacation"; 
 // import RealTimeMonitor from "./pages/Soldiers/RealTimeMonitor";
 
 // Civillians
@@ -427,7 +429,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "tmam/details/:id",
-            element: <ProtectedRoute allowedTypes={["admin", "شؤون ضباط"]} />,
+            element: <ProtectedRoute allowedTypes={["admin", "شؤون ضباط", "مبنى القيادة"]} />,
             children: [{ path: "", element: <OfficersTmamDetails /> }],
           },
           {
@@ -586,6 +588,11 @@ export const router = createBrowserRouter([
             element: <ProtectedRoute allowedTypes={"شؤون ادارية"} />,
             children: [{ path: "", element: <ManageNCOTmam /> }],
           },
+                    {
+            path: "manage-vacation",
+            element: <ProtectedRoute allowedTypes={"شؤون ادارية"} />,
+            children: [{ path: "", element: <ManageNCOVacation /> }],
+          },
         ],
       },
 
@@ -665,6 +672,11 @@ export const router = createBrowserRouter([
             path: "manage-tmam",
             element: <ProtectedRoute allowedTypes={"شؤون ادارية"} />,
             children: [{ path: "", element: <ManageSoldierTmam /> }],
+          },
+                    {
+            path: "manage-vacation",
+            element: <ProtectedRoute allowedTypes={"شؤون ادارية"} />,
+            children: [{ path: "", element: <ManageSoldierVacation /> }],
           },
         ],
       },
@@ -819,41 +831,41 @@ export const router = createBrowserRouter([
       // Past Workers
       {
         path: "past-workers",
-        element: <ProtectedRoute allowedTypes={["admin", "مبنى القيادة"]} />,
+        element: <ProtectedRoute allowedTypes={["admin", "مبنى القيادة", "secretary"]} />,
         children: [
           { path: "", element: <PastWorkersHome /> },
           {
             path: "officers",
             element: (
-              <ProtectedRoute allowedTypes={["admin", "مبنى القيادة"]} />
+              <ProtectedRoute allowedTypes={["admin", "مبنى القيادة", "secretary"]} />
             ),
             children: [{ path: "", element: <PastOfficers /> }],
           },
           {
             path: "officers/:id",
             element: (
-              <ProtectedRoute allowedTypes={["admin", "مبنى القيادة"]} />
+              <ProtectedRoute allowedTypes={["admin", "مبنى القيادة", "secretary"]} />
             ),
             children: [{ path: "", element: <PastOfficerDetails /> }],
           },
           {
             path: "ncos",
             element: (
-              <ProtectedRoute allowedTypes={["admin", "مبنى القيادة"]} />
+              <ProtectedRoute allowedTypes={["admin", "مبنى القيادة", "secretary"]} />
             ),
             children: [{ path: "", element: <PastNCOs /> }],
           },
           {
             path: "ncos/:id",
             element: (
-              <ProtectedRoute allowedTypes={["admin", "مبنى القيادة"]} />
+              <ProtectedRoute allowedTypes={["admin", "مبنى القيادة", "secretary"]} />
             ),
             children: [{ path: "", element: <PastNCODetails /> }],
           },
           {
             path: "search",
             element: (
-              <ProtectedRoute allowedTypes={["admin", "مبنى القيادة"]} />
+              <ProtectedRoute allowedTypes={["admin", "مبنى القيادة", "secretary"]} />
             ),
             children: [{ path: "", element: <SearchPastWorkers /> }],
           },

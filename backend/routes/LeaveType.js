@@ -7,8 +7,9 @@ const shuoonOfficers = require("../middleware/shuoonOfficers");
 const LeaveTypeController = require("../controllers/leaveTypeController");
 const allowAny = require("../middleware/allowAny");
 const securityHead = require("../middleware/securityHead");
+const shuoonSarya = require("../middleware/shuoonSarya");
 
-router.get("/", allowAny(gate,shuoonOfficers), (req, res) => {
+router.get("/", allowAny(gate,shuoonOfficers, shuoonSarya), (req, res) => {
     LeaveTypeController.getLeaveTypes(req, res);
 });
 

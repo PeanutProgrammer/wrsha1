@@ -388,12 +388,8 @@ const SecurityExperts = () => {
                           {moment(expert.latest_arrival).format("YYYY/MM/DD")}
                         </div>
                         <div>
-                          {moment(expert.latest_arrival).format("hh:mm")}
-                          <span>
-                            {moment(expert.latest_arrival).format("a") === "am"
-                              ? " ص"
-                              : " م"}
-                          </span>
+                          {moment(expert.latest_arrival).format("hh:mm a")}
+
                         </div>
                       </>
                     ) : (
@@ -408,13 +404,8 @@ const SecurityExperts = () => {
                           {moment(expert.latest_departure).format("YYYY/MM/DD")}
                         </div>
                         <div>
-                          {moment(expert.latest_departure).format("hh:mm")}
-                          <span>
-                            {moment(expert.latest_departure).format("a") ===
-                            "am"
-                              ? " ص"
-                              : " م"}
-                          </span>
+                          {moment(expert.latest_departure).format("hh:mm a")}
+
                         </div>
                       </>
                     ) : (

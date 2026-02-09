@@ -166,7 +166,7 @@ const OfficersLog = () => {
 
 
       <Table striped bordered hover>
-        <thead>
+        <thead className='table-dark'>
           <tr>
             <th>م</th>
             <th>الرقم العسكري</th>
@@ -175,7 +175,6 @@ const OfficersLog = () => {
             <th>الورشة / الفرع</th>
             <th>دخول / خروج</th>
             <th>الوقت</th>
-            <th>السبب</th>
             <th>ملاحظات</th>
             {/* <th>Action</th> */}
           </tr>
@@ -204,9 +203,7 @@ const OfficersLog = () => {
     : "لا يوجد"}
 </td>
 
-            <td>{(officer.event_type ? (officer.event_type == "دخول" ?
-              `عودة ${officer.reason || ""}`
-              : officer.reason) : "لا يوجد")}</td>
+           
             <td>{officer.notes? officer.notes : "لا يوجد"}</td>
 
             </tr>

@@ -265,10 +265,8 @@ const AllInUnit = () => {
                       </div>
                 
                       <div>
-                        {moment(unit.event_time).format("hh:mm")}
-                        <span>
-                          {moment(unit.event_time).format("a") === "am" ? " ص" : " م"}
-                        </span>
+                        {moment(unit.event_time).format("hh:mm a")}
+
                       </div>
                     </>
                   ) : (

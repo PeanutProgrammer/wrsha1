@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { Form, Button, Alert } from 'react-bootstrap';
+import React, { useState, useEffect } from "react";
+import { Form, Button, Alert } from "react-bootstrap";
 import "../../style/style.css";
-import axios from 'axios';
-import { getAuthUser } from '../../helper/Storage';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
+import axios from "axios";
+import { getAuthUser } from "../../helper/Storage";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import "react-datetime/css/react-datetime.css";
-import moment from 'moment';
-import Select from 'react-select'; // Importing react-select
+import moment from "moment";
+import Select from "react-select"; // Importing react-select
+import { useSearchParams } from "react-router-dom";
 
 // Validation schema using yup
 // Validation schema using yup
@@ -44,61 +45,83 @@ const schema = yup.object().shape({
     )
     .optional(),
 
-  destination: yup.string().max(255, "الوجهة يجب ألا تتجاوز 255 حرف").optional(),
+  destination: yup
+    .string()
+    .max(255, "الوجهة يجب ألا تتجاوز 255 حرف")
+    .optional(),
+  remaining: yup.string().max(255, "الرصيد يجب ألا يتجاوز 255 حرف").optional(),
+  duration: yup.string().max(255, "المدة يجب ألا تتجاوز 255 حرف").optional(),
 });
 
-
-const AddNCOTmam = () => {
+const AddTmam = () => {
   const [nco, setNCO] = useState([]);
   const [leaveType, setLeaveType] = useState([]);
   const auth = getAuthUser();
   const [ncoLog, setNCOLog] = useState({
     loading: false,
-    err: '',
-    notes: '',
-    ncoID: '',
-    leaveTypeID: '',
-    start_date: '',
-    end_date: '',
-    destination: '',
+    err: "",
+    notes: "",
+    ncoID: "",
+    leaveTypeID: "",
+    start_date: "",
+    end_date: "",
+    destination: "",
+    remaining: "",
+    duration: "",
     success: null,
   });
+  const [selectedNCO, setSelectedNCO] = useState(null);
+  const [searchParams] = useSearchParams();
+  const preselectedMilId = searchParams.get("nco");
 
-  const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    setValue,
+  } = useForm({
     resolver: yupResolver(schema),
   });
 
-
-  
   // Handle form submission
-  const createOfficerLog = async (data) => {
+  const createNcoLog = async (data) => {
     console.log("Request Data:", data);
     setNCOLog({ ...ncoLog, loading: true });
 
     const formattedData = {
       ...data,
-      start_date: data.start_date ? moment(data.start_date).locale("en").format("YYYY-MM-DD") : null,
-      end_date: data.end_date ? moment(data.end_date).locale("en").format("YYYY-MM-DD") : null,
-
+      start_date: data.start_date
+        ? moment(data.start_date).locale("en").format("YYYY-MM-DD")
+        : null,
+      end_date: data.end_date
+        ? moment(data.end_date).locale("en").format("YYYY-MM-DD")
+        : null,
     };
 
     console.log("Formatted Request Data:", formattedData);
 
     try {
-      await axios.post(`${process.env.REACT_APP_BACKEND_BASE_URL}/ncoLog/tmam`, formattedData, {
-        headers: { token: auth.token },
-      });
+      await axios.post(
+        `${process.env.REACT_APP_BACKEND_BASE_URL}/ncoLog/tmam`,
+        formattedData,
+        {
+          headers: { token: auth.token },
+        }
+      );
 
       setNCOLog({
         loading: false,
         err: null,
-        success: 'تمت الإضافة بنجاح!',
-        notes: '',
-        ncoID: '',
-        leaveTypeID: '',
-        start_date: '',
-        end_date: '',
-        destination: '',
+        success: "تمت الإضافة بنجاح!",
+        notes: "",
+        ncoID: "",
+        leaveTypeID: "",
+        start_date: "",
+        end_date: "",
+        destination: "",
+        remaining: "",
+        duration: "",
       });
 
       reset(); // Reset form after successful submission
@@ -110,7 +133,9 @@ const AddNCOTmam = () => {
       setNCOLog({
         ...ncoLog,
         loading: false,
-        err: err.response ? JSON.stringify(err.response.data.errors) : 'Something went wrong. Please try again later.',
+        err: err.response
+          ? JSON.stringify(err.response.data.errors)
+          : "Something went wrong. Please try again later.",
         success: null,
       });
     }
@@ -138,9 +163,27 @@ const AddNCOTmam = () => {
       .catch((err) => console.log(err));
   }, []);
 
-      const filteredLeaveTypes = leaveType.filter(
-      (type) => ![16, 17, 18].includes(type.id)
+  useEffect(() => {
+    if (!preselectedMilId || !nco.data?.length) return;
+
+    const foundNCO = nco.data.find(
+      (o) => String(o.mil_id) === String(preselectedMilId)
     );
+
+    if (foundNCO) {
+      setValue("ncoID", foundNCO.id);
+
+      // لو عايز react-select يبان فيه الاسم
+      setSelectedNCO({
+        value: foundNCO.id,
+        label: `${foundNCO.rank} / ${foundNCO.name}`,
+      });
+    }
+  }, [preselectedMilId, nco.data]);
+
+  const filteredLeaveTypes = leaveType.filter(
+    (type) => ![16, 17, 18].includes(type.id)
+  );
   const leaveTypeOptions = filteredLeaveTypes.map((type) => ({
     value: type.id,
     label: type.name,
@@ -162,10 +205,10 @@ const AddNCOTmam = () => {
   const customStyles = {
     control: (provided) => ({
       ...provided,
-      width: '100%',
-      padding: '0.375rem 0.75rem',
-      borderRadius: '0.25rem',
-      border: '1px solid #ced4da',
+      width: "100%",
+      padding: "0.375rem 0.75rem",
+      borderRadius: "0.25rem",
+      border: "1px solid #ced4da",
     }),
     menu: (provided) => ({
       ...provided,
@@ -173,8 +216,12 @@ const AddNCOTmam = () => {
     }),
     option: (provided, state) => ({
       ...provided,
-      backgroundColor: state.isSelected ? '#007bff' : state.isFocused ? '#f8f9fa' : null,
-      color: state.isSelected ? '#fff' : '#495057',
+      backgroundColor: state.isSelected
+        ? "#007bff"
+        : state.isFocused
+        ? "#f8f9fa"
+        : null,
+      color: state.isSelected ? "#fff" : "#495057",
     }),
   };
 
@@ -196,76 +243,117 @@ const AddNCOTmam = () => {
         </Alert>
       )}
 
-      <Form onSubmit={handleSubmit(createOfficerLog)} className="form">
+      <Form onSubmit={handleSubmit(createNcoLog)} className="form">
         {/* Officer Dropdown with React Select */}
         <Form.Group controlId="ncoID" className="form-group">
           <Form.Label>الاسم</Form.Label>
           <Select
-            {...register("ncoID")} // Bind the ncoID value from react-hook-form
+            value={selectedNCO}
             options={ncoOptions}
-            getOptionLabel={(e) => e.label}
-            getOptionValue={(e) => e.value}
-            onChange={handleNCOChange} // Update ncoID on selection
-            className="react-select" // Avoid using Bootstrap's `form-control` here
-            styles={customStyles} // Apply custom styles to fix overlap issues
-            placeholder="اختر ضابط الصف"
+            onChange={(option) => {
+              setSelectedNCO(option);
+              setValue("ncoID", option.value);
+            }}
+            styles={customStyles}
+            placeholder="اختر الضابط"
+            isDisabled={!!preselectedMilId}
+
           />
-          {errors.ncoID && <div className="invalid-feedback">{errors.ncoID.message}</div>}
+
+          {errors.ncoID && (
+            <div className="invalid-feedback">{errors.ncoID.message}</div>
+          )}
         </Form.Group>
 
         {/* Leave Type Dropdown */}
-               <Form.Group controlId="leaveTypeID" className="form-group">
-                 <Form.Label>سبب الخروج</Form.Label>
-                 <Select
-                   options={leaveTypeOptions}
-                   placeholder="اختر سبب الخروج"
-                   onChange={(selectedOption) => {
-                     setValue("leaveTypeID", selectedOption.value);
-                   }}
-                   styles={customStyles}
-                   className="react-select"
-                 />
-                 {errors.leaveTypeID && (
-                   <div className="invalid-feedback d-block">
-                     {errors.leaveTypeID.message}
-                   </div>
-                 )}
-                 {errors.leaveTypeID && (
-                   <div className="invalid-feedback">{errors.leaveTypeID.message}</div>
-                 )}
-               </Form.Group>
+        <Form.Group controlId="leaveTypeID" className="form-group">
+          <Form.Label>سبب الخروج</Form.Label>
+          <Select
+            options={leaveTypeOptions}
+            placeholder="اختر سبب الخروج"
+            onChange={(selectedOption) => {
+              setValue("leaveTypeID", selectedOption.value);
+            }}
+            styles={customStyles}
+            className="react-select"
+          />
+          {errors.leaveTypeID && (
+            <div className="invalid-feedback d-block">
+              {errors.leaveTypeID.message}
+            </div>
+          )}
+          {errors.leaveTypeID && (
+            <div className="invalid-feedback">{errors.leaveTypeID.message}</div>
+          )}
+        </Form.Group>
 
-                <Form.Group controlId="destination" className="form-group">
+        <Form.Group controlId="destination" className="form-group">
           <Form.Label>إلى</Form.Label>
           <Form.Control
             as="textarea"
             rows={3}
             placeholder="أدخل الوجهة"
             {...register("destination")}
-            className={`form-control ${errors.destination ? 'is-invalid' : ''}`}
+            className={`form-control ${errors.destination ? "is-invalid" : ""}`}
           />
-          {errors.destination && <div className="invalid-feedback">{errors.destination.message}</div>}
+          {errors.destination && (
+            <div className="invalid-feedback">{errors.destination.message}</div>
+          )}
         </Form.Group>
 
-         <Form.Group controlId="start_date" className="form-group">
-                  <Form.Label>الفترة من</Form.Label>
-                  <Form.Control
-                    type="date"
-                    {...register("start_date")}
-                    className={`form-control ${errors.start_date ? 'is-invalid' : ''}`}
-                  />
-                  {errors.start_date && <div className="invalid-feedback">{errors.start_date.message}</div>}
-                </Form.Group>
+        <Form.Group controlId="start_date" className="form-group">
+          <Form.Label>الفترة من</Form.Label>
+          <Form.Control
+            type="date"
+            {...register("start_date")}
+            className={`form-control ${errors.start_date ? "is-invalid" : ""}`}
+          />
+          {errors.start_date && (
+            <div className="invalid-feedback">{errors.start_date.message}</div>
+          )}
+        </Form.Group>
 
         <Form.Group controlId="end_date" className="form-group">
-                  <Form.Label>الفترة إلى</Form.Label>
-                  <Form.Control
-                    type="date"
-                    {...register("end_date")}
-                    className={`form-control ${errors.end_date ? 'is-invalid' : ''}`}
-                  />
-                  {errors.end_date && <div className="invalid-feedback">{errors.end_date.message}</div>}
-                </Form.Group>
+          <Form.Label>الفترة إلى</Form.Label>
+          <Form.Control
+            type="date"
+            {...register("end_date")}
+            className={`form-control ${errors.end_date ? "is-invalid" : ""}`}
+          />
+          {errors.end_date && (
+            <div className="invalid-feedback">{errors.end_date.message}</div>
+          )}
+        </Form.Group>
+
+        <Form.Group controlId="duration" className="form-group">
+          <Form.Label>المدة</Form.Label>
+          <Form.Control
+            as="textarea"
+            rows={1}
+            placeholder="أدخل المدة"
+            {...register("duration")}
+            className={`form-control ${errors.duration ? "is-invalid" : ""}`}
+          />
+          {errors.duration && (
+            <div className="invalid-feedback">{errors.duration.message}</div>
+          )}
+        </Form.Group>
+
+        {/* Remaining */}
+
+        <Form.Group controlId="remaining" className="form-group">
+          <Form.Label>الرصيد</Form.Label>
+          <Form.Control
+            as="textarea"
+            rows={1}
+            placeholder="أدخل الرصيد"
+            {...register("remaining")}
+            className={`form-control ${errors.remaining ? "is-invalid" : ""}`}
+          />
+          {errors.remaining && (
+            <div className="invalid-feedback">{errors.remaining.message}</div>
+          )}
+        </Form.Group>
 
         {/* Notes */}
         <Form.Group controlId="notes" className="form-group">
@@ -275,18 +363,25 @@ const AddNCOTmam = () => {
             rows={3}
             placeholder="أدخل ملاحظات"
             {...register("notes")}
-            className={`form-control ${errors.notes ? 'is-invalid' : ''}`}
+            className={`form-control ${errors.notes ? "is-invalid" : ""}`}
           />
-          {errors.notes && <div className="invalid-feedback">{errors.notes.message}</div>}
+          {errors.notes && (
+            <div className="invalid-feedback">{errors.notes.message}</div>
+          )}
         </Form.Group>
 
         {/* Submit Button */}
-        <Button type="submit" variant="primary" className='submit-btn' disabled={ncoLog.loading}>
-          {ncoLog.loading ? 'جاري الإضافة...' : 'تسجيل التمام'}
+        <Button
+          type="submit"
+          variant="primary"
+          className="submit-btn"
+          disabled={ncoLog.loading}
+        >
+          {ncoLog.loading ? "جاري الإضافة..." : "تسجيل التمام"}
         </Button>
       </Form>
     </div>
   );
 };
 
-export default AddNCOTmam;
+export default AddTmam;
