@@ -89,7 +89,7 @@ router.get(
   }
 );
 
-router.get("/", allowAny(shuoonOfficers,leader), (req, res) => {
+router.get("/", allowAny(shuoonOfficers,leader, gate), (req, res) => {
   console.log("Getting Officers");
 
   OfficerController.getOfficers(req, res);

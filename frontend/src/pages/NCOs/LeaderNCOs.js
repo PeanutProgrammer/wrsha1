@@ -340,13 +340,15 @@ const LeaderNCOs = () => {
                   : ""}
               </th>
               <th onClick={() => handleSort("in_unit")}>
-                التمام
+                التواجد
                 {sortConfig.key === "in_unit"
                   ? sortConfig.direction === "asc"
                     ? " 🔼"
                     : " 🔽"
                   : ""}
               </th>
+              <th>التمام</th>
+
               <th onClick={() => handleSort("latest_arrival")}>
                 اخر دخول
                 {sortConfig.key === "latest_arrival"
@@ -363,7 +365,7 @@ const LeaderNCOs = () => {
                     : " 🔽"
                   : ""}
               </th>
-              <th>ملاحظات</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -384,6 +386,8 @@ const LeaderNCOs = () => {
                   >
                     {officer.in_unit ? "متواجد" : "غير موجود"}
                   </td>
+                  <td>{officer.active_tmam ?? "لا يوجد"}</td>
+
                   <td>
                     {officer.latest_arrival ? (
                       <>
@@ -392,7 +396,6 @@ const LeaderNCOs = () => {
                         </div>
                         <div>
                           {moment(officer.latest_arrival).format("hh:mm a")}
-
                         </div>
                       </>
                     ) : (
@@ -405,7 +408,7 @@ const LeaderNCOs = () => {
                       <>
                         <div>
                           {moment(officer.latest_departure).format(
-                            "YYYY/MM/DD"
+                            "YYYY/MM/DD",
                           )}
                         </div>
                         <div>
@@ -422,8 +425,15 @@ const LeaderNCOs = () => {
                       "لا يوجد"
                     )}
                   </td>
-                  <td>{officer.in_unit ? "لا يوجد" : officer.tmam}</td>
-                </tr>
+<td className=" gap-1 p-1">
+                  
+                                      <Link
+                                        to={`../ncos/tmam/details/${officer.mil_id}`}
+                                        className="btn btn-sm btn-secondary mx-1 p-2"
+                                      >
+                                        تفاصيل
+                                      </Link>
+                                    </td>                </tr>
               ))
             ) : (
               <tr>

@@ -106,7 +106,6 @@ import SearchExperts from "./pages/Experts/SearchExperts";
 import ExpertArrival from "./pages/Experts/arrival";
 import ExpertDeparture from "./pages/Experts/departure";
 import LeaderExperts from "./pages/Experts/LeaderExperts";
-
 // Guests
 import Guests from "./pages/Guests/Guests";
 import AddGuests from "./pages/Guests/AddGuests";
@@ -558,7 +557,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "tmam/details/:id",
-            element: <ProtectedRoute allowedTypes={["admin", "شؤون ادارية"]} />,
+            element: <ProtectedRoute allowedTypes={["admin", "شؤون ادارية", "مبنى القيادة"]} />,
             children: [{ path: "", element: <NCOsTmamDetails /> }],
           },
           {

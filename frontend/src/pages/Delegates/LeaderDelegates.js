@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Table, Alert, Modal, Button, Form, InputGroup } from "react-bootstrap";
 import axios from "axios";
 import { getAuthUser } from "../../helper/Storage";
@@ -12,6 +12,7 @@ const toWesternDigits = (str) => {
 
 const LeaderDelegates = () => {
   const auth = getAuthUser();
+  const audioRef = useRef(null);
   const [sortConfig, setSortConfig] = useState({
     key: "",
     direction: "asc",
@@ -28,6 +29,11 @@ const LeaderDelegates = () => {
     limit: 0,
     tempSearch: "",
   });
+
+    useEffect(() => {
+      audioRef.current = new Audio("/sounds/chime.wav"); // put file in public folder
+      audioRef.current.preload = "auto";
+    }, []);
 
   useEffect(() => {
     const socket = io(`${process.env.REACT_APP_BACKEND_BASE_URL}`); //  backend port
@@ -72,6 +78,13 @@ const LeaderDelegates = () => {
     socket.on("delegatesUpdated", () => {
       console.log("📢 Delegates updated — refetching data...");
       fetchData(); // ✅ Re-fetch on update
+      if(audioRef.current) {
+        console.log("Playing notification sound");
+        audioRef.current.currentTime = 0; // restart if already playing
+        audioRef.current.play().catch((err) => {
+          console.log("Autoplay prevented:", err);
+        });
+      }
     });
 
     return () => socket.disconnect();

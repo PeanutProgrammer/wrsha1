@@ -28,7 +28,7 @@ const NCOsTmamDetails = () => {
       .then((resp) => {
         setNCOs({
           ...nco,
-          results: resp.data,
+          results: resp.data.data,
           loading: false,
           err: null,
         });
@@ -49,7 +49,7 @@ const NCOsTmamDetails = () => {
   }
 
   const records = nco.results;
-  const hasData = Array.isArray(records) && records.length > 0;
+  const hasData = records.length > 0;
   const basicInfo = hasData ? records[0] : null;
 
   return (
@@ -85,50 +85,28 @@ const NCOsTmamDetails = () => {
       <h5 className="mb-3">سجل التمام:</h5>
       <Table striped bordered hover responsive className="mb-0">
          <thead className='table-dark'>
-                  <tr>
-                    <th>م</th>
-                    <th>نوع التمام</th>
-                    <th>إلى</th>
-                    <th>الفترة من</th>
-                    <th>الفترة إلى</th>
-                                <th>وقت الدخول/الخروج</th> {/* New column header */}
-                    <th>ملاحظات</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {hasData ? (
-                    records.map((rec, index) => (
-                      <tr key={index}>
-                        <td>{index + 1}</td>
-                        <td>
-        {rec.event_type 
-          ? rec.event_type === "دخول"
-            ? `عودة ${rec.tmam || ""}` // If "دخول", show "عودة" with leave type
-            : `خروج ${rec.tmam || ""}` // If "خروج", show "خروج" with leave type
-          : rec.tmam
-          ? `خروج ${rec.tmam}` // If event_type is null, check in_unit
-          : rec.in_unit ? "متواجد" : "غير متواجد"} 
-                        </td>
-                        <td>{rec.destination || "—"}</td>
-                        <td>
-                          {rec.start_date
-                            ? moment(rec.start_date).format("YYYY/MM/DD")
-                            : "—"}
-                        </td>
-                        <td>
-                          {rec.end_date
-                            ? moment(rec.end_date).format("YYYY/MM/DD")
-                            : "—"}
-                        </td>
-                                        <td>
-                          {/* Time and Event Type */}
-                          {rec.event_type && rec.event_time
-                            ? ` ${moment(rec.event_time).format("YYYY/MM/DD HH:mm:ss")}`
-                            : "—"}
-                        </td>
-                        <td>{rec.notes || "—"}</td>
-        
-                      </tr>
+                           <tr>
+                             <th>م</th>
+                             <th>نوع التمام</th>
+                             <th>الوجهة</th>
+                             <th>المدة</th>
+                             <th>من</th>
+                             <th>إلى</th>
+                             <th>الرصيد</th>
+                           </tr>
+                         </thead>
+                         <tbody>
+                           {hasData ? (
+                             records.map((rec, index) => (
+                               <tr key={rec.tmam_id}>
+                                 <td>{index + 1}</td>
+                                 <td>{rec.tmam}</td>
+                                 <td>{rec.destination || "—"}</td>
+                                 <td>{rec.duration || "—"}</td>
+                                 <td>{moment(rec.start_date).format("YYYY/MM/DD")}</td>
+                                 <td>{moment(rec.end_date).format("YYYY/MM/DD")}</td>
+                                 <td>{rec.remaining ?? "—"}</td>
+                               </tr>
                     ))
                   ) : (
                     <tr>

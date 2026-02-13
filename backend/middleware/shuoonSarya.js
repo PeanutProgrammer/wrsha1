@@ -15,7 +15,6 @@ const shuoonSarya = async (req, res, next) => {
     return next();
   }
 
-  throw new Error("shuoonSarya");
 };
 
 module.exports = shuoonSarya;

@@ -209,7 +209,7 @@ useEffect(() => {
               </tr>
             ))          ) : (
             <tr>
-              <td colSpan="8" className="text-center">لا توجد بيانات</td>
+              <td colSpan="9" className="text-center">لا توجد بيانات</td>
             </tr>
           )}
         </tbody>

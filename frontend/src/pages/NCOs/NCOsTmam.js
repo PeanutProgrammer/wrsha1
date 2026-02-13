@@ -322,6 +322,25 @@ const NCOsTmam = () => {
         )}
         </tbody>
       </Table>
+      <div className="d-flex justify-content-between align-items-center mt-3">
+                    <Button
+                      onClick={handlePrevPage}
+                      disabled={ncos.page === 1}
+                      variant="secondary"
+                      size="sm"
+                    >
+                      السابق
+                    </Button>
+                    <div>{renderPageButtons()}</div>
+                    <Button
+                      onClick={handleNextPage}
+                      disabled={ncos.page === ncos.totalPages}
+                      variant="secondary"
+                      size="sm"
+                    >
+                      التالي
+                    </Button>
+                  </div>
     </div>
   );
 };

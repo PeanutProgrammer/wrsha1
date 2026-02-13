@@ -315,7 +315,7 @@ static async getRankSummary(req, res) {
 
     const results = await query(`
       SELECT
-        rank,
+        \`rank\`,
         COUNT(*) AS total,
         SUM(CASE WHEN tmam IS NULL THEN 1 ELSE 0 END) AS available,
         SUM(CASE WHEN tmam IS NOT NULL THEN 1 ELSE 0 END) AS missing,
@@ -358,7 +358,7 @@ static async getRankSummary(req, res) {
         LEFT JOIN leave_type lt
           ON lt.id = old.leaveTypeID
       ) all_units
-      GROUP BY rank
+      GROUP BY \`rank\`
     `);
 
     if (!results.length) {

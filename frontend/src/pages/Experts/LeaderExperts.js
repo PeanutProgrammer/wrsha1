@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Table, Alert, Modal, Button, InputGroup, Form } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import axios from "axios";
@@ -11,8 +11,10 @@ const toWesternDigits = (str) => {
   return str.replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
 };
 
-const SecurityExperts = () => {
+const LeaderExperts = () => {
   const auth = getAuthUser();
+  const audioRef = useRef(null);
+
   const [sortConfig, setSortConfig] = useState({
     key: "",
     direction: "asc",
@@ -34,6 +36,10 @@ const SecurityExperts = () => {
   // ✅ Modal state
   const [showConfirm, setShowConfirm] = useState(false);
   const [selectedExpert, setSelectedExpert] = useState(null);
+    useEffect(() => {
+      audioRef.current = new Audio("/sounds/chime.wav"); // put file in public folder
+      audioRef.current.preload = "auto";
+    }, []);
   useEffect(() => {
     const socket = io(`${process.env.REACT_APP_BACKEND_BASE_URL}`); //  backend port
 
@@ -45,7 +51,7 @@ const SecurityExperts = () => {
           `${process.env.REACT_APP_BACKEND_BASE_URL}/expert?page=${experts.page}&limit=${limit}&search=${searchValue}`,
           {
             headers: { token: auth.token },
-          }
+          },
         )
         .then((resp) => {
           setExperts({
@@ -70,6 +76,8 @@ const SecurityExperts = () => {
 
     fetchData(); // ✅ Initial fetch on component mount
 
+    
+
     socket.on("connect", () => {
       console.log("🟢 Connected to WebSocket:", socket.id);
     });
@@ -77,10 +85,19 @@ const SecurityExperts = () => {
     socket.on("expertsUpdated", () => {
       console.log("📢 Experts updated — refetching data...");
       fetchData(); // ✅ Re-fetch on update
+      if (audioRef.current) {
+        console.log("Playing notification sound");
+        audioRef.current.currentTime = 0; // restart if already playing
+        audioRef.current.play().catch((err) => {
+          console.log("Autoplay prevented:", err);
+        });
+      }
     });
 
     return () => socket.disconnect();
-  }, [experts.page, experts.search]);
+  }, []);
+
+
 
   // ✅ Show confirmation modal before deleting
   const handleDeleteClick = (expert) => {
@@ -100,7 +117,7 @@ const SecurityExperts = () => {
           headers: {
             token: auth.token,
           },
-        }
+        },
       )
       .then(() => {
         setShowConfirm(false);
@@ -189,7 +206,7 @@ const SecurityExperts = () => {
           className="mx-1 btn-sm"
         >
           {num}
-        </Button>
+        </Button>,
       );
     }
     return pages;
@@ -203,6 +220,11 @@ const SecurityExperts = () => {
       return sortConfig.direction === "asc" ? -1 : 1;
     return 0;
   });
+
+  const isToday = (date) => {
+    if (!date) return false;
+    return moment(date).isSame(moment(), "day");
+  };
 
   return (
     <div className="Officers p-5">
@@ -233,7 +255,6 @@ const SecurityExperts = () => {
             )}
           </InputGroup>
         </Form>
-
       </div>
 
       {/* ✅ Success Message */}
@@ -322,7 +343,6 @@ const SecurityExperts = () => {
                     : " 🔽"
                   : ""}
               </th> */}
-
             </tr>
           </thead>
           <tbody>
@@ -342,10 +362,10 @@ const SecurityExperts = () => {
                       moment(expert.valid_through).isAfter(now)
                         ? "bg-success text-white" // Valid: green
                         : moment(expert.valid_through).isBefore(now)
-                        ? "bg-danger text-white" // Expired: red
-                        : moment(expert.valid_from).isAfter(now)
-                        ? "bg-warning text-dark" // Not started yet: yellow
-                        : "bg-danger text-white" // fallback
+                          ? "bg-danger text-white" // Expired: red
+                          : moment(expert.valid_from).isAfter(now)
+                            ? "bg-warning text-dark" // Not started yet: yellow
+                            : "bg-danger text-white" // fallback
                     }
                   >
                     {" "}
@@ -354,10 +374,10 @@ const SecurityExperts = () => {
                       moment(expert.valid_through).isAfter(now)
                         ? "ساري"
                         : moment(expert.valid_through).isBefore(now)
-                        ? "منتهي"
-                        : moment(expert.valid_from).isAfter(now)
-                        ? "لم يبدأ بعد" // Optional, if you want to display something for experts who haven't started yet
-                        : "منتهي" // fallback for invalid state
+                          ? "منتهي"
+                          : moment(expert.valid_from).isAfter(now)
+                            ? "لم يبدأ بعد" // Optional, if you want to display something for experts who haven't started yet
+                            : "منتهي" // fallback for invalid state
                     }
                   </td>
                   <td
@@ -373,12 +393,19 @@ const SecurityExperts = () => {
                   <td>
                     {expert.latest_arrival ? (
                       <>
-                        <div>
-                          {moment(expert.latest_arrival).format("YYYY/MM/DD")}
+                        <div className=" align-items-center ">
+                          {isToday(expert.latest_arrival) && (
+                            <span className="badge bg-warning text-dark today-badge ml-2">
+                              اليوم
+                            </span>
+                          )}
+                          <span>
+                            {moment(expert.latest_arrival).format("YYYY/MM/DD")}
+                          </span>
                         </div>
+
                         <div>
                           {moment(expert.latest_arrival).format("hh:mm a")}
- 
                         </div>
                       </>
                     ) : (
@@ -386,15 +413,25 @@ const SecurityExperts = () => {
                     )}
                   </td>
 
+                  {/* Conditionally show visit_end */}
                   <td>
                     {expert.latest_departure ? (
                       <>
-                        <div>
-                          {moment(expert.latest_departure).format("YYYY/MM/DD")}
+                        <div className=" align-items-center ">
+                          {isToday(expert.latest_departure) && (
+                            <span className="badge bg-warning text-dark today-badge ml-2">
+                              اليوم
+                            </span>
+                          )}
+                          <span>
+                            {moment(expert.latest_departure).format(
+                              "YYYY/MM/DD",
+                            )}
+                          </span>
                         </div>
+
                         <div>
                           {moment(expert.latest_departure).format("hh:mm a")}
-
                         </div>
                       </>
                     ) : (
@@ -403,8 +440,6 @@ const SecurityExperts = () => {
                   </td>
 
                   {/* <td>{expert.company_name}</td> */}
-
-                  
                 </tr>
               ))
             ) : (
@@ -443,4 +478,4 @@ const SecurityExperts = () => {
   );
 };
 
-export default SecurityExperts;
+export default LeaderExperts;

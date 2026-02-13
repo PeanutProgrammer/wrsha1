@@ -78,7 +78,7 @@ router.get("/", allowAny(gate,shuoonSarya, leader),(req, res) => {
     NCOController.getNCOs(req, res);
 });
 
-router.get("/tmam/:id", shuoonSarya, (req,res) => {
+router.get("/tmam/:id", allowAny(shuoonSarya, leader), (req,res) => {
     NCOController.getNCOTmamDetails(req,res);
 });
 
