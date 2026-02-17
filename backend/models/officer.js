@@ -1,146 +1,151 @@
-
-
 class Officer {
-    constructor(name, join_date, department, mil_id, rank, address, height, weight, dob, telephone_number, seniority_number, in_unit, attached) {
-        this._name = name;
-        this._join_date = join_date;
-        this._department = department;
-        this._mil_id = mil_id;
-        this._rank = rank;
-        this._address = address;
-        this._height = height;
-        this._weight = weight;
-        this._dob = dob;
-        this._telephone_number = telephone_number;
-        this._seniority_number = seniority_number;
-        this._in_unit = in_unit;
-        this._attached = attached;
-    }
+  constructor(
+    name,
+    join_date,
+    department,
+    mil_id,
+    rank,
+    address,
+    height,
+    weight,
+    dob,
+    telephone_number,
+    seniority_number,
+    in_unit,
+    attached,
+    qr_token
+  ) {
+    this._name = name;
+    this._join_date = join_date;
+    this._department = department;
+    this._mil_id = mil_id;
+    this._rank = rank;
+    this._address = address;
+    this._height = height;
+    this._weight = weight;
+    this._dob = dob;
+    this._telephone_number = telephone_number;
+    this._seniority_number = seniority_number;
+    this._in_unit = in_unit;
+    this._attached = attached;
+    this._qr_token = qr_token;
+  }
 
-    getName = () => {
-        return this._name;
-    }
+  getName = () => {
+    return this._name;
+  };
 
-    getJoinDate = () => {
-        return this._join_date;
-    }
+  getJoinDate = () => {
+    return this._join_date;
+  };
 
-    getDepartment = () => {
-        return this._department;
-    }
+  getDepartment = () => {
+    return this._department;
+  };
 
-    getMilID = () => {
-        return this._mil_id;
-    }
+  getMilID = () => {
+    return this._mil_id;
+  };
 
-    getRank = () => {
-        return this._rank;
-    }
+  getRank = () => {
+    return this._rank;
+  };
 
+  getAddress = () => {
+    return this._address;
+  };
 
-    getAddress = () => {
-        return this._address;
-    }
+  getHeight = () => {
+    return this._height;
+  };
 
-    getHeight = () => {
-        return this._height;
-    }
+  getWeight = () => {
+    return this._weight;
+  };
 
+  getDOB = () => {
+    return this._dob;
+  };
 
-    getWeight = () => {
-        return this._weight;
-    }
+  getTelephoneNumber = () => {
+    return this._telephone_number;
+  };
 
+  getSeniorityNumber = () => {
+    return this._seniority_number;
+  };
 
-    getDOB = () => {
-        return this._dob;
-    }
+  getInUnit = () => {
+    return this._in_unit;
+  };
 
-    getTelephoneNumber = () => {
-        return this._telephone_number;
-    }
+  getAttached = () => {
+    return this._attached;
+  };
+  getQrToken = () => {
+    return this._qr_token;
+  };
 
-    getSeniorityNumber = () => {
-        return this._seniority_number;
-    }
+  setName = (name) => {
+    this._name = name;
+  };
 
+  setJoinDate = (join_date) => {
+    this._join_date = join_date;
+  };
 
+  setDepartment = (department) => {
+    this._department = department;
+  };
 
-    getInUnit = () => {
-        return this._in_unit;
-    }
+  setMilID = (mil_id) => {
+    this._mil_id = mil_id;
+  };
 
-    getAttached = () => {
-        return this._attached;
-    }
+  setRank = (rank) => {
+    this._rank = rank;
+  };
 
-    setName = (name) => {
-        this._name = name;
-    }
+  setAddress = (address) => {
+    this._address = address;
+  };
 
-    setJoinDate = (join_date) => {
-        this._join_date = join_date;
-    }
+  setHeight = (height) => {
+    this._height = height;
+  };
 
-    setDepartment = (department) => {
-        this._department = department;
-    }
+  setWeight = (weight) => {
+    this._weight = weight;
+  };
 
-    setMilID = (mil_id) => {
-        this._mil_id = mil_id;
-    }
+  setDOB = (dob) => {
+    this._dob = dob;
+  };
 
-    setRank = (rank) => {
-        this._rank = rank;
-    }
+  setTelephoneNumber = (telephone_number) => {
+    this._telephone_number = telephone_number;
+  };
 
+  setSeniorityNumber = (seniority_number) => {
+    this._seniority_number = seniority_number;
+  };
 
-    setAddress = (address) => {
-        this._address = address;
-    }
+  setInUnit = (in_unit) => {
+    this._in_unit = in_unit;
+  };
 
+  setAttached = (attached) => {
+    this._attached = attached;
+  };
 
-    setHeight = (height) => {
-        this._height = height;
-    }
+  setQrToken = (qr_token) => {
+    this._qr_token = qr_token;
+  };
 
-
-    setWeight = (weight) => {
-        this._weight = weight;
-    }
-
-
-    setDOB = (dob) => {
-        this._dob = dob;
-    }
-
-    setTelephoneNumber = (telephone_number) => {
-        this._telephone_number = telephone_number;
-    }
-
-    setSeniorityNumber = (seniority_number) => {
-        this._seniority_number = seniority_number;
-    }
-
-
-
-
-
-
-    setInUnit = (in_unit) => {
-        this._in_unit = in_unit;
-    }
-
-    setAttached = (attached) => {
-        this._attached = attached;
-    }
-
-
-    toJSON() {
-        const { ...json } = this;
-        return json;
-      } 
+  toJSON() {
+    const { ...json } = this;
+    return json;
+  }
 }
-
 
 module.exports = Officer;

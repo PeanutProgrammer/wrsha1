@@ -616,6 +616,95 @@
   }
 }
 
+
+.gate-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(145deg, #0f1115, #1b1f23);
+  direction: rtl;
+}
+
+.gate-card {
+  width: 600px;
+  max-width: 90%;
+  background: linear-gradient(145deg, #15181d, #1f2329);
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  text-align: center;
+}
+
+.gate-title {
+  color: #ffd700;
+  margin-bottom: 30px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.gate-input {
+  width: 100%;
+  padding: 18px;
+  font-size: 24px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 215, 0, 0.5);
+  background: #0f1115;
+  color: #fff;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.gate-input:focus {
+  border-color: #ffd700;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+}
+
+.gate-success {
+  margin-top: 30px;
+  padding: 25px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #1b2a1b, #122112);
+  border: 1px solid #28a745;
+}
+
+.gate-success h2 {
+  color: #28a745;
+  margin-bottom: 15px;
+}
+
+.officer-name {
+  font-size: 26px;
+  font-weight: 800;
+  color: #ffd700;
+  margin-bottom: 6px;
+}
+
+.officer-dept {
+  color: #bbb;
+  margin-bottom: 12px;
+}
+
+.gate-event-badge {
+  display: inline-block;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: #ffd700;
+  color: #000;
+  font-weight: 700;
+}
+
+.gate-error {
+  margin-top: 30px;
+  padding: 20px;
+  border-radius: 16px;
+  background: rgba(220, 53, 69, 0.15);
+  border: 1px solid #dc3545;
+  color: #ff6b6b;
+  font-weight: 600;
+}
+
+
 /* Mobile responsiveness */
 @media (max-width: 768px) {
   .officer-duty-page {

@@ -39,7 +39,7 @@ const ManageTmam = () => {
     available: 0,
     missing: 0,
     تمام_الخوارج: {
-      ثابتة: 0,
+      مأمورية_ثابتة: 0,
       فرقة_دورة: 0,
       راحة: 0,
       بدل_راحة: 0,
@@ -48,6 +48,7 @@ const ManageTmam = () => {
       منحة: 0,
       اجازة_سنوية: 0,
       اجازة_مرضية: 0,
+      اجازة_مأمورية: 0,
       سفر: 0,
       مأمورية: 0,
       عيادة: 0,
@@ -262,13 +263,14 @@ const ManageTmam = () => {
             <tr>
               <td>{dailySummary.total}</td>
               <td>{dailySummary.attached}</td>
-              <td>{dailySummary?.تمام_الخوارج?.ثابتة || 0}</td>
+              <td>{dailySummary?.تمام_الخوارج?.مأمورية_ثابتة || 0}</td>
               <td>{dailySummary?.تمام_الخوارج?.فرقة_دورة || 0}</td>
               <td>
                 {dailySummary?.تمام_الخوارج?.راحة +
                   dailySummary?.تمام_الخوارج?.بدل_راحة +
                   dailySummary?.تمام_الخوارج?.عارضة +
                   dailySummary?.تمام_الخوارج?.اجازة_ميدانية +
+                  dailySummary?.تمام_الخوارج?.اجازة_مأمورية +
                   dailySummary?.تمام_الخوارج?.منحة || 0}
               </td>
               <td>{dailySummary?.تمام_الخوارج?.اجازة_سنوية || 0}</td>
@@ -392,7 +394,6 @@ const ManageTmam = () => {
                         </div>
                         <div>
                           {moment(officer.latest_arrival).format("hh:mm a")}
-
                         </div>
                       </>
                     ) : (
@@ -409,7 +410,6 @@ const ManageTmam = () => {
                         </div>
                         <div>
                           {moment(officer.latest_departure).format("hh:mm a")}
-
                         </div>
                       </>
                     ) : (

@@ -43,6 +43,7 @@ import OfficerVacationLog from "./pages/Officers/OfficersVacationLog";
 import OfficerDutyForm from "./pages/Officers/OfficersDuty";
 import OfficerDutyViewer from "./pages/Officers/LeaderOfficerDuty";
 import OfficersView from "./pages/Officers/OfficersView";
+import GateScanner from "./pages/Officers/GateScanner";
 // NCOs
 import NCOs from "./pages/NCOs/NCOs";
 import AddNCOs from "./pages/NCOs/AddNCOs";
@@ -490,6 +491,11 @@ export const router = createBrowserRouter([
             path: "tmam/add",
             element: <ProtectedRoute allowedTypes={["شؤون ضباط"]} />,
             children: [{ path: "", element: <AddTmam /> }],
+          },
+                    {
+            path: "scan",
+            element: <ProtectedRoute allowedTypes={["بوابة"]} />,
+            children: [{ path: "", element: <GateScanner /> }],
           },
         ],
       },

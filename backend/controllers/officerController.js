@@ -4,6 +4,7 @@ const { validationResult } = require("express-validator");
 const connection = require("../db/dbConnection");
 const util = require("util");
 const moment = require("moment");
+const crypto = require("crypto");
 
 class OfficerController {
   static async createOfficer(req, res) {
@@ -29,6 +30,8 @@ class OfficerController {
         });
       }
 
+      const qr_token = crypto.randomBytes(32).toString("hex");
+
       const officerObject = new Officer(
         req.body.name,
         req.body.join_date,
@@ -42,11 +45,12 @@ class OfficerController {
         req.body.telephone_number,
         req.body.seniority_number,
         true,
-        req.body.attached || false
+        req.body.attached || false,
+        qr_token
       );
 
       await query(
-        "insert into officers set name =?, join_date = ?, department = ?, mil_id = ?, `rank` = ?, address = ?, height = ?, weight = ?, dob = ?, telephone_number = ?, seniority_number = ?, attached = ?",
+        "insert into officers set name =?, join_date = ?, department = ?, mil_id = ?, `rank` = ?, address = ?, height = ?, weight = ?, dob = ?, telephone_number = ?, seniority_number = ?, attached = ?, qr_token = ?",
         [
           officerObject.getName(),
           officerObject.getJoinDate(),
@@ -60,6 +64,7 @@ class OfficerController {
           officerObject.getTelephoneNumber(),
           officerObject.getSeniorityNumber(),
           officerObject.getAttached(),
+          officerObject.getQrToken()
         ]
       );
 
@@ -467,7 +472,6 @@ LIMIT ? OFFSET ?
           ON lt.id = old.leaveTypeID
 
       WHERE o.mil_id = ?
-        AND old.end_date < CURDATE()
         AND lt.id IN (1,2,3,4,5,6,7,8,10,11,12,13,14,22)
 
       ORDER BY old.start_date DESC
@@ -778,15 +782,14 @@ LIMIT ? OFFSET ?
 
       // --- Total count for pagination ---
       const countQuery = `SELECT COUNT(*) AS total FROM officers o JOIN officer_leave_details old ON o.id = old.officerID
-  WHERE o.in_unit = 0
-    AND old.leaveTypeID IN (4, 15, 19)
+    AND old.leaveTypeID IN (4, 15, 19,22)
     AND CURDATE() BETWEEN old.start_date AND old.end_date
     AND old.id = (
         -- Subquery to get the latest mission leave for each officer
         SELECT MAX(id) 
         FROM officer_leave_details 
         WHERE officerID = o.id 
-        AND leaveTypeID IN (4, 15, 19)  -- filter by mission leave types
+        AND leaveTypeID IN (4, 15, 19,22)  -- filter by mission leave types
     ) ${searchClause}`;
       const countResult = await query(countQuery, params);
       const total = countResult[0].total;
@@ -811,15 +814,14 @@ JOIN
 JOIN 
     leave_type lt ON old.leaveTypeID = lt.id
 WHERE 
-    old.leaveTypeID IN (4, 15, 19)  -- filter for mission leave types
-    AND o.in_unit = 0  -- officers not in unit
+    old.leaveTypeID IN (4, 15, 19, 22)  -- filter for mission leave types
     AND CURDATE() BETWEEN old.start_date AND old.end_date  -- leave is ongoing today
     AND old.id = (
         -- Subquery to get the latest mission leave for each officer
         SELECT MAX(id) 
         FROM officer_leave_details 
         WHERE officerID = o.id 
-        AND leaveTypeID IN (4, 15, 19)  -- filter by mission leave types
+        AND leaveTypeID IN (4, 15, 19,22)  -- filter by mission leave types
     )
 
         ${searchClause}
@@ -978,10 +980,12 @@ WHERE
         "اجازة ميدانية": "اجازة_ميدانية",
         "اجازة سنوية": "اجازة_سنوية",
         "اجازة مرضية": "اجازة_مرضية",
+        "اجارة مأمورية": "اجازة_مأمورية",
+        "مأمورية ثابتة": "مأمورية_ثابتة",
       };
       // Count each tmam type
       const tmamCounts = {
-        ثابتة: 0,
+        مأمورية_ثابتة: 0,
         فرقة_دورة: 0,
         راحة: 0,
         بدل_راحة: 0,
@@ -993,6 +997,7 @@ WHERE
         سفر: 0,
         مأمورية: 0,
         عيادة: 0,
+        اجازة_مأمورية: 0,
       };
 
       officers.forEach((officer) => {

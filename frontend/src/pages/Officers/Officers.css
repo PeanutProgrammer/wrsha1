@@ -26,6 +26,33 @@
 
 
 
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .print-only,
+  .print-only * {
+    visibility: visible;
+  }
+
+  .print-only {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
+
+
+
 .action-buttons {
   display: flex;
   gap: 6px;           /* space between buttons */

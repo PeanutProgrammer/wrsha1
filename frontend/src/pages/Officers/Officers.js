@@ -19,6 +19,7 @@ import { FaPrint } from "react-icons/fa"; // Import the printer icon from react-
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import AmiriFont from "../../assets/fonts/Amiri/Amiri-Regular.ttf";
+import { QRCodeCanvas } from "qrcode.react";
 
 // Helper: Convert Arabic-Indic digits to Western digits
 const toWesternDigits = (str) => {
@@ -57,6 +58,9 @@ const Officers = () => {
   const [successMsg, setSuccessMsg] = useState("");
   const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
   const [showDeleteError, setShowDeleteError] = useState(false);
+
+  const [showQR, setShowQR] = useState(false);
+  const [qrValue, setQrValue] = useState("");
 
   useEffect(() => {
     const socket = io(`${process.env.REACT_APP_BACKEND_BASE_URL}`); //  backend port
@@ -111,6 +115,16 @@ const Officers = () => {
   const handleDeleteClick = (officer) => {
     setSelectedOfficer(officer);
     setShowConfirm(true);
+  };
+
+  const handleGenerateQR = (officer) => {
+    if (!officer.qr_token) {
+      alert("No QR token found for this officer");
+      return;
+    }
+
+    setQrValue(officer.qr_token);
+    setShowQR(true);
   };
 
   // Handle form data changes
@@ -426,6 +440,25 @@ const Officers = () => {
       alert("Table not found!");
     }
   };
+
+  const handleDownloadQR = () => {
+    const canvas = document.getElementById("officer-qr");
+
+    if (!canvas) return;
+
+    const pngUrl = canvas
+      .toDataURL("image/png")
+      .replace("image/png", "image/octet-stream");
+
+    const downloadLink = document.createElement("a");
+    downloadLink.href = pngUrl;
+    downloadLink.download = `${selectedOfficer?.name || "qr-code"}.png`;
+
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+  };
+
   return (
     <div className="Officers p-5">
       {/* Header: Search + Add + Export */}
@@ -481,7 +514,6 @@ const Officers = () => {
           </Dropdown>
         </div>
       </div>
-
 
       {/* Table */}
       <div className="table-responsive shadow-sm rounded bg-white">
@@ -576,6 +608,7 @@ const Officers = () => {
                       >
                         حذف
                       </button>
+
                       <Link
                         to={`../${officer.id}`}
                         className="btn btn-sm btn-primary"
@@ -588,6 +621,13 @@ const Officers = () => {
                       >
                         تفاصيل
                       </Link>
+                      <Button
+                        size="sm"
+                        variant="warning"
+                        onClick={() => handleGenerateQR(officer)}
+                      >
+                        QR Code
+                      </Button>
                     </div>
                   </td>
                 </tr>
@@ -603,18 +643,18 @@ const Officers = () => {
         </Table>
       </div>
       {showDeleteSuccess && (
-  <div className="calendar-toast-delete success">
-    <div className="toast-icon">🗑</div>
-    <div className="toast-text">تم حذف الضابط بنجاح</div>
-  </div>
-)}
+        <div className="calendar-toast-delete success">
+          <div className="toast-icon">🗑</div>
+          <div className="toast-text">تم حذف الضابط بنجاح</div>
+        </div>
+      )}
 
-{showDeleteError && (
-  <div className="calendar-toast-delete error">
-    <div className="toast-icon">⚠</div>
-    <div className="toast-text">فشل حذف الضابط</div>
-  </div>
-)}
+      {showDeleteError && (
+        <div className="calendar-toast-delete error">
+          <div className="toast-icon">⚠</div>
+          <div className="toast-text">فشل حذف الضابط</div>
+        </div>
+      )}
 
       {/* Pagination Controls */}
 
@@ -669,6 +709,33 @@ const Officers = () => {
             حذف
           </Button>
         </Modal.Footer>
+      </Modal>
+
+      <Modal show={showQR} onHide={() => setShowQR(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>QR Code</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="text-center print-only">
+          <QRCodeCanvas
+            id="officer-qr" // ✅ important
+            value={qrValue}
+            size={220}
+            level="H"
+            includeMargin={true}
+            imageSettings={{
+              src: "/logo.png", // put logo in public folder
+              x: undefined,
+              y: undefined,
+              height: 60,
+              width: 60,
+              excavate: true, // makes white background behind logo
+            }}
+          />
+
+          <div className="mt-3 no-print">
+            <Button onClick={handleDownloadQR}>Print</Button>
+          </div>
+        </Modal.Body>
       </Modal>
 
       <div className="d-flex justify-content-between align-items-center mt-3">

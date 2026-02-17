@@ -103,7 +103,7 @@ const OfficersTmamDetails = () => {
                 <td>{rec.destination || "—"}</td>
                 <td>{rec.duration || "—"}</td>
                 <td>{moment(rec.start_date).format("YYYY/MM/DD")}</td>
-                <td>{moment(rec.end_date).format("YYYY/MM/DD")}</td>
+                <td>{rec.end_date ? moment(rec.end_date).format("YYYY/MM/DD") : "لا يوجد"}</td>
                 <td>{rec.remaining ?? "—"}</td>
               </tr>
             ))

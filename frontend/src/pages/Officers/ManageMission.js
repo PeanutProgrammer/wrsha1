@@ -134,53 +134,58 @@ const ManageMission = () => {
     setSortConfig({ key, direction });
   };
 
- // Filter logic: Apply if filter is active
-const filteredOfficers = useMemo(() => {
-  let result = officers.results;
+  // Filter logic: Apply if filter is active
+  const filteredOfficers = useMemo(() => {
+    let result = [...officers.results]; // clone to avoid mutating state
 
-  // If filterReturningToday is active, filter the officers for "مأمورية ثابتة"
-  if (filterReturningToday) {
-    result = result.filter((officer) => officer.leave_type_name === "مأمورية ثابتة");
-  }
+    if (filterReturningToday) {
+      // ✅ When checkbox is ON → show ONLY fixed missions
+      result = result.filter(
+        (officer) => officer.leave_type_name === "مأمورية ثابتة"
+      );
+    } else {
+      // ✅ Default → hide fixed missions
+      result = result.filter(
+        (officer) => officer.leave_type_name !== "مأمورية ثابتة"
+      );
+    }
 
-  // Apply sorting
-  if (sortConfig.key) {
-    result = result.sort((a, b) => {
-      if (a[sortConfig.key] > b[sortConfig.key])
-        return sortConfig.direction === "asc" ? 1 : -1;
-      if (a[sortConfig.key] < b[sortConfig.key])
-        return sortConfig.direction === "asc" ? -1 : 1;
-      return 0;
-    });
-  }
+    // Apply sorting
+    if (sortConfig.key) {
+      result.sort((a, b) => {
+        if (a[sortConfig.key] > b[sortConfig.key])
+          return sortConfig.direction === "asc" ? 1 : -1;
+        if (a[sortConfig.key] < b[sortConfig.key])
+          return sortConfig.direction === "asc" ? -1 : 1;
+        return 0;
+      });
+    }
 
-  return result;
-}, [officers.results, filterReturningToday, sortConfig]);
-
+    return result;
+  }, [officers.results, filterReturningToday, sortConfig]);
 
   // Render page buttons for pagination
- const renderPageButtons = () => {
-  const pages = [];
-  const maxButtons = 5;
-  let start = Math.max(officers.page - 2, 1);
-  let end = Math.min(start + maxButtons - 1, officers.totalPages);
-  start = Math.max(end - maxButtons + 1, 1);
+  const renderPageButtons = () => {
+    const pages = [];
+    const maxButtons = 5;
+    let start = Math.max(officers.page - 2, 1);
+    let end = Math.min(start + maxButtons - 1, officers.totalPages);
+    start = Math.max(end - maxButtons + 1, 1);
 
-  for (let num = start; num <= end; num++) {
-    pages.push(
-      <Button
-        key={num}
-        onClick={() => handleJumpToPage(num)}
-        variant={num === officers.page ? "primary" : "outline-primary"}
-        className="mx-1 btn-sm"
-      >
-        {num}
-      </Button>
-    );
-  }
-  return pages;
-};
-
+    for (let num = start; num <= end; num++) {
+      pages.push(
+        <Button
+          key={num}
+          onClick={() => handleJumpToPage(num)}
+          variant={num === officers.page ? "primary" : "outline-primary"}
+          className="mx-1 btn-sm"
+        >
+          {num}
+        </Button>
+      );
+    }
+    return pages;
+  };
 
   return (
     <div className="Officers p-5">
@@ -215,21 +220,15 @@ const filteredOfficers = useMemo(() => {
           </InputGroup>
         </Form>
         {/* Filter Toggle: Officers returning today */}
-        <Form.Check
-          type="checkbox"
-          label="المأموريات الثابتة"
-          checked={filterReturningToday}
-          onChange={() => setFilterReturningToday((prev) => !prev)}
-          className="text-white"
-          style={{
-            display: "flex",
-            alignItems: "baseline",
-            // marginRight: '100px',
-            flexDirection: "row-reverse",
-            flexWrap: "nowrap",
-            justifyContent: "flex-start",
-          }}
-        />
+        <div className="filter-toggle">
+          <input
+            type="checkbox"
+            id="filterReturningToday"
+            checked={officers.filterReturningToday}
+            onChange={() => setFilterReturningToday((prev) => !prev)}
+          />
+          <label htmlFor="filterReturningToday">عرض المأموريات الثابتة</label>
+        </div>
       </div>
 
       {/* Loading Indicator */}
@@ -253,45 +252,69 @@ const filteredOfficers = useMemo(() => {
             <tr>
               <th>م</th>
               <th onClick={() => handleSort("mil_id")}>
-               {sortConfig.key === "mil_id"
+                {sortConfig.key === "mil_id"
                   ? sortConfig.direction === "asc"
-                    ? " 🔼" : " 🔽"
-                  : ""} الرقم العسكري</th>
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}{" "}
+                الرقم العسكري
+              </th>
               <th onClick={() => handleSort("rank")}>
                 {sortConfig.key === "rank"
                   ? sortConfig.direction === "asc"
-                    ? " 🔼" : " 🔽"
-                  : ""} الرتبة</th>
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}{" "}
+                الرتبة
+              </th>
               <th onClick={() => handleSort("name")}>
                 {sortConfig.key === "name"
                   ? sortConfig.direction === "asc"
-                    ? " 🔼" : " 🔽"
-                  : ""} الاسم</th>
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}{" "}
+                الاسم
+              </th>
               <th onClick={() => handleSort("department")}>
                 {sortConfig.key === "department"
                   ? sortConfig.direction === "asc"
-                    ? " 🔼" : " 🔽"
-                  : ""} الورشة / الفرع</th>
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}{" "}
+                الورشة / الفرع
+              </th>
               <th onClick={() => handleSort("leave_type_name")}>
                 {sortConfig.key === "leave_type_name"
                   ? sortConfig.direction === "asc"
-                    ? " 🔼" : " 🔽"
-                  : ""} نوع المأمورية</th>
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}{" "}
+                نوع المأمورية
+              </th>
               <th onClick={() => handleSort("destination")}>
                 {sortConfig.key === "destination"
                   ? sortConfig.direction === "asc"
-                    ? " 🔼" : " 🔽"
-                  : ""} جهة المأمورية</th>
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}{" "}
+                جهة المأمورية
+              </th>
               <th onClick={() => handleSort("start_date")}>
                 {sortConfig.key === "start_date"
                   ? sortConfig.direction === "asc"
-                    ? " 🔼" : " 🔽"
-                  : ""} الفترة من</th>
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}{" "}
+                الفترة من
+              </th>
               <th onClick={() => handleSort("end_date")}>
                 {sortConfig.key === "end_date"
                   ? sortConfig.direction === "asc"
-                    ? " 🔼" : " 🔽"
-                  : ""} الفترة إلى</th>
+                    ? " 🔼"
+                    : " 🔽"
+                  : ""}{" "}
+                الفترة إلى
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -303,8 +326,18 @@ const filteredOfficers = useMemo(() => {
                   <td>{officer.rank}</td>
                   <td>{officer.name}</td>
                   <td>{officer.department}</td>
-                  <td>{officer.leave_type_name === "مأمورية ثابتة" ? "مأمورية ثابتة" : "مأمورية"}</td>
-                  <td>{officer.leave_type_name === "مأمورية جهاز الخدمات العامة" ? "مأمورية جهاز الخدمات العامة" : officer.destination ? officer.destination : "لا يوجد"}</td>
+                  <td>
+                    {officer.leave_type_name === "مأمورية ثابتة"
+                      ? "مأمورية ثابتة"
+                      : (officer.leave_type_name === "سفر" ? "مأمورية خارجية" : "مأمورية")}
+                  </td>
+                  <td>
+                    {officer.leave_type_name === "مأمورية جهاز الخدمات العامة"
+                      ? "جهاز الخدمات العامة"
+                      : officer.destination
+                      ? officer.destination
+                      : "لا يوجد"}
+                  </td>
                   <td>
                     {officer.start_date
                       ? moment(officer.start_date).format("YYYY/MM/DD")

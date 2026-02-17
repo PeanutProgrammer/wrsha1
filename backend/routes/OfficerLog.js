@@ -136,6 +136,19 @@ router.put(
   }
 );
 
+router.post(
+  "/scan",
+  gate,
+
+  body("qr_token").isString(),
+
+
+  (req, res) => {
+    OfficerLogController.scanOfficer(req, res);
+  }
+);
+
+
 router.get("/latest/:id", shuoonOfficers, (req, res) => {
   OfficerLogController.getLatestTmam(req, res);
 });

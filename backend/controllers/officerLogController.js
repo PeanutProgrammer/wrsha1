@@ -29,19 +29,25 @@ class OfficerLogController {
       // 🔴 STEP 1: overlap check (BUSINESS LOGIC)
       const overlap = await query(
         `
-      SELECT id
-      FROM officer_leave_details
-      WHERE officerID = ?
-        AND start_date <= ?
-        AND end_date >= ?
-      LIMIT 1
-      `,
-        [officerID, end_date, start_date]
+  SELECT id
+  FROM officer_leave_details
+  WHERE officerID = ?
+    AND ? <= end_date
+    AND ? >= start_date
+  LIMIT 1
+  `,
+        [officerID, start_date, end_date]
       );
 
       if (overlap.length > 0) {
         return res.status(409).json({
           msg: "يوجد تمام متداخل مع هذه الفترة لهذا الضابط",
+        });
+      }
+
+      if (start_date > end_date) {
+        return res.status(400).json({
+          msg: "تاريخ البداية يجب أن يكون قبل تاريخ النهاية",
         });
       }
 
@@ -119,19 +125,23 @@ class OfficerLogController {
       // 2️⃣ Check for overlapping tmam (exclude current record)
       const overlap = await query(
         `
-      SELECT id FROM officer_leave_details
-      WHERE officerID = ?
-        AND id != ?
-        AND (
-          (? <= end_date AND ? >= start_date)
-        )
-      `,
+  SELECT id FROM officer_leave_details
+  WHERE officerID = ?
+    AND id != ?
+    AND (? <= end_date AND ? >= start_date)
+  `,
         [officerID, leaveID, start_date, end_date]
       );
 
       if (overlap.length > 0) {
         return res.status(409).json({
           msg: "يوجد تمام متداخل مع هذه الفترة لنفس الضابط",
+        });
+      }
+
+            if (start_date > end_date) {
+        return res.status(400).json({
+          msg: "تاريخ البداية يجب أن يكون قبل تاريخ النهاية",
         });
       }
 
@@ -431,30 +441,30 @@ class OfficerLogController {
     }
   }
 
- static async getOfficerVacationLog(req, res) {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
+  static async getOfficerVacationLog(req, res) {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
 
-    const query = util.promisify(connection.query).bind(connection);
+      const query = util.promisify(connection.query).bind(connection);
 
-    // 1️⃣ Get officer
-    const officer = await query(
-      "SELECT id, mil_id, name, rank, department FROM officers WHERE mil_id = ?",
-      [req.params.id]
-    );
+      // 1️⃣ Get officer
+      const officer = await query(
+        "SELECT id, mil_id, name, rank, department FROM officers WHERE mil_id = ?",
+        [req.params.id]
+      );
 
-    if (officer.length === 0) {
-      return res.status(404).json({ msg: "Officer not found" });
-    }
+      if (officer.length === 0) {
+        return res.status(404).json({ msg: "Officer not found" });
+      }
 
-    const officerID = officer[0].id;
+      const officerID = officer[0].id;
 
-    // 2️⃣ Get vacation history (Shuoon only)
-    const vacationLog = await query(
-      `
+      // 2️⃣ Get vacation history (Shuoon only)
+      const vacationLog = await query(
+        `
       SELECT 
         o.mil_id,
         o.name,
@@ -480,20 +490,75 @@ class OfficerLogController {
 
       ORDER BY old.start_date DESC
       `,
-      [officerID]
-    );
+        [officerID]
+      );
 
-    return res.status(200).json(vacationLog);
-
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({
-      message: "An unexpected error occurred",
-      error: err.message,
-    });
+      return res.status(200).json(vacationLog);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({
+        message: "An unexpected error occurred",
+        error: err.message,
+      });
+    }
   }
-}
 
+  static async scanOfficer(req, res) {
+    try {
+      const qr_token = req.body.qr_token;
+      const loggerID = req.body.loggerID;
+
+      if (!qr_token) {
+        return res.status(400).json({ msg: "QR token required" });
+      }
+
+      await withTransaction(async (query) => {
+        // 🔥 1️⃣ Get officer first
+        const rows = await query("SELECT * FROM officers WHERE qr_token = ?", [
+          qr_token,
+        ]);
+
+        if (!rows.length) {
+          throw new Error("Officer not found");
+        }
+
+        const officer = rows[0];
+
+        // 🔥 2️⃣ Now we can calculate eventType
+        const eventType = officer.in_unit === 1 ? "خروج" : "دخول";
+
+        // 🔥 3️⃣ Insert log
+        await query(
+          `INSERT INTO officer_log 
+         (event_type, event_time, officerID, loggerID) 
+         VALUES (?, NOW(), ?, ?)`,
+          [eventType, officer.id, loggerID]
+        );
+
+        // 🔥 4️⃣ Update officer status
+        await query("UPDATE officers SET in_unit = ? WHERE id = ?", [
+          officer.in_unit === 1 ? 0 : 1,
+          officer.id,
+        ]);
+
+        // 🔥 5️⃣ Emit socket
+        req.app.get("io").emit("officersUpdated");
+
+        // 🔥 6️⃣ Send response
+        return res.status(200).json({
+          success: true,
+          event: eventType, // ✅ fixed
+          officer: {
+            name: officer.name,
+            rank: officer.rank,
+            department: officer.department,
+          },
+        });
+      });
+    } catch (err) {
+      return res.status(500).json({ message: err.message });
+    }
+  }
 }
 
 module.exports = OfficerLogController;
