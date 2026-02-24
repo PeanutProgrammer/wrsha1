@@ -57,6 +57,16 @@ const OfficersHome = () => {
               Go
             </Link>
           </div>
+
+                    <div className="card">
+            <div className="card-header">
+              <FaClipboardCheck className="card-icon" />
+              <h2>تسجيل الضباط QR Code</h2>
+            </div>
+            <Link to={"scan"} className="button">
+              تسجيل 
+            </Link>
+          </div>
         </>
       )}
 
@@ -83,15 +93,7 @@ const OfficersHome = () => {
             </Link>
           </div>
 
-          <div className="card">
-            <div className="card-header">
-              <FaClipboardCheck className="card-icon" />
-              <h2>تسجيل الضباط QR Code</h2>
-            </div>
-            <Link to={"scan"} className="button">
-              تسجيل 
-            </Link>
-          </div>
+
         </>
       )}
     </div>

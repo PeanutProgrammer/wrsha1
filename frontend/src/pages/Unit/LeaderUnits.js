@@ -47,7 +47,7 @@ const LeaderUnits = () => {
     available: 0,
     missing: 0,
     تمام_الخوارج: {
-      ثابتة: 0,
+      مأمورية_ثابتة: 0,
       فرقة_دورة: 0,
       راحة: 0,
       بدل_راحة: 0,
@@ -56,6 +56,8 @@ const LeaderUnits = () => {
       منحة: 0,
       اجازة_سنوية: 0,
       اجازة_مرضية: 0,
+      اجازة_مأمورية: 0,
+
       سفر: 0,
       مأمورية: 0,
       مستشفى: 0,
@@ -280,89 +282,90 @@ const LeaderUnits = () => {
   const printRankSummary = () => {
     const doc = new jsPDF("landscape", "pt", "a4");
 
-  // Add base64 fonts
-  doc.addFileToVFS("Amiri-Regular.ttf", amiriFont);
-  doc.addFont("Amiri-Regular.ttf", "Amiri", "normal");
-  doc.addFileToVFS("Amiri-Bold.ttf", amiriBold);
-  doc.addFont("Amiri-Bold.ttf", "Amiri", "bold");
-  doc.setFont("Amiri", "normal");
+    // Add base64 fonts
+    doc.addFileToVFS("Amiri-Regular.ttf", amiriFont);
+    doc.addFont("Amiri-Regular.ttf", "Amiri", "normal");
+    doc.addFileToVFS("Amiri-Bold.ttf", amiriBold);
+    doc.addFont("Amiri-Bold.ttf", "Amiri", "bold");
+    doc.setFont("Amiri", "normal");
 
-  const table = document.querySelector(`#rank-summary-section table`);
-  if (!table) {
-    alert("لا يوجد جدول للطباعة!");
-    return;
-  }
+    const table = document.querySelector(`#rank-summary-section table`);
+    if (!table) {
+      alert("لا يوجد جدول للطباعة!");
+      return;
+    }
 
-  // Table headers and body
-  const headers = Array.from(table.querySelectorAll("thead tr")).map((tr) =>
-    Array.from(tr.querySelectorAll("th")).map((th) => th.innerText)
-  );
-  const body = Array.from(table.querySelectorAll("tbody tr")).map((tr) =>
-    Array.from(tr.querySelectorAll("td")).map((td) => td.innerText)
-  );
+    // Table headers and body
+    const headers = Array.from(table.querySelectorAll("thead tr")).map((tr) =>
+      Array.from(tr.querySelectorAll("th")).map((th) => th.innerText)
+    );
+    const body = Array.from(table.querySelectorAll("tbody tr")).map((tr) =>
+      Array.from(tr.querySelectorAll("td")).map((td) => td.innerText)
+    );
 
-  const reversedHeaders = headers.map((row) => row.reverse());
-  const reversedBody = body.map((row) => row.reverse());
+    const reversedHeaders = headers.map((row) => row.reverse());
+    const reversedBody = body.map((row) => row.reverse());
 
-  const pageWidth = doc.internal.pageSize.getWidth();
+    const pageWidth = doc.internal.pageSize.getWidth();
 
-  // Current date in Arabic
-  const now = moment().locale("ar");
-  const dateStr = now.format("YYYY/MMMM/DD"); // e.g., 27 يناير 2026
+    // Current date in Arabic
+    const now = moment().locale("ar");
+    const dateStr = now.format("YYYY/MMMM/DD"); // e.g., 27 يناير 2026
 
-  // Top-right header block
-  const headerLines = [
-    "إدارة الأسلحة والذخيرة",
-    "الورش الرئيسية للأسلحة رقم 1",
-    "فرع نظم المعلومات",
-    `التاريخ: ${dateStr}`,
-  ];
-  doc.setFont("Amiri", "bold");
-  doc.setFontSize(12);
-  let startY = 20; // starting Y position
-  headerLines.forEach((line) => {
-    doc.text(line, pageWidth - 10, startY, { align: "right" });
-    startY += 15; // line spacing
-  });
+    // Top-right header block
+    const headerLines = [
+      "إدارة الأسلحة والذخيرة",
+      "الورش الرئيسية للأسلحة رقم 1",
+      "فرع نظم المعلومات",
+      `التاريخ: ${dateStr}`,
+    ];
+    doc.setFont("Amiri", "bold");
+    doc.setFontSize(12);
+    let startY = 20; // starting Y position
+    headerLines.forEach((line) => {
+      doc.text(line, pageWidth - 10, startY, { align: "right" });
+      startY += 15; // line spacing
+    });
 
-  // Title with day and date in parentheses
-  const dayName = now.format("dddd"); // Arabic day name
-  const titleText = `يومية عددية بالرتب عن يوم ${dayName} الموافق ${dateStr}`;
-  doc.setFont("Amiri", "bold");
-  doc.setFontSize(16);
-  doc.text(titleText, pageWidth / 2, startY + 10, { align: "center" });
+    // Title with day and date in parentheses
+    const dayName = now.format("dddd"); // Arabic day name
+    const titleText = `يومية عددية بالرتب عن يوم ${dayName} الموافق ${dateStr}`;
+    doc.setFont("Amiri", "bold");
+    doc.setFontSize(16);
+    doc.text(titleText, pageWidth / 2, startY + 10, { align: "center" });
 
-  // AutoTable
-  autoTable(doc, {
-    startY: startY + 30, // leave space for header and title
-    head: reversedHeaders,
-    body: reversedBody,
-    styles: {
-      font: "Amiri",
-      fontSize: 10,
-      cellPadding: 3,
-      halign: "right",
-    },
-    headStyles: {
-      halign: "right",
-      font: "Amiri",
-      fontStyle: "bold",
-    },
-    bodyStyles: { halign: "right" },
-    rtl: true,
-  });
+    // AutoTable
+    autoTable(doc, {
+      startY: startY + 30, // leave space for header and title
+      head: reversedHeaders,
+      body: reversedBody,
+      styles: {
+        font: "Amiri",
+        fontSize: 10,
+        cellPadding: 3,
+        halign: "right",
+      },
+      headStyles: {
+        halign: "right",
+        font: "Amiri",
+        fontStyle: "bold",
+      },
+      bodyStyles: { halign: "right" },
+      rtl: true,
+    });
 
-  // Footer with Arabic AM/PM
-  const arabicMeridiem = now.format("a") === "am" ? "ص" : "م";
-  const currentDateTime = now.format("YYYY/MM/DD hh:mm") + " " + arabicMeridiem;
-  const footerText = `تمت الطباعة في ${currentDateTime} بواسطة ${auth.name}`;
-  const pageHeight = doc.internal.pageSize.getHeight();
-  doc.setFontSize(10);
-  doc.setFont("Amiri", "normal");
-  doc.text(footerText, pageWidth / 2, pageHeight - 20, { align: "center" });
+    // Footer with Arabic AM/PM
+    const arabicMeridiem = now.format("a") === "am" ? "ص" : "م";
+    const currentDateTime =
+      now.format("YYYY/MM/DD hh:mm") + " " + arabicMeridiem;
+    const footerText = `تمت الطباعة في ${currentDateTime} بواسطة ${auth.name}`;
+    const pageHeight = doc.internal.pageSize.getHeight();
+    doc.setFontSize(10);
+    doc.setFont("Amiri", "normal");
+    doc.text(footerText, pageWidth / 2, pageHeight - 20, { align: "center" });
 
-  doc.save(`rank-summary.pdf`);
-};
+    doc.save(`rank-summary.pdf`);
+  };
 
   return (
     <div className="Officers p-5">
@@ -429,13 +432,14 @@ const LeaderUnits = () => {
                 <tr>
                   <td>{dailySummary.total}</td>
                   <td>{dailySummary.attached}</td>
-                  <td>{dailySummary?.تمام_الخوارج?.ثابتة || 0}</td>
+                  <td>{dailySummary?.تمام_الخوارج?.مأمورية_ثابتة || 0}</td>
                   <td>{dailySummary?.تمام_الخوارج?.فرقة_دورة || 0}</td>
                   <td>
                     {dailySummary?.تمام_الخوارج?.راحة +
                       dailySummary?.تمام_الخوارج?.بدل_راحة +
                       dailySummary?.تمام_الخوارج?.عارضة +
                       dailySummary?.تمام_الخوارج?.اجازة_ميدانية +
+                      dailySummary?.تمام_الخوارج?.اجازة_مأمورية +
                       dailySummary?.تمام_الخوارج?.منحة || 0}
                   </td>
                   <td>{dailySummary?.تمام_الخوارج?.اجازة_سنوية || 0}</td>
@@ -687,7 +691,6 @@ const LeaderUnits = () => {
                               </div>
                               <div>
                                 {moment(officer.event_time).format("hh:mm a")}
-
                               </div>
                             </>
                           ) : (

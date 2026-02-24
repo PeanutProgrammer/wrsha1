@@ -34,7 +34,7 @@ const [dailySummary, setDailySummary] = useState({
     available: 0,
     missing: 0,
     تمام_الخوارج: {
-      ثابتة: 0,
+      مأمورية_ثابتة: 0,
       فرقة_دورة: 0,
       راحة: 0,
       بدل_راحة: 0,
@@ -262,7 +262,7 @@ const [dailySummary, setDailySummary] = useState({
             <tr>
               <td>{dailySummary.total}</td>
               <td>{dailySummary.attached}</td>
-              <td>{dailySummary?.تمام_الخوارج?.ثابتة || 0}</td>
+              <td>{dailySummary?.تمام_الخوارج?.مأمورية_ثابتة || 0}</td>
               <td>{dailySummary?.تمام_الخوارج?.راحة +  dailySummary?.تمام_الخوارج?.اجازة_ميدانية + dailySummary?.تمام_الخوارج?.منحة || 0}</td>
               <td>{dailySummary?.تمام_الخوارج?.اجازة_مرضية || 0}</td>
               <td>{dailySummary?.تمام_الخوارج?.مأمورية || 0}</td>

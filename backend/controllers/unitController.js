@@ -252,6 +252,7 @@ static async getDailySummary(req, res) {
 
     const annualLeave = units.filter(u => u.tmam === "اجازة سنوية").length;
     const sickLeave = units.filter(u => u.tmam === "اجازة مرضية").length;
+    const missionLeave = units.filter(u => u.tmam === "اجازة مأمورية").length;
 
     const mission = units.filter(
       u =>
@@ -271,6 +272,7 @@ static async getDailySummary(req, res) {
       casualLeave +
       annualLeave +
       sickLeave +
+      missionLeave +
       mission +
       hospital;
 
@@ -284,7 +286,7 @@ static async getDailySummary(req, res) {
       attached: totalAttached,
       missing,
       تمام_الخوارج: {
-        ثابتة: fixedMission,
+        مأمورية_ثابتة: fixedMission,
         فرقة_دورة: course,
         راحة: normalLeave,
         اجازة_ميدانية: fieldLeave,

@@ -681,7 +681,7 @@ LEFT JOIN leave_type lt
       attached: totalAttached,
       missing: missing,
       تمام_الخوارج: {
-        ثابتة: fixedMission,
+        مأمورية_ثابتة: fixedMission,
         راحة: normalLeave,
         اجازة_ميدانية: fieldLeave,
         منحة: grantLeave,

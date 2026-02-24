@@ -39,7 +39,7 @@ const ManageTmam = () => {
     available: 0,
     missing: 0,
     تمام_الخوارج: {
-      ثابتة: 0,
+      مأمورية_ثابتة: 0,
       فرقة_دورة: 0,
       راحة: 0,
       بدل_راحة: 0,
@@ -262,7 +262,7 @@ const ManageTmam = () => {
             <tr>
               <td>{dailySummary.total}</td>
               <td>{dailySummary.attached}</td>
-              <td>{dailySummary?.تمام_الخوارج?.ثابتة || 0}</td>
+              <td>{dailySummary?.تمام_الخوارج?.مأمورية_ثابتة || 0}</td>
               <td>{dailySummary?.تمام_الخوارج?.فرقة_دورة || 0}</td>
               <td>
                 {dailySummary?.تمام_الخوارج?.راحة +

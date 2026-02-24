@@ -494,7 +494,7 @@ export const router = createBrowserRouter([
           },
                     {
             path: "scan",
-            element: <ProtectedRoute allowedTypes={["بوابة"]} />,
+            element: <ProtectedRoute allowedTypes={["بوابة", "admin"]} />,
             children: [{ path: "", element: <GateScanner /> }],
           },
         ],

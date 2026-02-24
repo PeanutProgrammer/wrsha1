@@ -270,13 +270,14 @@ const LeaderOfficers = () => {
             <tr>
               <td>{dailySummary.total}</td>
               <td>{dailySummary.attached}</td>
-              <td>{dailySummary?.تمام_الخوارج?.ثابتة || 0}</td>
+              <td>{dailySummary?.تمام_الخوارج?.مأمورية_ثابتة || 0}</td>
               <td>{dailySummary?.تمام_الخوارج?.فرقة_دورة || 0}</td>
               <td>
                 {dailySummary?.تمام_الخوارج?.راحة +
                   dailySummary?.تمام_الخوارج?.بدل_راحة +
                   dailySummary?.تمام_الخوارج?.عارضة +
                   dailySummary?.تمام_الخوارج?.اجازة_ميدانية +
+                  dailySummary?.تمام_الخوارج?.اجازة_مأمورية +
                   dailySummary?.تمام_الخوارج?.منحة || 0}
               </td>
               <td>{dailySummary?.تمام_الخوارج?.اجازة_سنوية || 0}</td>
@@ -398,7 +399,6 @@ const LeaderOfficers = () => {
                         </div>
                         <div>
                           {moment(officer.latest_arrival).format("hh:mm a")}
-
                         </div>
                       </>
                     ) : (
@@ -416,24 +416,28 @@ const LeaderOfficers = () => {
                         </div>
                         <div>
                           {moment(officer.latest_departure).format("hh:mm a")}
-  
                         </div>
                       </>
                     ) : (
                       "لا يوجد"
                     )}
                   </td>
-                                    <td className=" gap-1 p-1">
-                  
-                                      <Link
-                                        to={`../officers/tmam/details/${officer.mil_id}`}
-                                        className="btn btn-sm btn-secondary mx-1 p-2"
-                                      >
-                                        تفاصيل
-                                      </Link>
-                                    </td>
+                  <td className=" gap-1 p-1">
+                    <Link
+                      to={`../officers/tmam/details/${officer.mil_id}`}
+                      className="btn btn-sm btn-secondary mx-1 p-2"
+                    >
+                      تفاصيل
+                    </Link>
+                    <Link
+                      to={`../officer-vacation-log/${officer.mil_id}`}
+                      className="btn btn-sm btn-primary mx-1 p-2"
+                    >
+                      الاجازات السابقة{" "}
+                    </Link>
+                  </td>
                 </tr>
-              )) 
+              ))
             ) : (
               <tr>
                 <td colSpan="9" className="text-center">
