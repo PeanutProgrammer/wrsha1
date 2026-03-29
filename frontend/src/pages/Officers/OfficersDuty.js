@@ -20,6 +20,7 @@ const OfficerDutyForm = () => {
   const [isEdit, setIsEdit] = useState(false);
 
   const [formData, setFormData] = useState({
+    available_officer: null,
     commander_officer: null,
     operations_officer: null,
     duty_officer: null,
@@ -54,6 +55,7 @@ const OfficerDutyForm = () => {
 
   const resetForm = () => {
     setFormData({
+      available_officer: null,
       commander_officer: null,
       operations_officer: null,
       duty_officer: null,
@@ -103,6 +105,7 @@ const OfficerDutyForm = () => {
       .then((res) => {
         if (res.data) {
           setFormData({
+            available_officer: res.data.available_officer,
             commander_officer: res.data.commander_officer,
             operations_officer: res.data.operations_officer,
             duty_officer: res.data.duty_officer,
@@ -197,6 +200,7 @@ const OfficerDutyForm = () => {
       {/* Form */}
       <form className="duty-form" onSubmit={handleSubmit}>
         {[
+          ["available_officer", "تواجد بالوحدة"],
           ["commander_officer", "قائد منوب"],
           ["operations_officer", "منوب عمليات"],
           ["duty_officer", "ضابط نوبتجي"],

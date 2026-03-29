@@ -13,6 +13,7 @@ class OfficerDutyController {
         return res.status(400).json({ errors: errors.array() });
       }
       const {
+        available_officer,
         commander_officer,
         operations_officer,
         duty_officer,
@@ -24,9 +25,10 @@ class OfficerDutyController {
       const query = util.promisify(connection.query).bind(connection);
 
       const result = await query(
-        `INSERT INTO officer_duty (commander_officer, operations_officer, duty_officer, lightweight_officer, food_officer, date)
-                 VALUES (?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO officer_duty (available_officer, commander_officer, operations_officer, duty_officer, lightweight_officer, food_officer, date)
+                 VALUES (?, ?, ?, ?, ?, ?, ?)`,
         [
+          available_officer,
           commander_officer,
           operations_officer,
           duty_officer,
@@ -54,6 +56,7 @@ class OfficerDutyController {
         return res.status(400).json({ errors: errors.array() });
       }
       const {
+        available_officer,
         commander_officer,
         operations_officer,
         duty_officer,
@@ -75,9 +78,10 @@ class OfficerDutyController {
 
       await query(
         `UPDATE officer_duty
-             SET commander_officer = ?, operations_officer = ?, duty_officer = ?, lightweight_officer = ?, food_officer = ?
+             SET available_officer = ?, commander_officer = ?, operations_officer = ?, duty_officer = ?, lightweight_officer = ?, food_officer = ?
              WHERE date = ?`,
         [
+          available_officer || null,
           commander_officer || null,
           operations_officer || null,
           duty_officer || null,
@@ -118,9 +122,9 @@ class OfficerDutyController {
         searchClause = `
     WHERE (
       CONCAT_WS(' ',
-        cmd.name, ops.name, dut.name, lw.name, food.name,
-        cmd.department, ops.department, dut.department, lw.department, food.department,
-        cmd.rank, ops.rank, dut.rank, lw.rank, food.rank
+        avl.name, cmd.name, ops.name, dut.name, lw.name, food.name,
+        avl.department, cmd.department, ops.department, dut.department, lw.department, food.department,
+        avl.rank, cmd.rank, ops.rank, dut.rank, lw.rank, food.rank
       ) LIKE ?
       OR od.date LIKE ?
     )
@@ -133,6 +137,7 @@ class OfficerDutyController {
       const countQuery = `
   SELECT COUNT(*) AS total
   FROM officer_duty od
+  LEFT JOIN officers avl ON od.available_officer = avl.id
   LEFT JOIN officers cmd  ON od.commander_officer   = cmd.id
   LEFT JOIN officers ops  ON od.operations_officer  = ops.id
   LEFT JOIN officers dut  ON od.duty_officer        = dut.id
@@ -149,6 +154,11 @@ class OfficerDutyController {
       const dataQuery = `
 SELECT
   od.date,
+
+  avl.rank    AS available_rank,
+  avl.name    AS available_name,
+  avl.department AS available_department,
+  avl.telephone_number AS available_telephone_number,
 
   cmd.rank    AS commander_rank,
   cmd.name    AS commander_name,
@@ -176,6 +186,7 @@ SELECT
   food.telephone_number AS food_telephone_number
 
 FROM officer_duty od
+LEFT JOIN officers avl ON od.available_officer = avl.id
 LEFT JOIN officers cmd  ON od.commander_officer   = cmd.id
 LEFT JOIN officers ops  ON od.operations_officer  = ops.id
 LEFT JOIN officers dut  ON od.duty_officer        = dut.id
@@ -223,6 +234,11 @@ LIMIT ? OFFSET ?;
 
       const dataQuery = `
       SELECT
+        avl.rank  AS available_rank,
+        avl.name  AS available_name,
+        avl.department AS available_department,
+        avl.telephone_number AS available_telephone_number,
+
         cmd.rank  AS commander_rank,
         cmd.name  AS commander_name,
         cmd.department AS commander_department,
@@ -249,6 +265,7 @@ LIMIT ? OFFSET ?;
         food.telephone_number AS food_telephone_number
 
       FROM officer_duty od
+      LEFT JOIN officers avl ON od.available_officer = avl.id
       LEFT JOIN officers cmd  ON od.commander_officer   = cmd.id
       LEFT JOIN officers ops  ON od.operations_officer  = ops.id
       LEFT JOIN officers dut  ON od.duty_officer        = dut.id
@@ -289,17 +306,20 @@ LIMIT ? OFFSET ?;
         SELECT
         officer_duty.id,
         date,
+        available_officer,
         commander_officer,
         operations_officer,
         duty_officer,
         lightweight_officer,
         food_officer,
+        available_officer.telephone_number AS available_telephone_number,
         commander_officer.telephone_number AS commander_telephone_number,
         operations_officer.telephone_number AS operations_telephone_number,
         duty_officer.telephone_number AS duty_telephone_number,
         lightweight_officer.telephone_number AS lightweight_telephone_number,
         food_officer.telephone_number AS food_telephone_number
       FROM officer_duty
+      LEFT JOIN officers available_officer ON officer_duty.available_officer = available_officer.id
       LEFT JOIN officers commander_officer ON officer_duty.commander_officer = commander_officer.id
       LEFT JOIN officers operations_officer ON officer_duty.operations_officer = operations_officer.id
       LEFT JOIN officers duty_officer ON officer_duty.duty_officer = duty_officer.id

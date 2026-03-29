@@ -12,6 +12,9 @@ const OfficerDutyController = require("../controllers/officerDutyController");
 router.post(
   "/",
   shuoonOfficers,
+    body("commander_officer")
+    .isNumeric()
+    .withMessage("من فضلك أدخل اسم ضابط صحيح"),
   body("commander_officer")
     .isNumeric()
     .withMessage("من فضلك أدخل اسم ضابط صحيح"),
@@ -44,6 +47,9 @@ router.post(
 router.put(
   "/",
   shuoonOfficers,
+    body("commander_officer")
+    .isNumeric()
+    .withMessage("من فضلك أدخل اسم ضابط صحيح"),
   body("commander_officer")
     .isNumeric()
     .withMessage("من فضلك أدخل اسم ضابط صحيح"),

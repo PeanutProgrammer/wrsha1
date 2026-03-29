@@ -82,16 +82,22 @@ const OfficerDutyViewer = () => {
   const duty = data?.[0];
 
   const mappedDuty = duty && {
-  commander: {
-    rank: duty.commander_rank,
-    name: duty.commander_name,
-    department: duty.commander_department,
-    telephone_number: duty.commander_telephone_number,
-  },
-  operations: {
-    rank: duty.operations_rank,
-    name: duty.operations_name,
-    department: duty.operations_department,
+    available: {
+      rank: duty.available_rank,
+      name: duty.available_name,
+      department: duty.available_department,
+      telephone_number: duty.available_telephone_number,
+    },
+    commander: {
+      rank: duty.commander_rank,
+      name: duty.commander_name,
+      department: duty.commander_department,
+      telephone_number: duty.commander_telephone_number,
+    },
+    operations: {
+      rank: duty.operations_rank,
+      name: duty.operations_name,
+      department: duty.operations_department,
     telephone_number: duty.operations_telephone_number,
   },
   duty: {
@@ -199,6 +205,7 @@ const OfficerDutyViewer = () => {
       <div className={`duty-view-switch ${showHistory ? "history" : "card"}`}>
         {!showHistory && data?.length > 0 && (
           <div className="duty-view-card">
+              <Row label="تواجد بالوحدة" officer={mappedDuty.available} />
             <Row label="قائد منوب" officer={mappedDuty.commander} />
             <Row label="منوب عمليات" officer={mappedDuty.operations} />
             <Row label="ضابط نوبتجي" officer={mappedDuty.duty} />
@@ -226,6 +233,7 @@ const OfficerDutyViewer = () => {
               <thead>
                 <tr>
                   <th>التاريخ</th>
+                  <th>تواجد بالوحدة</th>
                   <th>قائد منوب</th>
                   <th>منوب عمليات</th>
                   <th>نوبتجي</th>
@@ -243,6 +251,7 @@ const OfficerDutyViewer = () => {
                     return (
                       <tr key={idx} className={isToday ? "duty-today-row" : ""}>
                         <td>{moment(row.date).format("YYYY/MM/DD")}</td>
+                          <td>{row.available_rank} / {row.available_name}</td>
                         <td>
                           {row.commander_rank} / {row.commander_name}
                         </td>
@@ -264,7 +273,7 @@ const OfficerDutyViewer = () => {
                 ) : (
                   <tr>
                     <td
-                      colSpan="6"
+                      colSpan="7"
                       style={{
                         textAlign: "center",
                         color: "#fff",
