@@ -65,17 +65,96 @@ const OfficerDutyForm = () => {
     setIsEdit(false);
   };
 
-  const selectedOfficerIds = Object.values(formData).filter(Boolean);
-  const getFilteredOptions = (currentKey) =>
-    officerOptions.filter(
-      (opt) =>
-        !selectedOfficerIds.includes(opt.value) ||
-        formData[currentKey] === opt.value
-    );
+  const getFilteredOptions = (currentKey) => {
+    const {
+      available_officer,
+      commander_officer,
+      operations_officer,
+      duty_officer,
+      lightweight_officer,
+      food_officer,
+    } = formData;
+
+    const allSelections = {
+      available_officer,
+      commander_officer,
+      operations_officer,
+      duty_officer,
+      lightweight_officer,
+      food_officer,
+    };
+
+    return officerOptions.filter((opt) => {
+      const selectedValues = Object.entries(allSelections)
+        .filter(([key, val]) => val && key !== currentKey)
+        .map(([_, val]) => val);
+
+      const isSameAsAvailableCommander =
+        (currentKey === "available_officer" &&
+          opt.value === commander_officer) ||
+        (currentKey === "commander_officer" && opt.value === available_officer);
+
+      // ✅ allow available = commander
+      if (isSameAsAvailableCommander) return true;
+
+      // ❌ prevent using the same officer anywhere else
+      if (selectedValues.includes(opt.value)) return false;
+
+      return true;
+    });
+  };
 
   const isFormValid = () => {
-    const values = Object.values(formData);
-    return values.every(Boolean) && new Set(values).size === values.length;
+    const {
+      available_officer,
+      commander_officer,
+      operations_officer,
+      duty_officer,
+      lightweight_officer,
+      food_officer,
+    } = formData;
+
+    // all required
+    if (
+      !available_officer ||
+      !commander_officer ||
+      !operations_officer ||
+      !duty_officer ||
+      !lightweight_officer ||
+      !food_officer
+    ) {
+      return false;
+    }
+
+    const allValues = [
+      available_officer,
+      commander_officer,
+      operations_officer,
+      duty_officer,
+      lightweight_officer,
+      food_officer,
+    ];
+
+    const uniqueValues = new Set(allValues);
+
+    // Case 1: all unique
+    if (uniqueValues.size === 6) return true;
+
+    // Case 2: ONLY available === commander, rest unique
+    if (
+      available_officer === commander_officer &&
+      new Set([
+        available_officer,
+        operations_officer,
+        duty_officer,
+        lightweight_officer,
+        food_officer,
+      ]).size === 5
+    ) {
+      return true;
+    }
+
+    return false;
   };
 
   // ---------------- Fetch officers list ----------------
